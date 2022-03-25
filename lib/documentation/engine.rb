@@ -8,5 +8,14 @@ module Documentation
       g.routing_specs   false
       g.helper          false
     end
+
+    initializer 'Documentation precompile hook' do |app|
+      if defined?(Sprockets)
+        app.config.assets.precompile += %w[
+          documentation/application.js
+          documentation/application.css
+        ]
+      end
+    end
   end
 end
