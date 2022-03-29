@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@hotwired/stimulus": "^3.0.1",
     "@hotwired/turbo-rails": "^7.1.1",
+    "@tiptap/core": "^2.0.0-beta.174",
+    "@tiptap/starter-kit": "^2.0.0-beta.183",
     "esbuild": "^0.14.28"
   },
   "scripts": {
