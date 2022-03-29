@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@hotwired/turbo-rails": "^7.1.1",
+    "esbuild": "^0.14.28"
+  },
+  "scripts": {
+    "build": "esbuild app/javascript/documentation/*.* --bundle --sourcemap --outdir=app/assets/javascripts/documentation"
+  }
+}
