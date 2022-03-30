@@ -1,2 +1,3 @@
 //= link_directory ../stylesheets/documentation .css
-//= link_directory ../javascripts/documentation .js
+//= link documentation/application.js
+//= link documentation/application.js.map

@@ -21,7 +21,18 @@
     <%= form.text_field :description %>
   </div>
 
-  <div data-controller="rich-text-editor"></div>
+  <div
+    class="rich-text-editor-component"
+    data-controller="rich-text-editor"
+    data-rich-text-editor-content-value='Hello World!'
+  >
+    <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
+      <a class="bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
+      <a class="italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
+      <a class="underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
+    </div>
+    <div data-rich-text-editor-target="tippy"></div>
+  </div>
 
   <div>
     <%= form.submit %>
