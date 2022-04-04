@@ -17,6 +17,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_03_25_041640) do
   create_table "documentation_pages", force: :cascade do |t|
     t.string "title"
     t.string "description"
+    t.text "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

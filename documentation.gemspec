@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rails', '>= 7.0.2.3'
   spec.add_dependency 'turbo-rails', '>= 1.0.1'
+  spec.add_dependency 'bulma-rails', '~> 0.9.3'
 
   spec.add_development_dependency 'rspec-rails', '~> 5.0.0'
   spec.add_development_dependency 'puma', '~> 5.6'

@@ -3,11 +3,15 @@ import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Underline from '@tiptap/extension-underline'
+import Placeholder from '@tiptap/extension-placeholder'
+
+import throttle from 'lodash.throttle'
 
 export default class RichTextEditorController extends Controller {
-  static targets = ['bubbleMenu', 'bold', 'italic', 'underline']
+  static targets = ['bubbleMenu', 'bold', 'italic', 'underline', 'output']
   static values = {
-    content: { type: String, default: '' }
+    content: { type: String, default: '' },
+    placeholder: { type: String, default: '' }
   }
 
   toolbarButtons = ['bold', 'italic', 'underline']
@@ -21,10 +25,14 @@ export default class RichTextEditorController extends Controller {
         BubbleMenu.configure({
           element: this.bubbleMenuTarget,
           tippyOptions: { appendTo: this.element, duration: 100 }
+        }),
+        Placeholder.configure({
+          placeholder: this.placeholderValue
         })
       ],
       autofocus: true,
-      content: this.contentValue
+      content: this.contentValue,
+      onUpdate: this.throttledUpdate
     })
 
     this.editor.on('transaction', () => {
@@ -32,6 +40,11 @@ export default class RichTextEditorController extends Controller {
       this.enableSelectedMenuButtons()
     })
   }
+
+  onUpdate = ({ editor }) => {
+    this.outputTarget.value = editor.getHTML()
+  }
+  throttledUpdate = throttle(this.onUpdate, 1000)
 
   toggleBold () {
     this.runCommand('toggleBold')

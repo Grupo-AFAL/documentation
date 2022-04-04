@@ -1,10 +1,15 @@
-<p style="color: green"><%= notice %></p>
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_with_icon "Back to pages", 'arrow-back', pages_path %></li>
+  </ul>
+</nav>
 
 <%= render @page %>
 
-<div>
-  <%= link_to "Edit this page", edit_page_path(@page) %> |
-  <%= link_to "Back to pages", pages_path %>
+<hr/>
 
-  <%= button_to "Destroy this page", @page, method: :delete %>
+<div>
+  <%= link_with_icon "Edit", 'edit', edit_page_path(@page) %> |
+  <%= link_with_icon "Delete", 'trash', @page, class: 'has-text-danger',
+      method: :delete, data: { confirm: '¿Estás seguro?' } %>
 </div>

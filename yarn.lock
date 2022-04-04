@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@glidejs/glide@^3.5":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@glidejs/glide/-/glide-3.5.2.tgz#7012c5920ecf202bbda44d8526fc979984b6dd54"
+  integrity sha512-7jGciNJ2bQ4eZLSNlSZ+VAyW63kALf420CvkEpK4lEsUfWJq9odqimci0YCiyNyMUFB+pWHwLYyNc57dijYsCg==
+
 "@hotwired/stimulus@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@hotwired/stimulus/-/stimulus-3.0.1.tgz#141f15645acaa3b133b7c247cad58ae252ffae85"
@@ -20,7 +25,7 @@
   resolved "https://registry.yarnpkg.com/@hotwired/turbo/-/turbo-7.1.0.tgz#27e44e0e3dc5bd1d4bda0766d579cf5a14091cd7"
   integrity sha512-Q8kGjqwPqER+CtpQudbH+3Zgs2X4zb6pBAlr6NsKTXadg45pAOvxI9i4QpuHbwSzR2+x87HUm+rot9F/Pe8rxA==
 
-"@popperjs/core@^2.9.0":
+"@popperjs/core@^2.11.2", "@popperjs/core@^2.9.0":
   version "2.11.4"
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.4.tgz#d8c7b8db9226d2d7664553a0741ad7d0397ee503"
   integrity sha512-q/ytXxO5NKvyT37pmisQAItCFqA7FD/vNb8dgaJy3/630Fsc+Mz9/9f2SziBoIZ30TJooXyTwZmhi1zjXmObYg==
@@ -29,6 +34,11 @@
   version "7.0.2"
   resolved "https://registry.yarnpkg.com/@rails/actioncable/-/actioncable-7.0.2.tgz#69a6d999f4087e0537dd38fe0963db1f4305d650"
   integrity sha512-G26maXW1Kx0LxQdmNNuNjQlRO/QlXNr3QfuwKiOKb5FZQGYe2OwtHTGXBAjSoiu4dW36XYMT/+L1Wo1Yov4ZXA==
+
+"@rails/request.js@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@rails/request.js/-/request.js-0.0.6.tgz#5f0347a9f363e50ec45118c7134080490cda81d8"
+  integrity sha512-dfFWaQXitYJ4kxrgGJNhDNXX54/v10YgoJqBMVe6lhqs6a4N9WD7goZJEvwin82TtK8MqUNhwfyisgKwM6dMdg==
 
 "@tiptap/core@^2.0.0-beta.174":
   version "2.0.0-beta.174"
@@ -151,6 +161,15 @@
   version "2.0.0-beta.23"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-paragraph/-/extension-paragraph-2.0.0-beta.23.tgz#2ab77308519494994d7a9e5a4acd14042f45f28c"
   integrity sha512-VWAxyzecErYWk97Kv/Gkghh97zAQTcaVOisEnYYArZAlyYDaYM48qVssAC/vnRRynP2eQxb1EkppbAxE+bMHAA==
+
+"@tiptap/extension-placeholder@^2.0.0-beta.48":
+  version "2.0.0-beta.48"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-placeholder/-/extension-placeholder-2.0.0-beta.48.tgz#aff02fbdcd27772ff503b5f84a2f1d83da846006"
+  integrity sha512-TZNGAHocPoV5DtB8Q5BwQU2uf5vDiwLxbgVHRAIme9P4VsVqa/U1i1TkyN5A5BVdfOzc+E4EOU7cKuyjy7DNyA==
+  dependencies:
+    prosemirror-model "^1.16.1"
+    prosemirror-state "^1.3.4"
+    prosemirror-view "^1.23.6"
 
 "@tiptap/extension-strike@^2.0.0-beta.27":
   version "2.0.0-beta.27"
@@ -280,6 +299,35 @@
     "@types/prosemirror-state" "*"
     "@types/prosemirror-transform" "*"
 
+bulma@^0.9.3:
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/bulma/-/bulma-0.9.3.tgz#ddccb7436ebe3e21bf47afe01d3c43a296b70243"
+  integrity sha512-0d7GNW1PY4ud8TWxdNcP6Cc8Bu7MxcntD/RRLGWuiw/s0a9P+XlH/6QoOIrmbj6o8WWJzJYhytiu9nFjTszk1g==
+
+chart.js@>=3.0.2, chart.js@^3.6.2:
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/chart.js/-/chart.js-3.7.1.tgz#0516f690c6a8680c6c707e31a4c1807a6f400ada"
+  integrity sha512-8knRegQLFnPQAheZV8MjxIXc5gQEfDFD897BJgv/klO/vtIyFFmgMXrNfgrXpbTr/XbTturxRgxIXx/Y+ASJBA==
+
+chartjs-adapter-date-fns@>=2.0.0, chartjs-adapter-date-fns@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/chartjs-adapter-date-fns/-/chartjs-adapter-date-fns-2.0.0.tgz#5e53b2f660b993698f936f509c86dddf9ed44c6b"
+  integrity sha512-rmZINGLe+9IiiEB0kb57vH3UugAtYw33anRiw5kS2Tu87agpetDDoouquycWc9pRsKtQo5j+vLsYHyr8etAvFw==
+
+chartkick@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/chartkick/-/chartkick-4.1.1.tgz#60d6e13a090c5334bd80ad8fb7da02aaf38fb936"
+  integrity sha512-+3+dIKZo8MzOiQFc4FZDZiRjDnrgVxgjk3tKXVclMcDF8yIJAEqSr5/l4pqpB2Rxye1s2Dg3j6bVA9eIeDbnCQ==
+  optionalDependencies:
+    chart.js ">=3.0.2"
+    chartjs-adapter-date-fns ">=2.0.0"
+    date-fns ">=2.0.0"
+
+date-fns@>=2.0.0, date-fns@^2.27.0:
+  version "2.28.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.28.0.tgz#9570d656f5fc13143e50c975a3b6bbeb46cd08b2"
+  integrity sha512-8d35hViGYx/QH0icHYCeLmsLmMUheMmTyV9Fcm6gvNwdw31yXXH+O85sOBJ+OLnLQMKZowvpKb6FgMIQjcpvQw==
+
 esbuild-android-64@0.14.28:
   version "0.14.28"
   resolved "https://registry.yarnpkg.com/esbuild-android-64/-/esbuild-android-64-0.14.28.tgz#69c7a8a4f4a888eb5584afb035524b0fda7affff"
@@ -406,6 +454,53 @@ esbuild@^0.14.28:
     esbuild-windows-64 "0.14.28"
     esbuild-windows-arm64 "0.14.28"
 
+flatpickr@=4.6.9:
+  version "4.6.9"
+  resolved "https://registry.yarnpkg.com/flatpickr/-/flatpickr-4.6.9.tgz#9a13383e8a6814bda5d232eae3fcdccb97dc1499"
+  integrity sha512-F0azNNi8foVWKSF+8X+ZJzz8r9sE1G4hl06RyceIaLvyltKvDl6vqk9Lm/6AUUCi5HWaIjiUbk7UpeE/fOXOpw==
+
+"frontend-helpers@https://github.com/Grupo-AFAL/frontend-helpers.git":
+  version "0.5.16"
+  resolved "https://github.com/Grupo-AFAL/frontend-helpers.git#c2c7e0bd66107b5d1856263bd3424297d7aad72f"
+  dependencies:
+    "@glidejs/glide" "^3.5"
+    "@hotwired/stimulus" "^3.0.1"
+    "@hotwired/turbo" "^7.1.0"
+    "@popperjs/core" "^2.11.2"
+    "@rails/request.js" "^0.0.6"
+    bulma "^0.9.3"
+    chart.js "^3.6.2"
+    chartjs-adapter-date-fns "^2.0.0"
+    chartkick "^4.1.1"
+    date-fns "^2.27.0"
+    flatpickr "=4.6.9"
+    hotkeys-js "^3.8.7"
+    lodash.camelcase "^4.3.0"
+    lodash.debounce "^4.0.8"
+    lodash.throttle "^4.1.1"
+    slim-select "^1.27.0"
+    sortablejs "^1.15.0"
+
+hotkeys-js@^3.8.7:
+  version "3.8.7"
+  resolved "https://registry.yarnpkg.com/hotkeys-js/-/hotkeys-js-3.8.7.tgz#c16cab978b53d7242f860ca3932e976b92399981"
+  integrity sha512-ckAx3EkUr5XjDwjEHDorHxRO2Kb7z6Z2Sxul4MbBkN8Nho7XDslQsgMJT+CiJ5Z4TgRxxvKHEpuLE3imzqy4Lg==
+
+lodash.camelcase@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
+  integrity sha1-soqmKIorn8ZRA1x3EfZathkDMaY=
+
+lodash.debounce@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+  integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
+
+lodash.throttle@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.throttle/-/lodash.throttle-4.1.1.tgz#c23e91b710242ac70c37f1e1cda9274cc39bf2f4"
+  integrity sha1-wj6RtxAkKscMN/HhzaknTMOb8vQ=
+
 orderedmap@^1.1.0:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/orderedmap/-/orderedmap-1.1.5.tgz#4174c90b61bd7c25294932edf789f3b5677744d0"
@@ -499,6 +594,16 @@ rope-sequence@^1.3.0:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/rope-sequence/-/rope-sequence-1.3.2.tgz#a19e02d72991ca71feb6b5f8a91154e48e3c098b"
   integrity sha512-ku6MFrwEVSVmXLvy3dYph3LAMNS0890K7fabn+0YIRQ2T96T9F4gkFf0vf0WW0JUraNWwGRtInEpH7yO4tbQZg==
+
+slim-select@^1.27.0:
+  version "1.27.1"
+  resolved "https://registry.yarnpkg.com/slim-select/-/slim-select-1.27.1.tgz#aab08c1f0428fc2c32b0376857f3da9b1fbdcb2f"
+  integrity sha512-LvJ02cKKk6/jSHIcQv7dZwkQSXHLCVQR3v3lo8RJUssUUcmKPkpBmTpQ8au8KSMkxwca9+yeg+dO0iHAaVr5Aw==
+
+sortablejs@^1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/sortablejs/-/sortablejs-1.15.0.tgz#53230b8aa3502bb77a29e2005808ffdb4a5f7e2a"
+  integrity sha512-bv9qgVMjUMf89wAvM6AxVvS/4MX3sPeN0+agqShejLU5z5GX4C75ow1O2e5k4L6XItUyAK3gH6AxSbXrOM5e8w==
 
 tippy.js@^6.3.7:
   version "6.3.7"

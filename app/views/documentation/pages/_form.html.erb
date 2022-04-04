@@ -11,20 +11,14 @@
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :title, style: "display: block" %>
-    <%= form.text_field :title %>
-  </div>
-
-  <div>
-    <%= form.label :description, style: "display: block" %>
-    <%= form.text_field :description %>
-  </div>
+  <%= form.text_field_group :title, label: false, placeholder: 'Title', class: 'is-large' %>
+  <%= form.text_field_group :description, label: false, placeholder: 'Description' %>
 
   <div
-    class="rich-text-editor-component"
+    class="rich-text-editor-component input mb-4"
     data-controller="rich-text-editor"
-    data-rich-text-editor-content-value='Hello World!'
+    data-rich-text-editor-content-value='<%= page.content %>'
+    data-rich-text-editor-placeholder-value='Escribe aqui...'
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
       <a class="bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
@@ -32,9 +26,8 @@
       <a class="underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
     </div>
     <div data-rich-text-editor-target="tippy"></div>
+    <%= form.hidden_field :content, 'data-rich-text-editor-target': 'output' %>
   </div>
 
-  <div>
-    <%= form.submit %>
-  </div>
+  <%= form.submit_actions 'Guardar', class: 'button is-primary' %>
 <% end %>

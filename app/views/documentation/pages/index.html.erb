@@ -1,14 +1,31 @@
 <p style="color: green"><%= notice %></p>
 
-<h1>Pages</h1>
+<div class="level">
+  <div class="level-left">
+    <h1 class="title is-1">Pages</h1>
+  </div>
 
-<div id="pages">
-  <% @pages.each do |page| %>
-    <%= render page %>
-    <p>
-      <%= link_to "Show this page", page %>
-    </p>
-  <% end %>
+  <div class="level-right">
+    <%= link_to "New page", new_page_path, class: 'button is-primary' %>
+  </div>
 </div>
 
-<%= link_to "New page", new_page_path %>
+<div id="pages">
+  <table class="table is-fullwidth">
+    <thead>
+      <tr>
+        <th colspan="2">Name</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @pages.each do |page| %>
+        <tr>
+          <td class="is-narrow">
+            <%= link_to icon_tag('edit'), edit_page_path(page) %>
+          </td>
+          <td><%= link_to page.title, page %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

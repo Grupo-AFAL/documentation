@@ -1,11 +1,11 @@
-require_relative "boot"
+require_relative 'boot'
 
-require "rails/all"
+require 'rails/all'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
-require "documentation"
+require 'documentation'
 
 module Dummy
   class Application < Rails::Application
@@ -13,6 +13,8 @@ module Dummy
 
     # For compatibility with applications that use this config
     config.action_controller.include_all_helpers = false
+
+    config.action_view.sanitized_allowed_tags = Rails::Html::Sanitizer.safe_list_sanitizer.allowed_tags << 'u'
 
     # Configuration for the application, engines, and railties goes here.
     #

@@ -10,7 +10,13 @@
   </head>
   <body>
 
-    <%= yield %>
+    <section class="section">
+      <div class="container <%= yield :container_class %>">
+        <%= render 'layouts/documentation/notifications' %>
+
+        <%= yield %>
+      </div>
+    </section>
 
   </body>
 </html>

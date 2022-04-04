@@ -1,10 +1,9 @@
-<h1>Editing page</h1>
+<% content_for :container_class, 'is-max-desktop' %>
+
+<nav class="breadcrumb" aria-label="breadcrumbs">
+  <ul>
+    <li><%= link_with_icon "Back to pages", 'arrow-back', pages_path %></li>
+  </ul>
+</nav>
 
 <%= render "form", page: @page %>
-
-<br>
-
-<div>
-  <%= link_to "Show this page", @page %> |
-  <%= link_to "Back to pages", pages_path %>
-</div>

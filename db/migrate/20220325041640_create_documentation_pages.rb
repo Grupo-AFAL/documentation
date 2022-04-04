@@ -3,6 +3,7 @@ class CreateDocumentationPages < ActiveRecord::Migration[7.0]
     create_table :documentation_pages do |t|
       t.string :title
       t.string :description
+      t.text :content
 
       t.timestamps
     end
