@@ -588,7 +588,7 @@
 
   // node_modules/lodash.throttle/index.js
   var require_lodash = __commonJS({
-    "node_modules/lodash.throttle/index.js"(exports, module) {
+    "node_modules/lodash.throttle/index.js"(exports2, module2) {
       var FUNC_ERROR_TEXT = "Expected a function";
       var NAN = 0 / 0;
       var symbolTag = "[object Symbol]";
@@ -730,7 +730,631 @@
         var isBinary = reIsBinary.test(value);
         return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
       }
-      module.exports = throttle2;
+      module2.exports = throttle2;
+    }
+  });
+
+  // node_modules/slim-select/dist/slimselect.min.mjs
+  var slimselect_min_exports = {};
+  __export(slimselect_min_exports, {
+    default: () => slimselect_min_default
+  });
+  var exports, slimselect_min_default;
+  var init_slimselect_min = __esm({
+    "node_modules/slim-select/dist/slimselect.min.mjs"() {
+      exports = {};
+      !function(e, t) {
+        typeof exports == "object" && typeof module == "object" ? module.exports = t() : typeof define == "function" && define.amd ? define([], t) : typeof exports == "object" ? exports.SlimSelect = t() : e.SlimSelect = t();
+      }(window, function() {
+        return n = {}, s.m = i = [function(e, t, i2) {
+          "use strict";
+          function n2(e2, t2) {
+            t2 = t2 || { bubbles: false, cancelable: false, detail: void 0 };
+            var i3 = document.createEvent("CustomEvent");
+            return i3.initCustomEvent(e2, t2.bubbles, t2.cancelable, t2.detail), i3;
+          }
+          t.__esModule = true, t.kebabCase = t.highlight = t.isValueInArrayOfObjects = t.debounce = t.putContent = t.ensureElementInView = t.hasClassInTree = void 0, t.hasClassInTree = function(e2, t2) {
+            function n3(e3, t3) {
+              return t3 && e3 && e3.classList && e3.classList.contains(t3) ? e3 : null;
+            }
+            return n3(e2, t2) || function e3(t3, i3) {
+              return t3 && t3 !== document ? n3(t3, i3) ? t3 : e3(t3.parentNode, i3) : null;
+            }(e2, t2);
+          }, t.ensureElementInView = function(e2, t2) {
+            var i3 = e2.scrollTop + e2.offsetTop, n3 = i3 + e2.clientHeight, s2 = t2.offsetTop, t2 = s2 + t2.clientHeight;
+            s2 < i3 ? e2.scrollTop -= i3 - s2 : n3 < t2 && (e2.scrollTop += t2 - n3);
+          }, t.putContent = function(e2, t2, i3) {
+            var n3 = e2.offsetHeight, s2 = e2.getBoundingClientRect(), e2 = i3 ? s2.top : s2.top - n3, n3 = i3 ? s2.bottom : s2.bottom + n3;
+            return e2 <= 0 ? "below" : n3 >= window.innerHeight ? "above" : i3 ? t2 : "below";
+          }, t.debounce = function(s2, a, o) {
+            var l;
+            return a === void 0 && (a = 100), o === void 0 && (o = false), function() {
+              for (var e2 = [], t2 = 0; t2 < arguments.length; t2++)
+                e2[t2] = arguments[t2];
+              var i3 = self, n3 = o && !l;
+              clearTimeout(l), l = setTimeout(function() {
+                l = null, o || s2.apply(i3, e2);
+              }, a), n3 && s2.apply(i3, e2);
+            };
+          }, t.isValueInArrayOfObjects = function(e2, t2, i3) {
+            if (!Array.isArray(e2))
+              return e2[t2] === i3;
+            for (var n3 = 0, s2 = e2; n3 < s2.length; n3++) {
+              var a = s2[n3];
+              if (a && a[t2] && a[t2] === i3)
+                return true;
+            }
+            return false;
+          }, t.highlight = function(e2, t2, i3) {
+            var n3 = e2, s2 = new RegExp("(" + t2.trim() + ")(?![^<]*>[^<>]*</)", "i");
+            if (!e2.match(s2))
+              return e2;
+            var a = e2.match(s2).index, t2 = a + e2.match(s2)[0].toString().length, t2 = e2.substring(a, t2);
+            return n3 = n3.replace(s2, '<mark class="'.concat(i3, '">').concat(t2, "</mark>"));
+          }, t.kebabCase = function(e2) {
+            var t2 = e2.replace(/[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g, function(e3) {
+              return "-" + e3.toLowerCase();
+            });
+            return e2[0] === e2[0].toUpperCase() ? t2.substring(1) : t2;
+          }, typeof (t = window).CustomEvent != "function" && (n2.prototype = t.Event.prototype, t.CustomEvent = n2);
+        }, function(e, t, i2) {
+          "use strict";
+          t.__esModule = true, t.validateOption = t.validateData = t.Data = void 0;
+          var n2 = (s2.prototype.newOption = function(e2) {
+            return { id: e2.id || String(Math.floor(1e8 * Math.random())), value: e2.value || "", text: e2.text || "", innerHTML: e2.innerHTML || "", selected: e2.selected || false, display: e2.display === void 0 || e2.display, disabled: e2.disabled || false, placeholder: e2.placeholder || false, class: e2.class || void 0, data: e2.data || {}, mandatory: e2.mandatory || false };
+          }, s2.prototype.add = function(e2) {
+            this.data.push({ id: String(Math.floor(1e8 * Math.random())), value: e2.value, text: e2.text, innerHTML: "", selected: false, display: true, disabled: false, placeholder: false, class: void 0, mandatory: e2.mandatory, data: {} });
+          }, s2.prototype.parseSelectData = function() {
+            this.data = [];
+            for (var e2 = 0, t2 = this.main.select.element.childNodes; e2 < t2.length; e2++) {
+              var i3 = t2[e2];
+              if (i3.nodeName === "OPTGROUP") {
+                for (var n3 = { label: i3.label, options: [] }, s3 = 0, a = i3.childNodes; s3 < a.length; s3++) {
+                  var o, l = a[s3];
+                  l.nodeName === "OPTION" && (o = this.pullOptionData(l), n3.options.push(o), o.placeholder && o.text.trim() !== "" && (this.main.config.placeholderText = o.text));
+                }
+                this.data.push(n3);
+              } else
+                i3.nodeName === "OPTION" && (o = this.pullOptionData(i3), this.data.push(o), o.placeholder && o.text.trim() !== "" && (this.main.config.placeholderText = o.text));
+            }
+          }, s2.prototype.pullOptionData = function(e2) {
+            return { id: !!e2.dataset && e2.dataset.id || String(Math.floor(1e8 * Math.random())), value: e2.value, text: e2.text, innerHTML: e2.innerHTML, selected: e2.selected, disabled: e2.disabled, placeholder: e2.dataset.placeholder === "true", class: e2.className, style: e2.style.cssText, data: e2.dataset, mandatory: !!e2.dataset && e2.dataset.mandatory === "true" };
+          }, s2.prototype.setSelectedFromSelect = function() {
+            if (this.main.config.isMultiple) {
+              for (var e2 = [], t2 = 0, i3 = this.main.select.element.options; t2 < i3.length; t2++) {
+                var n3 = i3[t2];
+                !n3.selected || (n3 = this.getObjectFromData(n3.value, "value")) && n3.id && e2.push(n3.id);
+              }
+              this.setSelected(e2, "id");
+            } else {
+              var s3 = this.main.select.element;
+              s3.selectedIndex !== -1 && (s3 = s3.options[s3.selectedIndex].value, this.setSelected(s3, "value"));
+            }
+          }, s2.prototype.setSelected = function(e2, t2) {
+            t2 === void 0 && (t2 = "id");
+            for (var i3 = 0, n3 = this.data; i3 < n3.length; i3++) {
+              var s3 = n3[i3];
+              if (s3.hasOwnProperty("label")) {
+                if (s3.hasOwnProperty("options")) {
+                  var a = s3.options;
+                  if (a)
+                    for (var o = 0, l = a; o < l.length; o++) {
+                      var r2 = l[o];
+                      r2.placeholder || (r2.selected = this.shouldBeSelected(r2, e2, t2));
+                    }
+                }
+              } else
+                s3.selected = this.shouldBeSelected(s3, e2, t2);
+            }
+          }, s2.prototype.shouldBeSelected = function(e2, t2, i3) {
+            if (i3 === void 0 && (i3 = "id"), Array.isArray(t2))
+              for (var n3 = 0, s3 = t2; n3 < s3.length; n3++) {
+                var a = s3[n3];
+                if (i3 in e2 && String(e2[i3]) === String(a))
+                  return true;
+              }
+            else if (i3 in e2 && String(e2[i3]) === String(t2))
+              return true;
+            return false;
+          }, s2.prototype.getSelected = function() {
+            for (var e2 = { text: "", placeholder: this.main.config.placeholderText }, t2 = [], i3 = 0, n3 = this.data; i3 < n3.length; i3++) {
+              var s3 = n3[i3];
+              if (s3.hasOwnProperty("label")) {
+                if (s3.hasOwnProperty("options")) {
+                  var a = s3.options;
+                  if (a)
+                    for (var o = 0, l = a; o < l.length; o++) {
+                      var r2 = l[o];
+                      r2.selected && (this.main.config.isMultiple ? t2.push(r2) : e2 = r2);
+                    }
+                }
+              } else
+                s3.selected && (this.main.config.isMultiple ? t2.push(s3) : e2 = s3);
+            }
+            return this.main.config.isMultiple ? t2 : e2;
+          }, s2.prototype.addToSelected = function(e2, t2) {
+            if (t2 === void 0 && (t2 = "id"), this.main.config.isMultiple) {
+              var i3 = [], n3 = this.getSelected();
+              if (Array.isArray(n3))
+                for (var s3 = 0, a = n3; s3 < a.length; s3++) {
+                  var o = a[s3];
+                  i3.push(o[t2]);
+                }
+              i3.push(e2), this.setSelected(i3, t2);
+            }
+          }, s2.prototype.removeFromSelected = function(e2, t2) {
+            if (t2 === void 0 && (t2 = "id"), this.main.config.isMultiple) {
+              for (var i3 = [], n3 = 0, s3 = this.getSelected(); n3 < s3.length; n3++) {
+                var a = s3[n3];
+                String(a[t2]) !== String(e2) && i3.push(a[t2]);
+              }
+              this.setSelected(i3, t2);
+            }
+          }, s2.prototype.onDataChange = function() {
+            this.main.onChange && this.isOnChangeEnabled && this.main.onChange(JSON.parse(JSON.stringify(this.getSelected())));
+          }, s2.prototype.getObjectFromData = function(e2, t2) {
+            t2 === void 0 && (t2 = "id");
+            for (var i3 = 0, n3 = this.data; i3 < n3.length; i3++) {
+              var s3 = n3[i3];
+              if (t2 in s3 && String(s3[t2]) === String(e2))
+                return s3;
+              if (s3.hasOwnProperty("options")) {
+                if (s3.options)
+                  for (var a = 0, o = s3.options; a < o.length; a++) {
+                    var l = o[a];
+                    if (String(l[t2]) === String(e2))
+                      return l;
+                  }
+              }
+            }
+            return null;
+          }, s2.prototype.search = function(n3) {
+            var s3, e2;
+            (this.searchValue = n3).trim() !== "" ? (s3 = this.main.config.searchFilter, e2 = this.data.slice(0), n3 = n3.trim(), e2 = e2.map(function(e3) {
+              if (e3.hasOwnProperty("options")) {
+                var t2 = e3, i3 = [];
+                if ((i3 = t2.options ? t2.options.filter(function(e4) {
+                  return s3(e4, n3);
+                }) : i3).length !== 0) {
+                  t2 = Object.assign({}, t2);
+                  return t2.options = i3, t2;
+                }
+              }
+              if (e3.hasOwnProperty("text") && s3(e3, n3))
+                return e3;
+              return null;
+            }), this.filtered = e2.filter(function(e3) {
+              return e3;
+            })) : this.filtered = null;
+          }, s2);
+          function s2(e2) {
+            this.contentOpen = false, this.contentPosition = "below", this.isOnChangeEnabled = true, this.main = e2.main, this.searchValue = "", this.data = [], this.filtered = null, this.parseSelectData(), this.setSelectedFromSelect();
+          }
+          function r(e2) {
+            return e2.text !== void 0 || (console.error("Data object option must have at least have a text value. Check object: " + JSON.stringify(e2)), false);
+          }
+          t.Data = n2, t.validateData = function(e2) {
+            if (!e2)
+              return console.error("Data must be an array of objects"), false;
+            for (var t2 = 0, i3 = 0, n3 = e2; i3 < n3.length; i3++) {
+              var s3 = n3[i3];
+              if (s3.hasOwnProperty("label")) {
+                if (s3.hasOwnProperty("options")) {
+                  var a = s3.options;
+                  if (a)
+                    for (var o = 0, l = a; o < l.length; o++)
+                      r(l[o]) || t2++;
+                }
+              } else
+                r(s3) || t2++;
+            }
+            return t2 === 0;
+          }, t.validateOption = r;
+        }, function(e, t, i2) {
+          "use strict";
+          t.__esModule = true;
+          var n2 = i2(3), s2 = i2(4), a = i2(5), r = i2(1), o = i2(0), i2 = (l.prototype.validate = function(e2) {
+            e2 = typeof e2.select == "string" ? document.querySelector(e2.select) : e2.select;
+            if (!e2)
+              throw new Error("Could not find select element");
+            if (e2.tagName !== "SELECT")
+              throw new Error("Element isnt of type select");
+            return e2;
+          }, l.prototype.selected = function() {
+            if (this.config.isMultiple) {
+              for (var e2 = [], t2 = 0, i3 = s3 = this.data.getSelected(); t2 < i3.length; t2++) {
+                var n3 = i3[t2];
+                e2.push(n3.value);
+              }
+              return e2;
+            }
+            var s3;
+            return (s3 = this.data.getSelected()) ? s3.value : "";
+          }, l.prototype.set = function(e2, t2, i3, n3) {
+            t2 === void 0 && (t2 = "value"), i3 === void 0 && (i3 = true), n3 === void 0 && (n3 = true), this.config.isMultiple && !Array.isArray(e2) ? this.data.addToSelected(e2, t2) : this.data.setSelected(e2, t2), this.select.setValue(), this.data.onDataChange(), this.render(), (i3 = this.config.hideSelectedOption && this.config.isMultiple && this.data.getSelected().length === this.data.data.length ? true : i3) && this.close();
+          }, l.prototype.setSelected = function(e2, t2, i3, n3) {
+            this.set(e2, t2 = t2 === void 0 ? "value" : t2, i3 = i3 === void 0 ? true : i3, n3 = n3 === void 0 ? true : n3);
+          }, l.prototype.setData = function(e2) {
+            if ((0, r.validateData)(e2)) {
+              for (var t2 = JSON.parse(JSON.stringify(e2)), i3 = this.data.getSelected(), n3 = 0; n3 < t2.length; n3++)
+                t2[n3].value || t2[n3].placeholder || (t2[n3].value = t2[n3].text);
+              if (this.config.isAjax && i3)
+                if (this.config.isMultiple)
+                  for (var s3 = 0, a2 = i3.reverse(); s3 < a2.length; s3++) {
+                    var o2 = a2[s3];
+                    t2.unshift(o2);
+                  }
+                else {
+                  t2.unshift(i3);
+                  for (n3 = 0; n3 < t2.length; n3++)
+                    t2[n3].placeholder || t2[n3].value !== i3.value || t2[n3].text !== i3.text || t2.splice(n3, 1);
+                  for (var l2 = false, n3 = 0; n3 < t2.length; n3++)
+                    t2[n3].placeholder && (l2 = true);
+                  l2 || t2.unshift({ text: "", placeholder: true });
+                }
+              this.select.create(t2), this.data.parseSelectData(), this.data.setSelectedFromSelect();
+            } else
+              console.error("Validation problem on: #" + this.select.element.id);
+          }, l.prototype.addData = function(e2) {
+            (0, r.validateData)([e2]) ? (this.data.add(this.data.newOption(e2)), this.select.create(this.data.data), this.data.parseSelectData(), this.data.setSelectedFromSelect(), this.render()) : console.error("Validation problem on: #" + this.select.element.id);
+          }, l.prototype.open = function() {
+            var e2, t2 = this;
+            this.config.isEnabled && (this.data.contentOpen || this.config.hideSelectedOption && this.config.isMultiple && this.data.getSelected().length === this.data.data.length || (this.beforeOpen && this.beforeOpen(), this.config.isMultiple && this.slim.multiSelected ? this.slim.multiSelected.plus.classList.add("ss-cross") : this.slim.singleSelected && (this.slim.singleSelected.arrowIcon.arrow.classList.remove("arrow-down"), this.slim.singleSelected.arrowIcon.arrow.classList.add("arrow-up")), this.slim[this.config.isMultiple ? "multiSelected" : "singleSelected"].container.classList.add(this.data.contentPosition === "above" ? this.config.openAbove : this.config.openBelow), this.config.addToBody && (e2 = this.slim.container.getBoundingClientRect(), this.slim.content.style.top = e2.top + e2.height + window.scrollY + "px", this.slim.content.style.left = e2.left + window.scrollX + "px", this.slim.content.style.width = e2.width + "px"), this.slim.content.classList.add(this.config.open), this.config.showContent.toLowerCase() === "up" || this.config.showContent.toLowerCase() !== "down" && (0, o.putContent)(this.slim.content, this.data.contentPosition, this.data.contentOpen) === "above" ? this.moveContentAbove() : this.moveContentBelow(), this.config.isMultiple || (e2 = this.data.getSelected()) && (e2 = e2.id, (e2 = this.slim.list.querySelector('[data-id="' + e2 + '"]')) && (0, o.ensureElementInView)(this.slim.list, e2)), setTimeout(function() {
+              t2.data.contentOpen = true, t2.config.searchFocus && t2.slim.search.input.focus(), t2.afterOpen && t2.afterOpen();
+            }, this.config.timeoutDelay)));
+          }, l.prototype.close = function() {
+            var e2 = this;
+            this.data.contentOpen && (this.beforeClose && this.beforeClose(), this.config.isMultiple && this.slim.multiSelected ? (this.slim.multiSelected.container.classList.remove(this.config.openAbove), this.slim.multiSelected.container.classList.remove(this.config.openBelow), this.slim.multiSelected.plus.classList.remove("ss-cross")) : this.slim.singleSelected && (this.slim.singleSelected.container.classList.remove(this.config.openAbove), this.slim.singleSelected.container.classList.remove(this.config.openBelow), this.slim.singleSelected.arrowIcon.arrow.classList.add("arrow-down"), this.slim.singleSelected.arrowIcon.arrow.classList.remove("arrow-up")), this.slim.content.classList.remove(this.config.open), this.data.contentOpen = false, this.search(""), setTimeout(function() {
+              e2.slim.content.removeAttribute("style"), e2.data.contentPosition = "below", e2.config.isMultiple && e2.slim.multiSelected ? (e2.slim.multiSelected.container.classList.remove(e2.config.openAbove), e2.slim.multiSelected.container.classList.remove(e2.config.openBelow)) : e2.slim.singleSelected && (e2.slim.singleSelected.container.classList.remove(e2.config.openAbove), e2.slim.singleSelected.container.classList.remove(e2.config.openBelow)), e2.slim.search.input.blur(), e2.afterClose && e2.afterClose();
+            }, this.config.timeoutDelay));
+          }, l.prototype.moveContentAbove = function() {
+            var e2 = 0;
+            this.config.isMultiple && this.slim.multiSelected ? e2 = this.slim.multiSelected.container.offsetHeight : this.slim.singleSelected && (e2 = this.slim.singleSelected.container.offsetHeight);
+            var t2 = e2 + this.slim.content.offsetHeight - 1;
+            this.slim.content.style.margin = "-" + t2 + "px 0 0 0", this.slim.content.style.height = t2 - e2 + 1 + "px", this.slim.content.style.transformOrigin = "center bottom", this.data.contentPosition = "above", this.config.isMultiple && this.slim.multiSelected ? (this.slim.multiSelected.container.classList.remove(this.config.openBelow), this.slim.multiSelected.container.classList.add(this.config.openAbove)) : this.slim.singleSelected && (this.slim.singleSelected.container.classList.remove(this.config.openBelow), this.slim.singleSelected.container.classList.add(this.config.openAbove));
+          }, l.prototype.moveContentBelow = function() {
+            this.data.contentPosition = "below", this.config.isMultiple && this.slim.multiSelected ? (this.slim.multiSelected.container.classList.remove(this.config.openAbove), this.slim.multiSelected.container.classList.add(this.config.openBelow)) : this.slim.singleSelected && (this.slim.singleSelected.container.classList.remove(this.config.openAbove), this.slim.singleSelected.container.classList.add(this.config.openBelow));
+          }, l.prototype.enable = function() {
+            this.config.isEnabled = true, this.config.isMultiple && this.slim.multiSelected ? this.slim.multiSelected.container.classList.remove(this.config.disabled) : this.slim.singleSelected && this.slim.singleSelected.container.classList.remove(this.config.disabled), this.select.triggerMutationObserver = false, this.select.element.disabled = false, this.slim.search.input.disabled = false, this.select.triggerMutationObserver = true;
+          }, l.prototype.disable = function() {
+            this.config.isEnabled = false, this.config.isMultiple && this.slim.multiSelected ? this.slim.multiSelected.container.classList.add(this.config.disabled) : this.slim.singleSelected && this.slim.singleSelected.container.classList.add(this.config.disabled), this.select.triggerMutationObserver = false, this.select.element.disabled = true, this.slim.search.input.disabled = true, this.select.triggerMutationObserver = true;
+          }, l.prototype.search = function(t2) {
+            var i3;
+            this.data.searchValue !== t2 && (this.slim.search.input.value = t2, this.config.isAjax ? ((i3 = this).config.isSearching = true, this.render(), this.ajax && this.ajax(t2, function(e2) {
+              i3.config.isSearching = false, Array.isArray(e2) ? (e2.unshift({ text: "", placeholder: true }), i3.setData(e2), i3.data.search(t2), i3.render()) : typeof e2 == "string" ? i3.slim.options(e2) : i3.render();
+            })) : (this.data.search(t2), this.render()));
+          }, l.prototype.setSearchText = function(e2) {
+            this.config.searchText = e2;
+          }, l.prototype.render = function() {
+            this.config.isMultiple ? this.slim.values() : (this.slim.placeholder(), this.slim.deselect()), this.slim.options();
+          }, l.prototype.destroy = function(e2) {
+            var t2 = (e2 = e2 === void 0 ? null : e2) ? document.querySelector("." + e2 + ".ss-main") : this.slim.container, i3 = e2 ? document.querySelector("[data-ssid=".concat(e2, "]")) : this.select.element;
+            t2 && i3 && (document.removeEventListener("click", this.documentClick), this.config.showContent === "auto" && window.removeEventListener("scroll", this.windowScroll, false), i3.style.display = "", delete i3.dataset.ssid, i3.slim = null, t2.parentElement && t2.parentElement.removeChild(t2), !this.config.addToBody || (e2 = e2 ? document.querySelector("." + e2 + ".ss-content") : this.slim.content) && document.body.removeChild(e2));
+          }, l);
+          function l(e2) {
+            var t2 = this;
+            this.ajax = null, this.addable = null, this.beforeOnChange = null, this.onChange = null, this.beforeOpen = null, this.afterOpen = null, this.beforeClose = null, this.afterClose = null, this.windowScroll = (0, o.debounce)(function(e3) {
+              t2.data.contentOpen && ((0, o.putContent)(t2.slim.content, t2.data.contentPosition, t2.data.contentOpen) === "above" ? t2.moveContentAbove() : t2.moveContentBelow());
+            }), this.documentClick = function(e3) {
+              e3.target && !(0, o.hasClassInTree)(e3.target, t2.config.id) && t2.close();
+            };
+            var i3 = this.validate(e2);
+            i3.dataset.ssid && this.destroy(i3.dataset.ssid), e2.ajax && (this.ajax = e2.ajax), e2.addable && (this.addable = e2.addable), this.config = new n2.Config({ select: i3, isAjax: !!e2.ajax, showSearch: e2.showSearch, searchPlaceholder: e2.searchPlaceholder, searchText: e2.searchText, searchingText: e2.searchingText, searchFocus: e2.searchFocus, searchHighlight: e2.searchHighlight, searchFilter: e2.searchFilter, closeOnSelect: e2.closeOnSelect, showContent: e2.showContent, placeholderText: e2.placeholder, allowDeselect: e2.allowDeselect, allowDeselectOption: e2.allowDeselectOption, hideSelectedOption: e2.hideSelectedOption, deselectLabel: e2.deselectLabel, isEnabled: e2.isEnabled, valuesUseText: e2.valuesUseText, showOptionTooltips: e2.showOptionTooltips, selectByGroup: e2.selectByGroup, limit: e2.limit, timeoutDelay: e2.timeoutDelay, addToBody: e2.addToBody }), this.select = new s2.Select({ select: i3, main: this }), this.data = new r.Data({ main: this }), this.slim = new a.Slim({ main: this }), this.select.element.parentNode && this.select.element.parentNode.insertBefore(this.slim.container, this.select.element.nextSibling), e2.data ? this.setData(e2.data) : this.render(), document.addEventListener("click", this.documentClick), this.config.showContent === "auto" && window.addEventListener("scroll", this.windowScroll, false), e2.beforeOnChange && (this.beforeOnChange = e2.beforeOnChange), e2.onChange && (this.onChange = e2.onChange), e2.beforeOpen && (this.beforeOpen = e2.beforeOpen), e2.afterOpen && (this.afterOpen = e2.afterOpen), e2.beforeClose && (this.beforeClose = e2.beforeClose), e2.afterClose && (this.afterClose = e2.afterClose), this.config.isEnabled || this.disable();
+          }
+          t.default = i2;
+        }, function(e, t, i2) {
+          "use strict";
+          t.__esModule = true, t.Config = void 0;
+          var n2 = (s2.prototype.searchFilter = function(e2, t2) {
+            return e2.text.toLowerCase().indexOf(t2.toLowerCase()) !== -1;
+          }, s2);
+          function s2(e2) {
+            this.id = "", this.isMultiple = false, this.isAjax = false, this.isSearching = false, this.showSearch = true, this.searchFocus = true, this.searchHighlight = false, this.closeOnSelect = true, this.showContent = "auto", this.searchPlaceholder = "Search", this.searchText = "No Results", this.searchingText = "Searching...", this.placeholderText = "Select Value", this.allowDeselect = false, this.allowDeselectOption = false, this.hideSelectedOption = false, this.deselectLabel = "x", this.isEnabled = true, this.valuesUseText = false, this.showOptionTooltips = false, this.selectByGroup = false, this.limit = 0, this.timeoutDelay = 200, this.addToBody = false, this.main = "ss-main", this.singleSelected = "ss-single-selected", this.arrow = "ss-arrow", this.multiSelected = "ss-multi-selected", this.add = "ss-add", this.plus = "ss-plus", this.values = "ss-values", this.value = "ss-value", this.valueText = "ss-value-text", this.valueDelete = "ss-value-delete", this.content = "ss-content", this.open = "ss-open", this.openAbove = "ss-open-above", this.openBelow = "ss-open-below", this.search = "ss-search", this.searchHighlighter = "ss-search-highlight", this.addable = "ss-addable", this.list = "ss-list", this.optgroup = "ss-optgroup", this.optgroupLabel = "ss-optgroup-label", this.optgroupLabelSelectable = "ss-optgroup-label-selectable", this.option = "ss-option", this.optionSelected = "ss-option-selected", this.highlighted = "ss-highlighted", this.disabled = "ss-disabled", this.hide = "ss-hide", this.id = "ss-" + Math.floor(1e5 * Math.random()), this.style = e2.select.style.cssText, this.class = e2.select.className.split(" "), this.isMultiple = e2.select.multiple, this.isAjax = e2.isAjax, this.showSearch = e2.showSearch !== false, this.searchFocus = e2.searchFocus !== false, this.searchHighlight = e2.searchHighlight === true, this.closeOnSelect = e2.closeOnSelect !== false, e2.showContent && (this.showContent = e2.showContent), this.isEnabled = e2.isEnabled !== false, e2.searchPlaceholder && (this.searchPlaceholder = e2.searchPlaceholder), e2.searchText && (this.searchText = e2.searchText), e2.searchingText && (this.searchingText = e2.searchingText), e2.placeholderText && (this.placeholderText = e2.placeholderText), this.allowDeselect = e2.allowDeselect === true, this.allowDeselectOption = e2.allowDeselectOption === true, this.hideSelectedOption = e2.hideSelectedOption === true, e2.deselectLabel && (this.deselectLabel = e2.deselectLabel), e2.valuesUseText && (this.valuesUseText = e2.valuesUseText), e2.showOptionTooltips && (this.showOptionTooltips = e2.showOptionTooltips), e2.selectByGroup && (this.selectByGroup = e2.selectByGroup), e2.limit && (this.limit = e2.limit), e2.searchFilter && (this.searchFilter = e2.searchFilter), e2.timeoutDelay != null && (this.timeoutDelay = e2.timeoutDelay), this.addToBody = e2.addToBody === true;
+          }
+          t.Config = n2;
+        }, function(e, t, i2) {
+          "use strict";
+          t.__esModule = true, t.Select = void 0;
+          var n2 = i2(0), i2 = (s2.prototype.setValue = function() {
+            if (this.main.data.getSelected()) {
+              if (this.main.config.isMultiple)
+                for (var e2 = this.main.data.getSelected(), t2 = 0, i3 = this.element.options; t2 < i3.length; t2++) {
+                  var n3 = i3[t2];
+                  n3.selected = false;
+                  for (var s3 = 0, a = e2; s3 < a.length; s3++)
+                    a[s3].value === n3.value && (n3.selected = true);
+                }
+              else {
+                e2 = this.main.data.getSelected();
+                this.element.value = e2 ? e2.value : "";
+              }
+              this.main.data.isOnChangeEnabled = false, this.element.dispatchEvent(new CustomEvent("change", { bubbles: true })), this.main.data.isOnChangeEnabled = true;
+            }
+          }, s2.prototype.addAttributes = function() {
+            this.element.tabIndex = -1, this.element.style.display = "none", this.element.dataset.ssid = this.main.config.id, this.element.setAttribute("aria-hidden", "true");
+          }, s2.prototype.addEventListeners = function() {
+            var t2 = this;
+            this.element.addEventListener("change", function(e2) {
+              t2.main.data.setSelectedFromSelect(), t2.main.render();
+            });
+          }, s2.prototype.addMutationObserver = function() {
+            var t2 = this;
+            this.main.config.isAjax || (this.mutationObserver = new MutationObserver(function(e2) {
+              t2.triggerMutationObserver && (t2.main.data.parseSelectData(), t2.main.data.setSelectedFromSelect(), t2.main.render(), e2.forEach(function(e3) {
+                e3.attributeName === "class" && t2.main.slim.updateContainerDivClass(t2.main.slim.container);
+              }));
+            }), this.observeMutationObserver());
+          }, s2.prototype.observeMutationObserver = function() {
+            this.mutationObserver && this.mutationObserver.observe(this.element, { attributes: true, childList: true, characterData: true });
+          }, s2.prototype.disconnectMutationObserver = function() {
+            this.mutationObserver && this.mutationObserver.disconnect();
+          }, s2.prototype.create = function(e2) {
+            this.element.innerHTML = "";
+            for (var t2 = 0, i3 = e2; t2 < i3.length; t2++) {
+              var n3 = i3[t2];
+              if (n3.hasOwnProperty("options")) {
+                var s3 = n3, a = document.createElement("optgroup");
+                if (a.label = s3.label, s3.options)
+                  for (var o = 0, l = s3.options; o < l.length; o++) {
+                    var r = l[o];
+                    a.appendChild(this.createOption(r));
+                  }
+                this.element.appendChild(a);
+              } else
+                this.element.appendChild(this.createOption(n3));
+            }
+          }, s2.prototype.createOption = function(t2) {
+            var i3 = document.createElement("option");
+            return i3.value = t2.value !== "" ? t2.value : t2.text, i3.innerHTML = t2.innerHTML || t2.text, t2.selected && (i3.selected = t2.selected), t2.display === false && (i3.style.display = "none"), t2.disabled && (i3.disabled = true), t2.placeholder && i3.setAttribute("data-placeholder", "true"), t2.mandatory && i3.setAttribute("data-mandatory", "true"), t2.class && t2.class.split(" ").forEach(function(e2) {
+              i3.classList.add(e2);
+            }), t2.data && typeof t2.data == "object" && Object.keys(t2.data).forEach(function(e2) {
+              i3.setAttribute("data-" + (0, n2.kebabCase)(e2), t2.data[e2]);
+            }), i3;
+          }, s2);
+          function s2(e2) {
+            this.triggerMutationObserver = true, this.element = e2.select, this.main = e2.main, this.element.disabled && (this.main.config.isEnabled = false), this.addAttributes(), this.addEventListeners(), this.mutationObserver = null, this.addMutationObserver(), this.element.slim = e2.main;
+          }
+          t.Select = i2;
+        }, function(e, t, i2) {
+          "use strict";
+          t.__esModule = true, t.Slim = void 0;
+          var n2 = i2(0), o = i2(1), i2 = (s2.prototype.containerDiv = function() {
+            var e2 = document.createElement("div");
+            return e2.style.cssText = this.main.config.style, this.updateContainerDivClass(e2), e2;
+          }, s2.prototype.updateContainerDivClass = function(e2) {
+            this.main.config.class = this.main.select.element.className.split(" "), e2.className = "", e2.classList.add(this.main.config.id), e2.classList.add(this.main.config.main);
+            for (var t2 = 0, i3 = this.main.config.class; t2 < i3.length; t2++) {
+              var n3 = i3[t2];
+              n3.trim() !== "" && e2.classList.add(n3);
+            }
+          }, s2.prototype.singleSelectedDiv = function() {
+            var t2 = this, e2 = document.createElement("div");
+            e2.classList.add(this.main.config.singleSelected);
+            var i3 = document.createElement("span");
+            i3.classList.add("placeholder"), e2.appendChild(i3);
+            var n3 = document.createElement("span");
+            n3.innerHTML = this.main.config.deselectLabel, n3.classList.add("ss-deselect"), n3.onclick = function(e3) {
+              e3.stopPropagation(), t2.main.config.isEnabled && t2.main.set("");
+            }, e2.appendChild(n3);
+            var s3 = document.createElement("span");
+            s3.classList.add(this.main.config.arrow);
+            var a = document.createElement("span");
+            return a.classList.add("arrow-down"), s3.appendChild(a), e2.appendChild(s3), e2.onclick = function() {
+              t2.main.config.isEnabled && (t2.main.data.contentOpen ? t2.main.close() : t2.main.open());
+            }, { container: e2, placeholder: i3, deselect: n3, arrowIcon: { container: s3, arrow: a } };
+          }, s2.prototype.placeholder = function() {
+            var e2, t2 = this.main.data.getSelected();
+            t2 === null || t2 && t2.placeholder ? ((e2 = document.createElement("span")).classList.add(this.main.config.disabled), e2.innerHTML = this.main.config.placeholderText, this.singleSelected && (this.singleSelected.placeholder.innerHTML = e2.outerHTML)) : (e2 = "", t2 && (e2 = t2.innerHTML && this.main.config.valuesUseText !== true ? t2.innerHTML : t2.text), this.singleSelected && (this.singleSelected.placeholder.innerHTML = t2 ? e2 : ""));
+          }, s2.prototype.deselect = function() {
+            this.singleSelected && (!this.main.config.allowDeselect || this.main.selected() === "" ? this.singleSelected.deselect.classList.add("ss-hide") : this.singleSelected.deselect.classList.remove("ss-hide"));
+          }, s2.prototype.multiSelectedDiv = function() {
+            var t2 = this, e2 = document.createElement("div");
+            e2.classList.add(this.main.config.multiSelected);
+            var i3 = document.createElement("div");
+            i3.classList.add(this.main.config.values), e2.appendChild(i3);
+            var n3 = document.createElement("div");
+            n3.classList.add(this.main.config.add);
+            var s3 = document.createElement("span");
+            return s3.classList.add(this.main.config.plus), s3.onclick = function(e3) {
+              t2.main.data.contentOpen && (t2.main.close(), e3.stopPropagation());
+            }, n3.appendChild(s3), e2.appendChild(n3), e2.onclick = function(e3) {
+              t2.main.config.isEnabled && (e3.target.classList.contains(t2.main.config.valueDelete) || (t2.main.data.contentOpen ? t2.main.close() : t2.main.open()));
+            }, { container: e2, values: i3, add: n3, plus: s3 };
+          }, s2.prototype.values = function() {
+            if (this.multiSelected) {
+              for (var e2 = this.multiSelected.values.childNodes, t2 = this.main.data.getSelected(), i3 = [], n3 = 0, s3 = e2; n3 < s3.length; n3++) {
+                for (var a = s3[n3], o2 = true, l = 0, r = t2; l < r.length; l++) {
+                  var c = r[l];
+                  String(c.id) === String(a.dataset.id) && (o2 = false);
+                }
+                o2 && i3.push(a);
+              }
+              for (var d = 0, h = i3; d < h.length; d++) {
+                var u = h[d];
+                u.classList.add("ss-out"), this.multiSelected.values.removeChild(u);
+              }
+              for (var p, e2 = this.multiSelected.values.childNodes, c = 0; c < t2.length; c++) {
+                o2 = false;
+                for (var m = 0, f = e2; m < f.length; m++) {
+                  a = f[m];
+                  String(t2[c].id) === String(a.dataset.id) && (o2 = true);
+                }
+                o2 || (e2.length !== 0 && HTMLElement.prototype.insertAdjacentElement ? c === 0 ? this.multiSelected.values.insertBefore(this.valueDiv(t2[c]), e2[c]) : e2[c - 1].insertAdjacentElement("afterend", this.valueDiv(t2[c])) : this.multiSelected.values.appendChild(this.valueDiv(t2[c])));
+              }
+              t2.length === 0 && ((p = document.createElement("span")).classList.add(this.main.config.disabled), p.innerHTML = this.main.config.placeholderText, this.multiSelected.values.innerHTML = p.outerHTML);
+            }
+          }, s2.prototype.valueDiv = function(s3) {
+            var a = this, e2 = document.createElement("div");
+            e2.classList.add(this.main.config.value), e2.dataset.id = s3.id;
+            var t2 = document.createElement("span");
+            return t2.classList.add(this.main.config.valueText), t2.innerHTML = s3.innerHTML && this.main.config.valuesUseText !== true ? s3.innerHTML : s3.text, e2.appendChild(t2), s3.mandatory || ((t2 = document.createElement("span")).classList.add(this.main.config.valueDelete), t2.innerHTML = this.main.config.deselectLabel, t2.onclick = function(e3) {
+              e3.preventDefault(), e3.stopPropagation();
+              var t3 = false;
+              if (a.main.beforeOnChange || (t3 = true), a.main.beforeOnChange) {
+                for (var e3 = a.main.data.getSelected(), i3 = JSON.parse(JSON.stringify(e3)), n3 = 0; n3 < i3.length; n3++)
+                  i3[n3].id === s3.id && i3.splice(n3, 1);
+                a.main.beforeOnChange(i3) !== false && (t3 = true);
+              }
+              t3 && (a.main.data.removeFromSelected(s3.id, "id"), a.main.render(), a.main.select.setValue(), a.main.data.onDataChange());
+            }, e2.appendChild(t2)), e2;
+          }, s2.prototype.contentDiv = function() {
+            var e2 = document.createElement("div");
+            return e2.classList.add(this.main.config.content), e2;
+          }, s2.prototype.searchDiv = function() {
+            var n3 = this, e2 = document.createElement("div"), s3 = document.createElement("input"), a = document.createElement("div");
+            e2.classList.add(this.main.config.search);
+            var t2 = { container: e2, input: s3 };
+            return this.main.config.showSearch || (e2.classList.add(this.main.config.hide), s3.readOnly = true), s3.type = "search", s3.placeholder = this.main.config.searchPlaceholder, s3.tabIndex = 0, s3.setAttribute("aria-label", this.main.config.searchPlaceholder), s3.setAttribute("autocapitalize", "off"), s3.setAttribute("autocomplete", "off"), s3.setAttribute("autocorrect", "off"), s3.onclick = function(e3) {
+              setTimeout(function() {
+                e3.target.value === "" && n3.main.search("");
+              }, 10);
+            }, s3.onkeydown = function(e3) {
+              e3.key === "ArrowUp" ? (n3.main.open(), n3.highlightUp(), e3.preventDefault()) : e3.key === "ArrowDown" ? (n3.main.open(), n3.highlightDown(), e3.preventDefault()) : e3.key === "Tab" ? n3.main.data.contentOpen ? n3.main.close() : setTimeout(function() {
+                n3.main.close();
+              }, n3.main.config.timeoutDelay) : e3.key === "Enter" && e3.preventDefault();
+            }, s3.onkeyup = function(e3) {
+              var t3 = e3.target;
+              if (e3.key === "Enter") {
+                if (n3.main.addable && e3.ctrlKey)
+                  return a.click(), e3.preventDefault(), void e3.stopPropagation();
+                var i3 = n3.list.querySelector("." + n3.main.config.highlighted);
+                i3 && i3.click();
+              } else
+                e3.key === "ArrowUp" || e3.key === "ArrowDown" || (e3.key === "Escape" ? n3.main.close() : n3.main.config.showSearch && n3.main.data.contentOpen ? n3.main.search(t3.value) : s3.value = "");
+              e3.preventDefault(), e3.stopPropagation();
+            }, s3.onfocus = function() {
+              n3.main.open();
+            }, e2.appendChild(s3), this.main.addable && (a.classList.add(this.main.config.addable), a.innerHTML = "+", a.onclick = function(e3) {
+              var t3;
+              n3.main.addable && (e3.preventDefault(), e3.stopPropagation(), (e3 = n3.search.input.value).trim() !== "" ? (e3 = n3.main.addable(e3), t3 = "", e3 && (typeof e3 == "object" ? (0, o.validateOption)(e3) && (n3.main.addData(e3), t3 = e3.value || e3.text) : (n3.main.addData(n3.main.data.newOption({ text: e3, value: e3 })), t3 = e3), n3.main.search(""), setTimeout(function() {
+                n3.main.set(t3, "value", false, false);
+              }, 100), n3.main.config.closeOnSelect && setTimeout(function() {
+                n3.main.close();
+              }, 100))) : n3.search.input.focus());
+            }, e2.appendChild(a), t2.addable = a), t2;
+          }, s2.prototype.highlightUp = function() {
+            var e2 = this.list.querySelector("." + this.main.config.highlighted), t2 = null;
+            if (e2)
+              for (t2 = e2.previousSibling; t2 !== null && t2.classList.contains(this.main.config.disabled); )
+                t2 = t2.previousSibling;
+            else
+              var i3 = this.list.querySelectorAll("." + this.main.config.option + ":not(." + this.main.config.disabled + ")"), t2 = i3[i3.length - 1];
+            (t2 = t2 && t2.classList.contains(this.main.config.optgroupLabel) ? null : t2) !== null || (i3 = e2.parentNode).classList.contains(this.main.config.optgroup) && (!i3.previousSibling || (i3 = i3.previousSibling.querySelectorAll("." + this.main.config.option + ":not(." + this.main.config.disabled + ")")).length && (t2 = i3[i3.length - 1])), t2 && (e2 && e2.classList.remove(this.main.config.highlighted), t2.classList.add(this.main.config.highlighted), (0, n2.ensureElementInView)(this.list, t2));
+          }, s2.prototype.highlightDown = function() {
+            var e2, t2 = this.list.querySelector("." + this.main.config.highlighted), i3 = null;
+            if (t2)
+              for (i3 = t2.nextSibling; i3 !== null && i3.classList.contains(this.main.config.disabled); )
+                i3 = i3.nextSibling;
+            else
+              i3 = this.list.querySelector("." + this.main.config.option + ":not(." + this.main.config.disabled + ")");
+            i3 !== null || t2 === null || (e2 = t2.parentNode).classList.contains(this.main.config.optgroup) && e2.nextSibling && (i3 = e2.nextSibling.querySelector("." + this.main.config.option + ":not(." + this.main.config.disabled + ")")), i3 && (t2 && t2.classList.remove(this.main.config.highlighted), i3.classList.add(this.main.config.highlighted), (0, n2.ensureElementInView)(this.list, i3));
+          }, s2.prototype.listDiv = function() {
+            var e2 = document.createElement("div");
+            return e2.classList.add(this.main.config.list), e2.setAttribute("role", "listbox"), e2;
+          }, s2.prototype.options = function(e2) {
+            e2 === void 0 && (e2 = "");
+            var t2 = this.main.data.filtered || this.main.data.data;
+            if ((this.list.innerHTML = "") !== e2)
+              return (i3 = document.createElement("div")).classList.add(this.main.config.option), i3.classList.add(this.main.config.disabled), i3.innerHTML = e2, void this.list.appendChild(i3);
+            if (this.main.config.isAjax && this.main.config.isSearching)
+              return (i3 = document.createElement("div")).classList.add(this.main.config.option), i3.classList.add(this.main.config.disabled), i3.innerHTML = this.main.config.searchingText, void this.list.appendChild(i3);
+            if (t2.length === 0) {
+              var i3 = document.createElement("div");
+              return i3.classList.add(this.main.config.option), i3.classList.add(this.main.config.disabled), i3.innerHTML = this.main.config.searchText, void this.list.appendChild(i3);
+            }
+            for (var r = this, n3 = 0, s3 = t2; n3 < s3.length; n3++)
+              !function(e3) {
+                if (e3.hasOwnProperty("label")) {
+                  var t3 = e3, s4 = document.createElement("div");
+                  s4.classList.add(r.main.config.optgroup);
+                  var i4 = document.createElement("div");
+                  i4.classList.add(r.main.config.optgroupLabel), r.main.config.selectByGroup && r.main.config.isMultiple && i4.classList.add(r.main.config.optgroupLabelSelectable), i4.innerHTML = t3.label, s4.appendChild(i4);
+                  t3 = t3.options;
+                  if (t3) {
+                    for (var a, n4 = 0, o2 = t3; n4 < o2.length; n4++) {
+                      var l = o2[n4];
+                      s4.appendChild(r.option(l));
+                    }
+                    r.main.config.selectByGroup && r.main.config.isMultiple && (a = r, i4.addEventListener("click", function(e4) {
+                      e4.preventDefault(), e4.stopPropagation();
+                      for (var t4 = 0, i5 = s4.children; t4 < i5.length; t4++) {
+                        var n5 = i5[t4];
+                        n5.className.indexOf(a.main.config.option) !== -1 && n5.click();
+                      }
+                    }));
+                  }
+                  r.list.appendChild(s4);
+                } else
+                  r.list.appendChild(r.option(e3));
+              }(s3[n3]);
+          }, s2.prototype.option = function(o2) {
+            if (o2.placeholder) {
+              var e2 = document.createElement("div");
+              return e2.classList.add(this.main.config.option), e2.classList.add(this.main.config.hide), e2;
+            }
+            var t2 = document.createElement("div");
+            t2.classList.add(this.main.config.option), t2.setAttribute("role", "option"), o2.class && o2.class.split(" ").forEach(function(e3) {
+              t2.classList.add(e3);
+            }), o2.style && (t2.style.cssText = o2.style);
+            var l = this.main.data.getSelected();
+            t2.dataset.id = o2.id, this.main.config.searchHighlight && this.main.slim && o2.innerHTML && this.main.slim.search.input.value.trim() !== "" ? t2.innerHTML = (0, n2.highlight)(o2.innerHTML, this.main.slim.search.input.value, this.main.config.searchHighlighter) : o2.innerHTML && (t2.innerHTML = o2.innerHTML), this.main.config.showOptionTooltips && t2.textContent && t2.setAttribute("title", t2.textContent);
+            var r = this;
+            t2.addEventListener("click", function(e3) {
+              e3.preventDefault(), e3.stopPropagation();
+              var t3 = this.dataset.id;
+              if (o2.selected === true && r.main.config.allowDeselectOption) {
+                var i3 = false;
+                if (r.main.beforeOnChange && r.main.config.isMultiple || (i3 = true), r.main.beforeOnChange && r.main.config.isMultiple) {
+                  for (var n3 = r.main.data.getSelected(), s3 = JSON.parse(JSON.stringify(n3)), a = 0; a < s3.length; a++)
+                    s3[a].id === t3 && s3.splice(a, 1);
+                  r.main.beforeOnChange(s3) !== false && (i3 = true);
+                }
+                i3 && (r.main.config.isMultiple ? (r.main.data.removeFromSelected(t3, "id"), r.main.render(), r.main.select.setValue(), r.main.data.onDataChange()) : r.main.set(""));
+              } else
+                o2.disabled || o2.selected || r.main.config.limit && Array.isArray(l) && r.main.config.limit <= l.length || (r.main.beforeOnChange ? (n3 = void 0, (i3 = JSON.parse(JSON.stringify(r.main.data.getObjectFromData(t3)))).selected = true, r.main.config.isMultiple ? (n3 = JSON.parse(JSON.stringify(l))).push(i3) : n3 = JSON.parse(JSON.stringify(i3)), r.main.beforeOnChange(n3) !== false && r.main.set(t3, "id", r.main.config.closeOnSelect)) : r.main.set(t3, "id", r.main.config.closeOnSelect));
+            });
+            e2 = l && (0, n2.isValueInArrayOfObjects)(l, "id", o2.id);
+            return (o2.disabled || e2) && (t2.onclick = null, r.main.config.allowDeselectOption || t2.classList.add(this.main.config.disabled), r.main.config.hideSelectedOption && t2.classList.add(this.main.config.hide)), e2 ? t2.classList.add(this.main.config.optionSelected) : t2.classList.remove(this.main.config.optionSelected), t2;
+          }, s2);
+          function s2(e2) {
+            this.main = e2.main, this.container = this.containerDiv(), this.content = this.contentDiv(), this.search = this.searchDiv(), this.list = this.listDiv(), this.options(), this.singleSelected = null, this.multiSelected = null, this.main.config.isMultiple ? (this.multiSelected = this.multiSelectedDiv(), this.multiSelected && this.container.appendChild(this.multiSelected.container)) : (this.singleSelected = this.singleSelectedDiv(), this.container.appendChild(this.singleSelected.container)), this.main.config.addToBody ? (this.content.classList.add(this.main.config.id), document.body.appendChild(this.content)) : this.container.appendChild(this.content), this.content.appendChild(this.search.container), this.content.appendChild(this.list);
+          }
+          t.Slim = i2;
+        }], s.c = n, s.d = function(e, t, i2) {
+          s.o(e, t) || Object.defineProperty(e, t, { enumerable: true, get: i2 });
+        }, s.r = function(e) {
+          typeof Symbol != "undefined" && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, { value: "Module" }), Object.defineProperty(e, "__esModule", { value: true });
+        }, s.t = function(t, e) {
+          if (1 & e && (t = s(t)), 8 & e)
+            return t;
+          if (4 & e && typeof t == "object" && t && t.__esModule)
+            return t;
+          var i2 = /* @__PURE__ */ Object.create(null);
+          if (s.r(i2), Object.defineProperty(i2, "default", { enumerable: true, value: t }), 2 & e && typeof t != "string")
+            for (var n2 in t)
+              s.d(i2, n2, function(e2) {
+                return t[e2];
+              }.bind(null, n2));
+          return i2;
+        }, s.n = function(e) {
+          var t = e && e.__esModule ? function() {
+            return e.default;
+          } : function() {
+            return e;
+          };
+          return s.d(t, "a", t), t;
+        }, s.o = function(e, t) {
+          return Object.prototype.hasOwnProperty.call(e, t);
+        }, s.p = "", s(s.s = 2).default;
+        function s(e) {
+          if (n[e])
+            return n[e].exports;
+          var t = n[e] = { i: e, l: false, exports: {} };
+          return i[e].call(t.exports, t, t.exports, s), t.l = true, t.exports;
+        }
+        var i, n;
+      });
+      slimselect_min_default = exports.SlimSelect;
     }
   });
 
@@ -4939,15 +5563,15 @@
     }
   };
   var Context = class {
-    constructor(module, scope) {
+    constructor(module2, scope) {
       this.logDebugActivity = (functionName, detail = {}) => {
         const { identifier, controller, element } = this;
         detail = Object.assign({ identifier, controller, element }, detail);
         this.application.logDebugActivity(this.identifier, functionName, detail);
       };
-      this.module = module;
+      this.module = module2;
       this.scope = scope;
-      this.controller = new module.controllerConstructor(this);
+      this.controller = new module2.controllerConstructor(this);
       this.bindingObserver = new BindingObserver(this, this.dispatcher);
       this.valueObserver = new ValueObserver(this, this.controller);
       this.targetObserver = new TargetObserver(this, this);
@@ -5416,7 +6040,7 @@
       return Array.from(this.modulesByIdentifier.values());
     }
     get contexts() {
-      return this.modules.reduce((contexts, module) => contexts.concat(module.contexts), []);
+      return this.modules.reduce((contexts, module2) => contexts.concat(module2.contexts), []);
     }
     start() {
       this.scopeObserver.start();
@@ -5426,19 +6050,19 @@
     }
     loadDefinition(definition) {
       this.unloadIdentifier(definition.identifier);
-      const module = new Module(this.application, definition);
-      this.connectModule(module);
+      const module2 = new Module(this.application, definition);
+      this.connectModule(module2);
     }
     unloadIdentifier(identifier) {
-      const module = this.modulesByIdentifier.get(identifier);
-      if (module) {
-        this.disconnectModule(module);
+      const module2 = this.modulesByIdentifier.get(identifier);
+      if (module2) {
+        this.disconnectModule(module2);
       }
     }
     getContextForElementAndIdentifier(element, identifier) {
-      const module = this.modulesByIdentifier.get(identifier);
-      if (module) {
-        return module.contexts.find((context) => context.element == element);
+      const module2 = this.modulesByIdentifier.get(identifier);
+      if (module2) {
+        return module2.contexts.find((context) => context.element == element);
       }
     }
     handleError(error2, message, detail) {
@@ -5449,27 +6073,27 @@
     }
     scopeConnected(scope) {
       this.scopesByIdentifier.add(scope.identifier, scope);
-      const module = this.modulesByIdentifier.get(scope.identifier);
-      if (module) {
-        module.connectContextForScope(scope);
+      const module2 = this.modulesByIdentifier.get(scope.identifier);
+      if (module2) {
+        module2.connectContextForScope(scope);
       }
     }
     scopeDisconnected(scope) {
       this.scopesByIdentifier.delete(scope.identifier, scope);
-      const module = this.modulesByIdentifier.get(scope.identifier);
-      if (module) {
-        module.disconnectContextForScope(scope);
+      const module2 = this.modulesByIdentifier.get(scope.identifier);
+      if (module2) {
+        module2.disconnectContextForScope(scope);
       }
     }
-    connectModule(module) {
-      this.modulesByIdentifier.set(module.identifier, module);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
-      scopes.forEach((scope) => module.connectContextForScope(scope));
+    connectModule(module2) {
+      this.modulesByIdentifier.set(module2.identifier, module2);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
+      scopes.forEach((scope) => module2.connectContextForScope(scope));
     }
-    disconnectModule(module) {
-      this.modulesByIdentifier.delete(module.identifier);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
-      scopes.forEach((scope) => module.disconnectContextForScope(scope));
+    disconnectModule(module2) {
+      this.modulesByIdentifier.delete(module2.identifier);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
+      scopes.forEach((scope) => module2.disconnectContextForScope(scope));
     }
   };
   var defaultSchema = {
@@ -7426,6 +8050,75 @@
     delay: Number,
     remove: Boolean
   });
+
+  // node_modules/frontend-helpers/javascript/src/controllers/slim-select-controller.js
+  var SlimSelectController = class extends Controller {
+    async connect() {
+      const { default: SlimSelect } = await Promise.resolve().then(() => (init_slimselect_min(), slimselect_min_exports));
+      const options = {
+        select: this.selectTarget,
+        placeholder: this.hasPlaceholderValue && this.placeholderValue,
+        showContent: this.showContentValue === "undefined" ? "down" : this.showContentValue,
+        showSearch: this.showSearchValue,
+        searchPlaceholder: this.searchPlaceholderValue,
+        addToBody: this.addToBodyValue,
+        closeOnSelect: this.closeOnSelectValue,
+        allowDeselectOption: this.allowDeselectOptionValue,
+        addable: this.addable()
+      };
+      if (this.hasInnerHTML()) {
+        options.data = this.dataWithHTML();
+      }
+      this.select = new SlimSelect(options);
+    }
+    disconnect() {
+      this.select.destroy();
+    }
+    addable() {
+      if (!this.addItemsValue)
+        return;
+      return function(value) {
+        return value;
+      };
+    }
+    dataWithHTML() {
+      return Array.from(this.selectTarget.children).map((option) => {
+        return {
+          text: option.text,
+          value: option.value,
+          innerHTML: option.dataset.innerHtml,
+          selected: option.selected,
+          disabled: option.disabled
+        };
+      });
+    }
+    hasInnerHTML() {
+      const firstOption = this.selectTarget.children[0];
+      return firstOption && !!firstOption.dataset.innerHtml;
+    }
+    selectAll() {
+      const allValues = Array.from(this.selectTarget.children).map((option) => option.value);
+      this.select.set(allValues);
+      this.selectAllButtonTarget.style.display = "none";
+      this.deselectAllButtonTarget.style.display = "block";
+    }
+    deselectAll() {
+      this.select.set([]);
+      this.deselectAllButtonTarget.style.display = "none";
+      this.selectAllButtonTarget.style.display = "block";
+    }
+  };
+  __publicField(SlimSelectController, "values", {
+    placeholder: String,
+    addItems: Boolean,
+    showContent: String,
+    showSearch: Boolean,
+    searchPlaceholder: String,
+    addToBody: Boolean,
+    closeOnSelect: Boolean,
+    allowDeselectOption: Boolean
+  });
+  __publicField(SlimSelectController, "targets", ["select", "selectAllButton", "deselectAllButton"]);
 
   // node_modules/orderedmap/index.es.js
   function OrderedMap(content2) {
@@ -25117,5 +25810,6 @@ img.ProseMirror-separator {
   var application = Application.start();
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);
+  application.register("slim-select", SlimSelectController);
 })();
 //# sourceMappingURL=application.js.map

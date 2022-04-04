@@ -11,6 +11,7 @@ PATH
   remote: .
   specs:
     documentation (0.1.0)
+      acts_as_tree
       bulma-rails (~> 0.9.3)
       rails (>= 7.0.2.3)
       turbo-rails (>= 1.0.1)
@@ -83,6 +84,8 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    acts_as_tree (2.9.1)
+      activerecord (>= 3.0.0)
     builder (3.2.4)
     bulma-rails (0.9.3)
       sassc (~> 2.0)
@@ -212,6 +215,7 @@ PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
+  acts_as_tree
   bulma-rails (~> 0.9.3)
   documentation!
   frontend_helpers!

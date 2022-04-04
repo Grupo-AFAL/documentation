@@ -1,18 +1,21 @@
 module Documentation
   class PagesController < ApplicationController
     before_action :set_page, only: %i[show edit update destroy]
+    before_action :set_root_pages, only: %i[new edit create update]
 
     def index
-      @pages = Page.all
+      @pages = Page.unscoped
     end
 
     def show; end
 
     def new
-      @page = Page.new
+      @parent = Page.find(params[:parent_id]) if params[:parent_id]
+      @page = Page.new(parent_id: @parent&.id)
     end
 
-    def edit; end
+    def edit
+    end
 
     def create
       @page = Page.new(page_params)
@@ -43,8 +46,12 @@ module Documentation
       @page = Page.find(params[:id])
     end
 
+    def set_root_pages
+      @pages = Page.roots.excluding(@page)
+    end
+
     def page_params
-      params.require(:page).permit(:title, :description, :content)
+      params.require(:page).permit(:title, :description, :content, :parent_id)
     end
   end
 end
