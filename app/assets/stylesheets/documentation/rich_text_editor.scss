@@ -45,9 +45,36 @@ $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
 .rich-text-editor-menu {
   display: flex;
   box-shadow: $menu-box-shadow;
-  border-radius: 0.25rem;
-  overflow: hidden;
   text-align: center;
+  border-radius: 0.25rem;
+
+  .dropdown-menu {
+    min-width: unset;
+  }
+
+  .dropdown-trigger {
+    a {
+      width: auto;
+      border-radius: 0.25rem 0 0 0.25rem;
+    }
+
+    .svg-inline {
+      width: 0.75em;
+      height: 0.75em;
+
+      path {
+        fill: $grey-light;
+      }
+    }
+  }
+
+  > :first-child {
+    border-radius: 0.25rem 0 0 0.25rem;
+  }
+
+  > :last-child {
+    border-radius: 0 0.25rem 0.25rem 0;
+  }
 
   a {
     display: inline-block;
@@ -57,8 +84,23 @@ $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
     padding: 0.25rem;
     width: 2rem;
 
-    &:last-child {
-      border-right: none;
+    &.dropdown-item {
+      display: block;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.25rem 1rem;
+
+      &.is-active {
+        background-color: $white;
+        color: $black;
+        font-weight: bold;
+        text-decoration: underline;
+      }
+
+      &:hover {
+        background-color: $grey-lightest;
+      }
     }
 
     &:hover {

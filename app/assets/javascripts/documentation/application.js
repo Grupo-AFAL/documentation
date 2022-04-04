@@ -6484,6 +6484,35 @@
     remove: Boolean
   });
 
+  // node_modules/frontend-helpers/javascript/src/controllers/dropdown-controller.js
+  var DropdownController = class extends Controller {
+    connect() {
+      document.addEventListener("click", this.closeDropdowns);
+      if (!(this.hasHoverableValue && this.hoverableValue)) {
+        return;
+      }
+      this.element.addEventListener("mouseenter", (event) => this.toggleMenu(event));
+      this.element.addEventListener("mouseleave", this.closeDropdowns);
+    }
+    disconnect() {
+      document.removeEventListener("click", this.closeDropdowns);
+      if (!(this.hasHoverableValue && this.hoverableValue)) {
+        return;
+      }
+      this.element.removeEventListener("mouseenter", this.closeDropdowns);
+      this.element.removeEventListener("mouseleave", this.closeDropdowns);
+    }
+    toggleMenu(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.element.classList.toggle("is-active");
+    }
+    closeDropdowns = () => {
+      this.element.classList.remove("is-active");
+    };
+  };
+  __publicField(DropdownController, "values", { hoverable: Boolean });
+
   // node_modules/@popperjs/core/lib/enums.js
   var top = "top";
   var bottom = "bottom";
@@ -25716,14 +25745,37 @@ img.ProseMirror-separator {
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
   var import_lodash = __toESM(require_lodash());
   var RichTextEditorController = class extends Controller {
-    toolbarButtons = [
-      { target: "h1", name: "heading", param: { level: 1 } },
-      { target: "h2", name: "heading", param: { level: 2 } },
-      { target: "h3", name: "heading", param: { level: 3 } },
+    toolbarMarks = [
       { target: "bold", name: "bold" },
       { target: "italic", name: "italic" },
       { target: "underline", name: "underline" }
     ];
+    toolbarTypes = [
+      {
+        target: "h1",
+        name: "heading",
+        attributes: { level: 1 },
+        text: "Heading 1"
+      },
+      {
+        target: "h2",
+        name: "heading",
+        attributes: { level: 2 },
+        text: "Heading 2"
+      },
+      {
+        target: "h3",
+        name: "heading",
+        attributes: { level: 3 },
+        text: "Heading 3"
+      },
+      {
+        name: "paragraph",
+        target: "text",
+        text: "Text"
+      }
+    ];
+    allMenuButtons = this.toolbarMarks.concat(this.toolbarTypes);
     connect() {
       this.editor = new Editor({
         element: this.element,
@@ -25744,7 +25796,7 @@ img.ProseMirror-separator {
       });
       this.editor.on("transaction", () => {
         this.resetMenuButtons();
-        this.enableSelectedMenuButtons();
+        this.enableSelectedMenuMarks();
       });
     }
     onUpdate = ({ editor }) => {
@@ -25769,21 +25821,36 @@ img.ProseMirror-separator {
     toggleH3() {
       this.runCommand("toggleHeading", { level: 3 });
     }
-    runCommand(name, param) {
-      this.editor.chain().focus()[name](param).run();
+    setParagraph() {
+      this.runCommand("setParagraph");
+    }
+    runCommand(name, attributes) {
+      this.editor.chain().focus()[name](attributes).run();
     }
     resetMenuButtons() {
-      this.toolbarButtons.forEach(({ target }) => {
+      if (this.hasDropdownTarget) {
+        this.dropdownTarget.classList.remove("is-active");
+      }
+      this.allMenuButtons.forEach(({ target }) => {
         if (this.hasTarget(target)) {
           this[`${target}Target`].classList.remove("is-active");
         }
       });
     }
-    enableSelectedMenuButtons() {
-      this.toolbarButtons.forEach(({ target, name, param }) => {
-        if (this.editor.isActive(name, param) && this.hasTarget(target)) {
+    enableSelectedMenuMarks() {
+      this.allMenuButtons.forEach(({ target, name, attributes }) => {
+        if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
           this[`${target}Target`].classList.add("is-active");
         }
+      });
+      if (this.hasDropdownTriggerTarget) {
+        const selectedType = this.selectedContentType();
+        this.dropdownTriggerTarget.innerHTML = selectedType.text;
+      }
+    }
+    selectedContentType() {
+      return this.toolbarTypes.find(({ name, attributes }) => {
+        return this.editor.isActive(name, attributes);
       });
     }
     hasTarget(name) {
@@ -25793,6 +25860,9 @@ img.ProseMirror-separator {
   };
   __publicField(RichTextEditorController, "targets", [
     "bubbleMenu",
+    "dropdown",
+    "dropdownTrigger",
+    "text",
     "h1",
     "h2",
     "h3",
@@ -25808,6 +25878,7 @@ img.ProseMirror-separator {
 
   // app/javascript/documentation/application.js
   var application = Application.start();
+  application.register("dropdown", DropdownController);
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);

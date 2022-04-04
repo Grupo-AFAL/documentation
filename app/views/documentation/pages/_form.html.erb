@@ -23,9 +23,22 @@
     data-rich-text-editor-placeholder-value='Write page content here...'
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
-      <a class="h1" data-action="rich-text-editor#toggleH1" data-rich-text-editor-target="h1">H1</a>
-      <a class="h2" data-action="rich-text-editor#toggleH2" data-rich-text-editor-target="h2">H2</a>
-      <a class="h3" data-action="rich-text-editor#toggleH3" data-rich-text-editor-target="h3">H3</a>
+      <div class="dropdown" data-controller="dropdown" data-rich-text-editor-target="dropdown">
+        <div class="dropdown-trigger">
+          <a data-action="dropdown#toggleMenu">
+            <span class="text" data-rich-text-editor-target="dropdownTrigger">Text</span>
+            <%= icon_tag('chevron-down') %>
+          </a>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-content">
+            <a class="h1 dropdown-item" data-action="rich-text-editor#setParagraph" data-rich-text-editor-target="text">Text</a>
+            <a class="h1 dropdown-item" data-action="rich-text-editor#toggleH1" data-rich-text-editor-target="h1">Heading 1</a>
+            <a class="h2 dropdown-item" data-action="rich-text-editor#toggleH2" data-rich-text-editor-target="h2">Heading 2</a>
+            <a class="h3 dropdown-item" data-action="rich-text-editor#toggleH3" data-rich-text-editor-target="h3">Heading 3</a>
+          </div>
+        </div>
+      </div>
       <a class="bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
       <a class="italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
       <a class="underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
