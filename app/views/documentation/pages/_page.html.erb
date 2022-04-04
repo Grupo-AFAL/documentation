@@ -3,6 +3,6 @@
   <p class="subtitle"><%= page.description %></p>
 
   <div class="rich-editor-content">
-    <%= page.content.html_safe %>
+    <%= sanitize page.content %>
   </div>
 </div>

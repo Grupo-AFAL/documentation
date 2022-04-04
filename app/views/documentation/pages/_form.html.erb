@@ -15,12 +15,16 @@
   <%= form.text_field_group :description, label: false, placeholder: 'Description' %>
 
   <div
-    class="rich-text-editor-component input mb-4"
+    data-turbo-cache="false"
+    class="rich-text-editor-component input mb-4 rich-editor-content"
     data-controller="rich-text-editor"
     data-rich-text-editor-content-value='<%= page.content %>'
     data-rich-text-editor-placeholder-value='Escribe aqui...'
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
+      <a class="h1" data-action="rich-text-editor#toggleH1" data-rich-text-editor-target="h1">H1</a>
+      <a class="h2" data-action="rich-text-editor#toggleH2" data-rich-text-editor-target="h2">H2</a>
+      <a class="h3" data-action="rich-text-editor#toggleH3" data-rich-text-editor-target="h3">H3</a>
       <a class="bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
       <a class="italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
       <a class="underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>

@@ -25023,7 +25023,14 @@ img.ProseMirror-separator {
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
   var import_lodash = __toESM(require_lodash());
   var RichTextEditorController = class extends Controller {
-    toolbarButtons = ["bold", "italic", "underline"];
+    toolbarButtons = [
+      { target: "h1", name: "heading", param: { level: 1 } },
+      { target: "h2", name: "heading", param: { level: 2 } },
+      { target: "h3", name: "heading", param: { level: 3 } },
+      { target: "bold", name: "bold" },
+      { target: "italic", name: "italic" },
+      { target: "underline", name: "underline" }
+    ];
     connect() {
       this.editor = new Editor({
         element: this.element,
@@ -25060,20 +25067,29 @@ img.ProseMirror-separator {
     toggleUnderline() {
       this.runCommand("toggleUnderline");
     }
-    runCommand(name) {
-      this.editor.chain().focus()[name]().run();
+    toggleH1() {
+      this.runCommand("toggleHeading", { level: 1 });
+    }
+    toggleH2() {
+      this.runCommand("toggleHeading", { level: 2 });
+    }
+    toggleH3() {
+      this.runCommand("toggleHeading", { level: 3 });
+    }
+    runCommand(name, param) {
+      this.editor.chain().focus()[name](param).run();
     }
     resetMenuButtons() {
-      this.toolbarButtons.forEach((button) => {
-        if (this.hasTarget(button)) {
-          this[`${button}Target`].classList.remove("is-active");
+      this.toolbarButtons.forEach(({ target }) => {
+        if (this.hasTarget(target)) {
+          this[`${target}Target`].classList.remove("is-active");
         }
       });
     }
     enableSelectedMenuButtons() {
-      this.toolbarButtons.forEach((button) => {
-        if (this.editor.isActive(button) && this.hasTarget(button)) {
-          this[`${button}Target`].classList.add("is-active");
+      this.toolbarButtons.forEach(({ target, name, param }) => {
+        if (this.editor.isActive(name, param) && this.hasTarget(target)) {
+          this[`${target}Target`].classList.add("is-active");
         }
       });
     }
@@ -25082,7 +25098,16 @@ img.ProseMirror-separator {
       return this[`has${capitalizedName}Target`];
     }
   };
-  __publicField(RichTextEditorController, "targets", ["bubbleMenu", "bold", "italic", "underline", "output"]);
+  __publicField(RichTextEditorController, "targets", [
+    "bubbleMenu",
+    "h1",
+    "h2",
+    "h3",
+    "bold",
+    "italic",
+    "underline",
+    "output"
+  ]);
   __publicField(RichTextEditorController, "values", {
     content: { type: String, default: "" },
     placeholder: { type: String, default: "" }
