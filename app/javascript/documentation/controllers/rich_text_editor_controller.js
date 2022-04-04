@@ -16,6 +16,7 @@ export default class RichTextEditorController extends Controller {
     'h1',
     'h2',
     'h3',
+    'ul',
     'bold',
     'italic',
     'underline',
@@ -50,6 +51,11 @@ export default class RichTextEditorController extends Controller {
       name: 'heading',
       attributes: { level: 3 },
       text: 'Heading 3'
+    },
+    {
+      name: 'bulletList',
+      target: 'ul',
+      text: 'Bulleted List'
     },
     {
       name: 'paragraph',
@@ -118,6 +124,10 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('setParagraph')
   }
 
+  toggleBulletList () {
+    this.runCommand('toggleBulletList')
+  }
+
   runCommand (name, attributes) {
     this.editor
       .chain()
@@ -139,9 +149,10 @@ export default class RichTextEditorController extends Controller {
   }
 
   enableSelectedMenuMarks () {
-    this.allMenuButtons.forEach(({ target, name, attributes }) => {
+    this.allMenuButtons.some(({ target, name, attributes }) => {
       if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
         this[`${target}Target`].classList.add('is-active')
+        return true
       }
     })
 

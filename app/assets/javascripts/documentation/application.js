@@ -25770,6 +25770,11 @@ img.ProseMirror-separator {
         text: "Heading 3"
       },
       {
+        name: "bulletList",
+        target: "ul",
+        text: "Bulleted List"
+      },
+      {
         name: "paragraph",
         target: "text",
         text: "Text"
@@ -25824,6 +25829,9 @@ img.ProseMirror-separator {
     setParagraph() {
       this.runCommand("setParagraph");
     }
+    toggleBulletList() {
+      this.runCommand("toggleBulletList");
+    }
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }
@@ -25838,9 +25846,10 @@ img.ProseMirror-separator {
       });
     }
     enableSelectedMenuMarks() {
-      this.allMenuButtons.forEach(({ target, name, attributes }) => {
+      this.allMenuButtons.some(({ target, name, attributes }) => {
         if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
           this[`${target}Target`].classList.add("is-active");
+          return true;
         }
       });
       if (this.hasDropdownTriggerTarget) {
@@ -25866,6 +25875,7 @@ img.ProseMirror-separator {
     "h1",
     "h2",
     "h3",
+    "ul",
     "bold",
     "italic",
     "underline",
