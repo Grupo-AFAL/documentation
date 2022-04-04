@@ -11,6 +11,7 @@
     </div>
   <% end %>
 
+  <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title, p.id] }, include_blank: 'Select page parent', label: false %>
   <%= form.text_field_group :title, label: false, placeholder: 'Title', class: 'is-large' %>
   <%= form.text_field_group :description, label: false, placeholder: 'Description' %>
 
@@ -19,7 +20,7 @@
     class="rich-text-editor-component input mb-4 rich-editor-content"
     data-controller="rich-text-editor"
     data-rich-text-editor-content-value='<%= page.content %>'
-    data-rich-text-editor-placeholder-value='Escribe aqui...'
+    data-rich-text-editor-placeholder-value='Write page content here...'
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
       <a class="h1" data-action="rich-text-editor#toggleH1" data-rich-text-editor-target="h1">H1</a>

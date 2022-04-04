@@ -14,16 +14,18 @@
   <table class="table is-fullwidth">
     <thead>
       <tr>
-        <th colspan="2">Name</th>
+        <th>Name</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
-      <% @pages.each do |page| %>
+      <% @pages.walk_tree do |page, level| %>
         <tr>
+          <td><%= link_to "#{'-'*level} #{page.title}", page %></td>
           <td class="is-narrow">
             <%= link_to icon_tag('edit'), edit_page_path(page) %>
+            <%= link_to icon_tag('plus'), new_page_path(parent_id: page.id) %>
           </td>
-          <td><%= link_to page.title, page %></td>
         </tr>
       <% end %>
     </tbody>

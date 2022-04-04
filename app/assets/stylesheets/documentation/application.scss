@@ -82,6 +82,10 @@
 @import 'fe_icons';
 @import 'fe_notification';
 
+// Plugins defined in js-frontend-helpers
+@import 'slim-select/dist/slimselect.min';
+@import 'fe_slim_select_customizations';
+
 // Engine styles
 //
 @import 'rich_text_editor';
