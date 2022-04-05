@@ -17,6 +17,7 @@ export default class RichTextEditorController extends Controller {
     'h2',
     'h3',
     'ul',
+    'ol',
     'bold',
     'italic',
     'underline',
@@ -56,6 +57,11 @@ export default class RichTextEditorController extends Controller {
       name: 'bulletList',
       target: 'ul',
       text: 'Bulleted List'
+    },
+    {
+      name: 'orderedList',
+      target: 'ol',
+      text: 'Ordered List'
     },
     {
       name: 'paragraph',
@@ -126,6 +132,10 @@ export default class RichTextEditorController extends Controller {
 
   toggleBulletList () {
     this.runCommand('toggleBulletList')
+  }
+
+  toggleOrderedList () {
+    this.runCommand('toggleOrderedList')
   }
 
   runCommand (name, attributes) {

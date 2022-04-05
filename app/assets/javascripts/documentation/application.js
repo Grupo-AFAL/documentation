@@ -25775,6 +25775,11 @@ img.ProseMirror-separator {
         text: "Bulleted List"
       },
       {
+        name: "orderedList",
+        target: "ol",
+        text: "Ordered List"
+      },
+      {
         name: "paragraph",
         target: "text",
         text: "Text"
@@ -25832,6 +25837,9 @@ img.ProseMirror-separator {
     toggleBulletList() {
       this.runCommand("toggleBulletList");
     }
+    toggleOrderedList() {
+      this.runCommand("toggleOrderedList");
+    }
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }
@@ -25876,6 +25884,7 @@ img.ProseMirror-separator {
     "h2",
     "h3",
     "ul",
+    "ol",
     "bold",
     "italic",
     "underline",
