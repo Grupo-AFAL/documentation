@@ -18,6 +18,7 @@ export default class RichTextEditorController extends Controller {
     'h3',
     'ul',
     'ol',
+    'blockquote',
     'bold',
     'italic',
     'underline',
@@ -64,6 +65,11 @@ export default class RichTextEditorController extends Controller {
       text: 'Ordered List'
     },
     {
+      name: 'blockquote',
+      target: 'blockquote',
+      text: 'Quote'
+    },
+    {
       name: 'paragraph',
       target: 'text',
       text: 'Text'
@@ -93,7 +99,9 @@ export default class RichTextEditorController extends Controller {
 
     this.editor.on('transaction', () => {
       this.resetMenuButtons()
-      this.enableSelectedMenuMarks()
+      this.enableSelectedToolbarMarks()
+      this.enableSelectedToolbarType()
+      this.setCurrentToolbarType()
     })
   }
 
@@ -138,6 +146,10 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleOrderedList')
   }
 
+  toggleBlockquote () {
+    this.runCommand('toggleBlockquote')
+  }
+
   runCommand (name, attributes) {
     this.editor
       .chain()
@@ -158,21 +170,31 @@ export default class RichTextEditorController extends Controller {
     })
   }
 
-  enableSelectedMenuMarks () {
-    this.allMenuButtons.some(({ target, name, attributes }) => {
+  enableSelectedToolbarMarks () {
+    this.toolbarMarks.forEach(({ target, name, attributes }) => {
+      if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
+        this[`${target}Target`].classList.add('is-active')
+      }
+    })
+  }
+
+  enableSelectedToolbarType () {
+    this.toolbarTypes.some(({ target, name, attributes }) => {
       if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
         this[`${target}Target`].classList.add('is-active')
         return true
       }
     })
-
-    if (this.hasDropdownTriggerTarget) {
-      const selectedType = this.selectedContentType()
-      this.dropdownTriggerTarget.innerHTML = selectedType.text
-    }
   }
 
-  selectedContentType () {
+  setCurrentToolbarType () {
+    if (!this.hasDropdownTriggerTarget) return
+
+    const selectedType = this.selectedToolbarType()
+    this.dropdownTriggerTarget.innerHTML = selectedType.text
+  }
+
+  selectedToolbarType () {
     return this.toolbarTypes.find(({ name, attributes }) => {
       return this.editor.isActive(name, attributes)
     })

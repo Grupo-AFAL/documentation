@@ -25780,6 +25780,11 @@ img.ProseMirror-separator {
         text: "Ordered List"
       },
       {
+        name: "blockquote",
+        target: "blockquote",
+        text: "Quote"
+      },
+      {
         name: "paragraph",
         target: "text",
         text: "Text"
@@ -25806,7 +25811,9 @@ img.ProseMirror-separator {
       });
       this.editor.on("transaction", () => {
         this.resetMenuButtons();
-        this.enableSelectedMenuMarks();
+        this.enableSelectedToolbarMarks();
+        this.enableSelectedToolbarType();
+        this.setCurrentToolbarType();
       });
     }
     onUpdate = ({ editor }) => {
@@ -25840,6 +25847,9 @@ img.ProseMirror-separator {
     toggleOrderedList() {
       this.runCommand("toggleOrderedList");
     }
+    toggleBlockquote() {
+      this.runCommand("toggleBlockquote");
+    }
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }
@@ -25853,19 +25863,28 @@ img.ProseMirror-separator {
         }
       });
     }
-    enableSelectedMenuMarks() {
-      this.allMenuButtons.some(({ target, name, attributes }) => {
+    enableSelectedToolbarMarks() {
+      this.toolbarMarks.forEach(({ target, name, attributes }) => {
+        if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
+          this[`${target}Target`].classList.add("is-active");
+        }
+      });
+    }
+    enableSelectedToolbarType() {
+      this.toolbarTypes.some(({ target, name, attributes }) => {
         if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
           this[`${target}Target`].classList.add("is-active");
           return true;
         }
       });
-      if (this.hasDropdownTriggerTarget) {
-        const selectedType = this.selectedContentType();
-        this.dropdownTriggerTarget.innerHTML = selectedType.text;
-      }
     }
-    selectedContentType() {
+    setCurrentToolbarType() {
+      if (!this.hasDropdownTriggerTarget)
+        return;
+      const selectedType = this.selectedToolbarType();
+      this.dropdownTriggerTarget.innerHTML = selectedType.text;
+    }
+    selectedToolbarType() {
       return this.toolbarTypes.find(({ name, attributes }) => {
         return this.editor.isActive(name, attributes);
       });
@@ -25885,6 +25904,7 @@ img.ProseMirror-separator {
     "h3",
     "ul",
     "ol",
+    "blockquote",
     "bold",
     "italic",
     "underline",

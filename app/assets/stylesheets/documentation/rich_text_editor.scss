@@ -33,6 +33,12 @@ $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
     margin-top: 1em;
   }
 
+  blockquote {
+    background-color: $grey-lightest;
+    border-left: 5px solid $grey-lighter;
+    padding: 1.25em 1.5em;
+  }
+
   blockquote:not(:last-child),
   dl:not(:last-child),
   ol:not(:last-child),
