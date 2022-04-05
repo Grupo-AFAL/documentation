@@ -27,7 +27,7 @@
         <div class="dropdown-trigger">
           <a data-action="dropdown#toggleMenu">
             <span class="text" data-rich-text-editor-target="dropdownTrigger">Text</span>
-            <%= icon_tag('chevron-down') %>
+            <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
           </a>
         </div>
         <div class="dropdown-menu">
@@ -42,6 +42,10 @@
           </div>
         </div>
       </div>
+      <a class="link" data-action="rich-text-editor#toggleLink" data-rich-text-editor-target="link">
+        <span>Link</span>
+        <%= icon_tag('arrow-right-up', class: 'toolbar-icon') %>
+      </a>
       <a class="bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
       <a class="italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
       <a class="underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>

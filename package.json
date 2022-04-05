@@ -4,12 +4,15 @@
     "@hotwired/turbo-rails": "^7.1.1",
     "@tiptap/core": "^2.0.0-beta.174",
     "@tiptap/extension-bubble-menu": "^2.0.0-beta.55",
+    "@tiptap/extension-link": "^2.0.0-beta.36",
+    "@tiptap/extension-mention": "^2.0.0-beta.95",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
     "@tiptap/extension-underline": "^2.0.0-beta.23",
     "@tiptap/starter-kit": "^2.0.0-beta.183",
     "esbuild": "^0.14.28",
     "frontend-helpers": "https://github.com/Grupo-AFAL/frontend-helpers.git",
-    "lodash.throttle": "^4.1.1"
+    "lodash.throttle": "^4.1.1",
+    "tippy.js": "^6.3.7"
   },
   "scripts": {
     "build": "esbuild app/javascript/documentation/application.js --bundle --sourcemap --outdir=app/assets/javascripts/documentation"

@@ -4,6 +4,10 @@ import StarterKit from '@tiptap/starter-kit'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
+import Link from '@tiptap/extension-link'
+import Mention from '@tiptap/extension-mention'
+
+import suggestion from '../src/suggestion'
 
 import throttle from 'lodash.throttle'
 
@@ -22,6 +26,7 @@ export default class RichTextEditorController extends Controller {
     'bold',
     'italic',
     'underline',
+    'link',
     'output'
   ]
   static values = {
@@ -32,7 +37,8 @@ export default class RichTextEditorController extends Controller {
   toolbarMarks = [
     { target: 'bold', name: 'bold' },
     { target: 'italic', name: 'italic' },
-    { target: 'underline', name: 'underline' }
+    { target: 'underline', name: 'underline' },
+    { target: 'link', name: 'link' }
   ]
 
   toolbarTypes = [
@@ -90,6 +96,15 @@ export default class RichTextEditorController extends Controller {
         }),
         Placeholder.configure({
           placeholder: this.placeholderValue
+        }),
+        Link.configure({
+          openOnClick: false
+        }),
+        Mention.configure({
+          HTMLAttributes: {
+            class: 'mention'
+          },
+          suggestion
         })
       ],
       autofocus: true,
@@ -120,6 +135,34 @@ export default class RichTextEditorController extends Controller {
 
   toggleUnderline () {
     this.runCommand('toggleUnderline')
+  }
+
+  toggleLink () {
+    const previousUrl = this.editor.getAttributes('link').href
+    const url = window.prompt('URL', previousUrl)
+
+    // cancelled
+    if (url === null) return
+
+    // Remove link when URL is empty
+    if (url === '') {
+      this.editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .unsetLink()
+        .run()
+
+      return
+    }
+
+    // Set link URL
+    this.editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink({ href: url, target: '_blank' })
+      .run()
   }
 
   toggleH1 () {

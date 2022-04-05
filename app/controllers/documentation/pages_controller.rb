@@ -5,6 +5,7 @@ module Documentation
 
     def index
       @pages = Page.unscoped
+      @pages = @pages.merge!(Page.search(params[:title])) if params[:title]
     end
 
     def show; end
@@ -14,8 +15,7 @@ module Documentation
       @page = Page.new(parent_id: @parent&.id)
     end
 
-    def edit
-    end
+    def edit; end
 
     def create
       @page = Page.new(page_params)
