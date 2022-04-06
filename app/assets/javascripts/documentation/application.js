@@ -27308,17 +27308,17 @@ img.ProseMirror-separator {
     }
   });
 
-  // app/javascript/documentation/src/suggestion.js
+  // app/javascript/documentation/rich_text_editor/mention_component.js
   var createMentionContent = () => {
-    const component = document.createElement("div");
-    component.classList.add("dropdown-content");
-    return component;
+    const div2 = document.createElement("div");
+    div2.classList.add("dropdown-content");
+    return div2;
   };
-  var createMentionItem = (content2, classNames = "") => {
-    const item = document.createElement("div");
-    item.classList.add("dropdown-item", classNames);
-    item.innerHTML = content2;
-    return item;
+  var createMentionItem = (item, classNames = "") => {
+    const div2 = document.createElement("div");
+    div2.classList.add("dropdown-item", classNames);
+    div2.innerHTML = item.title;
+    return div2;
   };
   var MentionComponent = class {
     constructor() {
@@ -27340,7 +27340,8 @@ img.ProseMirror-separator {
       this.command = command2;
     }
     selectActiveItem() {
-      this.command({ id: this.items[this.selectedIndex] });
+      const { id, url, title } = this.items[this.selectedIndex];
+      this.command({ id: url, url, label: title });
     }
     updateActiveItem(index2) {
       this.selectedIndex = index2;
@@ -27358,24 +27359,25 @@ img.ProseMirror-separator {
       this.element.remove();
     }
   };
+
+  // app/javascript/documentation/rich_text_editor/suggestion.js
   var suggestion_default = {
     items: async ({ query }) => {
       const response = await get("/documentation/pages", {
         query: { title: query },
         responseKind: "json"
       });
-      if (response.ok) {
-        const json = await response.json;
-        return json.map((o) => o.title);
-      }
+      if (!response.ok)
+        return [];
+      return await response.json;
     },
     render: () => {
       let component = new MentionComponent();
       let popup;
       return {
-        onStart: (props) => {
+        onStart: ({ clientRect: clientRect2 }) => {
           popup = tippy_esm_default("body", {
-            getReferenceClientRect: props.clientRect,
+            getReferenceClientRect: clientRect2,
             appendTo: () => document.body,
             allowHTML: true,
             content: component.render(),
@@ -27386,25 +27388,24 @@ img.ProseMirror-separator {
             arrow: false
           });
         },
-        onUpdate(props) {
-          component.updateProps(props);
+        onUpdate({ items, command: command2, clientRect: clientRect2 }) {
+          component.updateProps({ items, command: command2 });
           component.render();
-          popup[0].setProps({
-            getReferenceClientRect: props.clientRect
-          });
+          popup[0].setProps({ getReferenceClientRect: clientRect2 });
         },
-        onKeyDown(props) {
-          console.log(props);
-          if (props.event.key === "Escape") {
+        onKeyDown({ event }) {
+          if (event.key === "Escape") {
             popup[0].hide();
             return true;
-          } else if (props.event.key === "Enter") {
+          } else if (event.key === "Enter") {
             component.selectActiveItem();
             return true;
-          } else if (props.event.key === "ArrowUp") {
+          } else if (event.key === "ArrowUp") {
             component.goUp();
-          } else if (props.event.key === "ArrowDown") {
+            return true;
+          } else if (event.key === "ArrowDown") {
             component.goDown();
+            return true;
           }
         },
         onExit() {
@@ -27483,7 +27484,11 @@ img.ProseMirror-separator {
           }),
           Mention.configure({
             HTMLAttributes: {
-              class: "mention"
+              class: "suggestion",
+              "data-controller": "tiptap-mention"
+            },
+            renderLabel({ options, node: node4 }) {
+              return `${options.suggestion.char}${node4.attrs.label}`;
             },
             suggestion: suggestion_default
           })
@@ -27610,11 +27615,21 @@ img.ProseMirror-separator {
     placeholder: { type: String, default: "" }
   });
 
+  // app/javascript/documentation/controllers/tiptap_mention_controller.js
+  var TiptapMentionController = class extends Controller {
+    connect() {
+      this.element.addEventListener("click", () => {
+        window.location.assign(this.element.dataset.id);
+      });
+    }
+  };
+
   // app/javascript/documentation/application.js
   var application = Application.start();
   application.register("dropdown", DropdownController);
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
+  application.register("tiptap-mention", TiptapMentionController);
 })();
 //# sourceMappingURL=application.js.map

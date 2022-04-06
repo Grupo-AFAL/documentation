@@ -7,7 +7,7 @@ import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
 import Mention from '@tiptap/extension-mention'
 
-import suggestion from '../src/suggestion'
+import suggestion from '../rich_text_editor/suggestion'
 
 import throttle from 'lodash.throttle'
 
@@ -102,7 +102,11 @@ export default class RichTextEditorController extends Controller {
         }),
         Mention.configure({
           HTMLAttributes: {
-            class: 'mention'
+            class: 'suggestion',
+            'data-controller': 'tiptap-mention'
+          },
+          renderLabel ({ options, node }) {
+            return `${options.suggestion.char}${node.attrs.label}`
           },
           suggestion
         })
