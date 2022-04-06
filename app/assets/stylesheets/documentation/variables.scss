@@ -1,3 +1,5 @@
+$family-primary: 'Roboto', sans-serif;
+
 // Sizes
 $size-1: 3rem;
 $size-2: 2.5rem;
@@ -24,7 +26,13 @@ $white-ter: hsl(0, 0%, 96%);
 $white-bis: hsl(0, 0%, 98%);
 $white: hsl(0, 0%, 100%);
 
-$error: hsl(10, 60%, 59%);
+$primary: hsl(196, 82%, 46%);
+$active: hsl(196, 82%, 46%);
+$info: hsl(211, 54%, 56%);
+$success: hsl(141, 57%, 50%);
+$warning: hsl(44, 93%, 78%);
+$danger: hsl(10, 60%, 59%);
+$error: $danger;
 
 $box-shadow: 0px 3px 18px rgba($black, 0.1), 0 0 0 1px rgba($black, 0.03);
 

@@ -147,10 +147,28 @@
   resolved "https://registry.yarnpkg.com/@tiptap/extension-italic/-/extension-italic-2.0.0-beta.26.tgz#b00c9e32b81b1bd94eaed24bb2a22e44d5dc54a3"
   integrity sha512-vejGe2ra4K5ipFOn1U9viqF9X9nPTX8WSJpSOux+9UbKjHpANy7bz69tp66OIi/Wh5L/MMDc+luH/04qfVnpZw==
 
+"@tiptap/extension-link@^2.0.0-beta.36":
+  version "2.0.0-beta.36"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-link/-/extension-link-2.0.0-beta.36.tgz#184bac20f3226b8945e400ebfdce2feabb4f5a3c"
+  integrity sha512-jV0EBM/QPfR4e5FG5OPHZARnYS+CL8yhCzHO4J1Nb1i/+vRY9QpPVBruZABBwt+J+PMdq6t/6vvIXejCR3wyAg==
+  dependencies:
+    linkifyjs "^3.0.5"
+    prosemirror-model "^1.16.1"
+    prosemirror-state "^1.3.4"
+
 "@tiptap/extension-list-item@^2.0.0-beta.20":
   version "2.0.0-beta.20"
   resolved "https://registry.yarnpkg.com/@tiptap/extension-list-item/-/extension-list-item-2.0.0-beta.20.tgz#7169528b226dee4590e013bdf6e5fc6d83729b0f"
   integrity sha512-5IPEspJt38t9ROj4xLUesOVEYlTT/R9Skd9meHRxJQZX1qrzBICs5PC/WRIsnexrvTBhdxpYgCYjpvpsJBlKuQ==
+
+"@tiptap/extension-mention@^2.0.0-beta.95":
+  version "2.0.0-beta.95"
+  resolved "https://registry.yarnpkg.com/@tiptap/extension-mention/-/extension-mention-2.0.0-beta.95.tgz#b9e2302afa5ddd0d643bb76b93fba0c391dd3ae6"
+  integrity sha512-AiikYJa33APtMI7c6a4EpPhqAYxHHnub5b9hd62zM1peBp2D2aO1dEIL7cB7O2P8EBZ2pu2QN2mFcCbVlSi0Xw==
+  dependencies:
+    "@tiptap/suggestion" "^2.0.0-beta.90"
+    prosemirror-model "^1.16.1"
+    prosemirror-state "^1.3.4"
 
 "@tiptap/extension-ordered-list@^2.0.0-beta.27":
   version "2.0.0-beta.27"
@@ -210,6 +228,15 @@
     "@tiptap/extension-paragraph" "^2.0.0-beta.23"
     "@tiptap/extension-strike" "^2.0.0-beta.27"
     "@tiptap/extension-text" "^2.0.0-beta.15"
+
+"@tiptap/suggestion@^2.0.0-beta.90":
+  version "2.0.0-beta.90"
+  resolved "https://registry.yarnpkg.com/@tiptap/suggestion/-/suggestion-2.0.0-beta.90.tgz#16b0cf8732c08ac57d5e7f6cc98b70b0a581bdc6"
+  integrity sha512-L5PPYRatY/75uJJRQx2o/Ce+gzcOkmd81TwLjio9sADV3bRf4DO4WYcQy0AtGe6uNSz78DTL0SUVw4204VjoBw==
+  dependencies:
+    prosemirror-model "^1.16.1"
+    prosemirror-state "^1.3.4"
+    prosemirror-view "^1.23.6"
 
 "@types/orderedmap@*":
   version "1.0.0"
@@ -485,6 +512,11 @@ hotkeys-js@^3.8.7:
   version "3.8.7"
   resolved "https://registry.yarnpkg.com/hotkeys-js/-/hotkeys-js-3.8.7.tgz#c16cab978b53d7242f860ca3932e976b92399981"
   integrity sha512-ckAx3EkUr5XjDwjEHDorHxRO2Kb7z6Z2Sxul4MbBkN8Nho7XDslQsgMJT+CiJ5Z4TgRxxvKHEpuLE3imzqy4Lg==
+
+linkifyjs@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/linkifyjs/-/linkifyjs-3.0.5.tgz#99e51a3a0c0e232fcb63ebb89eea3ff923378f34"
+  integrity sha512-1Y9XQH65eQKA9p2xtk+zxvnTeQBG7rdAXSkUG97DmuI/Xhji9uaUzaWxRj6rf9YC0v8KKHkxav7tnLX82Sz5Fg==
 
 lodash.camelcase@^4.3.0:
   version "4.3.0"

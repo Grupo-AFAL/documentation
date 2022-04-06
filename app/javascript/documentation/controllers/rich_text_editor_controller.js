@@ -4,18 +4,29 @@ import StarterKit from '@tiptap/starter-kit'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
+import Link from '@tiptap/extension-link'
+import Mention from '@tiptap/extension-mention'
+
+import suggestion from '../rich_text_editor/suggestion'
 
 import throttle from 'lodash.throttle'
 
 export default class RichTextEditorController extends Controller {
   static targets = [
     'bubbleMenu',
+    'dropdown',
+    'dropdownTrigger',
+    'text',
     'h1',
     'h2',
     'h3',
+    'ul',
+    'ol',
+    'blockquote',
     'bold',
     'italic',
     'underline',
+    'link',
     'output'
   ]
   static values = {
@@ -23,14 +34,55 @@ export default class RichTextEditorController extends Controller {
     placeholder: { type: String, default: '' }
   }
 
-  toolbarButtons = [
-    { target: 'h1', name: 'heading', param: { level: 1 } },
-    { target: 'h2', name: 'heading', param: { level: 2 } },
-    { target: 'h3', name: 'heading', param: { level: 3 } },
+  toolbarMarks = [
     { target: 'bold', name: 'bold' },
     { target: 'italic', name: 'italic' },
-    { target: 'underline', name: 'underline' }
+    { target: 'underline', name: 'underline' },
+    { target: 'link', name: 'link' }
   ]
+
+  toolbarTypes = [
+    {
+      target: 'h1',
+      name: 'heading',
+      attributes: { level: 1 },
+      text: 'Heading 1'
+    },
+    {
+      target: 'h2',
+      name: 'heading',
+      attributes: { level: 2 },
+      text: 'Heading 2'
+    },
+    {
+      target: 'h3',
+      name: 'heading',
+      attributes: { level: 3 },
+      text: 'Heading 3'
+    },
+    {
+      name: 'bulletList',
+      target: 'ul',
+      text: 'Bulleted List'
+    },
+    {
+      name: 'orderedList',
+      target: 'ol',
+      text: 'Ordered List'
+    },
+    {
+      name: 'blockquote',
+      target: 'blockquote',
+      text: 'Quote'
+    },
+    {
+      name: 'paragraph',
+      target: 'text',
+      text: 'Text'
+    }
+  ]
+
+  allMenuButtons = this.toolbarMarks.concat(this.toolbarTypes)
 
   connect () {
     this.editor = new Editor({
@@ -44,6 +96,19 @@ export default class RichTextEditorController extends Controller {
         }),
         Placeholder.configure({
           placeholder: this.placeholderValue
+        }),
+        Link.configure({
+          openOnClick: false
+        }),
+        Mention.configure({
+          HTMLAttributes: {
+            class: 'suggestion',
+            'data-controller': 'tiptap-mention'
+          },
+          renderLabel ({ options, node }) {
+            return `${options.suggestion.char}${node.attrs.label}`
+          },
+          suggestion
         })
       ],
       autofocus: true,
@@ -53,7 +118,9 @@ export default class RichTextEditorController extends Controller {
 
     this.editor.on('transaction', () => {
       this.resetMenuButtons()
-      this.enableSelectedMenuButtons()
+      this.enableSelectedToolbarMarks()
+      this.enableSelectedToolbarType()
+      this.setCurrentToolbarType()
     })
   }
 
@@ -74,6 +141,34 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleUnderline')
   }
 
+  toggleLink () {
+    const previousUrl = this.editor.getAttributes('link').href
+    const url = window.prompt('URL', previousUrl)
+
+    // cancelled
+    if (url === null) return
+
+    // Remove link when URL is empty
+    if (url === '') {
+      this.editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .unsetLink()
+        .run()
+
+      return
+    }
+
+    // Set link URL
+    this.editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink({ href: url, target: '_blank' })
+      .run()
+  }
+
   toggleH1 () {
     this.runCommand('toggleHeading', { level: 1 })
   }
@@ -86,27 +181,69 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleHeading', { level: 3 })
   }
 
-  runCommand (name, param) {
+  setParagraph () {
+    this.runCommand('setParagraph')
+  }
+
+  toggleBulletList () {
+    this.runCommand('toggleBulletList')
+  }
+
+  toggleOrderedList () {
+    this.runCommand('toggleOrderedList')
+  }
+
+  toggleBlockquote () {
+    this.runCommand('toggleBlockquote')
+  }
+
+  runCommand (name, attributes) {
     this.editor
       .chain()
       .focus()
-      [name](param)
+      [name](attributes)
       .run()
   }
 
   resetMenuButtons () {
-    this.toolbarButtons.forEach(({ target }) => {
+    if (this.hasDropdownTarget) {
+      this.dropdownTarget.classList.remove('is-active')
+    }
+
+    this.allMenuButtons.forEach(({ target }) => {
       if (this.hasTarget(target)) {
         this[`${target}Target`].classList.remove('is-active')
       }
     })
   }
 
-  enableSelectedMenuButtons () {
-    this.toolbarButtons.forEach(({ target, name, param }) => {
-      if (this.editor.isActive(name, param) && this.hasTarget(target)) {
+  enableSelectedToolbarMarks () {
+    this.toolbarMarks.forEach(({ target, name, attributes }) => {
+      if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
         this[`${target}Target`].classList.add('is-active')
       }
+    })
+  }
+
+  enableSelectedToolbarType () {
+    this.toolbarTypes.some(({ target, name, attributes }) => {
+      if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
+        this[`${target}Target`].classList.add('is-active')
+        return true
+      }
+    })
+  }
+
+  setCurrentToolbarType () {
+    if (!this.hasDropdownTriggerTarget) return
+
+    const selectedType = this.selectedToolbarType()
+    this.dropdownTriggerTarget.innerHTML = selectedType.text
+  }
+
+  selectedToolbarType () {
+    return this.toolbarTypes.find(({ name, attributes }) => {
+      return this.editor.isActive(name, attributes)
     })
   }
 

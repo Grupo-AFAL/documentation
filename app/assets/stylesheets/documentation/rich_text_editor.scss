@@ -1,5 +1,11 @@
 $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
 
+.tippy-box .dropdown-item {
+  &.is-active {
+    background-color: $white-ter;
+  }
+}
+
 .rich-editor-content {
   p {
     min-height: 1.5rem;
@@ -15,6 +21,47 @@ $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
 
   h3 {
     font-size: $size-5;
+  }
+
+  ul {
+    list-style: disc outside;
+    margin-left: 2em;
+    margin-top: 1em;
+  }
+
+  li {
+    display: list-item;
+  }
+
+  ol {
+    list-style-position: outside;
+    margin-left: 2em;
+    margin-top: 1em;
+  }
+
+  blockquote {
+    background-color: $grey-lightest;
+    border-left: 5px solid $grey-lighter;
+    padding: 1.25em 1.5em;
+  }
+
+  .suggestion {
+    color: $info;
+    border: 1px solid darken($info, 10%);
+    border-radius: 0.4rem;
+    padding: 0.1rem 0.3rem;
+    box-decoration-break: clone;
+    cursor: pointer;
+  }
+
+  blockquote:not(:last-child),
+  dl:not(:last-child),
+  ol:not(:last-child),
+  p:not(:last-child),
+  pre:not(:last-child),
+  table:not(:last-child),
+  ul:not(:last-child) {
+    margin-bottom: 1em;
   }
 }
 
@@ -42,23 +89,70 @@ $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
   }
 }
 
+$menu-border-radius: 0.25rem;
+$menu-icon-size: 0.75em;
+
 .rich-text-editor-menu {
   display: flex;
   box-shadow: $menu-box-shadow;
-  border-radius: 0.25rem;
-  overflow: hidden;
   text-align: center;
+  border-radius: $menu-border-radius;
+
+  .toolbar-icon {
+    .svg-inline {
+      width: $menu-icon-size;
+      height: $menu-icon-size;
+
+      path {
+        fill: $grey-light;
+      }
+    }
+  }
+
+  .dropdown-menu {
+    min-width: unset;
+  }
+
+  .dropdown-trigger {
+    a {
+      width: auto;
+      border-radius: $menu-border-radius 0 0 $menu-border-radius;
+    }
+  }
+
+  > :first-child {
+    border-radius: $menu-border-radius 0 0 $menu-border-radius;
+  }
+
+  > :last-child {
+    border-radius: 0 $menu-border-radius $menu-border-radius 0;
+  }
 
   a {
     display: inline-block;
     color: $black-ter;
     background-color: white;
     border-right: 1px solid $grey-lightest;
-    padding: 0.25rem;
+    padding: 0.25rem 0.5rem;
     width: 2rem;
 
-    &:last-child {
-      border-right: none;
+    &.dropdown-item {
+      display: block;
+      border: none;
+      width: 100%;
+      text-align: left;
+      padding: 0.25rem 1rem;
+
+      &.is-active {
+        background-color: $white;
+        color: $black;
+        font-weight: bold;
+        text-decoration: underline;
+      }
+
+      &:hover {
+        background-color: $grey-lightest;
+      }
     }
 
     &:hover {
@@ -75,6 +169,10 @@ $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
 
     &.underline {
       text-decoration: underline;
+    }
+
+    &.link {
+      width: unset;
     }
   }
 }
