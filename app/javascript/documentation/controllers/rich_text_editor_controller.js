@@ -16,6 +16,8 @@ export default class RichTextEditorController extends Controller {
     'bubbleMenu',
     'dropdown',
     'dropdownTrigger',
+    'linkMenu',
+    'linkInput',
     'text',
     'h1',
     'h2',
@@ -141,32 +143,50 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleUnderline')
   }
 
-  toggleLink () {
-    const previousUrl = this.editor.getAttributes('link').href
-    const url = window.prompt('URL', previousUrl)
+  openLinkPanel () {
+    const link = this.editor.getAttributes('link')
+    console.log(link)
 
-    // cancelled
-    if (url === null) return
+    this.linkInputTarget.innerHTML = link.href
+  }
 
-    // Remove link when URL is empty
-    if (url === '') {
-      this.editor
-        .chain()
-        .focus()
-        .extendMarkRange('link')
-        .unsetLink()
-        .run()
+  saveLinkUrl (event) {
+    event.stopPropagation()
 
-      return
-    }
+    if (event.key !== 'Enter') return
 
-    // Set link URL
     this.editor
       .chain()
       .focus()
       .extendMarkRange('link')
-      .setLink({ href: url, target: '_blank' })
+      .setLink({ href: event.target.innerHTML, target: '_blank' })
       .run()
+
+    this.linkInputTarget.innerHTML = ''
+  }
+
+  toggleLink () {
+    // const previousUrl = this.editor.getAttributes('link').href
+    // const url = window.prompt('URL', previousUrl)
+    // cancelled
+    // if (url === null) return
+    // // Remove link when URL is empty
+    // if (url === '') {
+    //   this.editor
+    //     .chain()
+    //     .focus()
+    //     .extendMarkRange('link')
+    //     .unsetLink()
+    //     .run()
+    //   return
+    // }
+    // // Set link URL
+    // this.editor
+    //   .chain()
+    //   .focus()
+    //   .extendMarkRange('link')
+    //   .setLink({ href: url, target: '_blank' })
+    //   .run()
   }
 
   toggleH1 () {
@@ -208,6 +228,10 @@ export default class RichTextEditorController extends Controller {
   resetMenuButtons () {
     if (this.hasDropdownTarget) {
       this.dropdownTarget.classList.remove('is-active')
+    }
+
+    if (this.hasLinkMenuTarget) {
+      this.linkMenuTarget.classList.remove('is-active')
     }
 
     this.allMenuButtons.forEach(({ target }) => {

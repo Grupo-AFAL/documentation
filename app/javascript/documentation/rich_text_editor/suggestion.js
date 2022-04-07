@@ -1,6 +1,6 @@
 import tippy from 'tippy.js'
 import { get } from '@rails/request.js'
-import MentionComponent from './mention_component'
+import PopUpListComponent from './popup_list_component'
 
 /**
  * Tiptap suggestion utility
@@ -20,7 +20,7 @@ export default {
   },
 
   render: () => {
-    let component = new MentionComponent()
+    let component = new PopUpListComponent()
     let popup
 
     return {

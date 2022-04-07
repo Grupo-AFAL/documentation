@@ -23,6 +23,7 @@
     data-rich-text-editor-placeholder-value='Write page content here...'
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
+
       <div class="dropdown" data-controller="dropdown" data-rich-text-editor-target="dropdown">
         <div class="dropdown-trigger">
           <a data-action="dropdown#toggleMenu">
@@ -42,10 +43,23 @@
           </div>
         </div>
       </div>
-      <a class="link" data-action="rich-text-editor#toggleLink" data-rich-text-editor-target="link">
-        <span>Link</span>
-        <%= icon_tag('arrow-right-up', class: 'toolbar-icon') %>
-      </a>
+
+      <div class="dropdown" data-controller="dropdown" data-dropdown-close-on-click-value="false" data-rich-text-editor-target="linkMenu">
+        <div class="dropdown-trigger">
+          <a class="link" data-action="dropdown#toggleMenu rich-text-editor#openLinkPanel">
+            <span>Link</span>
+            <%= icon_tag('arrow-right-up', class: 'toolbar-icon') %>
+          </a>
+        </div>
+        <div class="dropdown-menu">
+          <div class="dropdown-content link-panel">
+            <div contenteditable="true" class="input is-small"
+                 placeholder="Ingresa la URL"
+                 data-rich-text-editor-target="linkInput" data-action="keydown->rich-text-editor#saveLinkUrl"></div>
+          </div>
+        </div>
+      </div>
+
       <a class="bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
       <a class="italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
       <a class="underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
