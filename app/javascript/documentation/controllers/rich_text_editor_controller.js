@@ -104,8 +104,7 @@ export default class RichTextEditorController extends Controller {
         }),
         Mention.configure({
           HTMLAttributes: {
-            class: 'suggestion',
-            'data-controller': 'tiptap-mention'
+            class: 'suggestion'
           },
           renderLabel ({ options, node }) {
             return `${options.suggestion.char}${node.attrs.label}`
@@ -145,48 +144,31 @@ export default class RichTextEditorController extends Controller {
 
   openLinkPanel () {
     const link = this.editor.getAttributes('link')
-    console.log(link)
-
-    this.linkInputTarget.innerHTML = link.href
+    this.linkInputTarget.innerHTML = link.href || ''
+    this.linkInputTarget.focus()
   }
 
   saveLinkUrl (event) {
-    event.stopPropagation()
-
     if (event.key !== 'Enter') return
+    const url = event.target.innerHTML
 
-    this.editor
-      .chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({ href: event.target.innerHTML, target: '_blank' })
-      .run()
+    if (url == '') {
+      this.editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .unsetLink()
+        .run()
+    } else {
+      this.editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .setLink({ href: event.target.innerHTML, target: '_blank' })
+        .run()
+    }
 
     this.linkInputTarget.innerHTML = ''
-  }
-
-  toggleLink () {
-    // const previousUrl = this.editor.getAttributes('link').href
-    // const url = window.prompt('URL', previousUrl)
-    // cancelled
-    // if (url === null) return
-    // // Remove link when URL is empty
-    // if (url === '') {
-    //   this.editor
-    //     .chain()
-    //     .focus()
-    //     .extendMarkRange('link')
-    //     .unsetLink()
-    //     .run()
-    //   return
-    // }
-    // // Set link URL
-    // this.editor
-    //   .chain()
-    //   .focus()
-    //   .extendMarkRange('link')
-    //   .setLink({ href: url, target: '_blank' })
-    //   .run()
   }
 
   toggleH1 () {

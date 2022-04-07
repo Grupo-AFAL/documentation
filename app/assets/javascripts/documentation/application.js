@@ -27490,8 +27490,7 @@ img.ProseMirror-separator {
           }),
           Mention.configure({
             HTMLAttributes: {
-              class: "suggestion",
-              "data-controller": "tiptap-mention"
+              class: "suggestion"
             },
             renderLabel({ options, node: node4 }) {
               return `${options.suggestion.char}${node4.attrs.label}`;
@@ -27525,17 +27524,19 @@ img.ProseMirror-separator {
     }
     openLinkPanel() {
       const link = this.editor.getAttributes("link");
-      console.log(link);
-      this.linkInputTarget.innerHTML = link.href;
+      this.linkInputTarget.innerHTML = link.href || "";
+      this.linkInputTarget.focus();
     }
     saveLinkUrl(event) {
-      event.stopPropagation();
       if (event.key !== "Enter")
         return;
-      this.editor.chain().focus().extendMarkRange("link").setLink({ href: event.target.innerHTML, target: "_blank" }).run();
+      const url = event.target.innerHTML;
+      if (url == "") {
+        this.editor.chain().focus().extendMarkRange("link").unsetLink().run();
+      } else {
+        this.editor.chain().focus().extendMarkRange("link").setLink({ href: event.target.innerHTML, target: "_blank" }).run();
+      }
       this.linkInputTarget.innerHTML = "";
-    }
-    toggleLink() {
     }
     toggleH1() {
       this.runCommand("toggleHeading", { level: 1 });
@@ -27629,21 +27630,11 @@ img.ProseMirror-separator {
     placeholder: { type: String, default: "" }
   });
 
-  // app/javascript/documentation/controllers/tiptap_mention_controller.js
-  var TiptapMentionController = class extends Controller {
-    connect() {
-      this.element.addEventListener("click", () => {
-        window.location.assign(this.element.dataset.id);
-      });
-    }
-  };
-
   // app/javascript/documentation/application.js
   var application = Application.start();
   application.register("dropdown", DropdownController);
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
-  application.register("tiptap-mention", TiptapMentionController);
 })();
 //# sourceMappingURL=application.js.map
