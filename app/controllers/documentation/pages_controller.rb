@@ -1,7 +1,7 @@
 module Documentation
   class PagesController < ApplicationController
     before_action :set_page, only: %i[show edit update destroy]
-    before_action :set_root_pages, only: %i[new edit create update]
+    before_action :set_pages, only: %i[new edit create update]
 
     def index
       @pages = Page.unscoped
@@ -46,8 +46,8 @@ module Documentation
       @page = Page.find(params[:id])
     end
 
-    def set_root_pages
-      @pages = Page.roots.excluding(@page)
+    def set_pages
+      @pages = Page.excluding(@page)
     end
 
     def page_params
