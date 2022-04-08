@@ -14,8 +14,10 @@ import throttle from 'lodash.throttle'
 export default class RichTextEditorController extends Controller {
   static targets = [
     'bubbleMenu',
-    'dropdown',
-    'dropdownTrigger',
+    'nodeSelect',
+    'nodeSelectTrigger',
+    'linkPanel',
+    'linkInput',
     'text',
     'h1',
     'h2',
@@ -102,8 +104,7 @@ export default class RichTextEditorController extends Controller {
         }),
         Mention.configure({
           HTMLAttributes: {
-            class: 'suggestion',
-            'data-controller': 'tiptap-mention'
+            class: 'suggestion'
           },
           renderLabel ({ options, node }) {
             return `${options.suggestion.char}${node.attrs.label}`
@@ -141,32 +142,41 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleUnderline')
   }
 
-  toggleLink () {
-    const previousUrl = this.editor.getAttributes('link').href
-    const url = window.prompt('URL', previousUrl)
+  closeLinkPanel () {
+    if (!this.hasLinkPanelTarget) return
 
-    // cancelled
-    if (url === null) return
+    this.linkPanelTarget.classList.remove('is-active')
+  }
 
-    // Remove link when URL is empty
-    if (url === '') {
+  openLinkPanel () {
+    this.closeNodeSelectDropdown()
+
+    const link = this.editor.getAttributes('link')
+    this.linkInputTarget.innerHTML = link.href || ''
+    this.linkInputTarget.focus()
+  }
+
+  saveLinkUrl (event) {
+    if (event.key !== 'Enter') return
+    const url = event.target.innerHTML
+
+    if (url == '') {
       this.editor
         .chain()
         .focus()
         .extendMarkRange('link')
         .unsetLink()
         .run()
-
-      return
+    } else {
+      this.editor
+        .chain()
+        .focus()
+        .extendMarkRange('link')
+        .setLink({ href: event.target.innerHTML, target: '_blank' })
+        .run()
     }
 
-    // Set link URL
-    this.editor
-      .chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({ href: url, target: '_blank' })
-      .run()
+    this.linkInputTarget.innerHTML = ''
   }
 
   toggleH1 () {
@@ -206,9 +216,8 @@ export default class RichTextEditorController extends Controller {
   }
 
   resetMenuButtons () {
-    if (this.hasDropdownTarget) {
-      this.dropdownTarget.classList.remove('is-active')
-    }
+    this.closeNodeSelectDropdown()
+    this.closeLinkPanel()
 
     this.allMenuButtons.forEach(({ target }) => {
       if (this.hasTarget(target)) {
@@ -235,10 +244,10 @@ export default class RichTextEditorController extends Controller {
   }
 
   setCurrentToolbarType () {
-    if (!this.hasDropdownTriggerTarget) return
+    if (!this.hasNodeSelectTriggerTarget) return
 
     const selectedType = this.selectedToolbarType()
-    this.dropdownTriggerTarget.innerHTML = selectedType.text
+    this.nodeSelectTriggerTarget.innerHTML = selectedType.text
   }
 
   selectedToolbarType () {
@@ -250,5 +259,11 @@ export default class RichTextEditorController extends Controller {
   hasTarget (name) {
     const capitalizedName = name[0].toUpperCase() + name.slice(1).toLowerCase()
     return this[`has${capitalizedName}Target`]
+  }
+
+  closeNodeSelectDropdown () {
+    if (!this.hasNodeSelectTarget) return
+
+    this.nodeSelectTarget.classList.remove('is-active')
   }
 }

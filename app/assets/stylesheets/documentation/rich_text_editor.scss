@@ -175,4 +175,21 @@ $menu-icon-size: 0.75em;
       width: unset;
     }
   }
+
+  .link-panel {
+    width: 18rem;
+    padding: 0.5rem;
+
+    .input {
+      display: inline-block;
+      text-align: left;
+    }
+
+    [contenteditable='true']:empty:before {
+      color: $grey-light;
+      content: attr(placeholder);
+      pointer-events: none;
+      display: block; /* For Firefox */
+    }
+  }
 }
