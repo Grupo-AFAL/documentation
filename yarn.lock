@@ -491,8 +491,9 @@ flatpickr@=4.6.9:
   resolved "https://registry.yarnpkg.com/flatpickr/-/flatpickr-4.6.9.tgz#9a13383e8a6814bda5d232eae3fcdccb97dc1499"
   integrity sha512-F0azNNi8foVWKSF+8X+ZJzz8r9sE1G4hl06RyceIaLvyltKvDl6vqk9Lm/6AUUCi5HWaIjiUbk7UpeE/fOXOpw==
 
-"frontend-helpers@file:../frontend-helpers":
-  version "0.5.19"
+"frontend-helpers@https://github.com/Grupo-AFAL/frontend-helpers.git":
+  version "0.5.20"
+  resolved "https://github.com/Grupo-AFAL/frontend-helpers.git#28c86d0d0990c8f8d964e9574c4852d89e91c30f"
   dependencies:
     "@glidejs/glide" "^3.5"
     "@hotwired/stimulus" "^3.0.1"
