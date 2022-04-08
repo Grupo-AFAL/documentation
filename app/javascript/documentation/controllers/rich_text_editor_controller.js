@@ -14,9 +14,9 @@ import throttle from 'lodash.throttle'
 export default class RichTextEditorController extends Controller {
   static targets = [
     'bubbleMenu',
-    'dropdown',
-    'dropdownTrigger',
-    'linkMenu',
+    'nodeSelect',
+    'nodeSelectTrigger',
+    'linkPanel',
     'linkInput',
     'text',
     'h1',
@@ -142,7 +142,15 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleUnderline')
   }
 
+  closeLinkPanel () {
+    if (!this.hasLinkPanelTarget) return
+
+    this.linkPanelTarget.classList.remove('is-active')
+  }
+
   openLinkPanel () {
+    this.closeNodeSelectDropdown()
+
     const link = this.editor.getAttributes('link')
     this.linkInputTarget.innerHTML = link.href || ''
     this.linkInputTarget.focus()
@@ -208,13 +216,8 @@ export default class RichTextEditorController extends Controller {
   }
 
   resetMenuButtons () {
-    if (this.hasDropdownTarget) {
-      this.dropdownTarget.classList.remove('is-active')
-    }
-
-    if (this.hasLinkMenuTarget) {
-      this.linkMenuTarget.classList.remove('is-active')
-    }
+    this.closeNodeSelectDropdown()
+    this.closeLinkPanel()
 
     this.allMenuButtons.forEach(({ target }) => {
       if (this.hasTarget(target)) {
@@ -241,10 +244,10 @@ export default class RichTextEditorController extends Controller {
   }
 
   setCurrentToolbarType () {
-    if (!this.hasDropdownTriggerTarget) return
+    if (!this.hasNodeSelectTriggerTarget) return
 
     const selectedType = this.selectedToolbarType()
-    this.dropdownTriggerTarget.innerHTML = selectedType.text
+    this.nodeSelectTriggerTarget.innerHTML = selectedType.text
   }
 
   selectedToolbarType () {
@@ -256,5 +259,11 @@ export default class RichTextEditorController extends Controller {
   hasTarget (name) {
     const capitalizedName = name[0].toUpperCase() + name.slice(1).toLowerCase()
     return this[`has${capitalizedName}Target`]
+  }
+
+  closeNodeSelectDropdown () {
+    if (!this.hasNodeSelectTarget) return
+
+    this.nodeSelectTarget.classList.remove('is-active')
   }
 }

@@ -24,10 +24,10 @@
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
 
-      <div class="dropdown" data-controller="dropdown" data-rich-text-editor-target="dropdown">
+      <div class="dropdown" data-controller="dropdown" data-rich-text-editor-target="nodeSelect">
         <div class="dropdown-trigger">
-          <a data-action="dropdown#toggleMenu">
-            <span class="text" data-rich-text-editor-target="dropdownTrigger">Text</span>
+          <a data-action="dropdown#toggleMenu rich-text-editor#closeLinkPanel">
+            <span class="text" data-rich-text-editor-target="nodeSelectTrigger">Text</span>
             <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
           </a>
         </div>
@@ -44,7 +44,7 @@
         </div>
       </div>
 
-      <div class="dropdown" data-controller="dropdown" data-dropdown-close-on-click-value="false" data-rich-text-editor-target="linkMenu">
+      <div class="dropdown" data-controller="dropdown" data-dropdown-close-on-click-value="false" data-rich-text-editor-target="linkPanel">
         <div class="dropdown-trigger">
           <a class="link" data-action="dropdown#toggleMenu rich-text-editor#openLinkPanel">
             <span>Link</span>
