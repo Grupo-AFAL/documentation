@@ -10,7 +10,7 @@ GIT
 PATH
   remote: ../bali
   specs:
-    bali (0.1.0)
+    bali_view_components (0.1.0)
       rails (>= 7.0.2.3)
       view_component (>= 2.0.0, < 3.0)
       view_component-contrib
@@ -219,7 +219,7 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
-    view_component (2.49.1)
+    view_component (2.52.0)
       activesupport (>= 5.0.0, < 8.0)
       method_source (~> 1.0)
     view_component-contrib (0.1.1)
@@ -235,7 +235,7 @@ PLATFORMS
 
 DEPENDENCIES
   acts_as_tree
-  bali!
+  bali_view_components!
   bulma-rails (~> 0.9.3)
   documentation!
   frontend_helpers!
