@@ -15,6 +15,8 @@ module Documentation
           documentation/application.js
           documentation/application.css
         ]
+
+        app.config.assets.paths << Rails.root.join('app/components')
       end
     end
   end

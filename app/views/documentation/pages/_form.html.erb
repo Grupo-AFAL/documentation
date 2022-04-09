@@ -53,16 +53,24 @@
         </div>
         <div class="dropdown-menu">
           <div class="dropdown-content link-panel">
-            <div contenteditable="true" class="input is-small"
+            <%= render(Bali::Tabs::Component.new) do |c| %>
+              <%= c.tab(title: 'URL', active: true) do %>
+                <div contenteditable="true" class="input is-small"
                  placeholder="Ingresa la URL"
                  data-rich-text-editor-target="linkInput" data-action="keydown->rich-text-editor#saveLinkUrl"></div>
+              <% end %>
+
+              <%= c.tab(title: 'Pages', active: false) do %>
+                <h5 class="title is-5">Pages</h5>
+              <% end %>
+            <% end %>
           </div>
         </div>
       </div>
 
-      <a class="bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
-      <a class="italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
-      <a class="underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
+      <a class="mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
+      <a class="mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
+      <a class="mark underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
     </div>
     <div data-rich-text-editor-target="tippy"></div>
     <%= form.hidden_field :content, 'data-rich-text-editor-target': 'output' %>

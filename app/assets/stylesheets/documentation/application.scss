@@ -70,7 +70,7 @@
 // @import 'sass/helpers/position';
 @import 'sass/helpers/spacing';
 @import 'sass/helpers/typography';
-// @import 'sass/helpers/visibility';
+@import 'sass/helpers/visibility';
 
 // @import 'sass/layout/hero';
 @import 'sass/layout/section';
@@ -89,3 +89,6 @@
 // Engine styles
 //
 @import 'rich_text_editor';
+
+// Bali Styles
+@import 'bali/tabs/index';

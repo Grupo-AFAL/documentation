@@ -6842,6 +6842,380 @@
   });
   __publicField(SlimSelectController, "targets", ["select", "selectAllButton", "deselectAllButton"]);
 
+  // node_modules/bali-view-components/node_modules/@hotwired/stimulus/dist/stimulus.js
+  function camelize2(value) {
+    return value.replace(/(?:[_-])([a-z0-9])/g, (_, char) => char.toUpperCase());
+  }
+  function capitalize2(value) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+  function dasherize2(value) {
+    return value.replace(/([A-Z])/g, (_, char) => `-${char.toLowerCase()}`);
+  }
+  function readInheritableStaticArrayValues2(constructor, propertyName) {
+    const ancestors = getAncestorsForConstructor2(constructor);
+    return Array.from(ancestors.reduce((values, constructor2) => {
+      getOwnStaticArrayValues2(constructor2, propertyName).forEach((name) => values.add(name));
+      return values;
+    }, /* @__PURE__ */ new Set()));
+  }
+  function readInheritableStaticObjectPairs2(constructor, propertyName) {
+    const ancestors = getAncestorsForConstructor2(constructor);
+    return ancestors.reduce((pairs, constructor2) => {
+      pairs.push(...getOwnStaticObjectPairs2(constructor2, propertyName));
+      return pairs;
+    }, []);
+  }
+  function getAncestorsForConstructor2(constructor) {
+    const ancestors = [];
+    while (constructor) {
+      ancestors.push(constructor);
+      constructor = Object.getPrototypeOf(constructor);
+    }
+    return ancestors.reverse();
+  }
+  function getOwnStaticArrayValues2(constructor, propertyName) {
+    const definition = constructor[propertyName];
+    return Array.isArray(definition) ? definition : [];
+  }
+  function getOwnStaticObjectPairs2(constructor, propertyName) {
+    const definition = constructor[propertyName];
+    return definition ? Object.keys(definition).map((key) => [key, definition[key]]) : [];
+  }
+  var getOwnKeys2 = (() => {
+    if (typeof Object.getOwnPropertySymbols == "function") {
+      return (object) => [
+        ...Object.getOwnPropertyNames(object),
+        ...Object.getOwnPropertySymbols(object)
+      ];
+    } else {
+      return Object.getOwnPropertyNames;
+    }
+  })();
+  var extend3 = (() => {
+    function extendWithReflect(constructor) {
+      function extended() {
+        return Reflect.construct(constructor, arguments, new.target);
+      }
+      extended.prototype = Object.create(constructor.prototype, {
+        constructor: { value: extended }
+      });
+      Reflect.setPrototypeOf(extended, constructor);
+      return extended;
+    }
+    function testReflectExtension() {
+      const a = function() {
+        this.a.call(this);
+      };
+      const b = extendWithReflect(a);
+      b.prototype.a = function() {
+      };
+      return new b();
+    }
+    try {
+      testReflectExtension();
+      return extendWithReflect;
+    } catch (error2) {
+      return (constructor) => class extended extends constructor {
+      };
+    }
+  })();
+  function ClassPropertiesBlessing2(constructor) {
+    const classes = readInheritableStaticArrayValues2(constructor, "classes");
+    return classes.reduce((properties, classDefinition) => {
+      return Object.assign(properties, propertiesForClassDefinition2(classDefinition));
+    }, {});
+  }
+  function propertiesForClassDefinition2(key) {
+    return {
+      [`${key}Class`]: {
+        get() {
+          const { classes } = this;
+          if (classes.has(key)) {
+            return classes.get(key);
+          } else {
+            const attribute = classes.getAttributeName(key);
+            throw new Error(`Missing attribute "${attribute}"`);
+          }
+        }
+      },
+      [`${key}Classes`]: {
+        get() {
+          return this.classes.getAll(key);
+        }
+      },
+      [`has${capitalize2(key)}Class`]: {
+        get() {
+          return this.classes.has(key);
+        }
+      }
+    };
+  }
+  function TargetPropertiesBlessing2(constructor) {
+    const targets = readInheritableStaticArrayValues2(constructor, "targets");
+    return targets.reduce((properties, targetDefinition) => {
+      return Object.assign(properties, propertiesForTargetDefinition2(targetDefinition));
+    }, {});
+  }
+  function propertiesForTargetDefinition2(name) {
+    return {
+      [`${name}Target`]: {
+        get() {
+          const target = this.targets.find(name);
+          if (target) {
+            return target;
+          } else {
+            throw new Error(`Missing target element "${name}" for "${this.identifier}" controller`);
+          }
+        }
+      },
+      [`${name}Targets`]: {
+        get() {
+          return this.targets.findAll(name);
+        }
+      },
+      [`has${capitalize2(name)}Target`]: {
+        get() {
+          return this.targets.has(name);
+        }
+      }
+    };
+  }
+  function ValuePropertiesBlessing2(constructor) {
+    const valueDefinitionPairs = readInheritableStaticObjectPairs2(constructor, "values");
+    const propertyDescriptorMap = {
+      valueDescriptorMap: {
+        get() {
+          return valueDefinitionPairs.reduce((result2, valueDefinitionPair) => {
+            const valueDescriptor = parseValueDefinitionPair2(valueDefinitionPair);
+            const attributeName = this.data.getAttributeNameForKey(valueDescriptor.key);
+            return Object.assign(result2, { [attributeName]: valueDescriptor });
+          }, {});
+        }
+      }
+    };
+    return valueDefinitionPairs.reduce((properties, valueDefinitionPair) => {
+      return Object.assign(properties, propertiesForValueDefinitionPair2(valueDefinitionPair));
+    }, propertyDescriptorMap);
+  }
+  function propertiesForValueDefinitionPair2(valueDefinitionPair) {
+    const definition = parseValueDefinitionPair2(valueDefinitionPair);
+    const { key, name, reader: read2, writer: write2 } = definition;
+    return {
+      [name]: {
+        get() {
+          const value = this.data.get(key);
+          if (value !== null) {
+            return read2(value);
+          } else {
+            return definition.defaultValue;
+          }
+        },
+        set(value) {
+          if (value === void 0) {
+            this.data.delete(key);
+          } else {
+            this.data.set(key, write2(value));
+          }
+        }
+      },
+      [`has${capitalize2(name)}`]: {
+        get() {
+          return this.data.has(key) || definition.hasCustomDefaultValue;
+        }
+      }
+    };
+  }
+  function parseValueDefinitionPair2([token, typeDefinition]) {
+    return valueDescriptorForTokenAndTypeDefinition2(token, typeDefinition);
+  }
+  function parseValueTypeConstant2(constant) {
+    switch (constant) {
+      case Array:
+        return "array";
+      case Boolean:
+        return "boolean";
+      case Number:
+        return "number";
+      case Object:
+        return "object";
+      case String:
+        return "string";
+    }
+  }
+  function parseValueTypeDefault2(defaultValue) {
+    switch (typeof defaultValue) {
+      case "boolean":
+        return "boolean";
+      case "number":
+        return "number";
+      case "string":
+        return "string";
+    }
+    if (Array.isArray(defaultValue))
+      return "array";
+    if (Object.prototype.toString.call(defaultValue) === "[object Object]")
+      return "object";
+  }
+  function parseValueTypeObject2(typeObject) {
+    const typeFromObject = parseValueTypeConstant2(typeObject.type);
+    if (typeFromObject) {
+      const defaultValueType = parseValueTypeDefault2(typeObject.default);
+      if (typeFromObject !== defaultValueType) {
+        throw new Error(`Type "${typeFromObject}" must match the type of the default value. Given default value: "${typeObject.default}" as "${defaultValueType}"`);
+      }
+      return typeFromObject;
+    }
+  }
+  function parseValueTypeDefinition2(typeDefinition) {
+    const typeFromObject = parseValueTypeObject2(typeDefinition);
+    const typeFromDefaultValue = parseValueTypeDefault2(typeDefinition);
+    const typeFromConstant = parseValueTypeConstant2(typeDefinition);
+    const type = typeFromObject || typeFromDefaultValue || typeFromConstant;
+    if (type)
+      return type;
+    throw new Error(`Unknown value type "${typeDefinition}"`);
+  }
+  function defaultValueForDefinition2(typeDefinition) {
+    const constant = parseValueTypeConstant2(typeDefinition);
+    if (constant)
+      return defaultValuesByType2[constant];
+    const defaultValue = typeDefinition.default;
+    if (defaultValue !== void 0)
+      return defaultValue;
+    return typeDefinition;
+  }
+  function valueDescriptorForTokenAndTypeDefinition2(token, typeDefinition) {
+    const key = `${dasherize2(token)}-value`;
+    const type = parseValueTypeDefinition2(typeDefinition);
+    return {
+      type,
+      key,
+      name: camelize2(key),
+      get defaultValue() {
+        return defaultValueForDefinition2(typeDefinition);
+      },
+      get hasCustomDefaultValue() {
+        return parseValueTypeDefault2(typeDefinition) !== void 0;
+      },
+      reader: readers2[type],
+      writer: writers2[type] || writers2.default
+    };
+  }
+  var defaultValuesByType2 = {
+    get array() {
+      return [];
+    },
+    boolean: false,
+    number: 0,
+    get object() {
+      return {};
+    },
+    string: ""
+  };
+  var readers2 = {
+    array(value) {
+      const array = JSON.parse(value);
+      if (!Array.isArray(array)) {
+        throw new TypeError("Expected array");
+      }
+      return array;
+    },
+    boolean(value) {
+      return !(value == "0" || value == "false");
+    },
+    number(value) {
+      return Number(value);
+    },
+    object(value) {
+      const object = JSON.parse(value);
+      if (object === null || typeof object != "object" || Array.isArray(object)) {
+        throw new TypeError("Expected object");
+      }
+      return object;
+    },
+    string(value) {
+      return value;
+    }
+  };
+  var writers2 = {
+    default: writeString2,
+    array: writeJSON2,
+    object: writeJSON2
+  };
+  function writeJSON2(value) {
+    return JSON.stringify(value);
+  }
+  function writeString2(value) {
+    return `${value}`;
+  }
+  var Controller2 = class {
+    constructor(context) {
+      this.context = context;
+    }
+    static get shouldLoad() {
+      return true;
+    }
+    get application() {
+      return this.context.application;
+    }
+    get scope() {
+      return this.context.scope;
+    }
+    get element() {
+      return this.scope.element;
+    }
+    get identifier() {
+      return this.scope.identifier;
+    }
+    get targets() {
+      return this.scope.targets;
+    }
+    get classes() {
+      return this.scope.classes;
+    }
+    get data() {
+      return this.scope.data;
+    }
+    initialize() {
+    }
+    connect() {
+    }
+    disconnect() {
+    }
+    dispatch(eventName, { target = this.element, detail = {}, prefix = this.identifier, bubbles = true, cancelable = true } = {}) {
+      const type = prefix ? `${prefix}:${eventName}` : eventName;
+      const event = new CustomEvent(type, { detail, bubbles, cancelable });
+      target.dispatchEvent(event);
+      return event;
+    }
+  };
+  Controller2.blessings = [ClassPropertiesBlessing2, TargetPropertiesBlessing2, ValuePropertiesBlessing2];
+  Controller2.targets = [];
+  Controller2.values = {};
+
+  // node_modules/bali-view-components/app/components/bali/tabs/index.js
+  var TabsController = class extends Controller2 {
+    open(event) {
+      event.preventDefault();
+      const index2 = event.currentTarget.getAttribute("data-tab-index");
+      this._hideAllTabs();
+      this._openTab(index2);
+    }
+    _hideAllTabs() {
+      const allContents = this.element.querySelectorAll("[data-content-index]");
+      Array.from(allContents).forEach((t) => t.classList.add("is-hidden"));
+      const allTabs = this.element.querySelectorAll("[data-tab-index]");
+      Array.from(allTabs).forEach((t) => t.classList.remove("is-active"));
+    }
+    _openTab(index2) {
+      const contentDiv = this.element.querySelector(`[data-content-index="${index2}"]`);
+      contentDiv.classList.remove("is-hidden");
+      const tabLi = this.element.querySelector(`[data-tab-index="${index2}"]`);
+      tabLi.classList.add("is-active");
+    }
+  };
+
   // node_modules/orderedmap/index.es.js
   function OrderedMap(content2) {
     this.content = content2;
@@ -27643,5 +28017,6 @@ img.ProseMirror-separator {
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
+  application.register("tabs", TabsController);
 })();
 //# sourceMappingURL=application.js.map

@@ -140,7 +140,10 @@ $menu-icon-size: 0.75em;
     background-color: white;
     border-right: 1px solid $grey-lightest;
     padding: 0.25rem 0.5rem;
-    width: 2rem;
+
+    &.mark {
+      width: 2rem;
+    }
 
     &.dropdown-item {
       display: block;
@@ -178,7 +181,6 @@ $menu-icon-size: 0.75em;
     }
 
     &.link {
-      width: unset;
     }
   }
 

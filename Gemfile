@@ -16,6 +16,8 @@ gem 'jbuilder'
 gem 'frontend_helpers', github: 'Grupo-AFAL/frontend-helpers', branch: 'main'
 # gem 'frontend_helpers', path: ENV['RUBY_FRONTEND_HELPERS_PATH']
 
+gem 'bali', path: '../bali'
+
 gem 'acts_as_tree'
 
 # Start debugger with binding.b [https://github.com/ruby/debug]

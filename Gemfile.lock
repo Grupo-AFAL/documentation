@@ -8,6 +8,14 @@ GIT
       ransack
 
 PATH
+  remote: ../bali
+  specs:
+    bali (0.1.0)
+      rails (>= 7.0.2.3)
+      view_component (>= 2.0.0, < 3.0)
+      view_component-contrib
+
+PATH
   remote: .
   specs:
     documentation (0.1.0)
@@ -186,6 +194,7 @@ GEM
       rspec-mocks (~> 3.10)
       rspec-support (~> 3.10)
     rspec-support (3.11.0)
+    ruby-next-core (0.15.1)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -210,6 +219,12 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
+    view_component (2.49.1)
+      activesupport (>= 5.0.0, < 8.0)
+      method_source (~> 1.0)
+    view_component-contrib (0.1.1)
+      ruby-next-core (>= 0.12.0)
+      view_component
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -220,6 +235,7 @@ PLATFORMS
 
 DEPENDENCIES
   acts_as_tree
+  bali!
   bulma-rails (~> 0.9.3)
   documentation!
   frontend_helpers!
