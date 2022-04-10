@@ -77,7 +77,7 @@ $menu-box-shadow: 0px 9px 9px rgba($black, 0.2), 0 0 0 1px rgba($black, 0.12);
     min-height: 5rem;
   }
 
-  .is-active {
+  .mark.is-active {
     color: $primary;
   }
 
@@ -187,10 +187,14 @@ $menu-icon-size: 0.75em;
   .link-panel {
     width: 18rem;
     padding: 0.5rem;
+    text-align: left;
+    font-size: $size-7;
 
     .input {
       display: inline-block;
       text-align: left;
+      overflow-wrap: normal;
+      overflow: hidden;
     }
 
     [contenteditable='true']:empty:before {
@@ -198,6 +202,15 @@ $menu-icon-size: 0.75em;
       content: attr(placeholder);
       pointer-events: none;
       display: block; /* For Firefox */
+    }
+
+    .tabs {
+      margin-bottom: 0.5rem;
+    }
+
+    .page-link {
+      display: block;
+      border: none;
     }
   }
 }

@@ -27918,6 +27918,10 @@ img.ProseMirror-separator {
       }
       this.linkInputTarget.innerHTML = "";
     }
+    savePageLink(event) {
+      const { url } = event.target.dataset;
+      this.editor.chain().focus().extendMarkRange("link").setLink({ href: url, target: "_blank" }).run();
+    }
     toggleH1() {
       this.runCommand("toggleHeading", { level: 1 });
     }
@@ -27970,7 +27974,9 @@ img.ProseMirror-separator {
       if (!this.hasNodeSelectTriggerTarget)
         return;
       const selectedType = this.selectedToolbarType();
-      this.nodeSelectTriggerTarget.innerHTML = selectedType.text;
+      if (selectedType) {
+        this.nodeSelectTriggerTarget.innerHTML = selectedType.text;
+      }
     }
     selectedToolbarType() {
       return this.toolbarTypes.find(({ name, attributes }) => {

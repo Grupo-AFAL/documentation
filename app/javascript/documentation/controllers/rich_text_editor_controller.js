@@ -179,6 +179,18 @@ export default class RichTextEditorController extends Controller {
     this.linkInputTarget.innerHTML = ''
   }
 
+  // TODO: Create PageLink extension to be able to store reference to the page.
+  savePageLink (event) {
+    const { url } = event.target.dataset
+
+    this.editor
+      .chain()
+      .focus()
+      .extendMarkRange('link')
+      .setLink({ href: url, target: '_blank' })
+      .run()
+  }
+
   toggleH1 () {
     this.runCommand('toggleHeading', { level: 1 })
   }
@@ -247,7 +259,9 @@ export default class RichTextEditorController extends Controller {
     if (!this.hasNodeSelectTriggerTarget) return
 
     const selectedType = this.selectedToolbarType()
-    this.nodeSelectTriggerTarget.innerHTML = selectedType.text
+    if (selectedType) {
+      this.nodeSelectTriggerTarget.innerHTML = selectedType.text
+    }
   }
 
   selectedToolbarType () {

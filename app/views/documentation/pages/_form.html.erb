@@ -53,15 +53,26 @@
         </div>
         <div class="dropdown-menu">
           <div class="dropdown-content link-panel">
-            <%= render(Bali::Tabs::Component.new) do |c| %>
+            <%= render(Bali::Tabs::Component.new(class: 'is-small')) do |c| %>
               <%= c.tab(title: 'URL', active: true) do %>
-                <div contenteditable="true" class="input is-small"
-                 placeholder="Ingresa la URL"
-                 data-rich-text-editor-target="linkInput" data-action="keydown->rich-text-editor#saveLinkUrl"></div>
+                <div contenteditable="true"
+                     class="input is-small"
+                     placeholder="Ingresa la URL"
+                     data-rich-text-editor-target="linkInput"
+                     data-action="keydown->rich-text-editor#saveLinkUrl">
+                </div>
               <% end %>
 
               <%= c.tab(title: 'Pages', active: false) do %>
-                <h5 class="title is-5">Pages</h5>
+                <% @pages.each do |page| %>
+                  <%= tag.a page.title,
+                      class: 'page-link',
+                      data: {
+                        action: 'click->rich-text-editor#savePageLink',
+                        id: page.id,
+                        url: page_url(page)
+                      } %>
+                <% end %>
               <% end %>
             <% end %>
           </div>
