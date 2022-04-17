@@ -1,13 +1,9 @@
 import '@hotwired/turbo-rails'
 
 import { Application } from '@hotwired/stimulus'
-import {
-  DropdownController,
-  NotificationController,
-  SlimSelectController
-} from 'frontend-helpers'
+import { NotificationController, SlimSelectController } from 'frontend-helpers'
 
-import { TabsController } from 'bali-view-components'
+import { DropdownController, TabsController } from 'bali-view-components'
 
 import RichTextEditorController from './controllers/rich_text_editor_controller'
 

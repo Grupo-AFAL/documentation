@@ -24,59 +24,49 @@
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
 
-      <div class="dropdown" data-controller="dropdown" data-rich-text-editor-target="nodeSelect">
-        <div class="dropdown-trigger">
-          <a data-action="dropdown#toggleMenu rich-text-editor#closeLinkPanel">
-            <span class="text" data-rich-text-editor-target="nodeSelectTrigger">Text</span>
-            <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
-          </a>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-content">
-            <a class="text dropdown-item" data-action="rich-text-editor#setParagraph" data-rich-text-editor-target="text">Text</a>
-            <a class="h1 dropdown-item" data-action="rich-text-editor#toggleH1" data-rich-text-editor-target="h1">Heading 1</a>
-            <a class="h2 dropdown-item" data-action="rich-text-editor#toggleH2" data-rich-text-editor-target="h2">Heading 2</a>
-            <a class="h3 dropdown-item" data-action="rich-text-editor#toggleH3" data-rich-text-editor-target="h3">Heading 3</a>
-            <a class="ul dropdown-item" data-action="rich-text-editor#toggleBulletList" data-rich-text-editor-target="ul">Bulleted list</a>
-            <a class="ol dropdown-item" data-action="rich-text-editor#toggleOrderedList" data-rich-text-editor-target="ol">Ordered list</a>
-            <a class="blockquote dropdown-item" data-action="rich-text-editor#toggleBlockquote" data-rich-text-editor-target="blockquote">Quote</a>
-          </div>
-        </div>
-      </div>
+      <%= render Bali::Dropdown::Component.new('data-rich-text-editor-target': 'nodeSelect') do |c| %>
+        <% c.trigger(data: { action: 'rich-text-editor#closeLinkPanel' }) do %>
+          <span class="text" data-rich-text-editor-target="nodeSelectTrigger">Text</span>
+          <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
+        <% end %>
 
-      <div class="dropdown" data-controller="dropdown" data-dropdown-close-on-click-value="false" data-rich-text-editor-target="linkPanel">
-        <div class="dropdown-trigger">
-          <a class="link" data-action="dropdown#toggleMenu rich-text-editor#openLinkPanel">
-            <span>Link</span>
-            <%= icon_tag('arrow-right-up', class: 'toolbar-icon') %>
-          </a>
-        </div>
-        <div class="dropdown-menu">
-          <div class="dropdown-content link-panel">
-            <%= render(Bali::Tabs::Component.new(class: 'is-small')) do |c| %>
-              <%= c.tab(title: 'URL', active: true) do %>
-                <div contenteditable="true"
-                     class="input is-small"
-                     placeholder="Ingresa la URL"
-                     data-rich-text-editor-target="linkInput"
-                     data-action="keydown->rich-text-editor#saveLinkUrl">
-                </div>
-              <% end %>
+        <%= c.item(class: 'text', data: { action: 'rich-text-editor#setParagraph', 'rich-text-editor-target': 'text' }) { 'Text' } %>
+        <%= c.item(class: 'h1', data: { action: 'rich-text-editor#toggleH1', 'rich-text-editor-target': 'h1' }) { 'Heading 1' } %>
+        <%= c.item(class: 'h2', data: { action: 'rich-text-editor#toggleH2', 'rich-text-editor-target': 'h2' }) { 'Heading 2' } %>
+        <%= c.item(class: 'h3', data: { action: 'rich-text-editor#toggleH3', 'rich-text-editor-target': 'h3' }) { 'Heading 2' } %>
+        <%= c.item(class: 'ul', data: { action: 'rich-text-editor#toggleBulletList', 'rich-text-editor-target': 'ul' }) { 'Bulleted list' } %>
+        <%= c.item(class: 'ol', data: { action: 'rich-text-editor#toggleOrderedList', 'rich-text-editor-target': 'ol' }) { 'Ordered list' } %>
+        <%= c.item(class: 'blockquote', data: { action: 'rich-text-editor#toggleBlockquote', 'rich-text-editor-target': 'blockquote' }) { 'Quote' } %>
+      <% end %>
 
-              <%= c.tab(title: 'Pages', active: false) do %>
-                <% @pages.each do |page| %>
-                  <%= tag.a page.title,
-                      class: 'page-link',
-                      data: {
-                        action: 'click->rich-text-editor#savePageLink',
-                        id: page.id,
-                        url: page_url(page)
-                      } %>
-                <% end %>
+      <%= render Bali::Dropdown::Component.new(close_on_click: false, data: { 'rich-text-editor-target': 'linkPanel' }) do |c| %>
+        <% c.trigger(class: 'link', data: { action: 'rich-text-editor#openLinkPanel' }) do %>
+          <span>Link</span>
+          <%= icon_tag('arrow-right-up', class: 'toolbar-icon') %>
+        <% end %>
+
+        <div class="link-panel">
+          <%= render(Bali::Tabs::Component.new(class: 'is-small')) do |c| %>
+            <%= c.tab(title: 'URL', active: true) do %>
+              <div contenteditable="true"
+                    class="input is-small"
+                    placeholder="Ingresa la URL"
+                    data-rich-text-editor-target="linkInput"
+                    data-action="keydown->rich-text-editor#saveLinkUrl">
+              </div>
+            <% end %>
+
+            <%= c.tab(title: 'Pages', active: false) do %>
+              <% @pages.each do |page| %>
+                <%= tag.a page.title, class: 'page-link',
+                    data: {
+                      action: 'click->rich-text-editor#savePageLink',
+                      id: page.id,
+                      url: page_url(page) } %>
               <% end %>
             <% end %>
-          </div>
-        </div>
+          <% end %>
+        <% end %>
       </div>
 
       <a class="mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
