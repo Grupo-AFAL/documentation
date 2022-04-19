@@ -18,6 +18,14 @@ module Documentation
 
         app.config.assets.paths << Rails.root.join('app/components')
       end
+
+      extra_tags = %w[u table tr td th colgroup col]
+      all_tags = Rails::Html::Sanitizer.safe_list_sanitizer.allowed_tags + extra_tags
+      app.config.action_view.sanitized_allowed_tags = all_tags
+
+      extra_attributes = %w[colspan rowspan colwidth style]
+      all_attributes = Rails::Html::Sanitizer.safe_list_sanitizer.allowed_attributes + extra_attributes
+      app.config.action_view.sanitized_allowed_attributes = all_attributes
     end
   end
 end
