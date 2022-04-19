@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 5b79cfc0f660e3e45ec1c034581d95eac7eff1ca
+  revision: 3683ba9ccffebfde6cee4c6fce95c72e3c37d2d0
   branch: main
   specs:
     bali_view_components (0.1.0)
@@ -139,7 +139,7 @@ GEM
       net-protocol
       timeout
     nio4r (2.5.8)
-    nokogiri (1.13.3-x86_64-darwin)
+    nokogiri (1.13.4-x86_64-darwin)
       racc (~> 1.4)
     pg (1.3.4)
     puma (5.6.2)
