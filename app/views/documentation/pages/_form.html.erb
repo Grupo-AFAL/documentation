@@ -24,8 +24,8 @@
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
 
-      <%= render Bali::Dropdown::Component.new('data-rich-text-editor-target': 'nodeSelect') do |c| %>
-        <% c.trigger(data: { action: 'rich-text-editor#closeLinkPanel' }) do %>
+      <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'nodeSelect'}) do |c| %>
+        <% c.trigger(data: { action: 'rich-text-editor#openNodeSelect' }) do %>
           <span class="text" data-rich-text-editor-target="nodeSelectTrigger">Text</span>
           <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
         <% end %>
@@ -68,6 +68,21 @@
           <% end %>
         <% end %>
       </div>
+
+      <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'tablePanel' }) do |c| %>
+        <% c.trigger(data: { action: 'rich-text-editor#openTablePanel' }) do %>
+          <span>Table</span>
+          <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
+        <% end %>
+
+        <%= c.item(data: { action: 'rich-text-editor#insertTable' }) { 'Insert Table' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addColumnBefore' }) { 'Insert Left' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addColumnAfter' }) { 'Insert Right' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addRowBefore' }) { 'Insert Above' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addRowAfter' }) { 'Insert Below' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteColumn' }) { 'Remove Column' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteRow' }) { 'Remove Row' } %>
+      <% end %>
 
       <a class="mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
       <a class="mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>

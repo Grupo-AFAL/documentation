@@ -14,7 +14,13 @@ module Dummy
     # For compatibility with applications that use this config
     config.action_controller.include_all_helpers = false
 
-    config.action_view.sanitized_allowed_tags = Rails::Html::Sanitizer.safe_list_sanitizer.allowed_tags << 'u'
+    extra_tags = %w[u table tr td th colgroup col]
+    all_tags = Rails::Html::Sanitizer.safe_list_sanitizer.allowed_tags + extra_tags
+    config.action_view.sanitized_allowed_tags = all_tags
+
+    extra_attributes = %w[colspan rowspan colwidth style]
+    all_attributes = Rails::Html::Sanitizer.safe_list_sanitizer.allowed_attributes + extra_attributes
+    config.action_view.sanitized_allowed_attributes = all_attributes
 
     # Configuration for the application, engines, and railties goes here.
     #

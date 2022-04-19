@@ -6,6 +6,10 @@ import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
 import Mention from '@tiptap/extension-mention'
+import Table from '@tiptap/extension-table'
+import TableRow from '@tiptap/extension-table-row'
+import TableCell from '@tiptap/extension-table-cell'
+import TableHeader from '@tiptap/extension-table-header'
 
 import suggestion from '../rich_text_editor/suggestion'
 
@@ -24,6 +28,7 @@ export default class RichTextEditorController extends Controller {
     'h3',
     'ul',
     'ol',
+    'tablePanel',
     'blockquote',
     'bold',
     'italic',
@@ -102,6 +107,10 @@ export default class RichTextEditorController extends Controller {
         Link.configure({
           openOnClick: false
         }),
+        Table,
+        TableRow,
+        TableCell,
+        TableHeader,
         Mention.configure({
           HTMLAttributes: {
             class: 'suggestion'
@@ -122,6 +131,7 @@ export default class RichTextEditorController extends Controller {
       this.enableSelectedToolbarMarks()
       this.enableSelectedToolbarType()
       this.setCurrentToolbarType()
+      this.updateTableModifiers()
     })
   }
 
@@ -150,10 +160,27 @@ export default class RichTextEditorController extends Controller {
 
   openLinkPanel () {
     this.closeNodeSelectDropdown()
+    this.closeTablePanel()
 
     const link = this.editor.getAttributes('link')
     this.linkInputTarget.innerHTML = link.href || ''
     this.linkInputTarget.focus()
+  }
+
+  openTablePanel () {
+    this.closeNodeSelectDropdown()
+    this.closeLinkPanel()
+  }
+
+  closeTablePanel () {
+    if (!this.hasTablePanelTarget) return
+
+    this.tablePanelTarget.classList.remove('is-active')
+  }
+
+  openNodeSelect () {
+    this.closeLinkPanel()
+    this.closeTablePanel()
   }
 
   saveLinkUrl (event) {
@@ -217,6 +244,58 @@ export default class RichTextEditorController extends Controller {
 
   toggleBlockquote () {
     this.runCommand('toggleBlockquote')
+  }
+
+  insertTable () {
+    this.runCommand('insertTable', { rows: 3, cols: 3, withHeaderRow: true })
+  }
+
+  addColumnBefore (e) {
+    this.runTableCommand(e, 'addColumnBefore')
+  }
+
+  addColumnAfter (e) {
+    this.runTableCommand(e, 'addColumnAfter')
+  }
+
+  addRowBefore (e) {
+    this.runTableCommand(e, 'addRowBefore')
+  }
+
+  addRowAfter (e) {
+    this.runTableCommand(e, 'addRowAfter')
+  }
+
+  deleteColumn (e) {
+    this.runTableCommand(e, 'deleteColumn')
+  }
+
+  deleteRow (e) {
+    this.runTableCommand(e, 'deleteRow')
+  }
+
+  runTableCommand (event, name) {
+    if (!this.editor.isActive('table')) {
+      return event.stopPropagation()
+    }
+
+    this.runCommand(name)
+  }
+
+  updateTableModifiers () {
+    const tableIsActive = this.editor.isActive('table')
+
+    this.tableModifierTargets().forEach(modifier => {
+      tableIsActive
+        ? modifier.classList.remove('disabled')
+        : modifier.classList.add('disabled')
+    })
+  }
+
+  tableModifierTargets () {
+    if (!this.hasTablePanelTarget) return []
+
+    return Array.from(this.tablePanelTarget.querySelectorAll('.modifier'))
   }
 
   runCommand (name, attributes) {
