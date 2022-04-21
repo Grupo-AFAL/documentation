@@ -242,8 +242,8 @@
           if (this.isActive()) {
             try {
               return this.close();
-            } catch (error2) {
-              logger_default.log("Failed to reopen WebSocket", error2);
+            } catch (error3) {
+              logger_default.log("Failed to reopen WebSocket", error3);
             } finally {
               logger_default.log(`Reopening WebSocket in ${this.constructor.reopenDelay}ms`);
               setTimeout(this.open, this.constructor.reopenDelay);
@@ -1358,6 +1358,4682 @@
     }
   });
 
+  // node_modules/highlight.js/lib/core.js
+  var require_core = __commonJS({
+    "node_modules/highlight.js/lib/core.js"(exports2, module2) {
+      function deepFreeze2(obj) {
+        if (obj instanceof Map) {
+          obj.clear = obj.delete = obj.set = function() {
+            throw new Error("map is read-only");
+          };
+        } else if (obj instanceof Set) {
+          obj.add = obj.clear = obj.delete = function() {
+            throw new Error("set is read-only");
+          };
+        }
+        Object.freeze(obj);
+        Object.getOwnPropertyNames(obj).forEach(function(name) {
+          var prop = obj[name];
+          if (typeof prop == "object" && !Object.isFrozen(prop)) {
+            deepFreeze2(prop);
+          }
+        });
+        return obj;
+      }
+      var deepFreezeEs62 = deepFreeze2;
+      var _default2 = deepFreeze2;
+      deepFreezeEs62.default = _default2;
+      var Response2 = class {
+        constructor(mode) {
+          if (mode.data === void 0)
+            mode.data = {};
+          this.data = mode.data;
+          this.isMatchIgnored = false;
+        }
+        ignoreMatch() {
+          this.isMatchIgnored = true;
+        }
+      };
+      function escapeHTML2(value) {
+        return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
+      }
+      function inherit2(original, ...objects) {
+        const result2 = /* @__PURE__ */ Object.create(null);
+        for (const key2 in original) {
+          result2[key2] = original[key2];
+        }
+        objects.forEach(function(obj) {
+          for (const key2 in obj) {
+            result2[key2] = obj[key2];
+          }
+        });
+        return result2;
+      }
+      var SPAN_CLOSE2 = "</span>";
+      var emitsWrappingTags2 = (node5) => {
+        return !!node5.kind;
+      };
+      var HTMLRenderer2 = class {
+        constructor(parseTree, options) {
+          this.buffer = "";
+          this.classPrefix = options.classPrefix;
+          parseTree.walk(this);
+        }
+        addText(text4) {
+          this.buffer += escapeHTML2(text4);
+        }
+        openNode(node5) {
+          if (!emitsWrappingTags2(node5))
+            return;
+          let className = node5.kind;
+          if (!node5.sublanguage) {
+            className = `${this.classPrefix}${className}`;
+          }
+          this.span(className);
+        }
+        closeNode(node5) {
+          if (!emitsWrappingTags2(node5))
+            return;
+          this.buffer += SPAN_CLOSE2;
+        }
+        value() {
+          return this.buffer;
+        }
+        span(className) {
+          this.buffer += `<span class="${className}">`;
+        }
+      };
+      var TokenTree2 = class {
+        constructor() {
+          this.rootNode = { children: [] };
+          this.stack = [this.rootNode];
+        }
+        get top() {
+          return this.stack[this.stack.length - 1];
+        }
+        get root() {
+          return this.rootNode;
+        }
+        add(node5) {
+          this.top.children.push(node5);
+        }
+        openNode(kind) {
+          const node5 = { kind, children: [] };
+          this.add(node5);
+          this.stack.push(node5);
+        }
+        closeNode() {
+          if (this.stack.length > 1) {
+            return this.stack.pop();
+          }
+          return void 0;
+        }
+        closeAllNodes() {
+          while (this.closeNode())
+            ;
+        }
+        toJSON() {
+          return JSON.stringify(this.rootNode, null, 4);
+        }
+        walk(builder) {
+          return this.constructor._walk(builder, this.rootNode);
+        }
+        static _walk(builder, node5) {
+          if (typeof node5 === "string") {
+            builder.addText(node5);
+          } else if (node5.children) {
+            builder.openNode(node5);
+            node5.children.forEach((child5) => this._walk(builder, child5));
+            builder.closeNode(node5);
+          }
+          return builder;
+        }
+        static _collapse(node5) {
+          if (typeof node5 === "string")
+            return;
+          if (!node5.children)
+            return;
+          if (node5.children.every((el) => typeof el === "string")) {
+            node5.children = [node5.children.join("")];
+          } else {
+            node5.children.forEach((child5) => {
+              TokenTree2._collapse(child5);
+            });
+          }
+        }
+      };
+      var TokenTreeEmitter2 = class extends TokenTree2 {
+        constructor(options) {
+          super();
+          this.options = options;
+        }
+        addKeyword(text4, kind) {
+          if (text4 === "") {
+            return;
+          }
+          this.openNode(kind);
+          this.addText(text4);
+          this.closeNode();
+        }
+        addText(text4) {
+          if (text4 === "") {
+            return;
+          }
+          this.add(text4);
+        }
+        addSublanguage(emitter, name) {
+          const node5 = emitter.root;
+          node5.kind = name;
+          node5.sublanguage = true;
+          this.add(node5);
+        }
+        toHTML() {
+          const renderer = new HTMLRenderer2(this, this.options);
+          return renderer.value();
+        }
+        finalize() {
+          return true;
+        }
+      };
+      function escape2(value) {
+        return new RegExp(value.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "m");
+      }
+      function source2(re) {
+        if (!re)
+          return null;
+        if (typeof re === "string")
+          return re;
+        return re.source;
+      }
+      function concat2(...args) {
+        const joined = args.map((x) => source2(x)).join("");
+        return joined;
+      }
+      function either2(...args) {
+        const joined = "(" + args.map((x) => source2(x)).join("|") + ")";
+        return joined;
+      }
+      function countMatchGroups2(re) {
+        return new RegExp(re.toString() + "|").exec("").length - 1;
+      }
+      function startsWith2(re, lexeme) {
+        const match = re && re.exec(lexeme);
+        return match && match.index === 0;
+      }
+      var BACKREF_RE2 = /\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;
+      function join2(regexps, separator = "|") {
+        let numCaptures = 0;
+        return regexps.map((regex) => {
+          numCaptures += 1;
+          const offset4 = numCaptures;
+          let re = source2(regex);
+          let out = "";
+          while (re.length > 0) {
+            const match = BACKREF_RE2.exec(re);
+            if (!match) {
+              out += re;
+              break;
+            }
+            out += re.substring(0, match.index);
+            re = re.substring(match.index + match[0].length);
+            if (match[0][0] === "\\" && match[1]) {
+              out += "\\" + String(Number(match[1]) + offset4);
+            } else {
+              out += match[0];
+              if (match[0] === "(") {
+                numCaptures++;
+              }
+            }
+          }
+          return out;
+        }).map((re) => `(${re})`).join(separator);
+      }
+      var MATCH_NOTHING_RE2 = /\b\B/;
+      var IDENT_RE2 = "[a-zA-Z]\\w*";
+      var UNDERSCORE_IDENT_RE2 = "[a-zA-Z_]\\w*";
+      var NUMBER_RE2 = "\\b\\d+(\\.\\d+)?";
+      var C_NUMBER_RE2 = "(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";
+      var BINARY_NUMBER_RE2 = "\\b(0b[01]+)";
+      var RE_STARTERS_RE2 = "!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";
+      var SHEBANG2 = (opts = {}) => {
+        const beginShebang = /^#![ ]*\//;
+        if (opts.binary) {
+          opts.begin = concat2(beginShebang, /.*\b/, opts.binary, /\b.*/);
+        }
+        return inherit2({
+          className: "meta",
+          begin: beginShebang,
+          end: /$/,
+          relevance: 0,
+          "on:begin": (m, resp) => {
+            if (m.index !== 0)
+              resp.ignoreMatch();
+          }
+        }, opts);
+      };
+      var BACKSLASH_ESCAPE2 = {
+        begin: "\\\\[\\s\\S]",
+        relevance: 0
+      };
+      var APOS_STRING_MODE2 = {
+        className: "string",
+        begin: "'",
+        end: "'",
+        illegal: "\\n",
+        contains: [BACKSLASH_ESCAPE2]
+      };
+      var QUOTE_STRING_MODE2 = {
+        className: "string",
+        begin: '"',
+        end: '"',
+        illegal: "\\n",
+        contains: [BACKSLASH_ESCAPE2]
+      };
+      var PHRASAL_WORDS_MODE2 = {
+        begin: /\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/
+      };
+      var COMMENT2 = function(begin, end4, modeOptions = {}) {
+        const mode = inherit2({
+          className: "comment",
+          begin,
+          end: end4,
+          contains: []
+        }, modeOptions);
+        mode.contains.push(PHRASAL_WORDS_MODE2);
+        mode.contains.push({
+          className: "doctag",
+          begin: "(?:TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):",
+          relevance: 0
+        });
+        return mode;
+      };
+      var C_LINE_COMMENT_MODE2 = COMMENT2("//", "$");
+      var C_BLOCK_COMMENT_MODE2 = COMMENT2("/\\*", "\\*/");
+      var HASH_COMMENT_MODE2 = COMMENT2("#", "$");
+      var NUMBER_MODE2 = {
+        className: "number",
+        begin: NUMBER_RE2,
+        relevance: 0
+      };
+      var C_NUMBER_MODE2 = {
+        className: "number",
+        begin: C_NUMBER_RE2,
+        relevance: 0
+      };
+      var BINARY_NUMBER_MODE2 = {
+        className: "number",
+        begin: BINARY_NUMBER_RE2,
+        relevance: 0
+      };
+      var CSS_NUMBER_MODE2 = {
+        className: "number",
+        begin: NUMBER_RE2 + "(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",
+        relevance: 0
+      };
+      var REGEXP_MODE2 = {
+        begin: /(?=\/[^/\n]*\/)/,
+        contains: [{
+          className: "regexp",
+          begin: /\//,
+          end: /\/[gimuy]*/,
+          illegal: /\n/,
+          contains: [
+            BACKSLASH_ESCAPE2,
+            {
+              begin: /\[/,
+              end: /\]/,
+              relevance: 0,
+              contains: [BACKSLASH_ESCAPE2]
+            }
+          ]
+        }]
+      };
+      var TITLE_MODE2 = {
+        className: "title",
+        begin: IDENT_RE2,
+        relevance: 0
+      };
+      var UNDERSCORE_TITLE_MODE2 = {
+        className: "title",
+        begin: UNDERSCORE_IDENT_RE2,
+        relevance: 0
+      };
+      var METHOD_GUARD2 = {
+        begin: "\\.\\s*" + UNDERSCORE_IDENT_RE2,
+        relevance: 0
+      };
+      var END_SAME_AS_BEGIN2 = function(mode) {
+        return Object.assign(mode, {
+          "on:begin": (m, resp) => {
+            resp.data._beginMatch = m[1];
+          },
+          "on:end": (m, resp) => {
+            if (resp.data._beginMatch !== m[1])
+              resp.ignoreMatch();
+          }
+        });
+      };
+      var MODES2 = /* @__PURE__ */ Object.freeze({
+        __proto__: null,
+        MATCH_NOTHING_RE: MATCH_NOTHING_RE2,
+        IDENT_RE: IDENT_RE2,
+        UNDERSCORE_IDENT_RE: UNDERSCORE_IDENT_RE2,
+        NUMBER_RE: NUMBER_RE2,
+        C_NUMBER_RE: C_NUMBER_RE2,
+        BINARY_NUMBER_RE: BINARY_NUMBER_RE2,
+        RE_STARTERS_RE: RE_STARTERS_RE2,
+        SHEBANG: SHEBANG2,
+        BACKSLASH_ESCAPE: BACKSLASH_ESCAPE2,
+        APOS_STRING_MODE: APOS_STRING_MODE2,
+        QUOTE_STRING_MODE: QUOTE_STRING_MODE2,
+        PHRASAL_WORDS_MODE: PHRASAL_WORDS_MODE2,
+        COMMENT: COMMENT2,
+        C_LINE_COMMENT_MODE: C_LINE_COMMENT_MODE2,
+        C_BLOCK_COMMENT_MODE: C_BLOCK_COMMENT_MODE2,
+        HASH_COMMENT_MODE: HASH_COMMENT_MODE2,
+        NUMBER_MODE: NUMBER_MODE2,
+        C_NUMBER_MODE: C_NUMBER_MODE2,
+        BINARY_NUMBER_MODE: BINARY_NUMBER_MODE2,
+        CSS_NUMBER_MODE: CSS_NUMBER_MODE2,
+        REGEXP_MODE: REGEXP_MODE2,
+        TITLE_MODE: TITLE_MODE2,
+        UNDERSCORE_TITLE_MODE: UNDERSCORE_TITLE_MODE2,
+        METHOD_GUARD: METHOD_GUARD2,
+        END_SAME_AS_BEGIN: END_SAME_AS_BEGIN2
+      });
+      function skipIfhasPrecedingDot2(match, response) {
+        const before3 = match.input[match.index - 1];
+        if (before3 === ".") {
+          response.ignoreMatch();
+        }
+      }
+      function beginKeywords2(mode, parent) {
+        if (!parent)
+          return;
+        if (!mode.beginKeywords)
+          return;
+        mode.begin = "\\b(" + mode.beginKeywords.split(" ").join("|") + ")(?!\\.)(?=\\b|\\s)";
+        mode.__beforeBegin = skipIfhasPrecedingDot2;
+        mode.keywords = mode.keywords || mode.beginKeywords;
+        delete mode.beginKeywords;
+        if (mode.relevance === void 0)
+          mode.relevance = 0;
+      }
+      function compileIllegal2(mode, _parent) {
+        if (!Array.isArray(mode.illegal))
+          return;
+        mode.illegal = either2(...mode.illegal);
+      }
+      function compileMatch2(mode, _parent) {
+        if (!mode.match)
+          return;
+        if (mode.begin || mode.end)
+          throw new Error("begin & end are not supported with match");
+        mode.begin = mode.match;
+        delete mode.match;
+      }
+      function compileRelevance2(mode, _parent) {
+        if (mode.relevance === void 0)
+          mode.relevance = 1;
+      }
+      var COMMON_KEYWORDS2 = [
+        "of",
+        "and",
+        "for",
+        "in",
+        "not",
+        "or",
+        "if",
+        "then",
+        "parent",
+        "list",
+        "value"
+      ];
+      var DEFAULT_KEYWORD_CLASSNAME2 = "keyword";
+      function compileKeywords2(rawKeywords, caseInsensitive, className = DEFAULT_KEYWORD_CLASSNAME2) {
+        const compiledKeywords = {};
+        if (typeof rawKeywords === "string") {
+          compileList(className, rawKeywords.split(" "));
+        } else if (Array.isArray(rawKeywords)) {
+          compileList(className, rawKeywords);
+        } else {
+          Object.keys(rawKeywords).forEach(function(className2) {
+            Object.assign(compiledKeywords, compileKeywords2(rawKeywords[className2], caseInsensitive, className2));
+          });
+        }
+        return compiledKeywords;
+        function compileList(className2, keywordList) {
+          if (caseInsensitive) {
+            keywordList = keywordList.map((x) => x.toLowerCase());
+          }
+          keywordList.forEach(function(keyword) {
+            const pair = keyword.split("|");
+            compiledKeywords[pair[0]] = [className2, scoreForKeyword2(pair[0], pair[1])];
+          });
+        }
+      }
+      function scoreForKeyword2(keyword, providedScore) {
+        if (providedScore) {
+          return Number(providedScore);
+        }
+        return commonKeyword2(keyword) ? 0 : 1;
+      }
+      function commonKeyword2(keyword) {
+        return COMMON_KEYWORDS2.includes(keyword.toLowerCase());
+      }
+      function compileLanguage2(language, { plugins }) {
+        function langRe(value, global2) {
+          return new RegExp(source2(value), "m" + (language.case_insensitive ? "i" : "") + (global2 ? "g" : ""));
+        }
+        class MultiRegex {
+          constructor() {
+            this.matchIndexes = {};
+            this.regexes = [];
+            this.matchAt = 1;
+            this.position = 0;
+          }
+          addRule(re, opts) {
+            opts.position = this.position++;
+            this.matchIndexes[this.matchAt] = opts;
+            this.regexes.push([opts, re]);
+            this.matchAt += countMatchGroups2(re) + 1;
+          }
+          compile() {
+            if (this.regexes.length === 0) {
+              this.exec = () => null;
+            }
+            const terminators = this.regexes.map((el) => el[1]);
+            this.matcherRe = langRe(join2(terminators), true);
+            this.lastIndex = 0;
+          }
+          exec(s) {
+            this.matcherRe.lastIndex = this.lastIndex;
+            const match = this.matcherRe.exec(s);
+            if (!match) {
+              return null;
+            }
+            const i = match.findIndex((el, i2) => i2 > 0 && el !== void 0);
+            const matchData = this.matchIndexes[i];
+            match.splice(0, i);
+            return Object.assign(match, matchData);
+          }
+        }
+        class ResumableMultiRegex {
+          constructor() {
+            this.rules = [];
+            this.multiRegexes = [];
+            this.count = 0;
+            this.lastIndex = 0;
+            this.regexIndex = 0;
+          }
+          getMatcher(index3) {
+            if (this.multiRegexes[index3])
+              return this.multiRegexes[index3];
+            const matcher = new MultiRegex();
+            this.rules.slice(index3).forEach(([re, opts]) => matcher.addRule(re, opts));
+            matcher.compile();
+            this.multiRegexes[index3] = matcher;
+            return matcher;
+          }
+          resumingScanAtSamePosition() {
+            return this.regexIndex !== 0;
+          }
+          considerAll() {
+            this.regexIndex = 0;
+          }
+          addRule(re, opts) {
+            this.rules.push([re, opts]);
+            if (opts.type === "begin")
+              this.count++;
+          }
+          exec(s) {
+            const m = this.getMatcher(this.regexIndex);
+            m.lastIndex = this.lastIndex;
+            let result2 = m.exec(s);
+            if (this.resumingScanAtSamePosition()) {
+              if (result2 && result2.index === this.lastIndex)
+                ;
+              else {
+                const m2 = this.getMatcher(0);
+                m2.lastIndex = this.lastIndex + 1;
+                result2 = m2.exec(s);
+              }
+            }
+            if (result2) {
+              this.regexIndex += result2.position + 1;
+              if (this.regexIndex === this.count) {
+                this.considerAll();
+              }
+            }
+            return result2;
+          }
+        }
+        function buildModeRegex(mode) {
+          const mm = new ResumableMultiRegex();
+          mode.contains.forEach((term) => mm.addRule(term.begin, { rule: term, type: "begin" }));
+          if (mode.terminatorEnd) {
+            mm.addRule(mode.terminatorEnd, { type: "end" });
+          }
+          if (mode.illegal) {
+            mm.addRule(mode.illegal, { type: "illegal" });
+          }
+          return mm;
+        }
+        function compileMode(mode, parent) {
+          const cmode = mode;
+          if (mode.isCompiled)
+            return cmode;
+          [
+            compileMatch2
+          ].forEach((ext) => ext(mode, parent));
+          language.compilerExtensions.forEach((ext) => ext(mode, parent));
+          mode.__beforeBegin = null;
+          [
+            beginKeywords2,
+            compileIllegal2,
+            compileRelevance2
+          ].forEach((ext) => ext(mode, parent));
+          mode.isCompiled = true;
+          let keywordPattern = null;
+          if (typeof mode.keywords === "object") {
+            keywordPattern = mode.keywords.$pattern;
+            delete mode.keywords.$pattern;
+          }
+          if (mode.keywords) {
+            mode.keywords = compileKeywords2(mode.keywords, language.case_insensitive);
+          }
+          if (mode.lexemes && keywordPattern) {
+            throw new Error("ERR: Prefer `keywords.$pattern` to `mode.lexemes`, BOTH are not allowed. (see mode reference) ");
+          }
+          keywordPattern = keywordPattern || mode.lexemes || /\w+/;
+          cmode.keywordPatternRe = langRe(keywordPattern, true);
+          if (parent) {
+            if (!mode.begin)
+              mode.begin = /\B|\b/;
+            cmode.beginRe = langRe(mode.begin);
+            if (mode.endSameAsBegin)
+              mode.end = mode.begin;
+            if (!mode.end && !mode.endsWithParent)
+              mode.end = /\B|\b/;
+            if (mode.end)
+              cmode.endRe = langRe(mode.end);
+            cmode.terminatorEnd = source2(mode.end) || "";
+            if (mode.endsWithParent && parent.terminatorEnd) {
+              cmode.terminatorEnd += (mode.end ? "|" : "") + parent.terminatorEnd;
+            }
+          }
+          if (mode.illegal)
+            cmode.illegalRe = langRe(mode.illegal);
+          if (!mode.contains)
+            mode.contains = [];
+          mode.contains = [].concat(...mode.contains.map(function(c) {
+            return expandOrCloneMode2(c === "self" ? mode : c);
+          }));
+          mode.contains.forEach(function(c) {
+            compileMode(c, cmode);
+          });
+          if (mode.starts) {
+            compileMode(mode.starts, parent);
+          }
+          cmode.matcher = buildModeRegex(cmode);
+          return cmode;
+        }
+        if (!language.compilerExtensions)
+          language.compilerExtensions = [];
+        if (language.contains && language.contains.includes("self")) {
+          throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");
+        }
+        language.classNameAliases = inherit2(language.classNameAliases || {});
+        return compileMode(language);
+      }
+      function dependencyOnParent2(mode) {
+        if (!mode)
+          return false;
+        return mode.endsWithParent || dependencyOnParent2(mode.starts);
+      }
+      function expandOrCloneMode2(mode) {
+        if (mode.variants && !mode.cachedVariants) {
+          mode.cachedVariants = mode.variants.map(function(variant) {
+            return inherit2(mode, { variants: null }, variant);
+          });
+        }
+        if (mode.cachedVariants) {
+          return mode.cachedVariants;
+        }
+        if (dependencyOnParent2(mode)) {
+          return inherit2(mode, { starts: mode.starts ? inherit2(mode.starts) : null });
+        }
+        if (Object.isFrozen(mode)) {
+          return inherit2(mode);
+        }
+        return mode;
+      }
+      var version2 = "10.7.3";
+      function hasValueOrEmptyAttribute2(value) {
+        return Boolean(value || value === "");
+      }
+      function BuildVuePlugin2(hljs) {
+        const Component = {
+          props: ["language", "code", "autodetect"],
+          data: function() {
+            return {
+              detectedLanguage: "",
+              unknownLanguage: false
+            };
+          },
+          computed: {
+            className() {
+              if (this.unknownLanguage)
+                return "";
+              return "hljs " + this.detectedLanguage;
+            },
+            highlighted() {
+              if (!this.autoDetect && !hljs.getLanguage(this.language)) {
+                console.warn(`The language "${this.language}" you specified could not be found.`);
+                this.unknownLanguage = true;
+                return escapeHTML2(this.code);
+              }
+              let result2 = {};
+              if (this.autoDetect) {
+                result2 = hljs.highlightAuto(this.code);
+                this.detectedLanguage = result2.language;
+              } else {
+                result2 = hljs.highlight(this.language, this.code, this.ignoreIllegals);
+                this.detectedLanguage = this.language;
+              }
+              return result2.value;
+            },
+            autoDetect() {
+              return !this.language || hasValueOrEmptyAttribute2(this.autodetect);
+            },
+            ignoreIllegals() {
+              return true;
+            }
+          },
+          render(createElement) {
+            return createElement("pre", {}, [
+              createElement("code", {
+                class: this.className,
+                domProps: { innerHTML: this.highlighted }
+              })
+            ]);
+          }
+        };
+        const VuePlugin = {
+          install(Vue) {
+            Vue.component("highlightjs", Component);
+          }
+        };
+        return { Component, VuePlugin };
+      }
+      var mergeHTMLPlugin2 = {
+        "after:highlightElement": ({ el, result: result2, text: text4 }) => {
+          const originalStream = nodeStream2(el);
+          if (!originalStream.length)
+            return;
+          const resultNode = document.createElement("div");
+          resultNode.innerHTML = result2.value;
+          result2.value = mergeStreams2(originalStream, nodeStream2(resultNode), text4);
+        }
+      };
+      function tag2(node5) {
+        return node5.nodeName.toLowerCase();
+      }
+      function nodeStream2(node5) {
+        const result2 = [];
+        (function _nodeStream(node6, offset4) {
+          for (let child5 = node6.firstChild; child5; child5 = child5.nextSibling) {
+            if (child5.nodeType === 3) {
+              offset4 += child5.nodeValue.length;
+            } else if (child5.nodeType === 1) {
+              result2.push({
+                event: "start",
+                offset: offset4,
+                node: child5
+              });
+              offset4 = _nodeStream(child5, offset4);
+              if (!tag2(child5).match(/br|hr|img|input/)) {
+                result2.push({
+                  event: "stop",
+                  offset: offset4,
+                  node: child5
+                });
+              }
+            }
+          }
+          return offset4;
+        })(node5, 0);
+        return result2;
+      }
+      function mergeStreams2(original, highlighted, value) {
+        let processed = 0;
+        let result2 = "";
+        const nodeStack = [];
+        function selectStream() {
+          if (!original.length || !highlighted.length) {
+            return original.length ? original : highlighted;
+          }
+          if (original[0].offset !== highlighted[0].offset) {
+            return original[0].offset < highlighted[0].offset ? original : highlighted;
+          }
+          return highlighted[0].event === "start" ? original : highlighted;
+        }
+        function open2(node5) {
+          function attributeString(attr) {
+            return " " + attr.nodeName + '="' + escapeHTML2(attr.value) + '"';
+          }
+          result2 += "<" + tag2(node5) + [].map.call(node5.attributes, attributeString).join("") + ">";
+        }
+        function close6(node5) {
+          result2 += "</" + tag2(node5) + ">";
+        }
+        function render2(event) {
+          (event.event === "start" ? open2 : close6)(event.node);
+        }
+        while (original.length || highlighted.length) {
+          let stream = selectStream();
+          result2 += escapeHTML2(value.substring(processed, stream[0].offset));
+          processed = stream[0].offset;
+          if (stream === original) {
+            nodeStack.reverse().forEach(close6);
+            do {
+              render2(stream.splice(0, 1)[0]);
+              stream = selectStream();
+            } while (stream === original && stream.length && stream[0].offset === processed);
+            nodeStack.reverse().forEach(open2);
+          } else {
+            if (stream[0].event === "start") {
+              nodeStack.push(stream[0].node);
+            } else {
+              nodeStack.pop();
+            }
+            render2(stream.splice(0, 1)[0]);
+          }
+        }
+        return result2 + escapeHTML2(value.substr(processed));
+      }
+      var seenDeprecations2 = {};
+      var error3 = (message) => {
+        console.error(message);
+      };
+      var warn2 = (message, ...args) => {
+        console.log(`WARN: ${message}`, ...args);
+      };
+      var deprecated2 = (version3, message) => {
+        if (seenDeprecations2[`${version3}/${message}`])
+          return;
+        console.log(`Deprecated as of ${version3}. ${message}`);
+        seenDeprecations2[`${version3}/${message}`] = true;
+      };
+      var escape$12 = escapeHTML2;
+      var inherit$12 = inherit2;
+      var NO_MATCH2 = Symbol("nomatch");
+      var HLJS2 = function(hljs) {
+        const languages = /* @__PURE__ */ Object.create(null);
+        const aliases = /* @__PURE__ */ Object.create(null);
+        const plugins = [];
+        let SAFE_MODE = true;
+        const fixMarkupRe = /(^(<[^>]+>|\t|)+|\n)/gm;
+        const LANGUAGE_NOT_FOUND = "Could not find the language '{}', did you forget to load/include a language module?";
+        const PLAINTEXT_LANGUAGE = { disableAutodetect: true, name: "Plain text", contains: [] };
+        let options = {
+          noHighlightRe: /^(no-?highlight)$/i,
+          languageDetectRe: /\blang(?:uage)?-([\w-]+)\b/i,
+          classPrefix: "hljs-",
+          tabReplace: null,
+          useBR: false,
+          languages: null,
+          __emitter: TokenTreeEmitter2
+        };
+        function shouldNotHighlight(languageName) {
+          return options.noHighlightRe.test(languageName);
+        }
+        function blockLanguage(block) {
+          let classes = block.className + " ";
+          classes += block.parentNode ? block.parentNode.className : "";
+          const match = options.languageDetectRe.exec(classes);
+          if (match) {
+            const language = getLanguage(match[1]);
+            if (!language) {
+              warn2(LANGUAGE_NOT_FOUND.replace("{}", match[1]));
+              warn2("Falling back to no-highlight mode for this block.", block);
+            }
+            return language ? match[1] : "no-highlight";
+          }
+          return classes.split(/\s+/).find((_class) => shouldNotHighlight(_class) || getLanguage(_class));
+        }
+        function highlight3(codeOrlanguageName, optionsOrCode, ignoreIllegals, continuation) {
+          let code = "";
+          let languageName = "";
+          if (typeof optionsOrCode === "object") {
+            code = codeOrlanguageName;
+            ignoreIllegals = optionsOrCode.ignoreIllegals;
+            languageName = optionsOrCode.language;
+            continuation = void 0;
+          } else {
+            deprecated2("10.7.0", "highlight(lang, code, ...args) has been deprecated.");
+            deprecated2("10.7.0", "Please use highlight(code, options) instead.\nhttps://github.com/highlightjs/highlight.js/issues/2277");
+            languageName = codeOrlanguageName;
+            code = optionsOrCode;
+          }
+          const context = {
+            code,
+            language: languageName
+          };
+          fire("before:highlight", context);
+          const result2 = context.result ? context.result : _highlight(context.language, context.code, ignoreIllegals, continuation);
+          result2.code = context.code;
+          fire("after:highlight", result2);
+          return result2;
+        }
+        function _highlight(languageName, codeToHighlight, ignoreIllegals, continuation) {
+          function keywordData(mode, match) {
+            const matchText = language.case_insensitive ? match[0].toLowerCase() : match[0];
+            return Object.prototype.hasOwnProperty.call(mode.keywords, matchText) && mode.keywords[matchText];
+          }
+          function processKeywords() {
+            if (!top2.keywords) {
+              emitter.addText(modeBuffer);
+              return;
+            }
+            let lastIndex = 0;
+            top2.keywordPatternRe.lastIndex = 0;
+            let match = top2.keywordPatternRe.exec(modeBuffer);
+            let buf = "";
+            while (match) {
+              buf += modeBuffer.substring(lastIndex, match.index);
+              const data = keywordData(top2, match);
+              if (data) {
+                const [kind, keywordRelevance] = data;
+                emitter.addText(buf);
+                buf = "";
+                relevance += keywordRelevance;
+                if (kind.startsWith("_")) {
+                  buf += match[0];
+                } else {
+                  const cssClass = language.classNameAliases[kind] || kind;
+                  emitter.addKeyword(match[0], cssClass);
+                }
+              } else {
+                buf += match[0];
+              }
+              lastIndex = top2.keywordPatternRe.lastIndex;
+              match = top2.keywordPatternRe.exec(modeBuffer);
+            }
+            buf += modeBuffer.substr(lastIndex);
+            emitter.addText(buf);
+          }
+          function processSubLanguage() {
+            if (modeBuffer === "")
+              return;
+            let result3 = null;
+            if (typeof top2.subLanguage === "string") {
+              if (!languages[top2.subLanguage]) {
+                emitter.addText(modeBuffer);
+                return;
+              }
+              result3 = _highlight(top2.subLanguage, modeBuffer, true, continuations[top2.subLanguage]);
+              continuations[top2.subLanguage] = result3.top;
+            } else {
+              result3 = highlightAuto2(modeBuffer, top2.subLanguage.length ? top2.subLanguage : null);
+            }
+            if (top2.relevance > 0) {
+              relevance += result3.relevance;
+            }
+            emitter.addSublanguage(result3.emitter, result3.language);
+          }
+          function processBuffer() {
+            if (top2.subLanguage != null) {
+              processSubLanguage();
+            } else {
+              processKeywords();
+            }
+            modeBuffer = "";
+          }
+          function startNewMode(mode) {
+            if (mode.className) {
+              emitter.openNode(language.classNameAliases[mode.className] || mode.className);
+            }
+            top2 = Object.create(mode, { parent: { value: top2 } });
+            return top2;
+          }
+          function endOfMode(mode, match, matchPlusRemainder) {
+            let matched = startsWith2(mode.endRe, matchPlusRemainder);
+            if (matched) {
+              if (mode["on:end"]) {
+                const resp = new Response2(mode);
+                mode["on:end"](match, resp);
+                if (resp.isMatchIgnored)
+                  matched = false;
+              }
+              if (matched) {
+                while (mode.endsParent && mode.parent) {
+                  mode = mode.parent;
+                }
+                return mode;
+              }
+            }
+            if (mode.endsWithParent) {
+              return endOfMode(mode.parent, match, matchPlusRemainder);
+            }
+          }
+          function doIgnore(lexeme) {
+            if (top2.matcher.regexIndex === 0) {
+              modeBuffer += lexeme[0];
+              return 1;
+            } else {
+              resumeScanAtSamePosition = true;
+              return 0;
+            }
+          }
+          function doBeginMatch(match) {
+            const lexeme = match[0];
+            const newMode = match.rule;
+            const resp = new Response2(newMode);
+            const beforeCallbacks = [newMode.__beforeBegin, newMode["on:begin"]];
+            for (const cb of beforeCallbacks) {
+              if (!cb)
+                continue;
+              cb(match, resp);
+              if (resp.isMatchIgnored)
+                return doIgnore(lexeme);
+            }
+            if (newMode && newMode.endSameAsBegin) {
+              newMode.endRe = escape2(lexeme);
+            }
+            if (newMode.skip) {
+              modeBuffer += lexeme;
+            } else {
+              if (newMode.excludeBegin) {
+                modeBuffer += lexeme;
+              }
+              processBuffer();
+              if (!newMode.returnBegin && !newMode.excludeBegin) {
+                modeBuffer = lexeme;
+              }
+            }
+            startNewMode(newMode);
+            return newMode.returnBegin ? 0 : lexeme.length;
+          }
+          function doEndMatch(match) {
+            const lexeme = match[0];
+            const matchPlusRemainder = codeToHighlight.substr(match.index);
+            const endMode = endOfMode(top2, match, matchPlusRemainder);
+            if (!endMode) {
+              return NO_MATCH2;
+            }
+            const origin = top2;
+            if (origin.skip) {
+              modeBuffer += lexeme;
+            } else {
+              if (!(origin.returnEnd || origin.excludeEnd)) {
+                modeBuffer += lexeme;
+              }
+              processBuffer();
+              if (origin.excludeEnd) {
+                modeBuffer = lexeme;
+              }
+            }
+            do {
+              if (top2.className) {
+                emitter.closeNode();
+              }
+              if (!top2.skip && !top2.subLanguage) {
+                relevance += top2.relevance;
+              }
+              top2 = top2.parent;
+            } while (top2 !== endMode.parent);
+            if (endMode.starts) {
+              if (endMode.endSameAsBegin) {
+                endMode.starts.endRe = endMode.endRe;
+              }
+              startNewMode(endMode.starts);
+            }
+            return origin.returnEnd ? 0 : lexeme.length;
+          }
+          function processContinuations() {
+            const list = [];
+            for (let current = top2; current !== language; current = current.parent) {
+              if (current.className) {
+                list.unshift(current.className);
+              }
+            }
+            list.forEach((item) => emitter.openNode(item));
+          }
+          let lastMatch = {};
+          function processLexeme(textBeforeMatch, match) {
+            const lexeme = match && match[0];
+            modeBuffer += textBeforeMatch;
+            if (lexeme == null) {
+              processBuffer();
+              return 0;
+            }
+            if (lastMatch.type === "begin" && match.type === "end" && lastMatch.index === match.index && lexeme === "") {
+              modeBuffer += codeToHighlight.slice(match.index, match.index + 1);
+              if (!SAFE_MODE) {
+                const err3 = new Error("0 width match regex");
+                err3.languageName = languageName;
+                err3.badRule = lastMatch.rule;
+                throw err3;
+              }
+              return 1;
+            }
+            lastMatch = match;
+            if (match.type === "begin") {
+              return doBeginMatch(match);
+            } else if (match.type === "illegal" && !ignoreIllegals) {
+              const err3 = new Error('Illegal lexeme "' + lexeme + '" for mode "' + (top2.className || "<unnamed>") + '"');
+              err3.mode = top2;
+              throw err3;
+            } else if (match.type === "end") {
+              const processed = doEndMatch(match);
+              if (processed !== NO_MATCH2) {
+                return processed;
+              }
+            }
+            if (match.type === "illegal" && lexeme === "") {
+              return 1;
+            }
+            if (iterations > 1e5 && iterations > match.index * 3) {
+              const err3 = new Error("potential infinite loop, way more iterations than matches");
+              throw err3;
+            }
+            modeBuffer += lexeme;
+            return lexeme.length;
+          }
+          const language = getLanguage(languageName);
+          if (!language) {
+            error3(LANGUAGE_NOT_FOUND.replace("{}", languageName));
+            throw new Error('Unknown language: "' + languageName + '"');
+          }
+          const md = compileLanguage2(language, { plugins });
+          let result2 = "";
+          let top2 = continuation || md;
+          const continuations = {};
+          const emitter = new options.__emitter(options);
+          processContinuations();
+          let modeBuffer = "";
+          let relevance = 0;
+          let index3 = 0;
+          let iterations = 0;
+          let resumeScanAtSamePosition = false;
+          try {
+            top2.matcher.considerAll();
+            for (; ; ) {
+              iterations++;
+              if (resumeScanAtSamePosition) {
+                resumeScanAtSamePosition = false;
+              } else {
+                top2.matcher.considerAll();
+              }
+              top2.matcher.lastIndex = index3;
+              const match = top2.matcher.exec(codeToHighlight);
+              if (!match)
+                break;
+              const beforeMatch = codeToHighlight.substring(index3, match.index);
+              const processedCount = processLexeme(beforeMatch, match);
+              index3 = match.index + processedCount;
+            }
+            processLexeme(codeToHighlight.substr(index3));
+            emitter.closeAllNodes();
+            emitter.finalize();
+            result2 = emitter.toHTML();
+            return {
+              relevance: Math.floor(relevance),
+              value: result2,
+              language: languageName,
+              illegal: false,
+              emitter,
+              top: top2
+            };
+          } catch (err3) {
+            if (err3.message && err3.message.includes("Illegal")) {
+              return {
+                illegal: true,
+                illegalBy: {
+                  msg: err3.message,
+                  context: codeToHighlight.slice(index3 - 100, index3 + 100),
+                  mode: err3.mode
+                },
+                sofar: result2,
+                relevance: 0,
+                value: escape$12(codeToHighlight),
+                emitter
+              };
+            } else if (SAFE_MODE) {
+              return {
+                illegal: false,
+                relevance: 0,
+                value: escape$12(codeToHighlight),
+                emitter,
+                language: languageName,
+                top: top2,
+                errorRaised: err3
+              };
+            } else {
+              throw err3;
+            }
+          }
+        }
+        function justTextHighlightResult(code) {
+          const result2 = {
+            relevance: 0,
+            emitter: new options.__emitter(options),
+            value: escape$12(code),
+            illegal: false,
+            top: PLAINTEXT_LANGUAGE
+          };
+          result2.emitter.addText(code);
+          return result2;
+        }
+        function highlightAuto2(code, languageSubset) {
+          languageSubset = languageSubset || options.languages || Object.keys(languages);
+          const plaintext = justTextHighlightResult(code);
+          const results = languageSubset.filter(getLanguage).filter(autoDetection).map((name) => _highlight(name, code, false));
+          results.unshift(plaintext);
+          const sorted = results.sort((a, b) => {
+            if (a.relevance !== b.relevance)
+              return b.relevance - a.relevance;
+            if (a.language && b.language) {
+              if (getLanguage(a.language).supersetOf === b.language) {
+                return 1;
+              } else if (getLanguage(b.language).supersetOf === a.language) {
+                return -1;
+              }
+            }
+            return 0;
+          });
+          const [best, secondBest] = sorted;
+          const result2 = best;
+          result2.second_best = secondBest;
+          return result2;
+        }
+        function fixMarkup(html) {
+          if (!(options.tabReplace || options.useBR)) {
+            return html;
+          }
+          return html.replace(fixMarkupRe, (match) => {
+            if (match === "\n") {
+              return options.useBR ? "<br>" : match;
+            } else if (options.tabReplace) {
+              return match.replace(/\t/g, options.tabReplace);
+            }
+            return match;
+          });
+        }
+        function updateClassName(element, currentLang, resultLang) {
+          const language = currentLang ? aliases[currentLang] : resultLang;
+          element.classList.add("hljs");
+          if (language)
+            element.classList.add(language);
+        }
+        const brPlugin = {
+          "before:highlightElement": ({ el }) => {
+            if (options.useBR) {
+              el.innerHTML = el.innerHTML.replace(/\n/g, "").replace(/<br[ /]*>/g, "\n");
+            }
+          },
+          "after:highlightElement": ({ result: result2 }) => {
+            if (options.useBR) {
+              result2.value = result2.value.replace(/\n/g, "<br>");
+            }
+          }
+        };
+        const TAB_REPLACE_RE = /^(<[^>]+>|\t)+/gm;
+        const tabReplacePlugin = {
+          "after:highlightElement": ({ result: result2 }) => {
+            if (options.tabReplace) {
+              result2.value = result2.value.replace(TAB_REPLACE_RE, (m) => m.replace(/\t/g, options.tabReplace));
+            }
+          }
+        };
+        function highlightElement(element) {
+          let node5 = null;
+          const language = blockLanguage(element);
+          if (shouldNotHighlight(language))
+            return;
+          fire("before:highlightElement", { el: element, language });
+          node5 = element;
+          const text4 = node5.textContent;
+          const result2 = language ? highlight3(text4, { language, ignoreIllegals: true }) : highlightAuto2(text4);
+          fire("after:highlightElement", { el: element, result: result2, text: text4 });
+          element.innerHTML = result2.value;
+          updateClassName(element, language, result2.language);
+          element.result = {
+            language: result2.language,
+            re: result2.relevance,
+            relavance: result2.relevance
+          };
+          if (result2.second_best) {
+            element.second_best = {
+              language: result2.second_best.language,
+              re: result2.second_best.relevance,
+              relavance: result2.second_best.relevance
+            };
+          }
+        }
+        function configure(userOptions) {
+          if (userOptions.useBR) {
+            deprecated2("10.3.0", "'useBR' will be removed entirely in v11.0");
+            deprecated2("10.3.0", "Please see https://github.com/highlightjs/highlight.js/issues/2559");
+          }
+          options = inherit$12(options, userOptions);
+        }
+        const initHighlighting = () => {
+          if (initHighlighting.called)
+            return;
+          initHighlighting.called = true;
+          deprecated2("10.6.0", "initHighlighting() is deprecated.  Use highlightAll() instead.");
+          const blocks = document.querySelectorAll("pre code");
+          blocks.forEach(highlightElement);
+        };
+        function initHighlightingOnLoad() {
+          deprecated2("10.6.0", "initHighlightingOnLoad() is deprecated.  Use highlightAll() instead.");
+          wantsHighlight = true;
+        }
+        let wantsHighlight = false;
+        function highlightAll() {
+          if (document.readyState === "loading") {
+            wantsHighlight = true;
+            return;
+          }
+          const blocks = document.querySelectorAll("pre code");
+          blocks.forEach(highlightElement);
+        }
+        function boot() {
+          if (wantsHighlight)
+            highlightAll();
+        }
+        if (typeof window !== "undefined" && window.addEventListener) {
+          window.addEventListener("DOMContentLoaded", boot, false);
+        }
+        function registerLanguage2(languageName, languageDefinition) {
+          let lang = null;
+          try {
+            lang = languageDefinition(hljs);
+          } catch (error$1) {
+            error3("Language definition for '{}' could not be registered.".replace("{}", languageName));
+            if (!SAFE_MODE) {
+              throw error$1;
+            } else {
+              error3(error$1);
+            }
+            lang = PLAINTEXT_LANGUAGE;
+          }
+          if (!lang.name)
+            lang.name = languageName;
+          languages[languageName] = lang;
+          lang.rawDefinition = languageDefinition.bind(null, hljs);
+          if (lang.aliases) {
+            registerAliases(lang.aliases, { languageName });
+          }
+        }
+        function unregisterLanguage(languageName) {
+          delete languages[languageName];
+          for (const alias of Object.keys(aliases)) {
+            if (aliases[alias] === languageName) {
+              delete aliases[alias];
+            }
+          }
+        }
+        function listLanguages2() {
+          return Object.keys(languages);
+        }
+        function requireLanguage(name) {
+          deprecated2("10.4.0", "requireLanguage will be removed entirely in v11.");
+          deprecated2("10.4.0", "Please see https://github.com/highlightjs/highlight.js/pull/2844");
+          const lang = getLanguage(name);
+          if (lang) {
+            return lang;
+          }
+          const err3 = new Error("The '{}' language is required, but not loaded.".replace("{}", name));
+          throw err3;
+        }
+        function getLanguage(name) {
+          name = (name || "").toLowerCase();
+          return languages[name] || languages[aliases[name]];
+        }
+        function registerAliases(aliasList, { languageName }) {
+          if (typeof aliasList === "string") {
+            aliasList = [aliasList];
+          }
+          aliasList.forEach((alias) => {
+            aliases[alias.toLowerCase()] = languageName;
+          });
+        }
+        function autoDetection(name) {
+          const lang = getLanguage(name);
+          return lang && !lang.disableAutodetect;
+        }
+        function upgradePluginAPI(plugin) {
+          if (plugin["before:highlightBlock"] && !plugin["before:highlightElement"]) {
+            plugin["before:highlightElement"] = (data) => {
+              plugin["before:highlightBlock"](Object.assign({ block: data.el }, data));
+            };
+          }
+          if (plugin["after:highlightBlock"] && !plugin["after:highlightElement"]) {
+            plugin["after:highlightElement"] = (data) => {
+              plugin["after:highlightBlock"](Object.assign({ block: data.el }, data));
+            };
+          }
+        }
+        function addPlugin(plugin) {
+          upgradePluginAPI(plugin);
+          plugins.push(plugin);
+        }
+        function fire(event, args) {
+          const cb = event;
+          plugins.forEach(function(plugin) {
+            if (plugin[cb]) {
+              plugin[cb](args);
+            }
+          });
+        }
+        function deprecateFixMarkup(arg) {
+          deprecated2("10.2.0", "fixMarkup will be removed entirely in v11.0");
+          deprecated2("10.2.0", "Please see https://github.com/highlightjs/highlight.js/issues/2534");
+          return fixMarkup(arg);
+        }
+        function deprecateHighlightBlock(el) {
+          deprecated2("10.7.0", "highlightBlock will be removed entirely in v12.0");
+          deprecated2("10.7.0", "Please use highlightElement now.");
+          return highlightElement(el);
+        }
+        Object.assign(hljs, {
+          highlight: highlight3,
+          highlightAuto: highlightAuto2,
+          highlightAll,
+          fixMarkup: deprecateFixMarkup,
+          highlightElement,
+          highlightBlock: deprecateHighlightBlock,
+          configure,
+          initHighlighting,
+          initHighlightingOnLoad,
+          registerLanguage: registerLanguage2,
+          unregisterLanguage,
+          listLanguages: listLanguages2,
+          getLanguage,
+          registerAliases,
+          requireLanguage,
+          autoDetection,
+          inherit: inherit$12,
+          addPlugin,
+          vuePlugin: BuildVuePlugin2(hljs).VuePlugin
+        });
+        hljs.debugMode = function() {
+          SAFE_MODE = false;
+        };
+        hljs.safeMode = function() {
+          SAFE_MODE = true;
+        };
+        hljs.versionString = version2;
+        for (const key2 in MODES2) {
+          if (typeof MODES2[key2] === "object") {
+            deepFreezeEs62(MODES2[key2]);
+          }
+        }
+        Object.assign(hljs, MODES2);
+        hljs.addPlugin(brPlugin);
+        hljs.addPlugin(mergeHTMLPlugin2);
+        hljs.addPlugin(tabReplacePlugin);
+        return hljs;
+      };
+      var highlight2 = HLJS2({});
+      module2.exports = highlight2;
+    }
+  });
+
+  // node_modules/format/format.js
+  var require_format = __commonJS({
+    "node_modules/format/format.js"(exports2, module2) {
+      (function() {
+        var namespace;
+        if (typeof module2 !== "undefined") {
+          namespace = module2.exports = format3;
+        } else {
+          namespace = function() {
+            return this || (1, eval)("this");
+          }();
+        }
+        namespace.format = format3;
+        namespace.vsprintf = vsprintf;
+        if (typeof console !== "undefined" && typeof console.log === "function") {
+          namespace.printf = printf;
+        }
+        function printf() {
+          console.log(format3.apply(null, arguments));
+        }
+        function vsprintf(fmt, replacements) {
+          return format3.apply(null, [fmt].concat(replacements));
+        }
+        function format3(fmt) {
+          var argIndex = 1, args = [].slice.call(arguments), i = 0, n = fmt.length, result2 = "", c, escaped = false, arg, tmp, leadingZero = false, precision, nextArg = function() {
+            return args[argIndex++];
+          }, slurpNumber = function() {
+            var digits = "";
+            while (/\d/.test(fmt[i])) {
+              digits += fmt[i++];
+              c = fmt[i];
+            }
+            return digits.length > 0 ? parseInt(digits) : null;
+          };
+          for (; i < n; ++i) {
+            c = fmt[i];
+            if (escaped) {
+              escaped = false;
+              if (c == ".") {
+                leadingZero = false;
+                c = fmt[++i];
+              } else if (c == "0" && fmt[i + 1] == ".") {
+                leadingZero = true;
+                i += 2;
+                c = fmt[i];
+              } else {
+                leadingZero = true;
+              }
+              precision = slurpNumber();
+              switch (c) {
+                case "b":
+                  result2 += parseInt(nextArg(), 10).toString(2);
+                  break;
+                case "c":
+                  arg = nextArg();
+                  if (typeof arg === "string" || arg instanceof String)
+                    result2 += arg;
+                  else
+                    result2 += String.fromCharCode(parseInt(arg, 10));
+                  break;
+                case "d":
+                  result2 += parseInt(nextArg(), 10);
+                  break;
+                case "f":
+                  tmp = String(parseFloat(nextArg()).toFixed(precision || 6));
+                  result2 += leadingZero ? tmp : tmp.replace(/^0/, "");
+                  break;
+                case "j":
+                  result2 += JSON.stringify(nextArg());
+                  break;
+                case "o":
+                  result2 += "0" + parseInt(nextArg(), 10).toString(8);
+                  break;
+                case "s":
+                  result2 += nextArg();
+                  break;
+                case "x":
+                  result2 += "0x" + parseInt(nextArg(), 10).toString(16);
+                  break;
+                case "X":
+                  result2 += "0x" + parseInt(nextArg(), 10).toString(16).toUpperCase();
+                  break;
+                default:
+                  result2 += c;
+                  break;
+              }
+            } else if (c === "%") {
+              escaped = true;
+            } else {
+              result2 += c;
+            }
+          }
+          return result2;
+        }
+      })();
+    }
+  });
+
+  // node_modules/fault/index.js
+  var require_fault = __commonJS({
+    "node_modules/fault/index.js"(exports2, module2) {
+      "use strict";
+      var formatter2 = require_format();
+      var fault2 = create9(Error);
+      module2.exports = fault2;
+      fault2.eval = create9(EvalError);
+      fault2.range = create9(RangeError);
+      fault2.reference = create9(ReferenceError);
+      fault2.syntax = create9(SyntaxError);
+      fault2.type = create9(TypeError);
+      fault2.uri = create9(URIError);
+      fault2.create = create9;
+      function create9(EConstructor) {
+        FormattedError.displayName = EConstructor.displayName || EConstructor.name;
+        return FormattedError;
+        function FormattedError(format3) {
+          if (format3) {
+            format3 = formatter2.apply(null, arguments);
+          }
+          return new EConstructor(format3);
+        }
+      }
+    }
+  });
+
+  // node_modules/lowlight/lib/core.js
+  var require_core2 = __commonJS({
+    "node_modules/lowlight/lib/core.js"(exports2) {
+      "use strict";
+      var high2 = require_core();
+      var fault2 = require_fault();
+      exports2.highlight = highlight2;
+      exports2.highlightAuto = highlightAuto2;
+      exports2.registerLanguage = registerLanguage2;
+      exports2.listLanguages = listLanguages2;
+      exports2.registerAlias = registerAlias2;
+      Emitter2.prototype.addText = text4;
+      Emitter2.prototype.addKeyword = addKeyword2;
+      Emitter2.prototype.addSublanguage = addSublanguage2;
+      Emitter2.prototype.openNode = open2;
+      Emitter2.prototype.closeNode = close6;
+      Emitter2.prototype.closeAllNodes = noop3;
+      Emitter2.prototype.finalize = noop3;
+      Emitter2.prototype.toHTML = toHtmlNoop2;
+      var defaultPrefix2 = "hljs-";
+      function highlight2(name, value, options) {
+        var before3 = high2.configure({});
+        var settings = options || {};
+        var prefix = settings.prefix;
+        var result2;
+        if (typeof name !== "string") {
+          throw fault2("Expected `string` for name, got `%s`", name);
+        }
+        if (!high2.getLanguage(name)) {
+          throw fault2("Unknown language: `%s` is not registered", name);
+        }
+        if (typeof value !== "string") {
+          throw fault2("Expected `string` for value, got `%s`", value);
+        }
+        if (prefix === null || prefix === void 0) {
+          prefix = defaultPrefix2;
+        }
+        high2.configure({ __emitter: Emitter2, classPrefix: prefix });
+        result2 = high2.highlight(value, { language: name, ignoreIllegals: true });
+        high2.configure(before3 || {});
+        if (result2.errorRaised) {
+          throw result2.errorRaised;
+        }
+        return {
+          relevance: result2.relevance,
+          language: result2.language,
+          value: result2.emitter.rootNode.children
+        };
+      }
+      function highlightAuto2(value, options) {
+        var settings = options || {};
+        var subset = settings.subset || high2.listLanguages();
+        var prefix = settings.prefix;
+        var length = subset.length;
+        var index3 = -1;
+        var result2;
+        var secondBest;
+        var current;
+        var name;
+        if (prefix === null || prefix === void 0) {
+          prefix = defaultPrefix2;
+        }
+        if (typeof value !== "string") {
+          throw fault2("Expected `string` for value, got `%s`", value);
+        }
+        secondBest = { relevance: 0, language: null, value: [] };
+        result2 = { relevance: 0, language: null, value: [] };
+        while (++index3 < length) {
+          name = subset[index3];
+          if (!high2.getLanguage(name)) {
+            continue;
+          }
+          current = highlight2(name, value, options);
+          current.language = name;
+          if (current.relevance > secondBest.relevance) {
+            secondBest = current;
+          }
+          if (current.relevance > result2.relevance) {
+            secondBest = result2;
+            result2 = current;
+          }
+        }
+        if (secondBest.language) {
+          result2.secondBest = secondBest;
+        }
+        return result2;
+      }
+      function registerLanguage2(name, syntax) {
+        high2.registerLanguage(name, syntax);
+      }
+      function listLanguages2() {
+        return high2.listLanguages();
+      }
+      function registerAlias2(name, alias) {
+        var map22 = name;
+        var key2;
+        if (alias) {
+          map22 = {};
+          map22[name] = alias;
+        }
+        for (key2 in map22) {
+          high2.registerAliases(map22[key2], { languageName: key2 });
+        }
+      }
+      function Emitter2(options) {
+        this.options = options;
+        this.rootNode = { children: [] };
+        this.stack = [this.rootNode];
+      }
+      function addKeyword2(value, name) {
+        this.openNode(name);
+        this.addText(value);
+        this.closeNode();
+      }
+      function addSublanguage2(other, name) {
+        var stack = this.stack;
+        var current = stack[stack.length - 1];
+        var results = other.rootNode.children;
+        var node5 = name ? {
+          type: "element",
+          tagName: "span",
+          properties: { className: [name] },
+          children: results
+        } : results;
+        current.children = current.children.concat(node5);
+      }
+      function text4(value) {
+        var stack = this.stack;
+        var current;
+        var tail;
+        if (value === "")
+          return;
+        current = stack[stack.length - 1];
+        tail = current.children[current.children.length - 1];
+        if (tail && tail.type === "text") {
+          tail.value += value;
+        } else {
+          current.children.push({ type: "text", value });
+        }
+      }
+      function open2(name) {
+        var stack = this.stack;
+        var className = this.options.classPrefix + name;
+        var current = stack[stack.length - 1];
+        var child5 = {
+          type: "element",
+          tagName: "span",
+          properties: { className: [className] },
+          children: []
+        };
+        current.children.push(child5);
+        stack.push(child5);
+      }
+      function close6() {
+        this.stack.pop();
+      }
+      function toHtmlNoop2() {
+        return "";
+      }
+      function noop3() {
+      }
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/css.js
+  var require_css = __commonJS({
+    "node_modules/highlight.js/lib/languages/css.js"(exports2, module2) {
+      var MODES2 = (hljs) => {
+        return {
+          IMPORTANT: {
+            className: "meta",
+            begin: "!important"
+          },
+          HEXCOLOR: {
+            className: "number",
+            begin: "#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})"
+          },
+          ATTRIBUTE_SELECTOR_MODE: {
+            className: "selector-attr",
+            begin: /\[/,
+            end: /\]/,
+            illegal: "$",
+            contains: [
+              hljs.APOS_STRING_MODE,
+              hljs.QUOTE_STRING_MODE
+            ]
+          }
+        };
+      };
+      var TAGS = [
+        "a",
+        "abbr",
+        "address",
+        "article",
+        "aside",
+        "audio",
+        "b",
+        "blockquote",
+        "body",
+        "button",
+        "canvas",
+        "caption",
+        "cite",
+        "code",
+        "dd",
+        "del",
+        "details",
+        "dfn",
+        "div",
+        "dl",
+        "dt",
+        "em",
+        "fieldset",
+        "figcaption",
+        "figure",
+        "footer",
+        "form",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "header",
+        "hgroup",
+        "html",
+        "i",
+        "iframe",
+        "img",
+        "input",
+        "ins",
+        "kbd",
+        "label",
+        "legend",
+        "li",
+        "main",
+        "mark",
+        "menu",
+        "nav",
+        "object",
+        "ol",
+        "p",
+        "q",
+        "quote",
+        "samp",
+        "section",
+        "span",
+        "strong",
+        "summary",
+        "sup",
+        "table",
+        "tbody",
+        "td",
+        "textarea",
+        "tfoot",
+        "th",
+        "thead",
+        "time",
+        "tr",
+        "ul",
+        "var",
+        "video"
+      ];
+      var MEDIA_FEATURES = [
+        "any-hover",
+        "any-pointer",
+        "aspect-ratio",
+        "color",
+        "color-gamut",
+        "color-index",
+        "device-aspect-ratio",
+        "device-height",
+        "device-width",
+        "display-mode",
+        "forced-colors",
+        "grid",
+        "height",
+        "hover",
+        "inverted-colors",
+        "monochrome",
+        "orientation",
+        "overflow-block",
+        "overflow-inline",
+        "pointer",
+        "prefers-color-scheme",
+        "prefers-contrast",
+        "prefers-reduced-motion",
+        "prefers-reduced-transparency",
+        "resolution",
+        "scan",
+        "scripting",
+        "update",
+        "width",
+        "min-width",
+        "max-width",
+        "min-height",
+        "max-height"
+      ];
+      var PSEUDO_CLASSES = [
+        "active",
+        "any-link",
+        "blank",
+        "checked",
+        "current",
+        "default",
+        "defined",
+        "dir",
+        "disabled",
+        "drop",
+        "empty",
+        "enabled",
+        "first",
+        "first-child",
+        "first-of-type",
+        "fullscreen",
+        "future",
+        "focus",
+        "focus-visible",
+        "focus-within",
+        "has",
+        "host",
+        "host-context",
+        "hover",
+        "indeterminate",
+        "in-range",
+        "invalid",
+        "is",
+        "lang",
+        "last-child",
+        "last-of-type",
+        "left",
+        "link",
+        "local-link",
+        "not",
+        "nth-child",
+        "nth-col",
+        "nth-last-child",
+        "nth-last-col",
+        "nth-last-of-type",
+        "nth-of-type",
+        "only-child",
+        "only-of-type",
+        "optional",
+        "out-of-range",
+        "past",
+        "placeholder-shown",
+        "read-only",
+        "read-write",
+        "required",
+        "right",
+        "root",
+        "scope",
+        "target",
+        "target-within",
+        "user-invalid",
+        "valid",
+        "visited",
+        "where"
+      ];
+      var PSEUDO_ELEMENTS = [
+        "after",
+        "backdrop",
+        "before",
+        "cue",
+        "cue-region",
+        "first-letter",
+        "first-line",
+        "grammar-error",
+        "marker",
+        "part",
+        "placeholder",
+        "selection",
+        "slotted",
+        "spelling-error"
+      ];
+      var ATTRIBUTES = [
+        "align-content",
+        "align-items",
+        "align-self",
+        "animation",
+        "animation-delay",
+        "animation-direction",
+        "animation-duration",
+        "animation-fill-mode",
+        "animation-iteration-count",
+        "animation-name",
+        "animation-play-state",
+        "animation-timing-function",
+        "auto",
+        "backface-visibility",
+        "background",
+        "background-attachment",
+        "background-clip",
+        "background-color",
+        "background-image",
+        "background-origin",
+        "background-position",
+        "background-repeat",
+        "background-size",
+        "border",
+        "border-bottom",
+        "border-bottom-color",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "border-bottom-style",
+        "border-bottom-width",
+        "border-collapse",
+        "border-color",
+        "border-image",
+        "border-image-outset",
+        "border-image-repeat",
+        "border-image-slice",
+        "border-image-source",
+        "border-image-width",
+        "border-left",
+        "border-left-color",
+        "border-left-style",
+        "border-left-width",
+        "border-radius",
+        "border-right",
+        "border-right-color",
+        "border-right-style",
+        "border-right-width",
+        "border-spacing",
+        "border-style",
+        "border-top",
+        "border-top-color",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-top-style",
+        "border-top-width",
+        "border-width",
+        "bottom",
+        "box-decoration-break",
+        "box-shadow",
+        "box-sizing",
+        "break-after",
+        "break-before",
+        "break-inside",
+        "caption-side",
+        "clear",
+        "clip",
+        "clip-path",
+        "color",
+        "column-count",
+        "column-fill",
+        "column-gap",
+        "column-rule",
+        "column-rule-color",
+        "column-rule-style",
+        "column-rule-width",
+        "column-span",
+        "column-width",
+        "columns",
+        "content",
+        "counter-increment",
+        "counter-reset",
+        "cursor",
+        "direction",
+        "display",
+        "empty-cells",
+        "filter",
+        "flex",
+        "flex-basis",
+        "flex-direction",
+        "flex-flow",
+        "flex-grow",
+        "flex-shrink",
+        "flex-wrap",
+        "float",
+        "font",
+        "font-display",
+        "font-family",
+        "font-feature-settings",
+        "font-kerning",
+        "font-language-override",
+        "font-size",
+        "font-size-adjust",
+        "font-smoothing",
+        "font-stretch",
+        "font-style",
+        "font-variant",
+        "font-variant-ligatures",
+        "font-variation-settings",
+        "font-weight",
+        "height",
+        "hyphens",
+        "icon",
+        "image-orientation",
+        "image-rendering",
+        "image-resolution",
+        "ime-mode",
+        "inherit",
+        "initial",
+        "justify-content",
+        "left",
+        "letter-spacing",
+        "line-height",
+        "list-style",
+        "list-style-image",
+        "list-style-position",
+        "list-style-type",
+        "margin",
+        "margin-bottom",
+        "margin-left",
+        "margin-right",
+        "margin-top",
+        "marks",
+        "mask",
+        "max-height",
+        "max-width",
+        "min-height",
+        "min-width",
+        "nav-down",
+        "nav-index",
+        "nav-left",
+        "nav-right",
+        "nav-up",
+        "none",
+        "normal",
+        "object-fit",
+        "object-position",
+        "opacity",
+        "order",
+        "orphans",
+        "outline",
+        "outline-color",
+        "outline-offset",
+        "outline-style",
+        "outline-width",
+        "overflow",
+        "overflow-wrap",
+        "overflow-x",
+        "overflow-y",
+        "padding",
+        "padding-bottom",
+        "padding-left",
+        "padding-right",
+        "padding-top",
+        "page-break-after",
+        "page-break-before",
+        "page-break-inside",
+        "perspective",
+        "perspective-origin",
+        "pointer-events",
+        "position",
+        "quotes",
+        "resize",
+        "right",
+        "src",
+        "tab-size",
+        "table-layout",
+        "text-align",
+        "text-align-last",
+        "text-decoration",
+        "text-decoration-color",
+        "text-decoration-line",
+        "text-decoration-style",
+        "text-indent",
+        "text-overflow",
+        "text-rendering",
+        "text-shadow",
+        "text-transform",
+        "text-underline-position",
+        "top",
+        "transform",
+        "transform-origin",
+        "transform-style",
+        "transition",
+        "transition-delay",
+        "transition-duration",
+        "transition-property",
+        "transition-timing-function",
+        "unicode-bidi",
+        "vertical-align",
+        "visibility",
+        "white-space",
+        "widows",
+        "width",
+        "word-break",
+        "word-spacing",
+        "word-wrap",
+        "z-index"
+      ].reverse();
+      function source2(re) {
+        if (!re)
+          return null;
+        if (typeof re === "string")
+          return re;
+        return re.source;
+      }
+      function lookahead(re) {
+        return concat2("(?=", re, ")");
+      }
+      function concat2(...args) {
+        const joined = args.map((x) => source2(x)).join("");
+        return joined;
+      }
+      function css2(hljs) {
+        const modes = MODES2(hljs);
+        const FUNCTION_DISPATCH = {
+          className: "built_in",
+          begin: /[\w-]+(?=\()/
+        };
+        const VENDOR_PREFIX = {
+          begin: /-(webkit|moz|ms|o)-(?=[a-z])/
+        };
+        const AT_MODIFIERS = "and or not only";
+        const AT_PROPERTY_RE = /@-?\w[\w]*(-\w+)*/;
+        const IDENT_RE2 = "[a-zA-Z-][a-zA-Z0-9_-]*";
+        const STRINGS = [
+          hljs.APOS_STRING_MODE,
+          hljs.QUOTE_STRING_MODE
+        ];
+        return {
+          name: "CSS",
+          case_insensitive: true,
+          illegal: /[=|'\$]/,
+          keywords: {
+            keyframePosition: "from to"
+          },
+          classNameAliases: {
+            keyframePosition: "selector-tag"
+          },
+          contains: [
+            hljs.C_BLOCK_COMMENT_MODE,
+            VENDOR_PREFIX,
+            hljs.CSS_NUMBER_MODE,
+            {
+              className: "selector-id",
+              begin: /#[A-Za-z0-9_-]+/,
+              relevance: 0
+            },
+            {
+              className: "selector-class",
+              begin: "\\." + IDENT_RE2,
+              relevance: 0
+            },
+            modes.ATTRIBUTE_SELECTOR_MODE,
+            {
+              className: "selector-pseudo",
+              variants: [
+                {
+                  begin: ":(" + PSEUDO_CLASSES.join("|") + ")"
+                },
+                {
+                  begin: "::(" + PSEUDO_ELEMENTS.join("|") + ")"
+                }
+              ]
+            },
+            {
+              className: "attribute",
+              begin: "\\b(" + ATTRIBUTES.join("|") + ")\\b"
+            },
+            {
+              begin: ":",
+              end: "[;}]",
+              contains: [
+                modes.HEXCOLOR,
+                modes.IMPORTANT,
+                hljs.CSS_NUMBER_MODE,
+                ...STRINGS,
+                {
+                  begin: /(url|data-uri)\(/,
+                  end: /\)/,
+                  relevance: 0,
+                  keywords: {
+                    built_in: "url data-uri"
+                  },
+                  contains: [
+                    {
+                      className: "string",
+                      begin: /[^)]/,
+                      endsWithParent: true,
+                      excludeEnd: true
+                    }
+                  ]
+                },
+                FUNCTION_DISPATCH
+              ]
+            },
+            {
+              begin: lookahead(/@/),
+              end: "[{;]",
+              relevance: 0,
+              illegal: /:/,
+              contains: [
+                {
+                  className: "keyword",
+                  begin: AT_PROPERTY_RE
+                },
+                {
+                  begin: /\s/,
+                  endsWithParent: true,
+                  excludeEnd: true,
+                  relevance: 0,
+                  keywords: {
+                    $pattern: /[a-z-]+/,
+                    keyword: AT_MODIFIERS,
+                    attribute: MEDIA_FEATURES.join(" ")
+                  },
+                  contains: [
+                    {
+                      begin: /[a-z-]+(?=:)/,
+                      className: "attribute"
+                    },
+                    ...STRINGS,
+                    hljs.CSS_NUMBER_MODE
+                  ]
+                }
+              ]
+            },
+            {
+              className: "selector-tag",
+              begin: "\\b(" + TAGS.join("|") + ")\\b"
+            }
+          ]
+        };
+      }
+      module2.exports = css2;
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/javascript.js
+  var require_javascript = __commonJS({
+    "node_modules/highlight.js/lib/languages/javascript.js"(exports2, module2) {
+      var IDENT_RE2 = "[A-Za-z$_][0-9A-Za-z$_]*";
+      var KEYWORDS = [
+        "as",
+        "in",
+        "of",
+        "if",
+        "for",
+        "while",
+        "finally",
+        "var",
+        "new",
+        "function",
+        "do",
+        "return",
+        "void",
+        "else",
+        "break",
+        "catch",
+        "instanceof",
+        "with",
+        "throw",
+        "case",
+        "default",
+        "try",
+        "switch",
+        "continue",
+        "typeof",
+        "delete",
+        "let",
+        "yield",
+        "const",
+        "class",
+        "debugger",
+        "async",
+        "await",
+        "static",
+        "import",
+        "from",
+        "export",
+        "extends"
+      ];
+      var LITERALS = [
+        "true",
+        "false",
+        "null",
+        "undefined",
+        "NaN",
+        "Infinity"
+      ];
+      var TYPES = [
+        "Intl",
+        "DataView",
+        "Number",
+        "Math",
+        "Date",
+        "String",
+        "RegExp",
+        "Object",
+        "Function",
+        "Boolean",
+        "Error",
+        "Symbol",
+        "Set",
+        "Map",
+        "WeakSet",
+        "WeakMap",
+        "Proxy",
+        "Reflect",
+        "JSON",
+        "Promise",
+        "Float64Array",
+        "Int16Array",
+        "Int32Array",
+        "Int8Array",
+        "Uint16Array",
+        "Uint32Array",
+        "Float32Array",
+        "Array",
+        "Uint8Array",
+        "Uint8ClampedArray",
+        "ArrayBuffer",
+        "BigInt64Array",
+        "BigUint64Array",
+        "BigInt"
+      ];
+      var ERROR_TYPES = [
+        "EvalError",
+        "InternalError",
+        "RangeError",
+        "ReferenceError",
+        "SyntaxError",
+        "TypeError",
+        "URIError"
+      ];
+      var BUILT_IN_GLOBALS = [
+        "setInterval",
+        "setTimeout",
+        "clearInterval",
+        "clearTimeout",
+        "require",
+        "exports",
+        "eval",
+        "isFinite",
+        "isNaN",
+        "parseFloat",
+        "parseInt",
+        "decodeURI",
+        "decodeURIComponent",
+        "encodeURI",
+        "encodeURIComponent",
+        "escape",
+        "unescape"
+      ];
+      var BUILT_IN_VARIABLES = [
+        "arguments",
+        "this",
+        "super",
+        "console",
+        "window",
+        "document",
+        "localStorage",
+        "module",
+        "global"
+      ];
+      var BUILT_INS = [].concat(BUILT_IN_GLOBALS, BUILT_IN_VARIABLES, TYPES, ERROR_TYPES);
+      function source2(re) {
+        if (!re)
+          return null;
+        if (typeof re === "string")
+          return re;
+        return re.source;
+      }
+      function lookahead(re) {
+        return concat2("(?=", re, ")");
+      }
+      function concat2(...args) {
+        const joined = args.map((x) => source2(x)).join("");
+        return joined;
+      }
+      function javascript2(hljs) {
+        const hasClosingTag = (match, { after: after3 }) => {
+          const tag2 = "</" + match[0].slice(1);
+          const pos = match.input.indexOf(tag2, after3);
+          return pos !== -1;
+        };
+        const IDENT_RE$1 = IDENT_RE2;
+        const FRAGMENT = {
+          begin: "<>",
+          end: "</>"
+        };
+        const XML_TAG = {
+          begin: /<[A-Za-z0-9\\._:-]+/,
+          end: /\/[A-Za-z0-9\\._:-]+>|\/>/,
+          isTrulyOpeningTag: (match, response) => {
+            const afterMatchIndex = match[0].length + match.index;
+            const nextChar = match.input[afterMatchIndex];
+            if (nextChar === "<") {
+              response.ignoreMatch();
+              return;
+            }
+            if (nextChar === ">") {
+              if (!hasClosingTag(match, { after: afterMatchIndex })) {
+                response.ignoreMatch();
+              }
+            }
+          }
+        };
+        const KEYWORDS$1 = {
+          $pattern: IDENT_RE2,
+          keyword: KEYWORDS,
+          literal: LITERALS,
+          built_in: BUILT_INS
+        };
+        const decimalDigits = "[0-9](_?[0-9])*";
+        const frac = `\\.(${decimalDigits})`;
+        const decimalInteger = `0|[1-9](_?[0-9])*|0[0-7]*[89][0-9]*`;
+        const NUMBER = {
+          className: "number",
+          variants: [
+            { begin: `(\\b(${decimalInteger})((${frac})|\\.)?|(${frac}))[eE][+-]?(${decimalDigits})\\b` },
+            { begin: `\\b(${decimalInteger})\\b((${frac})\\b|\\.)?|(${frac})\\b` },
+            { begin: `\\b(0|[1-9](_?[0-9])*)n\\b` },
+            { begin: "\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*n?\\b" },
+            { begin: "\\b0[bB][0-1](_?[0-1])*n?\\b" },
+            { begin: "\\b0[oO][0-7](_?[0-7])*n?\\b" },
+            { begin: "\\b0[0-7]+n?\\b" }
+          ],
+          relevance: 0
+        };
+        const SUBST = {
+          className: "subst",
+          begin: "\\$\\{",
+          end: "\\}",
+          keywords: KEYWORDS$1,
+          contains: []
+        };
+        const HTML_TEMPLATE = {
+          begin: "html`",
+          end: "",
+          starts: {
+            end: "`",
+            returnEnd: false,
+            contains: [
+              hljs.BACKSLASH_ESCAPE,
+              SUBST
+            ],
+            subLanguage: "xml"
+          }
+        };
+        const CSS_TEMPLATE = {
+          begin: "css`",
+          end: "",
+          starts: {
+            end: "`",
+            returnEnd: false,
+            contains: [
+              hljs.BACKSLASH_ESCAPE,
+              SUBST
+            ],
+            subLanguage: "css"
+          }
+        };
+        const TEMPLATE_STRING = {
+          className: "string",
+          begin: "`",
+          end: "`",
+          contains: [
+            hljs.BACKSLASH_ESCAPE,
+            SUBST
+          ]
+        };
+        const JSDOC_COMMENT = hljs.COMMENT(/\/\*\*(?!\/)/, "\\*/", {
+          relevance: 0,
+          contains: [
+            {
+              className: "doctag",
+              begin: "@[A-Za-z]+",
+              contains: [
+                {
+                  className: "type",
+                  begin: "\\{",
+                  end: "\\}",
+                  relevance: 0
+                },
+                {
+                  className: "variable",
+                  begin: IDENT_RE$1 + "(?=\\s*(-)|$)",
+                  endsParent: true,
+                  relevance: 0
+                },
+                {
+                  begin: /(?=[^\n])\s/,
+                  relevance: 0
+                }
+              ]
+            }
+          ]
+        });
+        const COMMENT2 = {
+          className: "comment",
+          variants: [
+            JSDOC_COMMENT,
+            hljs.C_BLOCK_COMMENT_MODE,
+            hljs.C_LINE_COMMENT_MODE
+          ]
+        };
+        const SUBST_INTERNALS = [
+          hljs.APOS_STRING_MODE,
+          hljs.QUOTE_STRING_MODE,
+          HTML_TEMPLATE,
+          CSS_TEMPLATE,
+          TEMPLATE_STRING,
+          NUMBER,
+          hljs.REGEXP_MODE
+        ];
+        SUBST.contains = SUBST_INTERNALS.concat({
+          begin: /\{/,
+          end: /\}/,
+          keywords: KEYWORDS$1,
+          contains: [
+            "self"
+          ].concat(SUBST_INTERNALS)
+        });
+        const SUBST_AND_COMMENTS = [].concat(COMMENT2, SUBST.contains);
+        const PARAMS_CONTAINS = SUBST_AND_COMMENTS.concat([
+          {
+            begin: /\(/,
+            end: /\)/,
+            keywords: KEYWORDS$1,
+            contains: ["self"].concat(SUBST_AND_COMMENTS)
+          }
+        ]);
+        const PARAMS = {
+          className: "params",
+          begin: /\(/,
+          end: /\)/,
+          excludeBegin: true,
+          excludeEnd: true,
+          keywords: KEYWORDS$1,
+          contains: PARAMS_CONTAINS
+        };
+        return {
+          name: "Javascript",
+          aliases: ["js", "jsx", "mjs", "cjs"],
+          keywords: KEYWORDS$1,
+          exports: { PARAMS_CONTAINS },
+          illegal: /#(?![$_A-z])/,
+          contains: [
+            hljs.SHEBANG({
+              label: "shebang",
+              binary: "node",
+              relevance: 5
+            }),
+            {
+              label: "use_strict",
+              className: "meta",
+              relevance: 10,
+              begin: /^\s*['"]use (strict|asm)['"]/
+            },
+            hljs.APOS_STRING_MODE,
+            hljs.QUOTE_STRING_MODE,
+            HTML_TEMPLATE,
+            CSS_TEMPLATE,
+            TEMPLATE_STRING,
+            COMMENT2,
+            NUMBER,
+            {
+              begin: concat2(/[{,\n]\s*/, lookahead(concat2(/(((\/\/.*$)|(\/\*(\*[^/]|[^*])*\*\/))\s*)*/, IDENT_RE$1 + "\\s*:"))),
+              relevance: 0,
+              contains: [
+                {
+                  className: "attr",
+                  begin: IDENT_RE$1 + lookahead("\\s*:"),
+                  relevance: 0
+                }
+              ]
+            },
+            {
+              begin: "(" + hljs.RE_STARTERS_RE + "|\\b(case|return|throw)\\b)\\s*",
+              keywords: "return throw case",
+              contains: [
+                COMMENT2,
+                hljs.REGEXP_MODE,
+                {
+                  className: "function",
+                  begin: "(\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)|" + hljs.UNDERSCORE_IDENT_RE + ")\\s*=>",
+                  returnBegin: true,
+                  end: "\\s*=>",
+                  contains: [
+                    {
+                      className: "params",
+                      variants: [
+                        {
+                          begin: hljs.UNDERSCORE_IDENT_RE,
+                          relevance: 0
+                        },
+                        {
+                          className: null,
+                          begin: /\(\s*\)/,
+                          skip: true
+                        },
+                        {
+                          begin: /\(/,
+                          end: /\)/,
+                          excludeBegin: true,
+                          excludeEnd: true,
+                          keywords: KEYWORDS$1,
+                          contains: PARAMS_CONTAINS
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  begin: /,/,
+                  relevance: 0
+                },
+                {
+                  className: "",
+                  begin: /\s/,
+                  end: /\s*/,
+                  skip: true
+                },
+                {
+                  variants: [
+                    { begin: FRAGMENT.begin, end: FRAGMENT.end },
+                    {
+                      begin: XML_TAG.begin,
+                      "on:begin": XML_TAG.isTrulyOpeningTag,
+                      end: XML_TAG.end
+                    }
+                  ],
+                  subLanguage: "xml",
+                  contains: [
+                    {
+                      begin: XML_TAG.begin,
+                      end: XML_TAG.end,
+                      skip: true,
+                      contains: ["self"]
+                    }
+                  ]
+                }
+              ],
+              relevance: 0
+            },
+            {
+              className: "function",
+              beginKeywords: "function",
+              end: /[{;]/,
+              excludeEnd: true,
+              keywords: KEYWORDS$1,
+              contains: [
+                "self",
+                hljs.inherit(hljs.TITLE_MODE, { begin: IDENT_RE$1 }),
+                PARAMS
+              ],
+              illegal: /%/
+            },
+            {
+              beginKeywords: "while if switch catch for"
+            },
+            {
+              className: "function",
+              begin: hljs.UNDERSCORE_IDENT_RE + "\\([^()]*(\\([^()]*(\\([^()]*\\)[^()]*)*\\)[^()]*)*\\)\\s*\\{",
+              returnBegin: true,
+              contains: [
+                PARAMS,
+                hljs.inherit(hljs.TITLE_MODE, { begin: IDENT_RE$1 })
+              ]
+            },
+            {
+              variants: [
+                { begin: "\\." + IDENT_RE$1 },
+                { begin: "\\$" + IDENT_RE$1 }
+              ],
+              relevance: 0
+            },
+            {
+              className: "class",
+              beginKeywords: "class",
+              end: /[{;=]/,
+              excludeEnd: true,
+              illegal: /[:"[\]]/,
+              contains: [
+                { beginKeywords: "extends" },
+                hljs.UNDERSCORE_TITLE_MODE
+              ]
+            },
+            {
+              begin: /\b(?=constructor)/,
+              end: /[{;]/,
+              excludeEnd: true,
+              contains: [
+                hljs.inherit(hljs.TITLE_MODE, { begin: IDENT_RE$1 }),
+                "self",
+                PARAMS
+              ]
+            },
+            {
+              begin: "(get|set)\\s+(?=" + IDENT_RE$1 + "\\()",
+              end: /\{/,
+              keywords: "get set",
+              contains: [
+                hljs.inherit(hljs.TITLE_MODE, { begin: IDENT_RE$1 }),
+                { begin: /\(\)/ },
+                PARAMS
+              ]
+            },
+            {
+              begin: /\$[(.]/
+            }
+          ]
+        };
+      }
+      module2.exports = javascript2;
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/json.js
+  var require_json = __commonJS({
+    "node_modules/highlight.js/lib/languages/json.js"(exports2, module2) {
+      function json2(hljs) {
+        const LITERALS = {
+          literal: "true false null"
+        };
+        const ALLOWED_COMMENTS = [
+          hljs.C_LINE_COMMENT_MODE,
+          hljs.C_BLOCK_COMMENT_MODE
+        ];
+        const TYPES = [
+          hljs.QUOTE_STRING_MODE,
+          hljs.C_NUMBER_MODE
+        ];
+        const VALUE_CONTAINER = {
+          end: ",",
+          endsWithParent: true,
+          excludeEnd: true,
+          contains: TYPES,
+          keywords: LITERALS
+        };
+        const OBJECT = {
+          begin: /\{/,
+          end: /\}/,
+          contains: [
+            {
+              className: "attr",
+              begin: /"/,
+              end: /"/,
+              contains: [hljs.BACKSLASH_ESCAPE],
+              illegal: "\\n"
+            },
+            hljs.inherit(VALUE_CONTAINER, {
+              begin: /:/
+            })
+          ].concat(ALLOWED_COMMENTS),
+          illegal: "\\S"
+        };
+        const ARRAY = {
+          begin: "\\[",
+          end: "\\]",
+          contains: [hljs.inherit(VALUE_CONTAINER)],
+          illegal: "\\S"
+        };
+        TYPES.push(OBJECT, ARRAY);
+        ALLOWED_COMMENTS.forEach(function(rule) {
+          TYPES.push(rule);
+        });
+        return {
+          name: "JSON",
+          contains: TYPES,
+          keywords: LITERALS,
+          illegal: "\\S"
+        };
+      }
+      module2.exports = json2;
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/ruby.js
+  var require_ruby = __commonJS({
+    "node_modules/highlight.js/lib/languages/ruby.js"(exports2, module2) {
+      function source2(re) {
+        if (!re)
+          return null;
+        if (typeof re === "string")
+          return re;
+        return re.source;
+      }
+      function lookahead(re) {
+        return concat2("(?=", re, ")");
+      }
+      function concat2(...args) {
+        const joined = args.map((x) => source2(x)).join("");
+        return joined;
+      }
+      function ruby2(hljs) {
+        const RUBY_METHOD_RE = "([a-zA-Z_]\\w*[!?=]?|[-+~]@|<<|>>|=~|===?|<=>|[<>]=?|\\*\\*|[-/+%^&*~`|]|\\[\\]=?)";
+        const RUBY_KEYWORDS = {
+          keyword: "and then defined module in return redo if BEGIN retry end for self when next until do begin unless END rescue else break undef not super class case require yield alias while ensure elsif or include attr_reader attr_writer attr_accessor __FILE__",
+          built_in: "proc lambda",
+          literal: "true false nil"
+        };
+        const YARDOCTAG = {
+          className: "doctag",
+          begin: "@[A-Za-z]+"
+        };
+        const IRB_OBJECT = {
+          begin: "#<",
+          end: ">"
+        };
+        const COMMENT_MODES = [
+          hljs.COMMENT("#", "$", {
+            contains: [YARDOCTAG]
+          }),
+          hljs.COMMENT("^=begin", "^=end", {
+            contains: [YARDOCTAG],
+            relevance: 10
+          }),
+          hljs.COMMENT("^__END__", "\\n$")
+        ];
+        const SUBST = {
+          className: "subst",
+          begin: /#\{/,
+          end: /\}/,
+          keywords: RUBY_KEYWORDS
+        };
+        const STRING = {
+          className: "string",
+          contains: [
+            hljs.BACKSLASH_ESCAPE,
+            SUBST
+          ],
+          variants: [
+            {
+              begin: /'/,
+              end: /'/
+            },
+            {
+              begin: /"/,
+              end: /"/
+            },
+            {
+              begin: /`/,
+              end: /`/
+            },
+            {
+              begin: /%[qQwWx]?\(/,
+              end: /\)/
+            },
+            {
+              begin: /%[qQwWx]?\[/,
+              end: /\]/
+            },
+            {
+              begin: /%[qQwWx]?\{/,
+              end: /\}/
+            },
+            {
+              begin: /%[qQwWx]?</,
+              end: />/
+            },
+            {
+              begin: /%[qQwWx]?\//,
+              end: /\//
+            },
+            {
+              begin: /%[qQwWx]?%/,
+              end: /%/
+            },
+            {
+              begin: /%[qQwWx]?-/,
+              end: /-/
+            },
+            {
+              begin: /%[qQwWx]?\|/,
+              end: /\|/
+            },
+            {
+              begin: /\B\?(\\\d{1,3})/
+            },
+            {
+              begin: /\B\?(\\x[A-Fa-f0-9]{1,2})/
+            },
+            {
+              begin: /\B\?(\\u\{?[A-Fa-f0-9]{1,6}\}?)/
+            },
+            {
+              begin: /\B\?(\\M-\\C-|\\M-\\c|\\c\\M-|\\M-|\\C-\\M-)[\x20-\x7e]/
+            },
+            {
+              begin: /\B\?\\(c|C-)[\x20-\x7e]/
+            },
+            {
+              begin: /\B\?\\?\S/
+            },
+            {
+              begin: /<<[-~]?'?(\w+)\n(?:[^\n]*\n)*?\s*\1\b/,
+              returnBegin: true,
+              contains: [
+                {
+                  begin: /<<[-~]?'?/
+                },
+                hljs.END_SAME_AS_BEGIN({
+                  begin: /(\w+)/,
+                  end: /(\w+)/,
+                  contains: [
+                    hljs.BACKSLASH_ESCAPE,
+                    SUBST
+                  ]
+                })
+              ]
+            }
+          ]
+        };
+        const decimal = "[1-9](_?[0-9])*|0";
+        const digits = "[0-9](_?[0-9])*";
+        const NUMBER = {
+          className: "number",
+          relevance: 0,
+          variants: [
+            {
+              begin: `\\b(${decimal})(\\.(${digits}))?([eE][+-]?(${digits})|r)?i?\\b`
+            },
+            {
+              begin: "\\b0[dD][0-9](_?[0-9])*r?i?\\b"
+            },
+            {
+              begin: "\\b0[bB][0-1](_?[0-1])*r?i?\\b"
+            },
+            {
+              begin: "\\b0[oO][0-7](_?[0-7])*r?i?\\b"
+            },
+            {
+              begin: "\\b0[xX][0-9a-fA-F](_?[0-9a-fA-F])*r?i?\\b"
+            },
+            {
+              begin: "\\b0(_?[0-7])+r?i?\\b"
+            }
+          ]
+        };
+        const PARAMS = {
+          className: "params",
+          begin: "\\(",
+          end: "\\)",
+          endsParent: true,
+          keywords: RUBY_KEYWORDS
+        };
+        const RUBY_DEFAULT_CONTAINS = [
+          STRING,
+          {
+            className: "class",
+            beginKeywords: "class module",
+            end: "$|;",
+            illegal: /=/,
+            contains: [
+              hljs.inherit(hljs.TITLE_MODE, {
+                begin: "[A-Za-z_]\\w*(::\\w+)*(\\?|!)?"
+              }),
+              {
+                begin: "<\\s*",
+                contains: [
+                  {
+                    begin: "(" + hljs.IDENT_RE + "::)?" + hljs.IDENT_RE,
+                    relevance: 0
+                  }
+                ]
+              }
+            ].concat(COMMENT_MODES)
+          },
+          {
+            className: "function",
+            begin: concat2(/def\s+/, lookahead(RUBY_METHOD_RE + "\\s*(\\(|;|$)")),
+            relevance: 0,
+            keywords: "def",
+            end: "$|;",
+            contains: [
+              hljs.inherit(hljs.TITLE_MODE, {
+                begin: RUBY_METHOD_RE
+              }),
+              PARAMS
+            ].concat(COMMENT_MODES)
+          },
+          {
+            begin: hljs.IDENT_RE + "::"
+          },
+          {
+            className: "symbol",
+            begin: hljs.UNDERSCORE_IDENT_RE + "(!|\\?)?:",
+            relevance: 0
+          },
+          {
+            className: "symbol",
+            begin: ":(?!\\s)",
+            contains: [
+              STRING,
+              {
+                begin: RUBY_METHOD_RE
+              }
+            ],
+            relevance: 0
+          },
+          NUMBER,
+          {
+            className: "variable",
+            begin: `(\\$\\W)|((\\$|@@?)(\\w+))(?=[^@$?])(?![A-Za-z])(?![@$?'])`
+          },
+          {
+            className: "params",
+            begin: /\|/,
+            end: /\|/,
+            relevance: 0,
+            keywords: RUBY_KEYWORDS
+          },
+          {
+            begin: "(" + hljs.RE_STARTERS_RE + "|unless)\\s*",
+            keywords: "unless",
+            contains: [
+              {
+                className: "regexp",
+                contains: [
+                  hljs.BACKSLASH_ESCAPE,
+                  SUBST
+                ],
+                illegal: /\n/,
+                variants: [
+                  {
+                    begin: "/",
+                    end: "/[a-z]*"
+                  },
+                  {
+                    begin: /%r\{/,
+                    end: /\}[a-z]*/
+                  },
+                  {
+                    begin: "%r\\(",
+                    end: "\\)[a-z]*"
+                  },
+                  {
+                    begin: "%r!",
+                    end: "![a-z]*"
+                  },
+                  {
+                    begin: "%r\\[",
+                    end: "\\][a-z]*"
+                  }
+                ]
+              }
+            ].concat(IRB_OBJECT, COMMENT_MODES),
+            relevance: 0
+          }
+        ].concat(IRB_OBJECT, COMMENT_MODES);
+        SUBST.contains = RUBY_DEFAULT_CONTAINS;
+        PARAMS.contains = RUBY_DEFAULT_CONTAINS;
+        const SIMPLE_PROMPT = "[>?]>";
+        const DEFAULT_PROMPT = "[\\w#]+\\(\\w+\\):\\d+:\\d+>";
+        const RVM_PROMPT = "(\\w+-)?\\d+\\.\\d+\\.\\d+(p\\d+)?[^\\d][^>]+>";
+        const IRB_DEFAULT = [
+          {
+            begin: /^\s*=>/,
+            starts: {
+              end: "$",
+              contains: RUBY_DEFAULT_CONTAINS
+            }
+          },
+          {
+            className: "meta",
+            begin: "^(" + SIMPLE_PROMPT + "|" + DEFAULT_PROMPT + "|" + RVM_PROMPT + ")(?=[ ])",
+            starts: {
+              end: "$",
+              contains: RUBY_DEFAULT_CONTAINS
+            }
+          }
+        ];
+        COMMENT_MODES.unshift(IRB_OBJECT);
+        return {
+          name: "Ruby",
+          aliases: [
+            "rb",
+            "gemspec",
+            "podspec",
+            "thor",
+            "irb"
+          ],
+          keywords: RUBY_KEYWORDS,
+          illegal: /\/\*/,
+          contains: [
+            hljs.SHEBANG({
+              binary: "ruby"
+            })
+          ].concat(IRB_DEFAULT).concat(COMMENT_MODES).concat(RUBY_DEFAULT_CONTAINS)
+        };
+      }
+      module2.exports = ruby2;
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/scss.js
+  var require_scss = __commonJS({
+    "node_modules/highlight.js/lib/languages/scss.js"(exports2, module2) {
+      var MODES2 = (hljs) => {
+        return {
+          IMPORTANT: {
+            className: "meta",
+            begin: "!important"
+          },
+          HEXCOLOR: {
+            className: "number",
+            begin: "#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})"
+          },
+          ATTRIBUTE_SELECTOR_MODE: {
+            className: "selector-attr",
+            begin: /\[/,
+            end: /\]/,
+            illegal: "$",
+            contains: [
+              hljs.APOS_STRING_MODE,
+              hljs.QUOTE_STRING_MODE
+            ]
+          }
+        };
+      };
+      var TAGS = [
+        "a",
+        "abbr",
+        "address",
+        "article",
+        "aside",
+        "audio",
+        "b",
+        "blockquote",
+        "body",
+        "button",
+        "canvas",
+        "caption",
+        "cite",
+        "code",
+        "dd",
+        "del",
+        "details",
+        "dfn",
+        "div",
+        "dl",
+        "dt",
+        "em",
+        "fieldset",
+        "figcaption",
+        "figure",
+        "footer",
+        "form",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "h5",
+        "h6",
+        "header",
+        "hgroup",
+        "html",
+        "i",
+        "iframe",
+        "img",
+        "input",
+        "ins",
+        "kbd",
+        "label",
+        "legend",
+        "li",
+        "main",
+        "mark",
+        "menu",
+        "nav",
+        "object",
+        "ol",
+        "p",
+        "q",
+        "quote",
+        "samp",
+        "section",
+        "span",
+        "strong",
+        "summary",
+        "sup",
+        "table",
+        "tbody",
+        "td",
+        "textarea",
+        "tfoot",
+        "th",
+        "thead",
+        "time",
+        "tr",
+        "ul",
+        "var",
+        "video"
+      ];
+      var MEDIA_FEATURES = [
+        "any-hover",
+        "any-pointer",
+        "aspect-ratio",
+        "color",
+        "color-gamut",
+        "color-index",
+        "device-aspect-ratio",
+        "device-height",
+        "device-width",
+        "display-mode",
+        "forced-colors",
+        "grid",
+        "height",
+        "hover",
+        "inverted-colors",
+        "monochrome",
+        "orientation",
+        "overflow-block",
+        "overflow-inline",
+        "pointer",
+        "prefers-color-scheme",
+        "prefers-contrast",
+        "prefers-reduced-motion",
+        "prefers-reduced-transparency",
+        "resolution",
+        "scan",
+        "scripting",
+        "update",
+        "width",
+        "min-width",
+        "max-width",
+        "min-height",
+        "max-height"
+      ];
+      var PSEUDO_CLASSES = [
+        "active",
+        "any-link",
+        "blank",
+        "checked",
+        "current",
+        "default",
+        "defined",
+        "dir",
+        "disabled",
+        "drop",
+        "empty",
+        "enabled",
+        "first",
+        "first-child",
+        "first-of-type",
+        "fullscreen",
+        "future",
+        "focus",
+        "focus-visible",
+        "focus-within",
+        "has",
+        "host",
+        "host-context",
+        "hover",
+        "indeterminate",
+        "in-range",
+        "invalid",
+        "is",
+        "lang",
+        "last-child",
+        "last-of-type",
+        "left",
+        "link",
+        "local-link",
+        "not",
+        "nth-child",
+        "nth-col",
+        "nth-last-child",
+        "nth-last-col",
+        "nth-last-of-type",
+        "nth-of-type",
+        "only-child",
+        "only-of-type",
+        "optional",
+        "out-of-range",
+        "past",
+        "placeholder-shown",
+        "read-only",
+        "read-write",
+        "required",
+        "right",
+        "root",
+        "scope",
+        "target",
+        "target-within",
+        "user-invalid",
+        "valid",
+        "visited",
+        "where"
+      ];
+      var PSEUDO_ELEMENTS = [
+        "after",
+        "backdrop",
+        "before",
+        "cue",
+        "cue-region",
+        "first-letter",
+        "first-line",
+        "grammar-error",
+        "marker",
+        "part",
+        "placeholder",
+        "selection",
+        "slotted",
+        "spelling-error"
+      ];
+      var ATTRIBUTES = [
+        "align-content",
+        "align-items",
+        "align-self",
+        "animation",
+        "animation-delay",
+        "animation-direction",
+        "animation-duration",
+        "animation-fill-mode",
+        "animation-iteration-count",
+        "animation-name",
+        "animation-play-state",
+        "animation-timing-function",
+        "auto",
+        "backface-visibility",
+        "background",
+        "background-attachment",
+        "background-clip",
+        "background-color",
+        "background-image",
+        "background-origin",
+        "background-position",
+        "background-repeat",
+        "background-size",
+        "border",
+        "border-bottom",
+        "border-bottom-color",
+        "border-bottom-left-radius",
+        "border-bottom-right-radius",
+        "border-bottom-style",
+        "border-bottom-width",
+        "border-collapse",
+        "border-color",
+        "border-image",
+        "border-image-outset",
+        "border-image-repeat",
+        "border-image-slice",
+        "border-image-source",
+        "border-image-width",
+        "border-left",
+        "border-left-color",
+        "border-left-style",
+        "border-left-width",
+        "border-radius",
+        "border-right",
+        "border-right-color",
+        "border-right-style",
+        "border-right-width",
+        "border-spacing",
+        "border-style",
+        "border-top",
+        "border-top-color",
+        "border-top-left-radius",
+        "border-top-right-radius",
+        "border-top-style",
+        "border-top-width",
+        "border-width",
+        "bottom",
+        "box-decoration-break",
+        "box-shadow",
+        "box-sizing",
+        "break-after",
+        "break-before",
+        "break-inside",
+        "caption-side",
+        "clear",
+        "clip",
+        "clip-path",
+        "color",
+        "column-count",
+        "column-fill",
+        "column-gap",
+        "column-rule",
+        "column-rule-color",
+        "column-rule-style",
+        "column-rule-width",
+        "column-span",
+        "column-width",
+        "columns",
+        "content",
+        "counter-increment",
+        "counter-reset",
+        "cursor",
+        "direction",
+        "display",
+        "empty-cells",
+        "filter",
+        "flex",
+        "flex-basis",
+        "flex-direction",
+        "flex-flow",
+        "flex-grow",
+        "flex-shrink",
+        "flex-wrap",
+        "float",
+        "font",
+        "font-display",
+        "font-family",
+        "font-feature-settings",
+        "font-kerning",
+        "font-language-override",
+        "font-size",
+        "font-size-adjust",
+        "font-smoothing",
+        "font-stretch",
+        "font-style",
+        "font-variant",
+        "font-variant-ligatures",
+        "font-variation-settings",
+        "font-weight",
+        "height",
+        "hyphens",
+        "icon",
+        "image-orientation",
+        "image-rendering",
+        "image-resolution",
+        "ime-mode",
+        "inherit",
+        "initial",
+        "justify-content",
+        "left",
+        "letter-spacing",
+        "line-height",
+        "list-style",
+        "list-style-image",
+        "list-style-position",
+        "list-style-type",
+        "margin",
+        "margin-bottom",
+        "margin-left",
+        "margin-right",
+        "margin-top",
+        "marks",
+        "mask",
+        "max-height",
+        "max-width",
+        "min-height",
+        "min-width",
+        "nav-down",
+        "nav-index",
+        "nav-left",
+        "nav-right",
+        "nav-up",
+        "none",
+        "normal",
+        "object-fit",
+        "object-position",
+        "opacity",
+        "order",
+        "orphans",
+        "outline",
+        "outline-color",
+        "outline-offset",
+        "outline-style",
+        "outline-width",
+        "overflow",
+        "overflow-wrap",
+        "overflow-x",
+        "overflow-y",
+        "padding",
+        "padding-bottom",
+        "padding-left",
+        "padding-right",
+        "padding-top",
+        "page-break-after",
+        "page-break-before",
+        "page-break-inside",
+        "perspective",
+        "perspective-origin",
+        "pointer-events",
+        "position",
+        "quotes",
+        "resize",
+        "right",
+        "src",
+        "tab-size",
+        "table-layout",
+        "text-align",
+        "text-align-last",
+        "text-decoration",
+        "text-decoration-color",
+        "text-decoration-line",
+        "text-decoration-style",
+        "text-indent",
+        "text-overflow",
+        "text-rendering",
+        "text-shadow",
+        "text-transform",
+        "text-underline-position",
+        "top",
+        "transform",
+        "transform-origin",
+        "transform-style",
+        "transition",
+        "transition-delay",
+        "transition-duration",
+        "transition-property",
+        "transition-timing-function",
+        "unicode-bidi",
+        "vertical-align",
+        "visibility",
+        "white-space",
+        "widows",
+        "width",
+        "word-break",
+        "word-spacing",
+        "word-wrap",
+        "z-index"
+      ].reverse();
+      function scss2(hljs) {
+        const modes = MODES2(hljs);
+        const PSEUDO_ELEMENTS$1 = PSEUDO_ELEMENTS;
+        const PSEUDO_CLASSES$1 = PSEUDO_CLASSES;
+        const AT_IDENTIFIER = "@[a-z-]+";
+        const AT_MODIFIERS = "and or not only";
+        const IDENT_RE2 = "[a-zA-Z-][a-zA-Z0-9_-]*";
+        const VARIABLE = {
+          className: "variable",
+          begin: "(\\$" + IDENT_RE2 + ")\\b"
+        };
+        return {
+          name: "SCSS",
+          case_insensitive: true,
+          illegal: "[=/|']",
+          contains: [
+            hljs.C_LINE_COMMENT_MODE,
+            hljs.C_BLOCK_COMMENT_MODE,
+            {
+              className: "selector-id",
+              begin: "#[A-Za-z0-9_-]+",
+              relevance: 0
+            },
+            {
+              className: "selector-class",
+              begin: "\\.[A-Za-z0-9_-]+",
+              relevance: 0
+            },
+            modes.ATTRIBUTE_SELECTOR_MODE,
+            {
+              className: "selector-tag",
+              begin: "\\b(" + TAGS.join("|") + ")\\b",
+              relevance: 0
+            },
+            {
+              className: "selector-pseudo",
+              begin: ":(" + PSEUDO_CLASSES$1.join("|") + ")"
+            },
+            {
+              className: "selector-pseudo",
+              begin: "::(" + PSEUDO_ELEMENTS$1.join("|") + ")"
+            },
+            VARIABLE,
+            {
+              begin: /\(/,
+              end: /\)/,
+              contains: [hljs.CSS_NUMBER_MODE]
+            },
+            {
+              className: "attribute",
+              begin: "\\b(" + ATTRIBUTES.join("|") + ")\\b"
+            },
+            {
+              begin: "\\b(whitespace|wait|w-resize|visible|vertical-text|vertical-ideographic|uppercase|upper-roman|upper-alpha|underline|transparent|top|thin|thick|text|text-top|text-bottom|tb-rl|table-header-group|table-footer-group|sw-resize|super|strict|static|square|solid|small-caps|separate|se-resize|scroll|s-resize|rtl|row-resize|ridge|right|repeat|repeat-y|repeat-x|relative|progress|pointer|overline|outside|outset|oblique|nowrap|not-allowed|normal|none|nw-resize|no-repeat|no-drop|newspaper|ne-resize|n-resize|move|middle|medium|ltr|lr-tb|lowercase|lower-roman|lower-alpha|loose|list-item|line|line-through|line-edge|lighter|left|keep-all|justify|italic|inter-word|inter-ideograph|inside|inset|inline|inline-block|inherit|inactive|ideograph-space|ideograph-parenthesis|ideograph-numeric|ideograph-alpha|horizontal|hidden|help|hand|groove|fixed|ellipsis|e-resize|double|dotted|distribute|distribute-space|distribute-letter|distribute-all-lines|disc|disabled|default|decimal|dashed|crosshair|collapse|col-resize|circle|char|center|capitalize|break-word|break-all|bottom|both|bolder|bold|block|bidi-override|below|baseline|auto|always|all-scroll|absolute|table|table-cell)\\b"
+            },
+            {
+              begin: ":",
+              end: ";",
+              contains: [
+                VARIABLE,
+                modes.HEXCOLOR,
+                hljs.CSS_NUMBER_MODE,
+                hljs.QUOTE_STRING_MODE,
+                hljs.APOS_STRING_MODE,
+                modes.IMPORTANT
+              ]
+            },
+            {
+              begin: "@(page|font-face)",
+              lexemes: AT_IDENTIFIER,
+              keywords: "@page @font-face"
+            },
+            {
+              begin: "@",
+              end: "[{;]",
+              returnBegin: true,
+              keywords: {
+                $pattern: /[a-z-]+/,
+                keyword: AT_MODIFIERS,
+                attribute: MEDIA_FEATURES.join(" ")
+              },
+              contains: [
+                {
+                  begin: AT_IDENTIFIER,
+                  className: "keyword"
+                },
+                {
+                  begin: /[a-z-]+(?=:)/,
+                  className: "attribute"
+                },
+                VARIABLE,
+                hljs.QUOTE_STRING_MODE,
+                hljs.APOS_STRING_MODE,
+                modes.HEXCOLOR,
+                hljs.CSS_NUMBER_MODE
+              ]
+            }
+          ]
+        };
+      }
+      module2.exports = scss2;
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/sql.js
+  var require_sql = __commonJS({
+    "node_modules/highlight.js/lib/languages/sql.js"(exports2, module2) {
+      function source2(re) {
+        if (!re)
+          return null;
+        if (typeof re === "string")
+          return re;
+        return re.source;
+      }
+      function concat2(...args) {
+        const joined = args.map((x) => source2(x)).join("");
+        return joined;
+      }
+      function either2(...args) {
+        const joined = "(" + args.map((x) => source2(x)).join("|") + ")";
+        return joined;
+      }
+      function sql2(hljs) {
+        const COMMENT_MODE = hljs.COMMENT("--", "$");
+        const STRING = {
+          className: "string",
+          variants: [
+            {
+              begin: /'/,
+              end: /'/,
+              contains: [
+                { begin: /''/ }
+              ]
+            }
+          ]
+        };
+        const QUOTED_IDENTIFIER = {
+          begin: /"/,
+          end: /"/,
+          contains: [{ begin: /""/ }]
+        };
+        const LITERALS = [
+          "true",
+          "false",
+          "unknown"
+        ];
+        const MULTI_WORD_TYPES = [
+          "double precision",
+          "large object",
+          "with timezone",
+          "without timezone"
+        ];
+        const TYPES = [
+          "bigint",
+          "binary",
+          "blob",
+          "boolean",
+          "char",
+          "character",
+          "clob",
+          "date",
+          "dec",
+          "decfloat",
+          "decimal",
+          "float",
+          "int",
+          "integer",
+          "interval",
+          "nchar",
+          "nclob",
+          "national",
+          "numeric",
+          "real",
+          "row",
+          "smallint",
+          "time",
+          "timestamp",
+          "varchar",
+          "varying",
+          "varbinary"
+        ];
+        const NON_RESERVED_WORDS = [
+          "add",
+          "asc",
+          "collation",
+          "desc",
+          "final",
+          "first",
+          "last",
+          "view"
+        ];
+        const RESERVED_WORDS = [
+          "abs",
+          "acos",
+          "all",
+          "allocate",
+          "alter",
+          "and",
+          "any",
+          "are",
+          "array",
+          "array_agg",
+          "array_max_cardinality",
+          "as",
+          "asensitive",
+          "asin",
+          "asymmetric",
+          "at",
+          "atan",
+          "atomic",
+          "authorization",
+          "avg",
+          "begin",
+          "begin_frame",
+          "begin_partition",
+          "between",
+          "bigint",
+          "binary",
+          "blob",
+          "boolean",
+          "both",
+          "by",
+          "call",
+          "called",
+          "cardinality",
+          "cascaded",
+          "case",
+          "cast",
+          "ceil",
+          "ceiling",
+          "char",
+          "char_length",
+          "character",
+          "character_length",
+          "check",
+          "classifier",
+          "clob",
+          "close",
+          "coalesce",
+          "collate",
+          "collect",
+          "column",
+          "commit",
+          "condition",
+          "connect",
+          "constraint",
+          "contains",
+          "convert",
+          "copy",
+          "corr",
+          "corresponding",
+          "cos",
+          "cosh",
+          "count",
+          "covar_pop",
+          "covar_samp",
+          "create",
+          "cross",
+          "cube",
+          "cume_dist",
+          "current",
+          "current_catalog",
+          "current_date",
+          "current_default_transform_group",
+          "current_path",
+          "current_role",
+          "current_row",
+          "current_schema",
+          "current_time",
+          "current_timestamp",
+          "current_path",
+          "current_role",
+          "current_transform_group_for_type",
+          "current_user",
+          "cursor",
+          "cycle",
+          "date",
+          "day",
+          "deallocate",
+          "dec",
+          "decimal",
+          "decfloat",
+          "declare",
+          "default",
+          "define",
+          "delete",
+          "dense_rank",
+          "deref",
+          "describe",
+          "deterministic",
+          "disconnect",
+          "distinct",
+          "double",
+          "drop",
+          "dynamic",
+          "each",
+          "element",
+          "else",
+          "empty",
+          "end",
+          "end_frame",
+          "end_partition",
+          "end-exec",
+          "equals",
+          "escape",
+          "every",
+          "except",
+          "exec",
+          "execute",
+          "exists",
+          "exp",
+          "external",
+          "extract",
+          "false",
+          "fetch",
+          "filter",
+          "first_value",
+          "float",
+          "floor",
+          "for",
+          "foreign",
+          "frame_row",
+          "free",
+          "from",
+          "full",
+          "function",
+          "fusion",
+          "get",
+          "global",
+          "grant",
+          "group",
+          "grouping",
+          "groups",
+          "having",
+          "hold",
+          "hour",
+          "identity",
+          "in",
+          "indicator",
+          "initial",
+          "inner",
+          "inout",
+          "insensitive",
+          "insert",
+          "int",
+          "integer",
+          "intersect",
+          "intersection",
+          "interval",
+          "into",
+          "is",
+          "join",
+          "json_array",
+          "json_arrayagg",
+          "json_exists",
+          "json_object",
+          "json_objectagg",
+          "json_query",
+          "json_table",
+          "json_table_primitive",
+          "json_value",
+          "lag",
+          "language",
+          "large",
+          "last_value",
+          "lateral",
+          "lead",
+          "leading",
+          "left",
+          "like",
+          "like_regex",
+          "listagg",
+          "ln",
+          "local",
+          "localtime",
+          "localtimestamp",
+          "log",
+          "log10",
+          "lower",
+          "match",
+          "match_number",
+          "match_recognize",
+          "matches",
+          "max",
+          "member",
+          "merge",
+          "method",
+          "min",
+          "minute",
+          "mod",
+          "modifies",
+          "module",
+          "month",
+          "multiset",
+          "national",
+          "natural",
+          "nchar",
+          "nclob",
+          "new",
+          "no",
+          "none",
+          "normalize",
+          "not",
+          "nth_value",
+          "ntile",
+          "null",
+          "nullif",
+          "numeric",
+          "octet_length",
+          "occurrences_regex",
+          "of",
+          "offset",
+          "old",
+          "omit",
+          "on",
+          "one",
+          "only",
+          "open",
+          "or",
+          "order",
+          "out",
+          "outer",
+          "over",
+          "overlaps",
+          "overlay",
+          "parameter",
+          "partition",
+          "pattern",
+          "per",
+          "percent",
+          "percent_rank",
+          "percentile_cont",
+          "percentile_disc",
+          "period",
+          "portion",
+          "position",
+          "position_regex",
+          "power",
+          "precedes",
+          "precision",
+          "prepare",
+          "primary",
+          "procedure",
+          "ptf",
+          "range",
+          "rank",
+          "reads",
+          "real",
+          "recursive",
+          "ref",
+          "references",
+          "referencing",
+          "regr_avgx",
+          "regr_avgy",
+          "regr_count",
+          "regr_intercept",
+          "regr_r2",
+          "regr_slope",
+          "regr_sxx",
+          "regr_sxy",
+          "regr_syy",
+          "release",
+          "result",
+          "return",
+          "returns",
+          "revoke",
+          "right",
+          "rollback",
+          "rollup",
+          "row",
+          "row_number",
+          "rows",
+          "running",
+          "savepoint",
+          "scope",
+          "scroll",
+          "search",
+          "second",
+          "seek",
+          "select",
+          "sensitive",
+          "session_user",
+          "set",
+          "show",
+          "similar",
+          "sin",
+          "sinh",
+          "skip",
+          "smallint",
+          "some",
+          "specific",
+          "specifictype",
+          "sql",
+          "sqlexception",
+          "sqlstate",
+          "sqlwarning",
+          "sqrt",
+          "start",
+          "static",
+          "stddev_pop",
+          "stddev_samp",
+          "submultiset",
+          "subset",
+          "substring",
+          "substring_regex",
+          "succeeds",
+          "sum",
+          "symmetric",
+          "system",
+          "system_time",
+          "system_user",
+          "table",
+          "tablesample",
+          "tan",
+          "tanh",
+          "then",
+          "time",
+          "timestamp",
+          "timezone_hour",
+          "timezone_minute",
+          "to",
+          "trailing",
+          "translate",
+          "translate_regex",
+          "translation",
+          "treat",
+          "trigger",
+          "trim",
+          "trim_array",
+          "true",
+          "truncate",
+          "uescape",
+          "union",
+          "unique",
+          "unknown",
+          "unnest",
+          "update   ",
+          "upper",
+          "user",
+          "using",
+          "value",
+          "values",
+          "value_of",
+          "var_pop",
+          "var_samp",
+          "varbinary",
+          "varchar",
+          "varying",
+          "versioning",
+          "when",
+          "whenever",
+          "where",
+          "width_bucket",
+          "window",
+          "with",
+          "within",
+          "without",
+          "year"
+        ];
+        const RESERVED_FUNCTIONS = [
+          "abs",
+          "acos",
+          "array_agg",
+          "asin",
+          "atan",
+          "avg",
+          "cast",
+          "ceil",
+          "ceiling",
+          "coalesce",
+          "corr",
+          "cos",
+          "cosh",
+          "count",
+          "covar_pop",
+          "covar_samp",
+          "cume_dist",
+          "dense_rank",
+          "deref",
+          "element",
+          "exp",
+          "extract",
+          "first_value",
+          "floor",
+          "json_array",
+          "json_arrayagg",
+          "json_exists",
+          "json_object",
+          "json_objectagg",
+          "json_query",
+          "json_table",
+          "json_table_primitive",
+          "json_value",
+          "lag",
+          "last_value",
+          "lead",
+          "listagg",
+          "ln",
+          "log",
+          "log10",
+          "lower",
+          "max",
+          "min",
+          "mod",
+          "nth_value",
+          "ntile",
+          "nullif",
+          "percent_rank",
+          "percentile_cont",
+          "percentile_disc",
+          "position",
+          "position_regex",
+          "power",
+          "rank",
+          "regr_avgx",
+          "regr_avgy",
+          "regr_count",
+          "regr_intercept",
+          "regr_r2",
+          "regr_slope",
+          "regr_sxx",
+          "regr_sxy",
+          "regr_syy",
+          "row_number",
+          "sin",
+          "sinh",
+          "sqrt",
+          "stddev_pop",
+          "stddev_samp",
+          "substring",
+          "substring_regex",
+          "sum",
+          "tan",
+          "tanh",
+          "translate",
+          "translate_regex",
+          "treat",
+          "trim",
+          "trim_array",
+          "unnest",
+          "upper",
+          "value_of",
+          "var_pop",
+          "var_samp",
+          "width_bucket"
+        ];
+        const POSSIBLE_WITHOUT_PARENS = [
+          "current_catalog",
+          "current_date",
+          "current_default_transform_group",
+          "current_path",
+          "current_role",
+          "current_schema",
+          "current_transform_group_for_type",
+          "current_user",
+          "session_user",
+          "system_time",
+          "system_user",
+          "current_time",
+          "localtime",
+          "current_timestamp",
+          "localtimestamp"
+        ];
+        const COMBOS = [
+          "create table",
+          "insert into",
+          "primary key",
+          "foreign key",
+          "not null",
+          "alter table",
+          "add constraint",
+          "grouping sets",
+          "on overflow",
+          "character set",
+          "respect nulls",
+          "ignore nulls",
+          "nulls first",
+          "nulls last",
+          "depth first",
+          "breadth first"
+        ];
+        const FUNCTIONS = RESERVED_FUNCTIONS;
+        const KEYWORDS = [...RESERVED_WORDS, ...NON_RESERVED_WORDS].filter((keyword) => {
+          return !RESERVED_FUNCTIONS.includes(keyword);
+        });
+        const VARIABLE = {
+          className: "variable",
+          begin: /@[a-z0-9]+/
+        };
+        const OPERATOR = {
+          className: "operator",
+          begin: /[-+*/=%^~]|&&?|\|\|?|!=?|<(?:=>?|<|>)?|>[>=]?/,
+          relevance: 0
+        };
+        const FUNCTION_CALL = {
+          begin: concat2(/\b/, either2(...FUNCTIONS), /\s*\(/),
+          keywords: {
+            built_in: FUNCTIONS
+          }
+        };
+        function reduceRelevancy(list, { exceptions, when } = {}) {
+          const qualifyFn = when;
+          exceptions = exceptions || [];
+          return list.map((item) => {
+            if (item.match(/\|\d+$/) || exceptions.includes(item)) {
+              return item;
+            } else if (qualifyFn(item)) {
+              return `${item}|0`;
+            } else {
+              return item;
+            }
+          });
+        }
+        return {
+          name: "SQL",
+          case_insensitive: true,
+          illegal: /[{}]|<\//,
+          keywords: {
+            $pattern: /\b[\w\.]+/,
+            keyword: reduceRelevancy(KEYWORDS, { when: (x) => x.length < 3 }),
+            literal: LITERALS,
+            type: TYPES,
+            built_in: POSSIBLE_WITHOUT_PARENS
+          },
+          contains: [
+            {
+              begin: either2(...COMBOS),
+              keywords: {
+                $pattern: /[\w\.]+/,
+                keyword: KEYWORDS.concat(COMBOS),
+                literal: LITERALS,
+                type: TYPES
+              }
+            },
+            {
+              className: "type",
+              begin: either2(...MULTI_WORD_TYPES)
+            },
+            FUNCTION_CALL,
+            VARIABLE,
+            STRING,
+            QUOTED_IDENTIFIER,
+            hljs.C_NUMBER_MODE,
+            hljs.C_BLOCK_COMMENT_MODE,
+            COMMENT_MODE,
+            OPERATOR
+          ]
+        };
+      }
+      module2.exports = sql2;
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/xml.js
+  var require_xml = __commonJS({
+    "node_modules/highlight.js/lib/languages/xml.js"(exports2, module2) {
+      function source2(re) {
+        if (!re)
+          return null;
+        if (typeof re === "string")
+          return re;
+        return re.source;
+      }
+      function lookahead(re) {
+        return concat2("(?=", re, ")");
+      }
+      function optional(re) {
+        return concat2("(", re, ")?");
+      }
+      function concat2(...args) {
+        const joined = args.map((x) => source2(x)).join("");
+        return joined;
+      }
+      function either2(...args) {
+        const joined = "(" + args.map((x) => source2(x)).join("|") + ")";
+        return joined;
+      }
+      function xml2(hljs) {
+        const TAG_NAME_RE = concat2(/[A-Z_]/, optional(/[A-Z0-9_.-]*:/), /[A-Z0-9_.-]*/);
+        const XML_IDENT_RE = /[A-Za-z0-9._:-]+/;
+        const XML_ENTITIES = {
+          className: "symbol",
+          begin: /&[a-z]+;|&#[0-9]+;|&#x[a-f0-9]+;/
+        };
+        const XML_META_KEYWORDS = {
+          begin: /\s/,
+          contains: [
+            {
+              className: "meta-keyword",
+              begin: /#?[a-z_][a-z1-9_-]+/,
+              illegal: /\n/
+            }
+          ]
+        };
+        const XML_META_PAR_KEYWORDS = hljs.inherit(XML_META_KEYWORDS, {
+          begin: /\(/,
+          end: /\)/
+        });
+        const APOS_META_STRING_MODE = hljs.inherit(hljs.APOS_STRING_MODE, {
+          className: "meta-string"
+        });
+        const QUOTE_META_STRING_MODE = hljs.inherit(hljs.QUOTE_STRING_MODE, {
+          className: "meta-string"
+        });
+        const TAG_INTERNALS = {
+          endsWithParent: true,
+          illegal: /</,
+          relevance: 0,
+          contains: [
+            {
+              className: "attr",
+              begin: XML_IDENT_RE,
+              relevance: 0
+            },
+            {
+              begin: /=\s*/,
+              relevance: 0,
+              contains: [
+                {
+                  className: "string",
+                  endsParent: true,
+                  variants: [
+                    {
+                      begin: /"/,
+                      end: /"/,
+                      contains: [XML_ENTITIES]
+                    },
+                    {
+                      begin: /'/,
+                      end: /'/,
+                      contains: [XML_ENTITIES]
+                    },
+                    {
+                      begin: /[^\s"'=<>`]+/
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        };
+        return {
+          name: "HTML, XML",
+          aliases: [
+            "html",
+            "xhtml",
+            "rss",
+            "atom",
+            "xjb",
+            "xsd",
+            "xsl",
+            "plist",
+            "wsf",
+            "svg"
+          ],
+          case_insensitive: true,
+          contains: [
+            {
+              className: "meta",
+              begin: /<![a-z]/,
+              end: />/,
+              relevance: 10,
+              contains: [
+                XML_META_KEYWORDS,
+                QUOTE_META_STRING_MODE,
+                APOS_META_STRING_MODE,
+                XML_META_PAR_KEYWORDS,
+                {
+                  begin: /\[/,
+                  end: /\]/,
+                  contains: [
+                    {
+                      className: "meta",
+                      begin: /<![a-z]/,
+                      end: />/,
+                      contains: [
+                        XML_META_KEYWORDS,
+                        XML_META_PAR_KEYWORDS,
+                        QUOTE_META_STRING_MODE,
+                        APOS_META_STRING_MODE
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            hljs.COMMENT(/<!--/, /-->/, {
+              relevance: 10
+            }),
+            {
+              begin: /<!\[CDATA\[/,
+              end: /\]\]>/,
+              relevance: 10
+            },
+            XML_ENTITIES,
+            {
+              className: "meta",
+              begin: /<\?xml/,
+              end: /\?>/,
+              relevance: 10
+            },
+            {
+              className: "tag",
+              begin: /<style(?=\s|>)/,
+              end: />/,
+              keywords: {
+                name: "style"
+              },
+              contains: [TAG_INTERNALS],
+              starts: {
+                end: /<\/style>/,
+                returnEnd: true,
+                subLanguage: [
+                  "css",
+                  "xml"
+                ]
+              }
+            },
+            {
+              className: "tag",
+              begin: /<script(?=\s|>)/,
+              end: />/,
+              keywords: {
+                name: "script"
+              },
+              contains: [TAG_INTERNALS],
+              starts: {
+                end: /<\/script>/,
+                returnEnd: true,
+                subLanguage: [
+                  "javascript",
+                  "handlebars",
+                  "xml"
+                ]
+              }
+            },
+            {
+              className: "tag",
+              begin: /<>|<\/>/
+            },
+            {
+              className: "tag",
+              begin: concat2(/</, lookahead(concat2(TAG_NAME_RE, either2(/\/>/, />/, /\s/)))),
+              end: /\/?>/,
+              contains: [
+                {
+                  className: "name",
+                  begin: TAG_NAME_RE,
+                  relevance: 0,
+                  starts: TAG_INTERNALS
+                }
+              ]
+            },
+            {
+              className: "tag",
+              begin: concat2(/<\//, lookahead(concat2(TAG_NAME_RE, />/))),
+              contains: [
+                {
+                  className: "name",
+                  begin: TAG_NAME_RE,
+                  relevance: 0
+                },
+                {
+                  begin: />/,
+                  relevance: 0,
+                  endsParent: true
+                }
+              ]
+            }
+          ]
+        };
+      }
+      module2.exports = xml2;
+    }
+  });
+
+  // node_modules/highlight.js/lib/languages/yaml.js
+  var require_yaml = __commonJS({
+    "node_modules/highlight.js/lib/languages/yaml.js"(exports2, module2) {
+      function yaml2(hljs) {
+        var LITERALS = "true false yes no null";
+        var URI_CHARACTERS = "[\\w#;/?:@&=+$,.~*'()[\\]]+";
+        var KEY = {
+          className: "attr",
+          variants: [
+            { begin: "\\w[\\w :\\/.-]*:(?=[ 	]|$)" },
+            { begin: '"\\w[\\w :\\/.-]*":(?=[ 	]|$)' },
+            { begin: "'\\w[\\w :\\/.-]*':(?=[ 	]|$)" }
+          ]
+        };
+        var TEMPLATE_VARIABLES = {
+          className: "template-variable",
+          variants: [
+            { begin: /\{\{/, end: /\}\}/ },
+            { begin: /%\{/, end: /\}/ }
+          ]
+        };
+        var STRING = {
+          className: "string",
+          relevance: 0,
+          variants: [
+            { begin: /'/, end: /'/ },
+            { begin: /"/, end: /"/ },
+            { begin: /\S+/ }
+          ],
+          contains: [
+            hljs.BACKSLASH_ESCAPE,
+            TEMPLATE_VARIABLES
+          ]
+        };
+        var CONTAINER_STRING = hljs.inherit(STRING, {
+          variants: [
+            { begin: /'/, end: /'/ },
+            { begin: /"/, end: /"/ },
+            { begin: /[^\s,{}[\]]+/ }
+          ]
+        });
+        var DATE_RE = "[0-9]{4}(-[0-9][0-9]){0,2}";
+        var TIME_RE = "([Tt \\t][0-9][0-9]?(:[0-9][0-9]){2})?";
+        var FRACTION_RE = "(\\.[0-9]*)?";
+        var ZONE_RE = "([ \\t])*(Z|[-+][0-9][0-9]?(:[0-9][0-9])?)?";
+        var TIMESTAMP = {
+          className: "number",
+          begin: "\\b" + DATE_RE + TIME_RE + FRACTION_RE + ZONE_RE + "\\b"
+        };
+        var VALUE_CONTAINER = {
+          end: ",",
+          endsWithParent: true,
+          excludeEnd: true,
+          keywords: LITERALS,
+          relevance: 0
+        };
+        var OBJECT = {
+          begin: /\{/,
+          end: /\}/,
+          contains: [VALUE_CONTAINER],
+          illegal: "\\n",
+          relevance: 0
+        };
+        var ARRAY = {
+          begin: "\\[",
+          end: "\\]",
+          contains: [VALUE_CONTAINER],
+          illegal: "\\n",
+          relevance: 0
+        };
+        var MODES2 = [
+          KEY,
+          {
+            className: "meta",
+            begin: "^---\\s*$",
+            relevance: 10
+          },
+          {
+            className: "string",
+            begin: "[\\|>]([1-9]?[+-])?[ ]*\\n( +)[^ ][^\\n]*\\n(\\2[^\\n]+\\n?)*"
+          },
+          {
+            begin: "<%[%=-]?",
+            end: "[%-]?%>",
+            subLanguage: "ruby",
+            excludeBegin: true,
+            excludeEnd: true,
+            relevance: 0
+          },
+          {
+            className: "type",
+            begin: "!\\w+!" + URI_CHARACTERS
+          },
+          {
+            className: "type",
+            begin: "!<" + URI_CHARACTERS + ">"
+          },
+          {
+            className: "type",
+            begin: "!" + URI_CHARACTERS
+          },
+          {
+            className: "type",
+            begin: "!!" + URI_CHARACTERS
+          },
+          {
+            className: "meta",
+            begin: "&" + hljs.UNDERSCORE_IDENT_RE + "$"
+          },
+          {
+            className: "meta",
+            begin: "\\*" + hljs.UNDERSCORE_IDENT_RE + "$"
+          },
+          {
+            className: "bullet",
+            begin: "-(?=[ ]|$)",
+            relevance: 0
+          },
+          hljs.HASH_COMMENT_MODE,
+          {
+            beginKeywords: LITERALS,
+            keywords: { literal: LITERALS }
+          },
+          TIMESTAMP,
+          {
+            className: "number",
+            begin: hljs.C_NUMBER_RE + "\\b",
+            relevance: 0
+          },
+          OBJECT,
+          ARRAY,
+          STRING
+        ];
+        var VALUE_MODES = [...MODES2];
+        VALUE_MODES.pop();
+        VALUE_MODES.push(CONTAINER_STRING);
+        VALUE_CONTAINER.contains = VALUE_MODES;
+        return {
+          name: "YAML",
+          case_insensitive: true,
+          aliases: ["yml"],
+          contains: MODES2
+        };
+      }
+      module2.exports = yaml2;
+    }
+  });
+
   // node_modules/@hotwired/turbo/dist/turbo.es2017-esm.js
   (function() {
     if (window.Reflect === void 0 || window.customElements === void 0 || window.customElements.polyfillWrapFlushCallback) {
@@ -1743,10 +6419,10 @@
         this.delegate.requestStarted(this);
         const response = await fetch(this.url.href, fetchOptions);
         return await this.receive(response);
-      } catch (error2) {
-        if (error2.name !== "AbortError") {
-          this.delegate.requestErrored(this, error2);
-          throw error2;
+      } catch (error3) {
+        if (error3.name !== "AbortError") {
+          this.delegate.requestErrored(this, error3);
+          throw error3;
         }
       } finally {
         this.delegate.requestFinished(this);
@@ -1982,8 +6658,8 @@
       if (response.clientError || response.serverError) {
         this.delegate.formSubmissionFailedWithResponse(this, response);
       } else if (this.requestMustRedirect(request) && responseSucceededWithoutRedirect(response)) {
-        const error2 = new Error("Form responses must redirect to another location");
-        this.delegate.formSubmissionErrored(this, error2);
+        const error3 = new Error("Form responses must redirect to another location");
+        this.delegate.formSubmissionErrored(this, error3);
       } else {
         this.state = FormSubmissionState.receiving;
         this.result = { success: true, fetchResponse: response };
@@ -1994,9 +6670,9 @@
       this.result = { success: false, fetchResponse: response };
       this.delegate.formSubmissionFailedWithResponse(this, response);
     }
-    requestErrored(request, error2) {
-      this.result = { success: false, error: error2 };
-      this.delegate.formSubmissionErrored(this, error2);
+    requestErrored(request, error3) {
+      this.result = { success: false, error: error3 };
+      this.delegate.formSubmissionErrored(this, error3);
     }
     requestFinished(request) {
       var _a;
@@ -2869,7 +7545,7 @@
         this.recordResponse({ statusCode, responseHTML, redirected });
       }
     }
-    requestErrored(request, error2) {
+    requestErrored(request, error3) {
       this.recordResponse({ statusCode: SystemStatusCode.networkFailure, redirected: false });
     }
     requestFinished() {
@@ -3355,8 +8031,8 @@
         this.view.clearSnapshotCache();
       }
     }
-    formSubmissionErrored(formSubmission, error2) {
-      console.error(error2);
+    formSubmissionErrored(formSubmission, error3) {
+      console.error(error3);
     }
     formSubmissionFinished(formSubmission) {
       if (typeof this.adapter.formSubmissionFinished === "function") {
@@ -3503,20 +8179,20 @@
         removeEventListener("turbo:before-fetch-response", this.inspectFetchResponse, false);
       }
     }
-    connectStreamSource(source) {
-      if (!this.streamSourceIsConnected(source)) {
-        this.sources.add(source);
-        source.addEventListener("message", this.receiveMessageEvent, false);
+    connectStreamSource(source2) {
+      if (!this.streamSourceIsConnected(source2)) {
+        this.sources.add(source2);
+        source2.addEventListener("message", this.receiveMessageEvent, false);
       }
     }
-    disconnectStreamSource(source) {
-      if (this.streamSourceIsConnected(source)) {
-        this.sources.delete(source);
-        source.removeEventListener("message", this.receiveMessageEvent, false);
+    disconnectStreamSource(source2) {
+      if (this.streamSourceIsConnected(source2)) {
+        this.sources.delete(source2);
+        source2.removeEventListener("message", this.receiveMessageEvent, false);
       }
     }
-    streamSourceIsConnected(source) {
-      return this.sources.has(source);
+    streamSourceIsConnected(source2) {
+      return this.sources.has(source2);
     }
     async receiveMessageResponse(response) {
       const html = await response.responseHTML;
@@ -3796,11 +8472,11 @@
     visit(location2, options = {}) {
       this.navigator.proposeVisit(expandURL(location2), options);
     }
-    connectStreamSource(source) {
-      this.streamObserver.connectStreamSource(source);
+    connectStreamSource(source2) {
+      this.streamObserver.connectStreamSource(source2);
     }
-    disconnectStreamSource(source) {
-      this.streamObserver.disconnectStreamSource(source);
+    disconnectStreamSource(source2) {
+      this.streamObserver.disconnectStreamSource(source2);
     }
     renderStreamMessage(message) {
       document.documentElement.appendChild(StreamMessage.wrap(message).fragment);
@@ -4018,11 +8694,11 @@
   function visit(location2, options) {
     session.visit(location2, options);
   }
-  function connectStreamSource(source) {
-    session.connectStreamSource(source);
+  function connectStreamSource(source2) {
+    session.connectStreamSource(source2);
   }
-  function disconnectStreamSource(source) {
-    session.disconnectStreamSource(source);
+  function disconnectStreamSource(source2) {
+    session.disconnectStreamSource(source2);
   }
   function renderStreamMessage(message) {
     session.renderStreamMessage(message);
@@ -4116,9 +8792,9 @@
             this.appearanceObserver.stop();
             await this.element.loaded;
             this.hasBeenLoaded = true;
-          } catch (error2) {
+          } catch (error3) {
             this.currentURL = previousURL;
-            throw error2;
+            throw error3;
           }
         }
       }
@@ -4140,8 +8816,8 @@
           session.frameLoaded(this.element);
           this.fetchResponseLoaded(fetchResponse);
         }
-      } catch (error2) {
-        console.error(error2);
+      } catch (error3) {
+        console.error(error3);
         this.view.invalidate();
       } finally {
         this.fetchResponseLoaded = () => {
@@ -4192,8 +8868,8 @@
       console.error(response);
       this.resolveVisitPromise();
     }
-    requestErrored(request, error2) {
-      console.error(error2);
+    requestErrored(request, error3) {
+      console.error(error3);
       this.resolveVisitPromise();
     }
     requestFinished(request) {
@@ -4210,8 +8886,8 @@
     formSubmissionFailedWithResponse(formSubmission, fetchResponse) {
       this.element.delegate.loadResponse(fetchResponse);
     }
-    formSubmissionErrored(formSubmission, error2) {
-      console.error(error2);
+    formSubmissionErrored(formSubmission, error3) {
+      console.error(error3);
     }
     formSubmissionFinished({ formElement }) {
       clearBusyState(formElement, this.findFrameElement(formElement));
@@ -4275,8 +8951,8 @@
           return await this.extractForeignFrameElement(element);
         }
         console.error(`Response has no matching <turbo-frame id="${id}"> element`);
-      } catch (error2) {
-        console.error(error2);
+      } catch (error3) {
+        console.error(error3);
       }
       return new FrameElement();
     }
@@ -4424,8 +9100,8 @@
     async connectedCallback() {
       try {
         await this.render();
-      } catch (error2) {
-        console.error(error2);
+      } catch (error3) {
+        console.error(error3);
       } finally {
         this.disconnect();
       }
@@ -4665,8 +9341,8 @@
     bindingDisconnected(binding) {
       this.fetchEventListenerForBinding(binding).bindingDisconnected(binding);
     }
-    handleError(error2, message, detail = {}) {
-      this.application.handleError(error2, `Error ${message}`, detail);
+    handleError(error3, message, detail = {}) {
+      this.application.handleError(error3, `Error ${message}`, detail);
     }
     fetchEventListenerForBinding(binding) {
       const { eventTarget, eventName, eventOptions } = binding;
@@ -4707,8 +9383,8 @@
   };
   var descriptorPattern = /^((.+?)(@(window|document))?->)?(.+?)(#([^:]+?))(:(.+))?$/;
   function parseActionDescriptorString(descriptorString) {
-    const source = descriptorString.trim();
-    const matches2 = source.match(descriptorPattern) || [];
+    const source2 = descriptorString.trim();
+    const matches2 = source2.match(descriptorPattern) || [];
     return {
       eventTarget: parseEventTarget(matches2[4]),
       eventName: matches2[2],
@@ -4851,10 +9527,10 @@
         const actionEvent = Object.assign(event, { params });
         this.method.call(this.controller, actionEvent);
         this.context.logDebugActivity(this.methodName, { event, target, currentTarget, action: this.methodName });
-      } catch (error2) {
+      } catch (error3) {
         const { identifier, controller, element, index: index3 } = this;
         const detail = { identifier, controller, element, index: index3, event };
-        this.context.handleError(error2, `invoking action "${this.action}"`, detail);
+        this.context.handleError(error3, `invoking action "${this.action}"`, detail);
       }
     }
     willBeInvokedByEvent(event) {
@@ -5350,8 +10026,8 @@
       try {
         const value = this.delegate.parseValueForToken(token);
         return { value };
-      } catch (error2) {
-        return { error: error2 };
+      } catch (error3) {
+        return { error: error3 };
       }
     }
   };
@@ -5578,8 +10254,8 @@
       try {
         this.controller.initialize();
         this.logDebugActivity("initialize");
-      } catch (error2) {
-        this.handleError(error2, "initializing controller");
+      } catch (error3) {
+        this.handleError(error3, "initializing controller");
       }
     }
     connect() {
@@ -5589,16 +10265,16 @@
       try {
         this.controller.connect();
         this.logDebugActivity("connect");
-      } catch (error2) {
-        this.handleError(error2, "connecting controller");
+      } catch (error3) {
+        this.handleError(error3, "connecting controller");
       }
     }
     disconnect() {
       try {
         this.controller.disconnect();
         this.logDebugActivity("disconnect");
-      } catch (error2) {
-        this.handleError(error2, "disconnecting controller");
+      } catch (error3) {
+        this.handleError(error3, "disconnecting controller");
       }
       this.targetObserver.stop();
       this.valueObserver.stop();
@@ -5622,10 +10298,10 @@
     get parentElement() {
       return this.element.parentElement;
     }
-    handleError(error2, message, detail = {}) {
+    handleError(error3, message, detail = {}) {
       const { identifier, controller, element } = this;
       detail = Object.assign({ identifier, controller, element }, detail);
-      this.application.handleError(error2, `Error ${message}`, detail);
+      this.application.handleError(error3, `Error ${message}`, detail);
     }
     targetConnected(element, name) {
       this.invokeControllerMethod(`${name}TargetConnected`, element);
@@ -5744,7 +10420,7 @@
     try {
       testReflectExtension();
       return extendWithReflect;
-    } catch (error2) {
+    } catch (error3) {
       return (constructor) => class extended extends constructor {
       };
     }
@@ -6065,8 +10741,8 @@
         return module2.contexts.find((context) => context.element == element);
       }
     }
-    handleError(error2, message, detail) {
-      this.application.handleError(error2, message, detail);
+    handleError(error3, message, detail) {
+      this.application.handleError(error3, message, detail);
     }
     createScopeForElementAndIdentifier(element, identifier) {
       return new Scope(this.schema, element, identifier, this.logger);
@@ -6154,14 +10830,14 @@
       const context = this.router.getContextForElementAndIdentifier(element, identifier);
       return context ? context.controller : null;
     }
-    handleError(error2, message, detail) {
+    handleError(error3, message, detail) {
       var _a;
       this.logger.error(`%s
 
 %o
 
-%o`, message, error2, detail);
-      (_a = window.onerror) === null || _a === void 0 ? void 0 : _a.call(window, message, "", 0, 0, error2);
+%o`, message, error3, detail);
+      (_a = window.onerror) === null || _a === void 0 ? void 0 : _a.call(window, message, "", 0, 0, error3);
     }
     logFormattedMessage(identifier, functionName, detail = {}) {
       detail = Object.assign({ application: this }, detail);
@@ -6584,8 +11260,8 @@
         if (requestInterceptor) {
           await requestInterceptor(this);
         }
-      } catch (error2) {
-        console.error(error2);
+      } catch (error3) {
+        console.error(error3);
       }
       const response = new FetchResponse2(await window.fetch(this.url, this.fetchOptions));
       if (response.unauthenticated && response.authenticationURL) {
@@ -7041,20 +11717,20 @@
     this.nodesBetween(0, this.size, f);
   };
   Fragment.prototype.textBetween = function textBetween(from5, to, blockSeparator, leafText) {
-    var text3 = "", separated = true;
+    var text4 = "", separated = true;
     this.nodesBetween(from5, to, function(node5, pos) {
       if (node5.isText) {
-        text3 += node5.text.slice(Math.max(from5, pos) - pos, to - pos);
+        text4 += node5.text.slice(Math.max(from5, pos) - pos, to - pos);
         separated = !blockSeparator;
       } else if (node5.isLeaf && leafText) {
-        text3 += typeof leafText === "function" ? leafText(node5) : leafText;
+        text4 += typeof leafText === "function" ? leafText(node5) : leafText;
         separated = !blockSeparator;
       } else if (!separated && node5.isBlock) {
-        text3 += blockSeparator;
+        text4 += blockSeparator;
         separated = true;
       }
     }, 0);
-    return text3;
+    return text4;
   };
   Fragment.prototype.append = function append(other) {
     if (!other.size) {
@@ -7358,15 +12034,15 @@
     }
     return obj;
   };
-  Mark.fromJSON = function fromJSON2(schema, json) {
-    if (!json) {
+  Mark.fromJSON = function fromJSON2(schema, json2) {
+    if (!json2) {
       throw new RangeError("Invalid input for Mark.fromJSON");
     }
-    var type = schema.marks[json.type];
+    var type = schema.marks[json2.type];
     if (!type) {
-      throw new RangeError("There is no mark type " + json.type + " in this schema");
+      throw new RangeError("There is no mark type " + json2.type + " in this schema");
     }
-    return type.create(json.attrs);
+    return type.create(json2.attrs);
   };
   Mark.sameSet = function sameSet(a, b) {
     if (a == b) {
@@ -7430,24 +12106,24 @@
     if (!this.content.size) {
       return null;
     }
-    var json = { content: this.content.toJSON() };
+    var json2 = { content: this.content.toJSON() };
     if (this.openStart > 0) {
-      json.openStart = this.openStart;
+      json2.openStart = this.openStart;
     }
     if (this.openEnd > 0) {
-      json.openEnd = this.openEnd;
+      json2.openEnd = this.openEnd;
     }
-    return json;
+    return json2;
   };
-  Slice.fromJSON = function fromJSON3(schema, json) {
-    if (!json) {
+  Slice.fromJSON = function fromJSON3(schema, json2) {
+    if (!json2) {
       return Slice.empty;
     }
-    var openStart = json.openStart || 0, openEnd = json.openEnd || 0;
+    var openStart = json2.openStart || 0, openEnd = json2.openEnd || 0;
     if (typeof openStart != "number" || typeof openEnd != "number") {
       throw new RangeError("Invalid input for Slice.fromJSON");
     }
-    return new Slice(Fragment.fromJSON(schema, json.content), openStart, openEnd);
+    return new Slice(Fragment.fromJSON(schema, json2.content), openStart, openEnd);
   };
   Slice.maxOpen = function maxOpen(fragment, openIsolating) {
     if (openIsolating === void 0)
@@ -8062,25 +12738,25 @@
     }
     return obj;
   };
-  Node2.fromJSON = function fromJSON4(schema, json) {
-    if (!json) {
+  Node2.fromJSON = function fromJSON4(schema, json2) {
+    if (!json2) {
       throw new RangeError("Invalid input for Node.fromJSON");
     }
     var marks3 = null;
-    if (json.marks) {
-      if (!Array.isArray(json.marks)) {
+    if (json2.marks) {
+      if (!Array.isArray(json2.marks)) {
         throw new RangeError("Invalid mark data for Node.fromJSON");
       }
-      marks3 = json.marks.map(schema.markFromJSON);
+      marks3 = json2.marks.map(schema.markFromJSON);
     }
-    if (json.type == "text") {
-      if (typeof json.text != "string") {
+    if (json2.type == "text") {
+      if (typeof json2.text != "string") {
         throw new RangeError("Invalid text node in JSON");
       }
-      return schema.text(json.text, marks3);
+      return schema.text(json2.text, marks3);
     }
-    var content3 = Fragment.fromJSON(schema, json.content);
-    return schema.nodeType(json.type).create(json.attrs, content3, marks3);
+    var content3 = Fragment.fromJSON(schema, json2.content);
+    return schema.nodeType(json2.type).create(json2.attrs, content3, marks3);
   };
   Object.defineProperties(Node2.prototype, prototypeAccessors$3);
   var TextNode = /* @__PURE__ */ function(Node7) {
@@ -8114,11 +12790,11 @@
     TextNode2.prototype.mark = function mark4(marks3) {
       return marks3 == this.marks ? this : new TextNode2(this.type, this.attrs, this.text, marks3);
     };
-    TextNode2.prototype.withText = function withText(text3) {
-      if (text3 == this.text) {
+    TextNode2.prototype.withText = function withText(text4) {
+      if (text4 == this.text) {
         return this;
       }
-      return new TextNode2(this.type, this.attrs, text3, this.marks);
+      return new TextNode2(this.type, this.attrs, text4, this.marks);
     };
     TextNode2.prototype.cut = function cut5(from5, to) {
       if (from5 === void 0)
@@ -8819,11 +13495,11 @@
     }
     return type.create(attrs);
   };
-  Schema.prototype.nodeFromJSON = function nodeFromJSON(json) {
-    return Node2.fromJSON(this, json);
+  Schema.prototype.nodeFromJSON = function nodeFromJSON(json2) {
+    return Node2.fromJSON(this, json2);
   };
-  Schema.prototype.markFromJSON = function markFromJSON(json) {
-    return Mark.fromJSON(this, json);
+  Schema.prototype.markFromJSON = function markFromJSON(json2) {
+    return Mark.fromJSON(this, json2);
   };
   Schema.prototype.nodeType = function nodeType(name) {
     var found3 = this.nodes[name];
@@ -9083,15 +13759,15 @@
     }
     return node5.parentNode && !blockTags.hasOwnProperty(node5.parentNode.nodeName.toLowerCase());
   };
-  var ParseContext = function ParseContext2(parser, options, open) {
+  var ParseContext = function ParseContext2(parser, options, open2) {
     this.parser = parser;
     this.options = options;
-    this.isOpen = open;
+    this.isOpen = open2;
     var topNode = options.topNode, topContext;
-    var topOptions = wsOptionsFor(null, options.preserveWhitespace, 0) | (open ? OPT_OPEN_LEFT : 0);
+    var topOptions = wsOptionsFor(null, options.preserveWhitespace, 0) | (open2 ? OPT_OPEN_LEFT : 0);
     if (topNode) {
       topContext = new NodeContext(topNode.type, topNode.attrs, Mark.none, Mark.none, true, options.topMatch || topNode.type.contentMatch, topOptions);
-    } else if (open) {
+    } else if (open2) {
       topContext = new NodeContext(null, null, Mark.none, Mark.none, true, null, topOptions);
     } else {
       topContext = new NodeContext(parser.schema.topNodeType, null, Mark.none, Mark.none, true, null, topOptions);
@@ -9990,15 +14666,15 @@
   Step.prototype.toJSON = function toJSON5() {
     return mustOverride();
   };
-  Step.fromJSON = function fromJSON5(schema, json) {
-    if (!json || !json.stepType) {
+  Step.fromJSON = function fromJSON5(schema, json2) {
+    if (!json2 || !json2.stepType) {
       throw new RangeError("Invalid input for Step.fromJSON");
     }
-    var type = stepsByID[json.stepType];
+    var type = stepsByID[json2.stepType];
     if (!type) {
-      throw new RangeError("No step type " + json.stepType + " defined");
+      throw new RangeError("No step type " + json2.stepType + " defined");
     }
-    return type.fromJSON(schema, json);
+    return type.fromJSON(schema, json2);
   };
   Step.jsonID = function jsonID(id, stepClass) {
     if (id in stepsByID) {
@@ -10074,20 +14750,20 @@
       }
     };
     ReplaceStep3.prototype.toJSON = function toJSON13() {
-      var json = { stepType: "replace", from: this.from, to: this.to };
+      var json2 = { stepType: "replace", from: this.from, to: this.to };
       if (this.slice.size) {
-        json.slice = this.slice.toJSON();
+        json2.slice = this.slice.toJSON();
       }
       if (this.structure) {
-        json.structure = true;
+        json2.structure = true;
       }
-      return json;
+      return json2;
     };
-    ReplaceStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number") {
+    ReplaceStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number") {
         throw new RangeError("Invalid input for ReplaceStep.fromJSON");
       }
-      return new ReplaceStep3(json.from, json.to, Slice.fromJSON(schema, json.slice), !!json.structure);
+      return new ReplaceStep3(json2.from, json2.to, Slice.fromJSON(schema, json2.slice), !!json2.structure);
     };
     return ReplaceStep3;
   }(Step);
@@ -10144,7 +14820,7 @@
       return new ReplaceAroundStep3(from5.pos, to.pos, gapFrom, gapTo, this.slice, this.insert, this.structure);
     };
     ReplaceAroundStep3.prototype.toJSON = function toJSON13() {
-      var json = {
+      var json2 = {
         stepType: "replaceAround",
         from: this.from,
         to: this.to,
@@ -10153,18 +14829,18 @@
         insert: this.insert
       };
       if (this.slice.size) {
-        json.slice = this.slice.toJSON();
+        json2.slice = this.slice.toJSON();
       }
       if (this.structure) {
-        json.structure = true;
+        json2.structure = true;
       }
-      return json;
+      return json2;
     };
-    ReplaceAroundStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number" || typeof json.gapFrom != "number" || typeof json.gapTo != "number" || typeof json.insert != "number") {
+    ReplaceAroundStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number" || typeof json2.gapFrom != "number" || typeof json2.gapTo != "number" || typeof json2.insert != "number") {
         throw new RangeError("Invalid input for ReplaceAroundStep.fromJSON");
       }
-      return new ReplaceAroundStep3(json.from, json.to, json.gapFrom, json.gapTo, Slice.fromJSON(schema, json.slice), json.insert, !!json.structure);
+      return new ReplaceAroundStep3(json2.from, json2.to, json2.gapFrom, json2.gapTo, Slice.fromJSON(schema, json2.slice), json2.insert, !!json2.structure);
     };
     return ReplaceAroundStep3;
   }(Step);
@@ -10494,11 +15170,11 @@
         to: this.to
       };
     };
-    AddMarkStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number") {
+    AddMarkStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number") {
         throw new RangeError("Invalid input for AddMarkStep.fromJSON");
       }
-      return new AddMarkStep3(json.from, json.to, schema.markFromJSON(json.mark));
+      return new AddMarkStep3(json2.from, json2.to, schema.markFromJSON(json2.mark));
     };
     return AddMarkStep3;
   }(Step);
@@ -10545,11 +15221,11 @@
         to: this.to
       };
     };
-    RemoveMarkStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number") {
+    RemoveMarkStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number") {
         throw new RangeError("Invalid input for RemoveMarkStep.fromJSON");
       }
-      return new RemoveMarkStep3(json.from, json.to, schema.markFromJSON(json.mark));
+      return new RemoveMarkStep3(json2.from, json2.to, schema.markFromJSON(json2.mark));
     };
     return RemoveMarkStep3;
   }(Step);
@@ -10899,18 +15575,18 @@
       }
   };
   Fitter.prototype.close = function close2($to) {
-    var close5 = this.findCloseLevel($to);
-    if (!close5) {
+    var close6 = this.findCloseLevel($to);
+    if (!close6) {
       return null;
     }
-    while (this.depth > close5.depth) {
+    while (this.depth > close6.depth) {
       this.closeFrontierNode();
     }
-    if (close5.fit.childCount) {
-      this.placed = addToFragment(this.placed, close5.depth, close5.fit);
+    if (close6.fit.childCount) {
+      this.placed = addToFragment(this.placed, close6.depth, close6.fit);
     }
-    $to = close5.move;
-    for (var d = close5.depth + 1; d <= $to.depth; d++) {
+    $to = close6.move;
+    for (var d = close6.depth + 1; d <= $to.depth; d++) {
       var node5 = $to.node(d), add3 = node5.type.contentMatch.fillBefore(node5.content, true, $to.index(d));
       this.openFrontierNode(node5.type, node5.attrs, add3);
     }
@@ -10923,8 +15599,8 @@
     this.frontier.push({ type, match: type.contentMatch });
   };
   Fitter.prototype.closeFrontierNode = function closeFrontierNode() {
-    var open = this.frontier.pop();
-    var add3 = open.match.fillBefore(Fragment.empty, true);
+    var open2 = this.frontier.pop();
+    var add3 = open2.match.fillBefore(Fragment.empty, true);
     if (add3.childCount) {
       this.placed = addToFragment(this.placed, this.frontier.length, add3);
     }
@@ -10964,8 +15640,8 @@
     }
     return node5.copy(frag);
   }
-  function contentAfterFits($to, depth, type, match, open) {
-    var node5 = $to.node(depth), index3 = open ? $to.indexAfter(depth) : $to.index(depth);
+  function contentAfterFits($to, depth, type, match, open2) {
+    var node5 = $to.node(depth), index3 = open2 ? $to.indexAfter(depth) : $to.index(depth);
     if (index3 == node5.childCount && !type.compatibleContent(node5.type)) {
       return null;
     }
@@ -11207,15 +15883,15 @@
   Selection.atEnd = function atEnd(doc2) {
     return findSelectionIn(doc2, doc2, doc2.content.size, doc2.childCount, -1) || new AllSelection(doc2);
   };
-  Selection.fromJSON = function fromJSON6(doc2, json) {
-    if (!json || !json.type) {
+  Selection.fromJSON = function fromJSON6(doc2, json2) {
+    if (!json2 || !json2.type) {
       throw new RangeError("Invalid input for Selection.fromJSON");
     }
-    var cls = classesById[json.type];
+    var cls = classesById[json2.type];
     if (!cls) {
-      throw new RangeError("No selection type " + json.type + " defined");
+      throw new RangeError("No selection type " + json2.type + " defined");
     }
-    return cls.fromJSON(doc2, json);
+    return cls.fromJSON(doc2, json2);
   };
   Selection.jsonID = function jsonID2(id, selectionClass) {
     if (id in classesById) {
@@ -11276,13 +15952,13 @@
     TextSelection3.prototype.toJSON = function toJSON13() {
       return { type: "text", anchor: this.anchor, head: this.head };
     };
-    TextSelection3.fromJSON = function fromJSON15(doc2, json) {
-      if (typeof json.anchor != "number" || typeof json.head != "number") {
+    TextSelection3.fromJSON = function fromJSON15(doc2, json2) {
+      if (typeof json2.anchor != "number" || typeof json2.head != "number") {
         throw new RangeError("Invalid input for TextSelection.fromJSON");
       }
-      return new TextSelection3(doc2.resolve(json.anchor), doc2.resolve(json.head));
+      return new TextSelection3(doc2.resolve(json2.anchor), doc2.resolve(json2.head));
     };
-    TextSelection3.create = function create8(doc2, anchor, head) {
+    TextSelection3.create = function create9(doc2, anchor, head) {
       if (head === void 0)
         head = anchor;
       var $anchor = doc2.resolve(anchor);
@@ -11360,13 +16036,13 @@
     NodeSelection3.prototype.getBookmark = function getBookmark3() {
       return new NodeBookmark(this.anchor);
     };
-    NodeSelection3.fromJSON = function fromJSON15(doc2, json) {
-      if (typeof json.anchor != "number") {
+    NodeSelection3.fromJSON = function fromJSON15(doc2, json2) {
+      if (typeof json2.anchor != "number") {
         throw new RangeError("Invalid input for NodeSelection.fromJSON");
       }
-      return new NodeSelection3(doc2.resolve(json.anchor));
+      return new NodeSelection3(doc2.resolve(json2.anchor));
     };
-    NodeSelection3.create = function create8(doc2, from5) {
+    NodeSelection3.create = function create9(doc2, from5) {
       return new this(doc2.resolve(from5));
     };
     NodeSelection3.isSelectable = function isSelectable(node5) {
@@ -11439,18 +16115,18 @@
       return new AllSelection(doc2);
     }
   };
-  function findSelectionIn(doc2, node5, pos, index3, dir, text3) {
+  function findSelectionIn(doc2, node5, pos, index3, dir, text4) {
     if (node5.inlineContent) {
       return TextSelection.create(doc2, pos);
     }
     for (var i = index3 - (dir > 0 ? 0 : 1); dir > 0 ? i < node5.childCount : i >= 0; i += dir) {
       var child5 = node5.child(i);
       if (!child5.isAtom) {
-        var inner = findSelectionIn(doc2, child5, pos + dir, dir < 0 ? child5.childCount : 0, dir, text3);
+        var inner = findSelectionIn(doc2, child5, pos + dir, dir < 0 ? child5.childCount : 0, dir, text4);
         if (inner) {
           return inner;
         }
-      } else if (!text3 && NodeSelection.isSelectable(child5)) {
+      } else if (!text4 && NodeSelection.isSelectable(child5)) {
         return NodeSelection.create(doc2, pos - (dir < 0 ? child5.nodeSize : 0));
       }
       pos += child5.nodeSize * dir;
@@ -11556,17 +16232,17 @@
       this.selection.replace(this);
       return this;
     };
-    Transaction3.prototype.insertText = function insertText(text3, from5, to) {
+    Transaction3.prototype.insertText = function insertText(text4, from5, to) {
       if (to === void 0)
         to = from5;
       var schema = this.doc.type.schema;
       if (from5 == null) {
-        if (!text3) {
+        if (!text4) {
           return this.deleteSelection();
         }
-        return this.replaceSelectionWith(schema.text(text3), true);
+        return this.replaceSelectionWith(schema.text(text4), true);
       } else {
-        if (!text3) {
+        if (!text4) {
           return this.deleteRange(from5, to);
         }
         var marks3 = this.storedMarks;
@@ -11574,7 +16250,7 @@
           var $from = this.doc.resolve(from5);
           marks3 = to == from5 ? $from.marks() : $from.marksAcross(this.doc.resolve(to));
         }
-        this.replaceRangeWith(from5, to, schema.text(text3, marks3));
+        this.replaceRangeWith(from5, to, schema.text(text4, marks3));
         if (!this.selection.empty) {
           this.setSelection(Selection.near(this.selection.$to));
         }
@@ -11779,8 +16455,8 @@
     }
     return result2;
   };
-  EditorState.fromJSON = function fromJSON7(config, json, pluginFields) {
-    if (!json) {
+  EditorState.fromJSON = function fromJSON7(config, json2, pluginFields) {
+    if (!json2) {
       throw new RangeError("Invalid input for EditorState.fromJSON");
     }
     if (!config.schema) {
@@ -11790,19 +16466,19 @@
     var instance = new EditorState($config);
     $config.fields.forEach(function(field) {
       if (field.name == "doc") {
-        instance.doc = Node2.fromJSON(config.schema, json.doc);
+        instance.doc = Node2.fromJSON(config.schema, json2.doc);
       } else if (field.name == "selection") {
-        instance.selection = Selection.fromJSON(instance.doc, json.selection);
+        instance.selection = Selection.fromJSON(instance.doc, json2.selection);
       } else if (field.name == "storedMarks") {
-        if (json.storedMarks) {
-          instance.storedMarks = json.storedMarks.map(config.schema.markFromJSON);
+        if (json2.storedMarks) {
+          instance.storedMarks = json2.storedMarks.map(config.schema.markFromJSON);
         }
       } else {
         if (pluginFields) {
           for (var prop in pluginFields) {
             var plugin = pluginFields[prop], state = plugin.spec.state;
-            if (plugin.key == field.name && state && state.fromJSON && Object.prototype.hasOwnProperty.call(json, prop)) {
-              instance[field.name] = state.fromJSON.call(plugin, config, json[prop], instance);
+            if (plugin.key == field.name && state && state.fromJSON && Object.prototype.hasOwnProperty.call(json2, prop)) {
+              instance[field.name] = state.fromJSON.call(plugin, config, json2[prop], instance);
               return;
             }
           }
@@ -13573,10 +18249,10 @@
     return WidgetViewDesc2;
   }(ViewDesc);
   var CompositionViewDesc = /* @__PURE__ */ function(ViewDesc3) {
-    function CompositionViewDesc2(parent, dom, textDOM, text3) {
+    function CompositionViewDesc2(parent, dom, textDOM, text4) {
       ViewDesc3.call(this, parent, nothing, dom, null);
       this.textDOM = textDOM;
-      this.text = text3;
+      this.text = text4;
     }
     if (ViewDesc3)
       CompositionViewDesc2.__proto__ = ViewDesc3;
@@ -13610,7 +18286,7 @@
       MarkViewDesc2.__proto__ = ViewDesc3;
     MarkViewDesc2.prototype = Object.create(ViewDesc3 && ViewDesc3.prototype);
     MarkViewDesc2.prototype.constructor = MarkViewDesc2;
-    MarkViewDesc2.create = function create8(parent, mark4, inline2, view) {
+    MarkViewDesc2.create = function create9(parent, mark4, inline2, view) {
       var custom = view.nodeViews[mark4.type.name];
       var spec = custom && custom(mark4, view, inline2);
       if (!spec || !spec.dom) {
@@ -13673,7 +18349,7 @@
     NodeViewDesc2.prototype = Object.create(ViewDesc3 && ViewDesc3.prototype);
     NodeViewDesc2.prototype.constructor = NodeViewDesc2;
     var prototypeAccessors$33 = { size: { configurable: true }, border: { configurable: true }, domAtom: { configurable: true } };
-    NodeViewDesc2.create = function create8(parent, node5, outerDeco, innerDeco, view, pos) {
+    NodeViewDesc2.create = function create9(parent, node5, outerDeco, innerDeco, view, pos) {
       var assign;
       var custom = view.nodeViews[node5.type.name], descObj;
       var spec = custom && custom(node5, view, function() {
@@ -13795,9 +18471,9 @@
         return;
       }
       if (this.node.inlineContent) {
-        var text3 = textNode.nodeValue;
-        var textPos = findTextInFragment(this.node.content, text3, from5 - pos, to - pos);
-        return textPos < 0 ? null : { node: textNode, pos: textPos, text: text3 };
+        var text4 = textNode.nodeValue;
+        var textPos = findTextInFragment(this.node.content, text4, from5 - pos, to - pos);
+        return textPos < 0 ? null : { node: textNode, pos: textPos, text: text4 };
       } else {
         return { node: textNode, pos: -1 };
       }
@@ -13805,7 +18481,7 @@
     NodeViewDesc2.prototype.protectLocalComposition = function protectLocalComposition(view, ref) {
       var node5 = ref.node;
       var pos = ref.pos;
-      var text3 = ref.text;
+      var text4 = ref.text;
       if (this.getDesc(node5)) {
         return;
       }
@@ -13824,9 +18500,9 @@
           topNode.pmViewDesc = null;
         }
       }
-      var desc = new CompositionViewDesc(this, topNode, node5, text3);
+      var desc = new CompositionViewDesc(this, topNode, node5, text4);
       view.compositionNodes.push(desc);
-      this.children = replaceNodes(this.children, pos, pos + text3.length, view, desc);
+      this.children = replaceNodes(this.children, pos, pos + text4.length, view, desc);
     };
     NodeViewDesc2.prototype.update = function update4(node5, outerDeco, innerDeco, view) {
       if (this.dirty == NODE_DIRTY || !node5.sameMarkup(this.node)) {
@@ -14478,7 +19154,7 @@
       }
     }
   }
-  function findTextInFragment(frag, text3, from5, to) {
+  function findTextInFragment(frag, text4, from5, to) {
     for (var i = 0, pos = 0; i < frag.childCount && pos <= to; ) {
       var child5 = frag.child(i++), childStart = pos;
       pos += child5.nodeSize;
@@ -14495,11 +19171,11 @@
         str += next.text;
       }
       if (pos >= from5) {
-        var found3 = childStart < to ? str.lastIndexOf(text3, to - childStart - 1) : -1;
-        if (found3 >= 0 && found3 + text3.length + childStart >= from5) {
+        var found3 = childStart < to ? str.lastIndexOf(text4, to - childStart - 1) : -1;
+        if (found3 >= 0 && found3 + text4.length + childStart >= from5) {
           return childStart + found3;
         }
-        if (from5 == to && str.length >= to + text3.length - childStart && str.slice(to - childStart, to - childStart + text3.length) == text3) {
+        if (from5 == to && str.length >= to + text4.length - childStart && str.slice(to - childStart, to - childStart + text4.length) == text4) {
           return to;
         }
       }
@@ -15103,8 +19779,8 @@
     var sel = view.state.selection;
     var parse4 = parseBetween(view, from5, to);
     if (result.chrome && view.cursorWrapper && parse4.sel && parse4.sel.anchor == view.cursorWrapper.deco.from) {
-      var text3 = view.cursorWrapper.deco.type.toDOM.nextSibling;
-      var size = text3 && text3.nodeValue ? text3.nodeValue.length : 1;
+      var text4 = view.cursorWrapper.deco.type.toDOM.nextSibling;
+      var size = text4 && text4.nodeValue ? text4.nodeValue.length : 1;
       parse4.sel = { anchor: parse4.sel.anchor + size, head: parse4.sel.anchor + size };
     }
     var doc2 = view.state.doc, compare = doc2.slice(parse4.from, parse4.to);
@@ -15353,26 +20029,26 @@
     if (firstChild && firstChild.nodeType == 1) {
       firstChild.setAttribute("data-pm-slice", openStart + " " + openEnd + " " + JSON.stringify(context));
     }
-    var text3 = view.someProp("clipboardTextSerializer", function(f) {
+    var text4 = view.someProp("clipboardTextSerializer", function(f) {
       return f(slice6);
     }) || slice6.content.textBetween(0, slice6.content.size, "\n\n");
-    return { dom: wrap, text: text3 };
+    return { dom: wrap, text: text4 };
   }
-  function parseFromClipboard(view, text3, html, plainText, $context) {
+  function parseFromClipboard(view, text4, html, plainText, $context) {
     var dom, inCode = $context.parent.type.spec.code, slice6;
-    if (!html && !text3) {
+    if (!html && !text4) {
       return null;
     }
-    var asText = text3 && (plainText || inCode || !html);
+    var asText = text4 && (plainText || inCode || !html);
     if (asText) {
       view.someProp("transformPastedText", function(f) {
-        text3 = f(text3, inCode || plainText);
+        text4 = f(text4, inCode || plainText);
       });
       if (inCode) {
-        return text3 ? new Slice(Fragment.from(view.state.schema.text(text3.replace(/\r\n?/g, "\n"))), 0, 0) : Slice.empty;
+        return text4 ? new Slice(Fragment.from(view.state.schema.text(text4.replace(/\r\n?/g, "\n"))), 0, 0) : Slice.empty;
       }
       var parsed = view.someProp("clipboardTextParser", function(f) {
-        return f(text3, $context, plainText);
+        return f(text4, $context, plainText);
       });
       if (parsed) {
         slice6 = parsed;
@@ -15382,7 +20058,7 @@
         var schema = ref.schema;
         var serializer = DOMSerializer.fromSchema(schema);
         dom = document.createElement("div");
-        text3.split(/(?:\r\n?|\n)+/).forEach(function(block) {
+        text4.split(/(?:\r\n?|\n)+/).forEach(function(block) {
           var p = dom.appendChild(document.createElement("p"));
           if (block) {
             p.appendChild(serializer.serializeNode(schema.text(block, marks3)));
@@ -15968,11 +20644,11 @@
     }
     var sel = view.state.selection;
     if (!(sel instanceof TextSelection) || !sel.$from.sameParent(sel.$to)) {
-      var text3 = String.fromCharCode(event.charCode);
+      var text4 = String.fromCharCode(event.charCode);
       if (!view.someProp("handleTextInput", function(f) {
-        return f(view, sel.$from.pos, sel.$to.pos, text3);
+        return f(view, sel.$from.pos, sel.$to.pos, text4);
       })) {
-        view.dispatch(view.state.tr.insertText(text3).scrollIntoView());
+        view.dispatch(view.state.tr.insertText(text4).scrollIntoView());
       }
       event.preventDefault();
     }
@@ -16351,12 +21027,12 @@
     var slice6 = sel.content();
     var ref = serializeForClipboard(view, slice6);
     var dom = ref.dom;
-    var text3 = ref.text;
+    var text4 = ref.text;
     if (data) {
       e.preventDefault();
       data.clearData();
       data.setData("text/html", dom.innerHTML);
-      data.setData("text/plain", text3);
+      data.setData("text/plain", text4);
     } else {
       captureCopy(view, dom);
     }
@@ -16390,8 +21066,8 @@
       }
     }, 50);
   }
-  function doPaste(view, text3, html, e) {
-    var slice6 = parseFromClipboard(view, text3, html, view.shiftKey, view.state.selection.$from);
+  function doPaste(view, text4, html, e) {
+    var slice6 = parseFromClipboard(view, text4, html, view.shiftKey, view.state.selection.$from);
     if (view.someProp("handlePaste", function(f) {
       return f(view, e, slice6 || Slice.empty);
     })) {
@@ -16444,12 +21120,12 @@
     var slice6 = view.state.selection.content();
     var ref = serializeForClipboard(view, slice6);
     var dom = ref.dom;
-    var text3 = ref.text;
+    var text4 = ref.text;
     e.dataTransfer.clearData();
     e.dataTransfer.setData(brokenClipboardAPI ? "Text" : "text/html", dom.innerHTML);
     e.dataTransfer.effectAllowed = "copyMove";
     if (!brokenClipboardAPI) {
-      e.dataTransfer.setData("text/plain", text3);
+      e.dataTransfer.setData("text/plain", text4);
     }
     view.dragging = new Dragging(slice6, !e[dragCopyModifier]);
   };
@@ -17747,18 +22423,18 @@
     }
     return value.constructor === Object && Object.getPrototypeOf(value) === Object.prototype;
   }
-  function mergeDeep(target, source) {
+  function mergeDeep(target, source2) {
     const output = { ...target };
-    if (isPlainObject(target) && isPlainObject(source)) {
-      Object.keys(source).forEach((key2) => {
-        if (isPlainObject(source[key2])) {
+    if (isPlainObject(target) && isPlainObject(source2)) {
+      Object.keys(source2).forEach((key2) => {
+        if (isPlainObject(source2[key2])) {
           if (!(key2 in target)) {
-            Object.assign(output, { [key2]: source[key2] });
+            Object.assign(output, { [key2]: source2[key2] });
           } else {
-            output[key2] = mergeDeep(target[key2], source[key2]);
+            output[key2] = mergeDeep(target[key2], source2[key2]);
           }
         } else {
-          Object.assign(output, { [key2]: source[key2] });
+          Object.assign(output, { [key2]: source2[key2] });
         }
       });
     }
@@ -17851,31 +22527,31 @@
   function getTextBetween(startNode, range, options) {
     const { from: from5, to } = range;
     const { blockSeparator = "\n\n", textSerializers = {} } = options || {};
-    let text3 = "";
+    let text4 = "";
     let separated = true;
     startNode.nodesBetween(from5, to, (node5, pos, parent, index3) => {
       var _a;
       const textSerializer = textSerializers === null || textSerializers === void 0 ? void 0 : textSerializers[node5.type.name];
       if (textSerializer) {
         if (node5.isBlock && !separated) {
-          text3 += blockSeparator;
+          text4 += blockSeparator;
           separated = true;
         }
-        text3 += textSerializer({
+        text4 += textSerializer({
           node: node5,
           pos,
           parent,
           index: index3
         });
       } else if (node5.isText) {
-        text3 += (_a = node5 === null || node5 === void 0 ? void 0 : node5.text) === null || _a === void 0 ? void 0 : _a.slice(Math.max(from5, pos) - pos, to - pos);
+        text4 += (_a = node5 === null || node5 === void 0 ? void 0 : node5.text) === null || _a === void 0 ? void 0 : _a.slice(Math.max(from5, pos) - pos, to - pos);
         separated = false;
       } else if (node5.isBlock && !separated) {
-        text3 += blockSeparator;
+        text4 += blockSeparator;
         separated = true;
       }
     });
-    return text3;
+    return text4;
   }
   function getTextSeralizersFromSchema(schema) {
     return Object.fromEntries(Object.entries(schema.nodes).filter(([, node5]) => node5.spec.toText).map(([name, node5]) => [name, node5.spec.toText]));
@@ -18247,8 +22923,8 @@
           return Fragment.fromArray(content3.map((item) => schema.nodeFromJSON(item)));
         }
         return schema.nodeFromJSON(content3);
-      } catch (error2) {
-        console.warn("[tiptap warn]: Invalid content.", "Passed value:", content3, "Error:", error2);
+      } catch (error3) {
+        console.warn("[tiptap warn]: Invalid content.", "Passed value:", content3, "Error:", error3);
         return createNodeFromContent("", schema, options);
       }
     }
@@ -19637,18 +24313,18 @@
       this.handler = config.handler;
     }
   };
-  var inputRuleMatcherHandler = (text3, find3) => {
+  var inputRuleMatcherHandler = (text4, find3) => {
     if (isRegExp(find3)) {
-      return find3.exec(text3);
+      return find3.exec(text4);
     }
-    const inputRuleMatch = find3(text3);
+    const inputRuleMatch = find3(text4);
     if (!inputRuleMatch) {
       return null;
     }
     const result2 = [];
     result2.push(inputRuleMatch.text);
     result2.index = inputRuleMatch.index;
-    result2.input = text3;
+    result2.input = text4;
     result2.data = inputRuleMatch.data;
     if (inputRuleMatch.replaceWith) {
       if (!inputRuleMatch.text.includes(inputRuleMatch.replaceWith)) {
@@ -19660,7 +24336,7 @@
   };
   function run$1(config) {
     var _a;
-    const { editor, from: from5, to, text: text3, rules, plugin } = config;
+    const { editor, from: from5, to, text: text4, rules, plugin } = config;
     const { view } = editor;
     if (view.composing) {
       return false;
@@ -19671,7 +24347,7 @@
     }
     let matched = false;
     const maxMatch = 500;
-    const textBefore = $from.parent.textBetween(Math.max(0, $from.parentOffset - maxMatch), $from.parentOffset, void 0, " ") + text3;
+    const textBefore = $from.parent.textBetween(Math.max(0, $from.parentOffset - maxMatch), $from.parentOffset, void 0, " ") + text4;
     rules.forEach((rule) => {
       if (matched) {
         return;
@@ -19686,7 +24362,7 @@
         transaction: tr
       });
       const range = {
-        from: from5 - (match[0].length - text3.length),
+        from: from5 - (match[0].length - text4.length),
         to
       };
       const { commands, chain, can } = new CommandManager({
@@ -19708,7 +24384,7 @@
         transform: tr,
         from: from5,
         to,
-        text: text3
+        text: text4
       });
       view.dispatch(tr);
       matched = true;
@@ -19731,12 +24407,12 @@
         }
       },
       props: {
-        handleTextInput(view, from5, to, text3) {
+        handleTextInput(view, from5, to, text4) {
           return run$1({
             editor,
             from: from5,
             to,
-            text: text3,
+            text: text4,
             rules,
             plugin
           });
@@ -19790,11 +24466,11 @@
       this.handler = config.handler;
     }
   };
-  var pasteRuleMatcherHandler = (text3, find3) => {
+  var pasteRuleMatcherHandler = (text4, find3) => {
     if (isRegExp(find3)) {
-      return [...text3.matchAll(find3)];
+      return [...text4.matchAll(find3)];
     }
-    const matches2 = find3(text3);
+    const matches2 = find3(text4);
     if (!matches2) {
       return [];
     }
@@ -19802,7 +24478,7 @@
       const result2 = [];
       result2.push(pasteRuleMatch.text);
       result2.index = pasteRuleMatch.index;
-      result2.input = text3;
+      result2.input = text4;
       result2.data = pasteRuleMatch.data;
       if (pasteRuleMatch.replaceWith) {
         if (!pasteRuleMatch.text.includes(pasteRuleMatch.replaceWith)) {
@@ -21008,6 +25684,18 @@ img.ProseMirror-separator {
     });
     return transform;
   }
+  function findChildren(node5, predicate) {
+    const nodesWithPos = [];
+    node5.descendants((child5, pos) => {
+      if (predicate(child5)) {
+        nodesWithPos.push({
+          node: child5,
+          pos
+        });
+      }
+    });
+    return nodesWithPos;
+  }
   function findChildrenInRange(node5, range, predicate) {
     const nodesWithPos = [];
     node5.nodesBetween(range.from, range.to, (child5, pos) => {
@@ -21486,17 +26174,17 @@ img.ProseMirror-separator {
               if (this.editor.isActive(this.type.name)) {
                 return false;
               }
-              const text3 = event.clipboardData.getData("text/plain");
+              const text4 = event.clipboardData.getData("text/plain");
               const vscode = event.clipboardData.getData("vscode-editor-data");
               const vscodeData = vscode ? JSON.parse(vscode) : void 0;
               const language = vscodeData === null || vscodeData === void 0 ? void 0 : vscodeData.mode;
-              if (!text3 || !language) {
+              if (!text4 || !language) {
                 return false;
               }
               const { tr } = view.state;
               tr.replaceSelectionWith(this.type.create({ language }));
               tr.setSelection(TextSelection.near(tr.doc.resolve(Math.max(0, tr.selection.from - 2))));
-              tr.insertText(text3.replace(/\r\n?/g, "\n"));
+              tr.insertText(text4.replace(/\r\n?/g, "\n"));
               tr.setMeta("paste", true);
               view.dispatch(tr);
               return true;
@@ -21687,11 +26375,11 @@ img.ProseMirror-separator {
     GapCursor2.prototype.toJSON = function toJSON13() {
       return { type: "gapcursor", pos: this.head };
     };
-    GapCursor2.fromJSON = function fromJSON15(doc2, json) {
-      if (typeof json.pos != "number") {
+    GapCursor2.fromJSON = function fromJSON15(doc2, json2) {
+      if (typeof json2.pos != "number") {
         throw new RangeError("Invalid input for GapCursor.fromJSON");
       }
-      return new GapCursor2(doc2.resolve(json.pos));
+      return new GapCursor2(doc2.resolve(json2.pos));
     };
     GapCursor2.prototype.getBookmark = function getBookmark3() {
       return new GapBookmark(this.anchor);
@@ -23264,8 +27952,8 @@ img.ProseMirror-separator {
       currentNode = currentNode.host;
     }
     while (isHTMLElement(currentNode) && ["html", "body"].indexOf(getNodeName(currentNode)) < 0) {
-      var css = getComputedStyle2(currentNode);
-      if (css.transform !== "none" || css.perspective !== "none" || css.contain === "paint" || ["transform", "perspective"].indexOf(css.willChange) !== -1 || isFirefox && css.willChange === "filter" || isFirefox && css.filter && css.filter !== "none") {
+      var css2 = getComputedStyle2(currentNode);
+      if (css2.transform !== "none" || css2.perspective !== "none" || css2.contain === "paint" || ["transform", "perspective"].indexOf(css2.willChange) !== -1 || isFirefox && css2.willChange === "filter" || isFirefox && css2.filter && css2.filter !== "none") {
         return currentNode;
       } else {
         currentNode = currentNode.parentNode;
@@ -26869,8 +31557,8 @@ img.ProseMirror-separator {
             }
           });
           findChildrenInRange(newState.doc, newRange, (node5) => node5.isTextblock).forEach((textBlock) => {
-            const text3 = newState.doc.textBetween(textBlock.pos, textBlock.pos + textBlock.node.nodeSize, void 0, " ");
-            find2(text3).filter((link) => link.isLink).map((link) => ({
+            const text4 = newState.doc.textBetween(textBlock.pos, textBlock.pos + textBlock.node.nodeSize, void 0, " ");
+            find2(text4).filter((link) => link.isLink).map((link) => ({
               ...link,
               from: textBlock.pos + link.start + 1,
               to: textBlock.pos + link.end + 1
@@ -26992,7 +31680,7 @@ img.ProseMirror-separator {
     addPasteRules() {
       return [
         markPasteRule({
-          find: (text3) => find2(text3).filter((link) => link.isLink).map((link) => ({
+          find: (text4) => find2(text4).filter((link) => link.isLink).map((link) => ({
             text: link.value,
             index: link.start,
             data: link
@@ -27039,8 +31727,8 @@ img.ProseMirror-separator {
     const isTopLevelNode = $position.depth <= 0;
     const textFrom = isTopLevelNode ? 0 : $position.before();
     const textTo = $position.pos;
-    const text3 = $position.doc.textBetween(textFrom, textTo, "\0", "\0");
-    const match = Array.from(text3.matchAll(regexp)).pop();
+    const text4 = $position.doc.textBetween(textFrom, textTo, "\0", "\0");
+    const match = Array.from(text4.matchAll(regexp)).pop();
     if (!match || match.input === void 0 || match.index === void 0) {
       return null;
     }
@@ -27051,7 +31739,7 @@ img.ProseMirror-separator {
     }
     const from5 = match.index + $position.start();
     let to = from5 + match[0].length;
-    if (allowSpaces && suffix.test(text3.slice(to - 1, to + 1))) {
+    if (allowSpaces && suffix.test(text4.slice(to - 1, to + 1))) {
       match[0] += " ";
       to += 1;
     }
@@ -27900,10 +32588,10 @@ img.ProseMirror-separator {
     CellSelection2.prototype.toJSON = function toJSON13() {
       return { type: "cell", anchor: this.$anchorCell.pos, head: this.$headCell.pos };
     };
-    CellSelection2.fromJSON = function fromJSON15(doc2, json) {
-      return new CellSelection2(doc2.resolve(json.anchor), doc2.resolve(json.head));
+    CellSelection2.fromJSON = function fromJSON15(doc2, json2) {
+      return new CellSelection2(doc2.resolve(json2.anchor), doc2.resolve(json2.head));
     };
-    CellSelection2.create = function create8(doc2, anchorCell, headCell) {
+    CellSelection2.create = function create9(doc2, anchorCell, headCell) {
       if (headCell === void 0)
         headCell = anchorCell;
       return new CellSelection2(doc2.resolve(anchorCell), doc2.resolve(headCell));
@@ -28097,9 +32785,9 @@ img.ProseMirror-separator {
     if (height != newHeight) {
       var newRows$1 = [];
       for (var row$1 = 0, i$1 = 0; row$1 < newHeight; row$1++, i$1++) {
-        var cells$1 = [], source = rows[i$1 % height];
-        for (var j$1 = 0; j$1 < source.childCount; j$1++) {
-          var cell$1 = source.child(j$1);
+        var cells$1 = [], source2 = rows[i$1 % height];
+        for (var j$1 = 0; j$1 < source2.childCount; j$1++) {
+          var cell$1 = source2.child(j$1);
           if (row$1 + cell$1.attrs.rowspan > newHeight) {
             cell$1 = cell$1.type.create(setAttr(cell$1.attrs, "rowspan", Math.max(1, newHeight - cell$1.attrs.rowspan)), cell$1.content);
           }
@@ -29438,20 +34126,20 @@ img.ProseMirror-separator {
     this.nodesBetween(0, this.size, f);
   };
   Fragment3.prototype.textBetween = function textBetween3(from5, to, blockSeparator, leafText) {
-    var text3 = "", separated = true;
+    var text4 = "", separated = true;
     this.nodesBetween(from5, to, function(node5, pos) {
       if (node5.isText) {
-        text3 += node5.text.slice(Math.max(from5, pos) - pos, to - pos);
+        text4 += node5.text.slice(Math.max(from5, pos) - pos, to - pos);
         separated = !blockSeparator;
       } else if (node5.isLeaf && leafText) {
-        text3 += typeof leafText === "function" ? leafText(node5) : leafText;
+        text4 += typeof leafText === "function" ? leafText(node5) : leafText;
         separated = !blockSeparator;
       } else if (!separated && node5.isBlock) {
-        text3 += blockSeparator;
+        text4 += blockSeparator;
         separated = true;
       }
     }, 0);
-    return text3;
+    return text4;
   };
   Fragment3.prototype.append = function append3(other) {
     if (!other.size) {
@@ -29755,15 +34443,15 @@ img.ProseMirror-separator {
     }
     return obj;
   };
-  Mark4.fromJSON = function fromJSON9(schema, json) {
-    if (!json) {
+  Mark4.fromJSON = function fromJSON9(schema, json2) {
+    if (!json2) {
       throw new RangeError("Invalid input for Mark.fromJSON");
     }
-    var type = schema.marks[json.type];
+    var type = schema.marks[json2.type];
     if (!type) {
-      throw new RangeError("There is no mark type " + json.type + " in this schema");
+      throw new RangeError("There is no mark type " + json2.type + " in this schema");
     }
-    return type.create(json.attrs);
+    return type.create(json2.attrs);
   };
   Mark4.sameSet = function sameSet2(a, b) {
     if (a == b) {
@@ -29827,24 +34515,24 @@ img.ProseMirror-separator {
     if (!this.content.size) {
       return null;
     }
-    var json = { content: this.content.toJSON() };
+    var json2 = { content: this.content.toJSON() };
     if (this.openStart > 0) {
-      json.openStart = this.openStart;
+      json2.openStart = this.openStart;
     }
     if (this.openEnd > 0) {
-      json.openEnd = this.openEnd;
+      json2.openEnd = this.openEnd;
     }
-    return json;
+    return json2;
   };
-  Slice3.fromJSON = function fromJSON10(schema, json) {
-    if (!json) {
+  Slice3.fromJSON = function fromJSON10(schema, json2) {
+    if (!json2) {
       return Slice3.empty;
     }
-    var openStart = json.openStart || 0, openEnd = json.openEnd || 0;
+    var openStart = json2.openStart || 0, openEnd = json2.openEnd || 0;
     if (typeof openStart != "number" || typeof openEnd != "number") {
       throw new RangeError("Invalid input for Slice.fromJSON");
     }
-    return new Slice3(Fragment3.fromJSON(schema, json.content), openStart, openEnd);
+    return new Slice3(Fragment3.fromJSON(schema, json2.content), openStart, openEnd);
   };
   Slice3.maxOpen = function maxOpen2(fragment, openIsolating) {
     if (openIsolating === void 0)
@@ -30459,25 +35147,25 @@ img.ProseMirror-separator {
     }
     return obj;
   };
-  Node5.fromJSON = function fromJSON11(schema, json) {
-    if (!json) {
+  Node5.fromJSON = function fromJSON11(schema, json2) {
+    if (!json2) {
       throw new RangeError("Invalid input for Node.fromJSON");
     }
     var marks3 = null;
-    if (json.marks) {
-      if (!Array.isArray(json.marks)) {
+    if (json2.marks) {
+      if (!Array.isArray(json2.marks)) {
         throw new RangeError("Invalid mark data for Node.fromJSON");
       }
-      marks3 = json.marks.map(schema.markFromJSON);
+      marks3 = json2.marks.map(schema.markFromJSON);
     }
-    if (json.type == "text") {
-      if (typeof json.text != "string") {
+    if (json2.type == "text") {
+      if (typeof json2.text != "string") {
         throw new RangeError("Invalid text node in JSON");
       }
-      return schema.text(json.text, marks3);
+      return schema.text(json2.text, marks3);
     }
-    var content3 = Fragment3.fromJSON(schema, json.content);
-    return schema.nodeType(json.type).create(json.attrs, content3, marks3);
+    var content3 = Fragment3.fromJSON(schema, json2.content);
+    return schema.nodeType(json2.type).create(json2.attrs, content3, marks3);
   };
   Object.defineProperties(Node5.prototype, prototypeAccessors$3$1);
   function wrapMarks2(marks3, str) {
@@ -31235,15 +35923,15 @@ img.ProseMirror-separator {
     }
     return node5.parentNode && !blockTags2.hasOwnProperty(node5.parentNode.nodeName.toLowerCase());
   };
-  var ParseContext3 = function ParseContext4(parser, options, open) {
+  var ParseContext3 = function ParseContext4(parser, options, open2) {
     this.parser = parser;
     this.options = options;
-    this.isOpen = open;
+    this.isOpen = open2;
     var topNode = options.topNode, topContext;
-    var topOptions = wsOptionsFor2(null, options.preserveWhitespace, 0) | (open ? OPT_OPEN_LEFT2 : 0);
+    var topOptions = wsOptionsFor2(null, options.preserveWhitespace, 0) | (open2 ? OPT_OPEN_LEFT2 : 0);
     if (topNode) {
       topContext = new NodeContext3(topNode.type, topNode.attrs, Mark4.none, Mark4.none, true, options.topMatch || topNode.type.contentMatch, topOptions);
-    } else if (open) {
+    } else if (open2) {
       topContext = new NodeContext3(null, null, Mark4.none, Mark4.none, true, null, topOptions);
     } else {
       topContext = new NodeContext3(parser.schema.topNodeType, null, Mark4.none, Mark4.none, true, null, topOptions);
@@ -31960,15 +36648,15 @@ img.ProseMirror-separator {
   Step3.prototype.toJSON = function toJSON11() {
     return mustOverride2();
   };
-  Step3.fromJSON = function fromJSON12(schema, json) {
-    if (!json || !json.stepType) {
+  Step3.fromJSON = function fromJSON12(schema, json2) {
+    if (!json2 || !json2.stepType) {
       throw new RangeError("Invalid input for Step.fromJSON");
     }
-    var type = stepsByID2[json.stepType];
+    var type = stepsByID2[json2.stepType];
     if (!type) {
-      throw new RangeError("No step type " + json.stepType + " defined");
+      throw new RangeError("No step type " + json2.stepType + " defined");
     }
-    return type.fromJSON(schema, json);
+    return type.fromJSON(schema, json2);
   };
   Step3.jsonID = function jsonID3(id, stepClass) {
     if (id in stepsByID2) {
@@ -32044,20 +36732,20 @@ img.ProseMirror-separator {
       }
     };
     ReplaceStep3.prototype.toJSON = function toJSON13() {
-      var json = { stepType: "replace", from: this.from, to: this.to };
+      var json2 = { stepType: "replace", from: this.from, to: this.to };
       if (this.slice.size) {
-        json.slice = this.slice.toJSON();
+        json2.slice = this.slice.toJSON();
       }
       if (this.structure) {
-        json.structure = true;
+        json2.structure = true;
       }
-      return json;
+      return json2;
     };
-    ReplaceStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number") {
+    ReplaceStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number") {
         throw new RangeError("Invalid input for ReplaceStep.fromJSON");
       }
-      return new ReplaceStep3(json.from, json.to, Slice3.fromJSON(schema, json.slice), !!json.structure);
+      return new ReplaceStep3(json2.from, json2.to, Slice3.fromJSON(schema, json2.slice), !!json2.structure);
     };
     return ReplaceStep3;
   }(Step3);
@@ -32114,7 +36802,7 @@ img.ProseMirror-separator {
       return new ReplaceAroundStep3(from5.pos, to.pos, gapFrom, gapTo, this.slice, this.insert, this.structure);
     };
     ReplaceAroundStep3.prototype.toJSON = function toJSON13() {
-      var json = {
+      var json2 = {
         stepType: "replaceAround",
         from: this.from,
         to: this.to,
@@ -32123,18 +36811,18 @@ img.ProseMirror-separator {
         insert: this.insert
       };
       if (this.slice.size) {
-        json.slice = this.slice.toJSON();
+        json2.slice = this.slice.toJSON();
       }
       if (this.structure) {
-        json.structure = true;
+        json2.structure = true;
       }
-      return json;
+      return json2;
     };
-    ReplaceAroundStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number" || typeof json.gapFrom != "number" || typeof json.gapTo != "number" || typeof json.insert != "number") {
+    ReplaceAroundStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number" || typeof json2.gapFrom != "number" || typeof json2.gapTo != "number" || typeof json2.insert != "number") {
         throw new RangeError("Invalid input for ReplaceAroundStep.fromJSON");
       }
-      return new ReplaceAroundStep3(json.from, json.to, json.gapFrom, json.gapTo, Slice3.fromJSON(schema, json.slice), json.insert, !!json.structure);
+      return new ReplaceAroundStep3(json2.from, json2.to, json2.gapFrom, json2.gapTo, Slice3.fromJSON(schema, json2.slice), json2.insert, !!json2.structure);
     };
     return ReplaceAroundStep3;
   }(Step3);
@@ -32338,11 +37026,11 @@ img.ProseMirror-separator {
         to: this.to
       };
     };
-    AddMarkStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number") {
+    AddMarkStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number") {
         throw new RangeError("Invalid input for AddMarkStep.fromJSON");
       }
-      return new AddMarkStep3(json.from, json.to, schema.markFromJSON(json.mark));
+      return new AddMarkStep3(json2.from, json2.to, schema.markFromJSON(json2.mark));
     };
     return AddMarkStep3;
   }(Step3);
@@ -32389,11 +37077,11 @@ img.ProseMirror-separator {
         to: this.to
       };
     };
-    RemoveMarkStep3.fromJSON = function fromJSON15(schema, json) {
-      if (typeof json.from != "number" || typeof json.to != "number") {
+    RemoveMarkStep3.fromJSON = function fromJSON15(schema, json2) {
+      if (typeof json2.from != "number" || typeof json2.to != "number") {
         throw new RangeError("Invalid input for RemoveMarkStep.fromJSON");
       }
-      return new RemoveMarkStep3(json.from, json.to, schema.markFromJSON(json.mark));
+      return new RemoveMarkStep3(json2.from, json2.to, schema.markFromJSON(json2.mark));
     };
     return RemoveMarkStep3;
   }(Step3);
@@ -32743,18 +37431,18 @@ img.ProseMirror-separator {
       }
   };
   Fitter3.prototype.close = function close4($to) {
-    var close5 = this.findCloseLevel($to);
-    if (!close5) {
+    var close6 = this.findCloseLevel($to);
+    if (!close6) {
       return null;
     }
-    while (this.depth > close5.depth) {
+    while (this.depth > close6.depth) {
       this.closeFrontierNode();
     }
-    if (close5.fit.childCount) {
-      this.placed = addToFragment2(this.placed, close5.depth, close5.fit);
+    if (close6.fit.childCount) {
+      this.placed = addToFragment2(this.placed, close6.depth, close6.fit);
     }
-    $to = close5.move;
-    for (var d = close5.depth + 1; d <= $to.depth; d++) {
+    $to = close6.move;
+    for (var d = close6.depth + 1; d <= $to.depth; d++) {
       var node5 = $to.node(d), add3 = node5.type.contentMatch.fillBefore(node5.content, true, $to.index(d));
       this.openFrontierNode(node5.type, node5.attrs, add3);
     }
@@ -32767,8 +37455,8 @@ img.ProseMirror-separator {
     this.frontier.push({ type, match: type.contentMatch });
   };
   Fitter3.prototype.closeFrontierNode = function closeFrontierNode2() {
-    var open = this.frontier.pop();
-    var add3 = open.match.fillBefore(Fragment3.empty, true);
+    var open2 = this.frontier.pop();
+    var add3 = open2.match.fillBefore(Fragment3.empty, true);
     if (add3.childCount) {
       this.placed = addToFragment2(this.placed, this.frontier.length, add3);
     }
@@ -32808,8 +37496,8 @@ img.ProseMirror-separator {
     }
     return node5.copy(frag);
   }
-  function contentAfterFits2($to, depth, type, match, open) {
-    var node5 = $to.node(depth), index3 = open ? $to.indexAfter(depth) : $to.index(depth);
+  function contentAfterFits2($to, depth, type, match, open2) {
+    var node5 = $to.node(depth), index3 = open2 ? $to.indexAfter(depth) : $to.index(depth);
     if (index3 == node5.childCount && !type.compatibleContent(node5.type)) {
       return null;
     }
@@ -33046,15 +37734,15 @@ img.ProseMirror-separator {
   Selection3.atEnd = function atEnd2(doc2) {
     return findSelectionIn2(doc2, doc2, doc2.content.size, doc2.childCount, -1) || new AllSelection2(doc2);
   };
-  Selection3.fromJSON = function fromJSON13(doc2, json) {
-    if (!json || !json.type) {
+  Selection3.fromJSON = function fromJSON13(doc2, json2) {
+    if (!json2 || !json2.type) {
       throw new RangeError("Invalid input for Selection.fromJSON");
     }
-    var cls = classesById2[json.type];
+    var cls = classesById2[json2.type];
     if (!cls) {
-      throw new RangeError("No selection type " + json.type + " defined");
+      throw new RangeError("No selection type " + json2.type + " defined");
     }
-    return cls.fromJSON(doc2, json);
+    return cls.fromJSON(doc2, json2);
   };
   Selection3.jsonID = function jsonID4(id, selectionClass) {
     if (id in classesById2) {
@@ -33115,13 +37803,13 @@ img.ProseMirror-separator {
     TextSelection3.prototype.toJSON = function toJSON13() {
       return { type: "text", anchor: this.anchor, head: this.head };
     };
-    TextSelection3.fromJSON = function fromJSON15(doc2, json) {
-      if (typeof json.anchor != "number" || typeof json.head != "number") {
+    TextSelection3.fromJSON = function fromJSON15(doc2, json2) {
+      if (typeof json2.anchor != "number" || typeof json2.head != "number") {
         throw new RangeError("Invalid input for TextSelection.fromJSON");
       }
-      return new TextSelection3(doc2.resolve(json.anchor), doc2.resolve(json.head));
+      return new TextSelection3(doc2.resolve(json2.anchor), doc2.resolve(json2.head));
     };
-    TextSelection3.create = function create8(doc2, anchor, head) {
+    TextSelection3.create = function create9(doc2, anchor, head) {
       if (head === void 0)
         head = anchor;
       var $anchor = doc2.resolve(anchor);
@@ -33199,13 +37887,13 @@ img.ProseMirror-separator {
     NodeSelection3.prototype.getBookmark = function getBookmark3() {
       return new NodeBookmark3(this.anchor);
     };
-    NodeSelection3.fromJSON = function fromJSON15(doc2, json) {
-      if (typeof json.anchor != "number") {
+    NodeSelection3.fromJSON = function fromJSON15(doc2, json2) {
+      if (typeof json2.anchor != "number") {
         throw new RangeError("Invalid input for NodeSelection.fromJSON");
       }
-      return new NodeSelection3(doc2.resolve(json.anchor));
+      return new NodeSelection3(doc2.resolve(json2.anchor));
     };
-    NodeSelection3.create = function create8(doc2, from5) {
+    NodeSelection3.create = function create9(doc2, from5) {
       return new this(doc2.resolve(from5));
     };
     NodeSelection3.isSelectable = function isSelectable(node5) {
@@ -33278,18 +37966,18 @@ img.ProseMirror-separator {
       return new AllSelection2(doc2);
     }
   };
-  function findSelectionIn2(doc2, node5, pos, index3, dir, text3) {
+  function findSelectionIn2(doc2, node5, pos, index3, dir, text4) {
     if (node5.inlineContent) {
       return TextSelection2.create(doc2, pos);
     }
     for (var i = index3 - (dir > 0 ? 0 : 1); dir > 0 ? i < node5.childCount : i >= 0; i += dir) {
       var child5 = node5.child(i);
       if (!child5.isAtom) {
-        var inner = findSelectionIn2(doc2, child5, pos + dir, dir < 0 ? child5.childCount : 0, dir, text3);
+        var inner = findSelectionIn2(doc2, child5, pos + dir, dir < 0 ? child5.childCount : 0, dir, text4);
         if (inner) {
           return inner;
         }
-      } else if (!text3 && NodeSelection2.isSelectable(child5)) {
+      } else if (!text4 && NodeSelection2.isSelectable(child5)) {
         return NodeSelection2.create(doc2, pos - (dir < 0 ? child5.nodeSize : 0));
       }
       pos += child5.nodeSize * dir;
@@ -33395,17 +38083,17 @@ img.ProseMirror-separator {
       this.selection.replace(this);
       return this;
     };
-    Transaction3.prototype.insertText = function insertText(text3, from5, to) {
+    Transaction3.prototype.insertText = function insertText(text4, from5, to) {
       if (to === void 0)
         to = from5;
       var schema = this.doc.type.schema;
       if (from5 == null) {
-        if (!text3) {
+        if (!text4) {
           return this.deleteSelection();
         }
-        return this.replaceSelectionWith(schema.text(text3), true);
+        return this.replaceSelectionWith(schema.text(text4), true);
       } else {
-        if (!text3) {
+        if (!text4) {
           return this.deleteRange(from5, to);
         }
         var marks3 = this.storedMarks;
@@ -33413,7 +38101,7 @@ img.ProseMirror-separator {
           var $from = this.doc.resolve(from5);
           marks3 = to == from5 ? $from.marks() : $from.marksAcross(this.doc.resolve(to));
         }
-        this.replaceRangeWith(from5, to, schema.text(text3, marks3));
+        this.replaceRangeWith(from5, to, schema.text(text4, marks3));
         if (!this.selection.empty) {
           this.setSelection(Selection3.near(this.selection.$to));
         }
@@ -33618,8 +38306,8 @@ img.ProseMirror-separator {
     }
     return result2;
   };
-  EditorState3.fromJSON = function fromJSON14(config, json, pluginFields) {
-    if (!json) {
+  EditorState3.fromJSON = function fromJSON14(config, json2, pluginFields) {
+    if (!json2) {
       throw new RangeError("Invalid input for EditorState.fromJSON");
     }
     if (!config.schema) {
@@ -33629,19 +38317,19 @@ img.ProseMirror-separator {
     var instance = new EditorState3($config);
     $config.fields.forEach(function(field) {
       if (field.name == "doc") {
-        instance.doc = Node5.fromJSON(config.schema, json.doc);
+        instance.doc = Node5.fromJSON(config.schema, json2.doc);
       } else if (field.name == "selection") {
-        instance.selection = Selection3.fromJSON(instance.doc, json.selection);
+        instance.selection = Selection3.fromJSON(instance.doc, json2.selection);
       } else if (field.name == "storedMarks") {
-        if (json.storedMarks) {
-          instance.storedMarks = json.storedMarks.map(config.schema.markFromJSON);
+        if (json2.storedMarks) {
+          instance.storedMarks = json2.storedMarks.map(config.schema.markFromJSON);
         }
       } else {
         if (pluginFields) {
           for (var prop in pluginFields) {
             var plugin = pluginFields[prop], state = plugin.spec.state;
-            if (plugin.key == field.name && state && state.fromJSON && Object.prototype.hasOwnProperty.call(json, prop)) {
-              instance[field.name] = state.fromJSON.call(plugin, config, json[prop], instance);
+            if (plugin.key == field.name && state && state.fromJSON && Object.prototype.hasOwnProperty.call(json2, prop)) {
+              instance[field.name] = state.fromJSON.call(plugin, config, json2[prop], instance);
               return;
             }
           }
@@ -34034,6 +38722,1800 @@ img.ProseMirror-separator {
     }
   });
 
+  // node_modules/@tiptap/extension-code-block-lowlight/dist/tiptap-extension-code-block-lowlight.esm.js
+  var core$1 = {};
+  function deepFreeze(obj) {
+    if (obj instanceof Map) {
+      obj.clear = obj.delete = obj.set = function() {
+        throw new Error("map is read-only");
+      };
+    } else if (obj instanceof Set) {
+      obj.add = obj.clear = obj.delete = function() {
+        throw new Error("set is read-only");
+      };
+    }
+    Object.freeze(obj);
+    Object.getOwnPropertyNames(obj).forEach(function(name) {
+      var prop = obj[name];
+      if (typeof prop == "object" && !Object.isFrozen(prop)) {
+        deepFreeze(prop);
+      }
+    });
+    return obj;
+  }
+  var deepFreezeEs6 = deepFreeze;
+  var _default = deepFreeze;
+  deepFreezeEs6.default = _default;
+  var Response = class {
+    constructor(mode) {
+      if (mode.data === void 0)
+        mode.data = {};
+      this.data = mode.data;
+      this.isMatchIgnored = false;
+    }
+    ignoreMatch() {
+      this.isMatchIgnored = true;
+    }
+  };
+  function escapeHTML(value) {
+    return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
+  }
+  function inherit(original, ...objects) {
+    const result2 = /* @__PURE__ */ Object.create(null);
+    for (const key2 in original) {
+      result2[key2] = original[key2];
+    }
+    objects.forEach(function(obj) {
+      for (const key2 in obj) {
+        result2[key2] = obj[key2];
+      }
+    });
+    return result2;
+  }
+  var SPAN_CLOSE = "</span>";
+  var emitsWrappingTags = (node5) => {
+    return !!node5.kind;
+  };
+  var HTMLRenderer = class {
+    constructor(parseTree, options) {
+      this.buffer = "";
+      this.classPrefix = options.classPrefix;
+      parseTree.walk(this);
+    }
+    addText(text4) {
+      this.buffer += escapeHTML(text4);
+    }
+    openNode(node5) {
+      if (!emitsWrappingTags(node5))
+        return;
+      let className = node5.kind;
+      if (!node5.sublanguage) {
+        className = `${this.classPrefix}${className}`;
+      }
+      this.span(className);
+    }
+    closeNode(node5) {
+      if (!emitsWrappingTags(node5))
+        return;
+      this.buffer += SPAN_CLOSE;
+    }
+    value() {
+      return this.buffer;
+    }
+    span(className) {
+      this.buffer += `<span class="${className}">`;
+    }
+  };
+  var TokenTree = class {
+    constructor() {
+      this.rootNode = { children: [] };
+      this.stack = [this.rootNode];
+    }
+    get top() {
+      return this.stack[this.stack.length - 1];
+    }
+    get root() {
+      return this.rootNode;
+    }
+    add(node5) {
+      this.top.children.push(node5);
+    }
+    openNode(kind) {
+      const node5 = { kind, children: [] };
+      this.add(node5);
+      this.stack.push(node5);
+    }
+    closeNode() {
+      if (this.stack.length > 1) {
+        return this.stack.pop();
+      }
+      return void 0;
+    }
+    closeAllNodes() {
+      while (this.closeNode())
+        ;
+    }
+    toJSON() {
+      return JSON.stringify(this.rootNode, null, 4);
+    }
+    walk(builder) {
+      return this.constructor._walk(builder, this.rootNode);
+    }
+    static _walk(builder, node5) {
+      if (typeof node5 === "string") {
+        builder.addText(node5);
+      } else if (node5.children) {
+        builder.openNode(node5);
+        node5.children.forEach((child5) => this._walk(builder, child5));
+        builder.closeNode(node5);
+      }
+      return builder;
+    }
+    static _collapse(node5) {
+      if (typeof node5 === "string")
+        return;
+      if (!node5.children)
+        return;
+      if (node5.children.every((el) => typeof el === "string")) {
+        node5.children = [node5.children.join("")];
+      } else {
+        node5.children.forEach((child5) => {
+          TokenTree._collapse(child5);
+        });
+      }
+    }
+  };
+  var TokenTreeEmitter = class extends TokenTree {
+    constructor(options) {
+      super();
+      this.options = options;
+    }
+    addKeyword(text4, kind) {
+      if (text4 === "") {
+        return;
+      }
+      this.openNode(kind);
+      this.addText(text4);
+      this.closeNode();
+    }
+    addText(text4) {
+      if (text4 === "") {
+        return;
+      }
+      this.add(text4);
+    }
+    addSublanguage(emitter, name) {
+      const node5 = emitter.root;
+      node5.kind = name;
+      node5.sublanguage = true;
+      this.add(node5);
+    }
+    toHTML() {
+      const renderer = new HTMLRenderer(this, this.options);
+      return renderer.value();
+    }
+    finalize() {
+      return true;
+    }
+  };
+  function escape(value) {
+    return new RegExp(value.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&"), "m");
+  }
+  function source(re) {
+    if (!re)
+      return null;
+    if (typeof re === "string")
+      return re;
+    return re.source;
+  }
+  function concat(...args) {
+    const joined = args.map((x) => source(x)).join("");
+    return joined;
+  }
+  function either(...args) {
+    const joined = "(" + args.map((x) => source(x)).join("|") + ")";
+    return joined;
+  }
+  function countMatchGroups(re) {
+    return new RegExp(re.toString() + "|").exec("").length - 1;
+  }
+  function startsWith(re, lexeme) {
+    const match = re && re.exec(lexeme);
+    return match && match.index === 0;
+  }
+  var BACKREF_RE = /\[(?:[^\\\]]|\\.)*\]|\(\??|\\([1-9][0-9]*)|\\./;
+  function join(regexps, separator = "|") {
+    let numCaptures = 0;
+    return regexps.map((regex) => {
+      numCaptures += 1;
+      const offset4 = numCaptures;
+      let re = source(regex);
+      let out = "";
+      while (re.length > 0) {
+        const match = BACKREF_RE.exec(re);
+        if (!match) {
+          out += re;
+          break;
+        }
+        out += re.substring(0, match.index);
+        re = re.substring(match.index + match[0].length);
+        if (match[0][0] === "\\" && match[1]) {
+          out += "\\" + String(Number(match[1]) + offset4);
+        } else {
+          out += match[0];
+          if (match[0] === "(") {
+            numCaptures++;
+          }
+        }
+      }
+      return out;
+    }).map((re) => `(${re})`).join(separator);
+  }
+  var MATCH_NOTHING_RE = /\b\B/;
+  var IDENT_RE = "[a-zA-Z]\\w*";
+  var UNDERSCORE_IDENT_RE = "[a-zA-Z_]\\w*";
+  var NUMBER_RE = "\\b\\d+(\\.\\d+)?";
+  var C_NUMBER_RE = "(-?)(\\b0[xX][a-fA-F0-9]+|(\\b\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";
+  var BINARY_NUMBER_RE = "\\b(0b[01]+)";
+  var RE_STARTERS_RE = "!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|-|-=|/=|/|:|;|<<|<<=|<=|<|===|==|=|>>>=|>>=|>=|>>>|>>|>|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";
+  var SHEBANG = (opts = {}) => {
+    const beginShebang = /^#![ ]*\//;
+    if (opts.binary) {
+      opts.begin = concat(beginShebang, /.*\b/, opts.binary, /\b.*/);
+    }
+    return inherit({
+      className: "meta",
+      begin: beginShebang,
+      end: /$/,
+      relevance: 0,
+      "on:begin": (m, resp) => {
+        if (m.index !== 0)
+          resp.ignoreMatch();
+      }
+    }, opts);
+  };
+  var BACKSLASH_ESCAPE = {
+    begin: "\\\\[\\s\\S]",
+    relevance: 0
+  };
+  var APOS_STRING_MODE = {
+    className: "string",
+    begin: "'",
+    end: "'",
+    illegal: "\\n",
+    contains: [BACKSLASH_ESCAPE]
+  };
+  var QUOTE_STRING_MODE = {
+    className: "string",
+    begin: '"',
+    end: '"',
+    illegal: "\\n",
+    contains: [BACKSLASH_ESCAPE]
+  };
+  var PHRASAL_WORDS_MODE = {
+    begin: /\b(a|an|the|are|I'm|isn't|don't|doesn't|won't|but|just|should|pretty|simply|enough|gonna|going|wtf|so|such|will|you|your|they|like|more)\b/
+  };
+  var COMMENT = function(begin, end4, modeOptions = {}) {
+    const mode = inherit({
+      className: "comment",
+      begin,
+      end: end4,
+      contains: []
+    }, modeOptions);
+    mode.contains.push(PHRASAL_WORDS_MODE);
+    mode.contains.push({
+      className: "doctag",
+      begin: "(?:TODO|FIXME|NOTE|BUG|OPTIMIZE|HACK|XXX):",
+      relevance: 0
+    });
+    return mode;
+  };
+  var C_LINE_COMMENT_MODE = COMMENT("//", "$");
+  var C_BLOCK_COMMENT_MODE = COMMENT("/\\*", "\\*/");
+  var HASH_COMMENT_MODE = COMMENT("#", "$");
+  var NUMBER_MODE = {
+    className: "number",
+    begin: NUMBER_RE,
+    relevance: 0
+  };
+  var C_NUMBER_MODE = {
+    className: "number",
+    begin: C_NUMBER_RE,
+    relevance: 0
+  };
+  var BINARY_NUMBER_MODE = {
+    className: "number",
+    begin: BINARY_NUMBER_RE,
+    relevance: 0
+  };
+  var CSS_NUMBER_MODE = {
+    className: "number",
+    begin: NUMBER_RE + "(%|em|ex|ch|rem|vw|vh|vmin|vmax|cm|mm|in|pt|pc|px|deg|grad|rad|turn|s|ms|Hz|kHz|dpi|dpcm|dppx)?",
+    relevance: 0
+  };
+  var REGEXP_MODE = {
+    begin: /(?=\/[^/\n]*\/)/,
+    contains: [{
+      className: "regexp",
+      begin: /\//,
+      end: /\/[gimuy]*/,
+      illegal: /\n/,
+      contains: [
+        BACKSLASH_ESCAPE,
+        {
+          begin: /\[/,
+          end: /\]/,
+          relevance: 0,
+          contains: [BACKSLASH_ESCAPE]
+        }
+      ]
+    }]
+  };
+  var TITLE_MODE = {
+    className: "title",
+    begin: IDENT_RE,
+    relevance: 0
+  };
+  var UNDERSCORE_TITLE_MODE = {
+    className: "title",
+    begin: UNDERSCORE_IDENT_RE,
+    relevance: 0
+  };
+  var METHOD_GUARD = {
+    begin: "\\.\\s*" + UNDERSCORE_IDENT_RE,
+    relevance: 0
+  };
+  var END_SAME_AS_BEGIN = function(mode) {
+    return Object.assign(mode, {
+      "on:begin": (m, resp) => {
+        resp.data._beginMatch = m[1];
+      },
+      "on:end": (m, resp) => {
+        if (resp.data._beginMatch !== m[1])
+          resp.ignoreMatch();
+      }
+    });
+  };
+  var MODES = /* @__PURE__ */ Object.freeze({
+    __proto__: null,
+    MATCH_NOTHING_RE,
+    IDENT_RE,
+    UNDERSCORE_IDENT_RE,
+    NUMBER_RE,
+    C_NUMBER_RE,
+    BINARY_NUMBER_RE,
+    RE_STARTERS_RE,
+    SHEBANG,
+    BACKSLASH_ESCAPE,
+    APOS_STRING_MODE,
+    QUOTE_STRING_MODE,
+    PHRASAL_WORDS_MODE,
+    COMMENT,
+    C_LINE_COMMENT_MODE,
+    C_BLOCK_COMMENT_MODE,
+    HASH_COMMENT_MODE,
+    NUMBER_MODE,
+    C_NUMBER_MODE,
+    BINARY_NUMBER_MODE,
+    CSS_NUMBER_MODE,
+    REGEXP_MODE,
+    TITLE_MODE,
+    UNDERSCORE_TITLE_MODE,
+    METHOD_GUARD,
+    END_SAME_AS_BEGIN
+  });
+  function skipIfhasPrecedingDot(match, response) {
+    const before3 = match.input[match.index - 1];
+    if (before3 === ".") {
+      response.ignoreMatch();
+    }
+  }
+  function beginKeywords(mode, parent) {
+    if (!parent)
+      return;
+    if (!mode.beginKeywords)
+      return;
+    mode.begin = "\\b(" + mode.beginKeywords.split(" ").join("|") + ")(?!\\.)(?=\\b|\\s)";
+    mode.__beforeBegin = skipIfhasPrecedingDot;
+    mode.keywords = mode.keywords || mode.beginKeywords;
+    delete mode.beginKeywords;
+    if (mode.relevance === void 0)
+      mode.relevance = 0;
+  }
+  function compileIllegal(mode, _parent) {
+    if (!Array.isArray(mode.illegal))
+      return;
+    mode.illegal = either(...mode.illegal);
+  }
+  function compileMatch(mode, _parent) {
+    if (!mode.match)
+      return;
+    if (mode.begin || mode.end)
+      throw new Error("begin & end are not supported with match");
+    mode.begin = mode.match;
+    delete mode.match;
+  }
+  function compileRelevance(mode, _parent) {
+    if (mode.relevance === void 0)
+      mode.relevance = 1;
+  }
+  var COMMON_KEYWORDS = [
+    "of",
+    "and",
+    "for",
+    "in",
+    "not",
+    "or",
+    "if",
+    "then",
+    "parent",
+    "list",
+    "value"
+  ];
+  var DEFAULT_KEYWORD_CLASSNAME = "keyword";
+  function compileKeywords(rawKeywords, caseInsensitive, className = DEFAULT_KEYWORD_CLASSNAME) {
+    const compiledKeywords = {};
+    if (typeof rawKeywords === "string") {
+      compileList(className, rawKeywords.split(" "));
+    } else if (Array.isArray(rawKeywords)) {
+      compileList(className, rawKeywords);
+    } else {
+      Object.keys(rawKeywords).forEach(function(className2) {
+        Object.assign(compiledKeywords, compileKeywords(rawKeywords[className2], caseInsensitive, className2));
+      });
+    }
+    return compiledKeywords;
+    function compileList(className2, keywordList) {
+      if (caseInsensitive) {
+        keywordList = keywordList.map((x) => x.toLowerCase());
+      }
+      keywordList.forEach(function(keyword) {
+        const pair = keyword.split("|");
+        compiledKeywords[pair[0]] = [className2, scoreForKeyword(pair[0], pair[1])];
+      });
+    }
+  }
+  function scoreForKeyword(keyword, providedScore) {
+    if (providedScore) {
+      return Number(providedScore);
+    }
+    return commonKeyword(keyword) ? 0 : 1;
+  }
+  function commonKeyword(keyword) {
+    return COMMON_KEYWORDS.includes(keyword.toLowerCase());
+  }
+  function compileLanguage(language, { plugins }) {
+    function langRe(value, global2) {
+      return new RegExp(source(value), "m" + (language.case_insensitive ? "i" : "") + (global2 ? "g" : ""));
+    }
+    class MultiRegex {
+      constructor() {
+        this.matchIndexes = {};
+        this.regexes = [];
+        this.matchAt = 1;
+        this.position = 0;
+      }
+      addRule(re, opts) {
+        opts.position = this.position++;
+        this.matchIndexes[this.matchAt] = opts;
+        this.regexes.push([opts, re]);
+        this.matchAt += countMatchGroups(re) + 1;
+      }
+      compile() {
+        if (this.regexes.length === 0) {
+          this.exec = () => null;
+        }
+        const terminators = this.regexes.map((el) => el[1]);
+        this.matcherRe = langRe(join(terminators), true);
+        this.lastIndex = 0;
+      }
+      exec(s) {
+        this.matcherRe.lastIndex = this.lastIndex;
+        const match = this.matcherRe.exec(s);
+        if (!match) {
+          return null;
+        }
+        const i = match.findIndex((el, i2) => i2 > 0 && el !== void 0);
+        const matchData = this.matchIndexes[i];
+        match.splice(0, i);
+        return Object.assign(match, matchData);
+      }
+    }
+    class ResumableMultiRegex {
+      constructor() {
+        this.rules = [];
+        this.multiRegexes = [];
+        this.count = 0;
+        this.lastIndex = 0;
+        this.regexIndex = 0;
+      }
+      getMatcher(index3) {
+        if (this.multiRegexes[index3])
+          return this.multiRegexes[index3];
+        const matcher = new MultiRegex();
+        this.rules.slice(index3).forEach(([re, opts]) => matcher.addRule(re, opts));
+        matcher.compile();
+        this.multiRegexes[index3] = matcher;
+        return matcher;
+      }
+      resumingScanAtSamePosition() {
+        return this.regexIndex !== 0;
+      }
+      considerAll() {
+        this.regexIndex = 0;
+      }
+      addRule(re, opts) {
+        this.rules.push([re, opts]);
+        if (opts.type === "begin")
+          this.count++;
+      }
+      exec(s) {
+        const m = this.getMatcher(this.regexIndex);
+        m.lastIndex = this.lastIndex;
+        let result2 = m.exec(s);
+        if (this.resumingScanAtSamePosition()) {
+          if (result2 && result2.index === this.lastIndex)
+            ;
+          else {
+            const m2 = this.getMatcher(0);
+            m2.lastIndex = this.lastIndex + 1;
+            result2 = m2.exec(s);
+          }
+        }
+        if (result2) {
+          this.regexIndex += result2.position + 1;
+          if (this.regexIndex === this.count) {
+            this.considerAll();
+          }
+        }
+        return result2;
+      }
+    }
+    function buildModeRegex(mode) {
+      const mm = new ResumableMultiRegex();
+      mode.contains.forEach((term) => mm.addRule(term.begin, { rule: term, type: "begin" }));
+      if (mode.terminatorEnd) {
+        mm.addRule(mode.terminatorEnd, { type: "end" });
+      }
+      if (mode.illegal) {
+        mm.addRule(mode.illegal, { type: "illegal" });
+      }
+      return mm;
+    }
+    function compileMode(mode, parent) {
+      const cmode = mode;
+      if (mode.isCompiled)
+        return cmode;
+      [
+        compileMatch
+      ].forEach((ext) => ext(mode, parent));
+      language.compilerExtensions.forEach((ext) => ext(mode, parent));
+      mode.__beforeBegin = null;
+      [
+        beginKeywords,
+        compileIllegal,
+        compileRelevance
+      ].forEach((ext) => ext(mode, parent));
+      mode.isCompiled = true;
+      let keywordPattern = null;
+      if (typeof mode.keywords === "object") {
+        keywordPattern = mode.keywords.$pattern;
+        delete mode.keywords.$pattern;
+      }
+      if (mode.keywords) {
+        mode.keywords = compileKeywords(mode.keywords, language.case_insensitive);
+      }
+      if (mode.lexemes && keywordPattern) {
+        throw new Error("ERR: Prefer `keywords.$pattern` to `mode.lexemes`, BOTH are not allowed. (see mode reference) ");
+      }
+      keywordPattern = keywordPattern || mode.lexemes || /\w+/;
+      cmode.keywordPatternRe = langRe(keywordPattern, true);
+      if (parent) {
+        if (!mode.begin)
+          mode.begin = /\B|\b/;
+        cmode.beginRe = langRe(mode.begin);
+        if (mode.endSameAsBegin)
+          mode.end = mode.begin;
+        if (!mode.end && !mode.endsWithParent)
+          mode.end = /\B|\b/;
+        if (mode.end)
+          cmode.endRe = langRe(mode.end);
+        cmode.terminatorEnd = source(mode.end) || "";
+        if (mode.endsWithParent && parent.terminatorEnd) {
+          cmode.terminatorEnd += (mode.end ? "|" : "") + parent.terminatorEnd;
+        }
+      }
+      if (mode.illegal)
+        cmode.illegalRe = langRe(mode.illegal);
+      if (!mode.contains)
+        mode.contains = [];
+      mode.contains = [].concat(...mode.contains.map(function(c) {
+        return expandOrCloneMode(c === "self" ? mode : c);
+      }));
+      mode.contains.forEach(function(c) {
+        compileMode(c, cmode);
+      });
+      if (mode.starts) {
+        compileMode(mode.starts, parent);
+      }
+      cmode.matcher = buildModeRegex(cmode);
+      return cmode;
+    }
+    if (!language.compilerExtensions)
+      language.compilerExtensions = [];
+    if (language.contains && language.contains.includes("self")) {
+      throw new Error("ERR: contains `self` is not supported at the top-level of a language.  See documentation.");
+    }
+    language.classNameAliases = inherit(language.classNameAliases || {});
+    return compileMode(language);
+  }
+  function dependencyOnParent(mode) {
+    if (!mode)
+      return false;
+    return mode.endsWithParent || dependencyOnParent(mode.starts);
+  }
+  function expandOrCloneMode(mode) {
+    if (mode.variants && !mode.cachedVariants) {
+      mode.cachedVariants = mode.variants.map(function(variant) {
+        return inherit(mode, { variants: null }, variant);
+      });
+    }
+    if (mode.cachedVariants) {
+      return mode.cachedVariants;
+    }
+    if (dependencyOnParent(mode)) {
+      return inherit(mode, { starts: mode.starts ? inherit(mode.starts) : null });
+    }
+    if (Object.isFrozen(mode)) {
+      return inherit(mode);
+    }
+    return mode;
+  }
+  var version = "10.7.3";
+  function hasValueOrEmptyAttribute(value) {
+    return Boolean(value || value === "");
+  }
+  function BuildVuePlugin(hljs) {
+    const Component = {
+      props: ["language", "code", "autodetect"],
+      data: function() {
+        return {
+          detectedLanguage: "",
+          unknownLanguage: false
+        };
+      },
+      computed: {
+        className() {
+          if (this.unknownLanguage)
+            return "";
+          return "hljs " + this.detectedLanguage;
+        },
+        highlighted() {
+          if (!this.autoDetect && !hljs.getLanguage(this.language)) {
+            console.warn(`The language "${this.language}" you specified could not be found.`);
+            this.unknownLanguage = true;
+            return escapeHTML(this.code);
+          }
+          let result2 = {};
+          if (this.autoDetect) {
+            result2 = hljs.highlightAuto(this.code);
+            this.detectedLanguage = result2.language;
+          } else {
+            result2 = hljs.highlight(this.language, this.code, this.ignoreIllegals);
+            this.detectedLanguage = this.language;
+          }
+          return result2.value;
+        },
+        autoDetect() {
+          return !this.language || hasValueOrEmptyAttribute(this.autodetect);
+        },
+        ignoreIllegals() {
+          return true;
+        }
+      },
+      render(createElement) {
+        return createElement("pre", {}, [
+          createElement("code", {
+            class: this.className,
+            domProps: { innerHTML: this.highlighted }
+          })
+        ]);
+      }
+    };
+    const VuePlugin = {
+      install(Vue) {
+        Vue.component("highlightjs", Component);
+      }
+    };
+    return { Component, VuePlugin };
+  }
+  var mergeHTMLPlugin = {
+    "after:highlightElement": ({ el, result: result2, text: text4 }) => {
+      const originalStream = nodeStream(el);
+      if (!originalStream.length)
+        return;
+      const resultNode = document.createElement("div");
+      resultNode.innerHTML = result2.value;
+      result2.value = mergeStreams(originalStream, nodeStream(resultNode), text4);
+    }
+  };
+  function tag(node5) {
+    return node5.nodeName.toLowerCase();
+  }
+  function nodeStream(node5) {
+    const result2 = [];
+    (function _nodeStream(node6, offset4) {
+      for (let child5 = node6.firstChild; child5; child5 = child5.nextSibling) {
+        if (child5.nodeType === 3) {
+          offset4 += child5.nodeValue.length;
+        } else if (child5.nodeType === 1) {
+          result2.push({
+            event: "start",
+            offset: offset4,
+            node: child5
+          });
+          offset4 = _nodeStream(child5, offset4);
+          if (!tag(child5).match(/br|hr|img|input/)) {
+            result2.push({
+              event: "stop",
+              offset: offset4,
+              node: child5
+            });
+          }
+        }
+      }
+      return offset4;
+    })(node5, 0);
+    return result2;
+  }
+  function mergeStreams(original, highlighted, value) {
+    let processed = 0;
+    let result2 = "";
+    const nodeStack = [];
+    function selectStream() {
+      if (!original.length || !highlighted.length) {
+        return original.length ? original : highlighted;
+      }
+      if (original[0].offset !== highlighted[0].offset) {
+        return original[0].offset < highlighted[0].offset ? original : highlighted;
+      }
+      return highlighted[0].event === "start" ? original : highlighted;
+    }
+    function open2(node5) {
+      function attributeString(attr) {
+        return " " + attr.nodeName + '="' + escapeHTML(attr.value) + '"';
+      }
+      result2 += "<" + tag(node5) + [].map.call(node5.attributes, attributeString).join("") + ">";
+    }
+    function close6(node5) {
+      result2 += "</" + tag(node5) + ">";
+    }
+    function render2(event) {
+      (event.event === "start" ? open2 : close6)(event.node);
+    }
+    while (original.length || highlighted.length) {
+      let stream = selectStream();
+      result2 += escapeHTML(value.substring(processed, stream[0].offset));
+      processed = stream[0].offset;
+      if (stream === original) {
+        nodeStack.reverse().forEach(close6);
+        do {
+          render2(stream.splice(0, 1)[0]);
+          stream = selectStream();
+        } while (stream === original && stream.length && stream[0].offset === processed);
+        nodeStack.reverse().forEach(open2);
+      } else {
+        if (stream[0].event === "start") {
+          nodeStack.push(stream[0].node);
+        } else {
+          nodeStack.pop();
+        }
+        render2(stream.splice(0, 1)[0]);
+      }
+    }
+    return result2 + escapeHTML(value.substr(processed));
+  }
+  var seenDeprecations = {};
+  var error2 = (message) => {
+    console.error(message);
+  };
+  var warn = (message, ...args) => {
+    console.log(`WARN: ${message}`, ...args);
+  };
+  var deprecated = (version2, message) => {
+    if (seenDeprecations[`${version2}/${message}`])
+      return;
+    console.log(`Deprecated as of ${version2}. ${message}`);
+    seenDeprecations[`${version2}/${message}`] = true;
+  };
+  var escape$1 = escapeHTML;
+  var inherit$1 = inherit;
+  var NO_MATCH = Symbol("nomatch");
+  var HLJS = function(hljs) {
+    const languages = /* @__PURE__ */ Object.create(null);
+    const aliases = /* @__PURE__ */ Object.create(null);
+    const plugins = [];
+    let SAFE_MODE = true;
+    const fixMarkupRe = /(^(<[^>]+>|\t|)+|\n)/gm;
+    const LANGUAGE_NOT_FOUND = "Could not find the language '{}', did you forget to load/include a language module?";
+    const PLAINTEXT_LANGUAGE = { disableAutodetect: true, name: "Plain text", contains: [] };
+    let options = {
+      noHighlightRe: /^(no-?highlight)$/i,
+      languageDetectRe: /\blang(?:uage)?-([\w-]+)\b/i,
+      classPrefix: "hljs-",
+      tabReplace: null,
+      useBR: false,
+      languages: null,
+      __emitter: TokenTreeEmitter
+    };
+    function shouldNotHighlight(languageName) {
+      return options.noHighlightRe.test(languageName);
+    }
+    function blockLanguage(block) {
+      let classes = block.className + " ";
+      classes += block.parentNode ? block.parentNode.className : "";
+      const match = options.languageDetectRe.exec(classes);
+      if (match) {
+        const language = getLanguage(match[1]);
+        if (!language) {
+          warn(LANGUAGE_NOT_FOUND.replace("{}", match[1]));
+          warn("Falling back to no-highlight mode for this block.", block);
+        }
+        return language ? match[1] : "no-highlight";
+      }
+      return classes.split(/\s+/).find((_class) => shouldNotHighlight(_class) || getLanguage(_class));
+    }
+    function highlight2(codeOrlanguageName, optionsOrCode, ignoreIllegals, continuation) {
+      let code = "";
+      let languageName = "";
+      if (typeof optionsOrCode === "object") {
+        code = codeOrlanguageName;
+        ignoreIllegals = optionsOrCode.ignoreIllegals;
+        languageName = optionsOrCode.language;
+        continuation = void 0;
+      } else {
+        deprecated("10.7.0", "highlight(lang, code, ...args) has been deprecated.");
+        deprecated("10.7.0", "Please use highlight(code, options) instead.\nhttps://github.com/highlightjs/highlight.js/issues/2277");
+        languageName = codeOrlanguageName;
+        code = optionsOrCode;
+      }
+      const context = {
+        code,
+        language: languageName
+      };
+      fire("before:highlight", context);
+      const result2 = context.result ? context.result : _highlight(context.language, context.code, ignoreIllegals, continuation);
+      result2.code = context.code;
+      fire("after:highlight", result2);
+      return result2;
+    }
+    function _highlight(languageName, codeToHighlight, ignoreIllegals, continuation) {
+      function keywordData(mode, match) {
+        const matchText = language.case_insensitive ? match[0].toLowerCase() : match[0];
+        return Object.prototype.hasOwnProperty.call(mode.keywords, matchText) && mode.keywords[matchText];
+      }
+      function processKeywords() {
+        if (!top2.keywords) {
+          emitter.addText(modeBuffer);
+          return;
+        }
+        let lastIndex = 0;
+        top2.keywordPatternRe.lastIndex = 0;
+        let match = top2.keywordPatternRe.exec(modeBuffer);
+        let buf = "";
+        while (match) {
+          buf += modeBuffer.substring(lastIndex, match.index);
+          const data = keywordData(top2, match);
+          if (data) {
+            const [kind, keywordRelevance] = data;
+            emitter.addText(buf);
+            buf = "";
+            relevance += keywordRelevance;
+            if (kind.startsWith("_")) {
+              buf += match[0];
+            } else {
+              const cssClass = language.classNameAliases[kind] || kind;
+              emitter.addKeyword(match[0], cssClass);
+            }
+          } else {
+            buf += match[0];
+          }
+          lastIndex = top2.keywordPatternRe.lastIndex;
+          match = top2.keywordPatternRe.exec(modeBuffer);
+        }
+        buf += modeBuffer.substr(lastIndex);
+        emitter.addText(buf);
+      }
+      function processSubLanguage() {
+        if (modeBuffer === "")
+          return;
+        let result3 = null;
+        if (typeof top2.subLanguage === "string") {
+          if (!languages[top2.subLanguage]) {
+            emitter.addText(modeBuffer);
+            return;
+          }
+          result3 = _highlight(top2.subLanguage, modeBuffer, true, continuations[top2.subLanguage]);
+          continuations[top2.subLanguage] = result3.top;
+        } else {
+          result3 = highlightAuto2(modeBuffer, top2.subLanguage.length ? top2.subLanguage : null);
+        }
+        if (top2.relevance > 0) {
+          relevance += result3.relevance;
+        }
+        emitter.addSublanguage(result3.emitter, result3.language);
+      }
+      function processBuffer() {
+        if (top2.subLanguage != null) {
+          processSubLanguage();
+        } else {
+          processKeywords();
+        }
+        modeBuffer = "";
+      }
+      function startNewMode(mode) {
+        if (mode.className) {
+          emitter.openNode(language.classNameAliases[mode.className] || mode.className);
+        }
+        top2 = Object.create(mode, { parent: { value: top2 } });
+        return top2;
+      }
+      function endOfMode(mode, match, matchPlusRemainder) {
+        let matched = startsWith(mode.endRe, matchPlusRemainder);
+        if (matched) {
+          if (mode["on:end"]) {
+            const resp = new Response(mode);
+            mode["on:end"](match, resp);
+            if (resp.isMatchIgnored)
+              matched = false;
+          }
+          if (matched) {
+            while (mode.endsParent && mode.parent) {
+              mode = mode.parent;
+            }
+            return mode;
+          }
+        }
+        if (mode.endsWithParent) {
+          return endOfMode(mode.parent, match, matchPlusRemainder);
+        }
+      }
+      function doIgnore(lexeme) {
+        if (top2.matcher.regexIndex === 0) {
+          modeBuffer += lexeme[0];
+          return 1;
+        } else {
+          resumeScanAtSamePosition = true;
+          return 0;
+        }
+      }
+      function doBeginMatch(match) {
+        const lexeme = match[0];
+        const newMode = match.rule;
+        const resp = new Response(newMode);
+        const beforeCallbacks = [newMode.__beforeBegin, newMode["on:begin"]];
+        for (const cb of beforeCallbacks) {
+          if (!cb)
+            continue;
+          cb(match, resp);
+          if (resp.isMatchIgnored)
+            return doIgnore(lexeme);
+        }
+        if (newMode && newMode.endSameAsBegin) {
+          newMode.endRe = escape(lexeme);
+        }
+        if (newMode.skip) {
+          modeBuffer += lexeme;
+        } else {
+          if (newMode.excludeBegin) {
+            modeBuffer += lexeme;
+          }
+          processBuffer();
+          if (!newMode.returnBegin && !newMode.excludeBegin) {
+            modeBuffer = lexeme;
+          }
+        }
+        startNewMode(newMode);
+        return newMode.returnBegin ? 0 : lexeme.length;
+      }
+      function doEndMatch(match) {
+        const lexeme = match[0];
+        const matchPlusRemainder = codeToHighlight.substr(match.index);
+        const endMode = endOfMode(top2, match, matchPlusRemainder);
+        if (!endMode) {
+          return NO_MATCH;
+        }
+        const origin = top2;
+        if (origin.skip) {
+          modeBuffer += lexeme;
+        } else {
+          if (!(origin.returnEnd || origin.excludeEnd)) {
+            modeBuffer += lexeme;
+          }
+          processBuffer();
+          if (origin.excludeEnd) {
+            modeBuffer = lexeme;
+          }
+        }
+        do {
+          if (top2.className) {
+            emitter.closeNode();
+          }
+          if (!top2.skip && !top2.subLanguage) {
+            relevance += top2.relevance;
+          }
+          top2 = top2.parent;
+        } while (top2 !== endMode.parent);
+        if (endMode.starts) {
+          if (endMode.endSameAsBegin) {
+            endMode.starts.endRe = endMode.endRe;
+          }
+          startNewMode(endMode.starts);
+        }
+        return origin.returnEnd ? 0 : lexeme.length;
+      }
+      function processContinuations() {
+        const list = [];
+        for (let current = top2; current !== language; current = current.parent) {
+          if (current.className) {
+            list.unshift(current.className);
+          }
+        }
+        list.forEach((item) => emitter.openNode(item));
+      }
+      let lastMatch = {};
+      function processLexeme(textBeforeMatch, match) {
+        const lexeme = match && match[0];
+        modeBuffer += textBeforeMatch;
+        if (lexeme == null) {
+          processBuffer();
+          return 0;
+        }
+        if (lastMatch.type === "begin" && match.type === "end" && lastMatch.index === match.index && lexeme === "") {
+          modeBuffer += codeToHighlight.slice(match.index, match.index + 1);
+          if (!SAFE_MODE) {
+            const err3 = new Error("0 width match regex");
+            err3.languageName = languageName;
+            err3.badRule = lastMatch.rule;
+            throw err3;
+          }
+          return 1;
+        }
+        lastMatch = match;
+        if (match.type === "begin") {
+          return doBeginMatch(match);
+        } else if (match.type === "illegal" && !ignoreIllegals) {
+          const err3 = new Error('Illegal lexeme "' + lexeme + '" for mode "' + (top2.className || "<unnamed>") + '"');
+          err3.mode = top2;
+          throw err3;
+        } else if (match.type === "end") {
+          const processed = doEndMatch(match);
+          if (processed !== NO_MATCH) {
+            return processed;
+          }
+        }
+        if (match.type === "illegal" && lexeme === "") {
+          return 1;
+        }
+        if (iterations > 1e5 && iterations > match.index * 3) {
+          const err3 = new Error("potential infinite loop, way more iterations than matches");
+          throw err3;
+        }
+        modeBuffer += lexeme;
+        return lexeme.length;
+      }
+      const language = getLanguage(languageName);
+      if (!language) {
+        error2(LANGUAGE_NOT_FOUND.replace("{}", languageName));
+        throw new Error('Unknown language: "' + languageName + '"');
+      }
+      const md = compileLanguage(language, { plugins });
+      let result2 = "";
+      let top2 = continuation || md;
+      const continuations = {};
+      const emitter = new options.__emitter(options);
+      processContinuations();
+      let modeBuffer = "";
+      let relevance = 0;
+      let index3 = 0;
+      let iterations = 0;
+      let resumeScanAtSamePosition = false;
+      try {
+        top2.matcher.considerAll();
+        for (; ; ) {
+          iterations++;
+          if (resumeScanAtSamePosition) {
+            resumeScanAtSamePosition = false;
+          } else {
+            top2.matcher.considerAll();
+          }
+          top2.matcher.lastIndex = index3;
+          const match = top2.matcher.exec(codeToHighlight);
+          if (!match)
+            break;
+          const beforeMatch = codeToHighlight.substring(index3, match.index);
+          const processedCount = processLexeme(beforeMatch, match);
+          index3 = match.index + processedCount;
+        }
+        processLexeme(codeToHighlight.substr(index3));
+        emitter.closeAllNodes();
+        emitter.finalize();
+        result2 = emitter.toHTML();
+        return {
+          relevance: Math.floor(relevance),
+          value: result2,
+          language: languageName,
+          illegal: false,
+          emitter,
+          top: top2
+        };
+      } catch (err3) {
+        if (err3.message && err3.message.includes("Illegal")) {
+          return {
+            illegal: true,
+            illegalBy: {
+              msg: err3.message,
+              context: codeToHighlight.slice(index3 - 100, index3 + 100),
+              mode: err3.mode
+            },
+            sofar: result2,
+            relevance: 0,
+            value: escape$1(codeToHighlight),
+            emitter
+          };
+        } else if (SAFE_MODE) {
+          return {
+            illegal: false,
+            relevance: 0,
+            value: escape$1(codeToHighlight),
+            emitter,
+            language: languageName,
+            top: top2,
+            errorRaised: err3
+          };
+        } else {
+          throw err3;
+        }
+      }
+    }
+    function justTextHighlightResult(code) {
+      const result2 = {
+        relevance: 0,
+        emitter: new options.__emitter(options),
+        value: escape$1(code),
+        illegal: false,
+        top: PLAINTEXT_LANGUAGE
+      };
+      result2.emitter.addText(code);
+      return result2;
+    }
+    function highlightAuto2(code, languageSubset) {
+      languageSubset = languageSubset || options.languages || Object.keys(languages);
+      const plaintext = justTextHighlightResult(code);
+      const results = languageSubset.filter(getLanguage).filter(autoDetection).map((name) => _highlight(name, code, false));
+      results.unshift(plaintext);
+      const sorted = results.sort((a, b) => {
+        if (a.relevance !== b.relevance)
+          return b.relevance - a.relevance;
+        if (a.language && b.language) {
+          if (getLanguage(a.language).supersetOf === b.language) {
+            return 1;
+          } else if (getLanguage(b.language).supersetOf === a.language) {
+            return -1;
+          }
+        }
+        return 0;
+      });
+      const [best, secondBest] = sorted;
+      const result2 = best;
+      result2.second_best = secondBest;
+      return result2;
+    }
+    function fixMarkup(html) {
+      if (!(options.tabReplace || options.useBR)) {
+        return html;
+      }
+      return html.replace(fixMarkupRe, (match) => {
+        if (match === "\n") {
+          return options.useBR ? "<br>" : match;
+        } else if (options.tabReplace) {
+          return match.replace(/\t/g, options.tabReplace);
+        }
+        return match;
+      });
+    }
+    function updateClassName(element, currentLang, resultLang) {
+      const language = currentLang ? aliases[currentLang] : resultLang;
+      element.classList.add("hljs");
+      if (language)
+        element.classList.add(language);
+    }
+    const brPlugin = {
+      "before:highlightElement": ({ el }) => {
+        if (options.useBR) {
+          el.innerHTML = el.innerHTML.replace(/\n/g, "").replace(/<br[ /]*>/g, "\n");
+        }
+      },
+      "after:highlightElement": ({ result: result2 }) => {
+        if (options.useBR) {
+          result2.value = result2.value.replace(/\n/g, "<br>");
+        }
+      }
+    };
+    const TAB_REPLACE_RE = /^(<[^>]+>|\t)+/gm;
+    const tabReplacePlugin = {
+      "after:highlightElement": ({ result: result2 }) => {
+        if (options.tabReplace) {
+          result2.value = result2.value.replace(TAB_REPLACE_RE, (m) => m.replace(/\t/g, options.tabReplace));
+        }
+      }
+    };
+    function highlightElement(element) {
+      let node5 = null;
+      const language = blockLanguage(element);
+      if (shouldNotHighlight(language))
+        return;
+      fire("before:highlightElement", { el: element, language });
+      node5 = element;
+      const text4 = node5.textContent;
+      const result2 = language ? highlight2(text4, { language, ignoreIllegals: true }) : highlightAuto2(text4);
+      fire("after:highlightElement", { el: element, result: result2, text: text4 });
+      element.innerHTML = result2.value;
+      updateClassName(element, language, result2.language);
+      element.result = {
+        language: result2.language,
+        re: result2.relevance,
+        relavance: result2.relevance
+      };
+      if (result2.second_best) {
+        element.second_best = {
+          language: result2.second_best.language,
+          re: result2.second_best.relevance,
+          relavance: result2.second_best.relevance
+        };
+      }
+    }
+    function configure(userOptions) {
+      if (userOptions.useBR) {
+        deprecated("10.3.0", "'useBR' will be removed entirely in v11.0");
+        deprecated("10.3.0", "Please see https://github.com/highlightjs/highlight.js/issues/2559");
+      }
+      options = inherit$1(options, userOptions);
+    }
+    const initHighlighting = () => {
+      if (initHighlighting.called)
+        return;
+      initHighlighting.called = true;
+      deprecated("10.6.0", "initHighlighting() is deprecated.  Use highlightAll() instead.");
+      const blocks = document.querySelectorAll("pre code");
+      blocks.forEach(highlightElement);
+    };
+    function initHighlightingOnLoad() {
+      deprecated("10.6.0", "initHighlightingOnLoad() is deprecated.  Use highlightAll() instead.");
+      wantsHighlight = true;
+    }
+    let wantsHighlight = false;
+    function highlightAll() {
+      if (document.readyState === "loading") {
+        wantsHighlight = true;
+        return;
+      }
+      const blocks = document.querySelectorAll("pre code");
+      blocks.forEach(highlightElement);
+    }
+    function boot() {
+      if (wantsHighlight)
+        highlightAll();
+    }
+    if (typeof window !== "undefined" && window.addEventListener) {
+      window.addEventListener("DOMContentLoaded", boot, false);
+    }
+    function registerLanguage2(languageName, languageDefinition) {
+      let lang = null;
+      try {
+        lang = languageDefinition(hljs);
+      } catch (error$1) {
+        error2("Language definition for '{}' could not be registered.".replace("{}", languageName));
+        if (!SAFE_MODE) {
+          throw error$1;
+        } else {
+          error2(error$1);
+        }
+        lang = PLAINTEXT_LANGUAGE;
+      }
+      if (!lang.name)
+        lang.name = languageName;
+      languages[languageName] = lang;
+      lang.rawDefinition = languageDefinition.bind(null, hljs);
+      if (lang.aliases) {
+        registerAliases(lang.aliases, { languageName });
+      }
+    }
+    function unregisterLanguage(languageName) {
+      delete languages[languageName];
+      for (const alias of Object.keys(aliases)) {
+        if (aliases[alias] === languageName) {
+          delete aliases[alias];
+        }
+      }
+    }
+    function listLanguages2() {
+      return Object.keys(languages);
+    }
+    function requireLanguage(name) {
+      deprecated("10.4.0", "requireLanguage will be removed entirely in v11.");
+      deprecated("10.4.0", "Please see https://github.com/highlightjs/highlight.js/pull/2844");
+      const lang = getLanguage(name);
+      if (lang) {
+        return lang;
+      }
+      const err3 = new Error("The '{}' language is required, but not loaded.".replace("{}", name));
+      throw err3;
+    }
+    function getLanguage(name) {
+      name = (name || "").toLowerCase();
+      return languages[name] || languages[aliases[name]];
+    }
+    function registerAliases(aliasList, { languageName }) {
+      if (typeof aliasList === "string") {
+        aliasList = [aliasList];
+      }
+      aliasList.forEach((alias) => {
+        aliases[alias.toLowerCase()] = languageName;
+      });
+    }
+    function autoDetection(name) {
+      const lang = getLanguage(name);
+      return lang && !lang.disableAutodetect;
+    }
+    function upgradePluginAPI(plugin) {
+      if (plugin["before:highlightBlock"] && !plugin["before:highlightElement"]) {
+        plugin["before:highlightElement"] = (data) => {
+          plugin["before:highlightBlock"](Object.assign({ block: data.el }, data));
+        };
+      }
+      if (plugin["after:highlightBlock"] && !plugin["after:highlightElement"]) {
+        plugin["after:highlightElement"] = (data) => {
+          plugin["after:highlightBlock"](Object.assign({ block: data.el }, data));
+        };
+      }
+    }
+    function addPlugin(plugin) {
+      upgradePluginAPI(plugin);
+      plugins.push(plugin);
+    }
+    function fire(event, args) {
+      const cb = event;
+      plugins.forEach(function(plugin) {
+        if (plugin[cb]) {
+          plugin[cb](args);
+        }
+      });
+    }
+    function deprecateFixMarkup(arg) {
+      deprecated("10.2.0", "fixMarkup will be removed entirely in v11.0");
+      deprecated("10.2.0", "Please see https://github.com/highlightjs/highlight.js/issues/2534");
+      return fixMarkup(arg);
+    }
+    function deprecateHighlightBlock(el) {
+      deprecated("10.7.0", "highlightBlock will be removed entirely in v12.0");
+      deprecated("10.7.0", "Please use highlightElement now.");
+      return highlightElement(el);
+    }
+    Object.assign(hljs, {
+      highlight: highlight2,
+      highlightAuto: highlightAuto2,
+      highlightAll,
+      fixMarkup: deprecateFixMarkup,
+      highlightElement,
+      highlightBlock: deprecateHighlightBlock,
+      configure,
+      initHighlighting,
+      initHighlightingOnLoad,
+      registerLanguage: registerLanguage2,
+      unregisterLanguage,
+      listLanguages: listLanguages2,
+      getLanguage,
+      registerAliases,
+      requireLanguage,
+      autoDetection,
+      inherit: inherit$1,
+      addPlugin,
+      vuePlugin: BuildVuePlugin(hljs).VuePlugin
+    });
+    hljs.debugMode = function() {
+      SAFE_MODE = false;
+    };
+    hljs.safeMode = function() {
+      SAFE_MODE = true;
+    };
+    hljs.versionString = version;
+    for (const key2 in MODES) {
+      if (typeof MODES[key2] === "object") {
+        deepFreezeEs6(MODES[key2]);
+      }
+    }
+    Object.assign(hljs, MODES);
+    hljs.addPlugin(brPlugin);
+    hljs.addPlugin(mergeHTMLPlugin);
+    hljs.addPlugin(tabReplacePlugin);
+    return hljs;
+  };
+  var highlight$1 = HLJS({});
+  var core = highlight$1;
+  var format2 = { exports: {} };
+  (function(module2) {
+    (function() {
+      var namespace;
+      {
+        namespace = module2.exports = format3;
+      }
+      namespace.format = format3;
+      namespace.vsprintf = vsprintf;
+      if (typeof console !== "undefined" && typeof console.log === "function") {
+        namespace.printf = printf;
+      }
+      function printf() {
+        console.log(format3.apply(null, arguments));
+      }
+      function vsprintf(fmt, replacements) {
+        return format3.apply(null, [fmt].concat(replacements));
+      }
+      function format3(fmt) {
+        var argIndex = 1, args = [].slice.call(arguments), i = 0, n = fmt.length, result2 = "", c, escaped = false, arg, tmp, leadingZero = false, precision, nextArg = function() {
+          return args[argIndex++];
+        }, slurpNumber = function() {
+          var digits = "";
+          while (/\d/.test(fmt[i])) {
+            digits += fmt[i++];
+            c = fmt[i];
+          }
+          return digits.length > 0 ? parseInt(digits) : null;
+        };
+        for (; i < n; ++i) {
+          c = fmt[i];
+          if (escaped) {
+            escaped = false;
+            if (c == ".") {
+              leadingZero = false;
+              c = fmt[++i];
+            } else if (c == "0" && fmt[i + 1] == ".") {
+              leadingZero = true;
+              i += 2;
+              c = fmt[i];
+            } else {
+              leadingZero = true;
+            }
+            precision = slurpNumber();
+            switch (c) {
+              case "b":
+                result2 += parseInt(nextArg(), 10).toString(2);
+                break;
+              case "c":
+                arg = nextArg();
+                if (typeof arg === "string" || arg instanceof String)
+                  result2 += arg;
+                else
+                  result2 += String.fromCharCode(parseInt(arg, 10));
+                break;
+              case "d":
+                result2 += parseInt(nextArg(), 10);
+                break;
+              case "f":
+                tmp = String(parseFloat(nextArg()).toFixed(precision || 6));
+                result2 += leadingZero ? tmp : tmp.replace(/^0/, "");
+                break;
+              case "j":
+                result2 += JSON.stringify(nextArg());
+                break;
+              case "o":
+                result2 += "0" + parseInt(nextArg(), 10).toString(8);
+                break;
+              case "s":
+                result2 += nextArg();
+                break;
+              case "x":
+                result2 += "0x" + parseInt(nextArg(), 10).toString(16);
+                break;
+              case "X":
+                result2 += "0x" + parseInt(nextArg(), 10).toString(16).toUpperCase();
+                break;
+              default:
+                result2 += c;
+                break;
+            }
+          } else if (c === "%") {
+            escaped = true;
+          } else {
+            result2 += c;
+          }
+        }
+        return result2;
+      }
+    })();
+  })(format2);
+  var formatter = format2.exports;
+  var fault$1 = create8(Error);
+  var fault_1 = fault$1;
+  fault$1.eval = create8(EvalError);
+  fault$1.range = create8(RangeError);
+  fault$1.reference = create8(ReferenceError);
+  fault$1.syntax = create8(SyntaxError);
+  fault$1.type = create8(TypeError);
+  fault$1.uri = create8(URIError);
+  fault$1.create = create8;
+  function create8(EConstructor) {
+    FormattedError.displayName = EConstructor.displayName || EConstructor.name;
+    return FormattedError;
+    function FormattedError(format3) {
+      if (format3) {
+        format3 = formatter.apply(null, arguments);
+      }
+      return new EConstructor(format3);
+    }
+  }
+  var high = core;
+  var fault = fault_1;
+  core$1.highlight = highlight;
+  core$1.highlightAuto = highlightAuto;
+  core$1.registerLanguage = registerLanguage;
+  core$1.listLanguages = listLanguages;
+  core$1.registerAlias = registerAlias;
+  Emitter.prototype.addText = text3;
+  Emitter.prototype.addKeyword = addKeyword;
+  Emitter.prototype.addSublanguage = addSublanguage;
+  Emitter.prototype.openNode = open;
+  Emitter.prototype.closeNode = close5;
+  Emitter.prototype.closeAllNodes = noop2;
+  Emitter.prototype.finalize = noop2;
+  Emitter.prototype.toHTML = toHtmlNoop;
+  var defaultPrefix = "hljs-";
+  function highlight(name, value, options) {
+    var before3 = high.configure({});
+    var settings = options || {};
+    var prefix = settings.prefix;
+    var result2;
+    if (typeof name !== "string") {
+      throw fault("Expected `string` for name, got `%s`", name);
+    }
+    if (!high.getLanguage(name)) {
+      throw fault("Unknown language: `%s` is not registered", name);
+    }
+    if (typeof value !== "string") {
+      throw fault("Expected `string` for value, got `%s`", value);
+    }
+    if (prefix === null || prefix === void 0) {
+      prefix = defaultPrefix;
+    }
+    high.configure({ __emitter: Emitter, classPrefix: prefix });
+    result2 = high.highlight(value, { language: name, ignoreIllegals: true });
+    high.configure(before3 || {});
+    if (result2.errorRaised) {
+      throw result2.errorRaised;
+    }
+    return {
+      relevance: result2.relevance,
+      language: result2.language,
+      value: result2.emitter.rootNode.children
+    };
+  }
+  function highlightAuto(value, options) {
+    var settings = options || {};
+    var subset = settings.subset || high.listLanguages();
+    settings.prefix;
+    var length = subset.length;
+    var index3 = -1;
+    var result2;
+    var secondBest;
+    var current;
+    var name;
+    if (typeof value !== "string") {
+      throw fault("Expected `string` for value, got `%s`", value);
+    }
+    secondBest = { relevance: 0, language: null, value: [] };
+    result2 = { relevance: 0, language: null, value: [] };
+    while (++index3 < length) {
+      name = subset[index3];
+      if (!high.getLanguage(name)) {
+        continue;
+      }
+      current = highlight(name, value, options);
+      current.language = name;
+      if (current.relevance > secondBest.relevance) {
+        secondBest = current;
+      }
+      if (current.relevance > result2.relevance) {
+        secondBest = result2;
+        result2 = current;
+      }
+    }
+    if (secondBest.language) {
+      result2.secondBest = secondBest;
+    }
+    return result2;
+  }
+  function registerLanguage(name, syntax) {
+    high.registerLanguage(name, syntax);
+  }
+  function listLanguages() {
+    return high.listLanguages();
+  }
+  function registerAlias(name, alias) {
+    var map22 = name;
+    var key2;
+    if (alias) {
+      map22 = {};
+      map22[name] = alias;
+    }
+    for (key2 in map22) {
+      high.registerAliases(map22[key2], { languageName: key2 });
+    }
+  }
+  function Emitter(options) {
+    this.options = options;
+    this.rootNode = { children: [] };
+    this.stack = [this.rootNode];
+  }
+  function addKeyword(value, name) {
+    this.openNode(name);
+    this.addText(value);
+    this.closeNode();
+  }
+  function addSublanguage(other, name) {
+    var stack = this.stack;
+    var current = stack[stack.length - 1];
+    var results = other.rootNode.children;
+    var node5 = name ? {
+      type: "element",
+      tagName: "span",
+      properties: { className: [name] },
+      children: results
+    } : results;
+    current.children = current.children.concat(node5);
+  }
+  function text3(value) {
+    var stack = this.stack;
+    var current;
+    var tail;
+    if (value === "")
+      return;
+    current = stack[stack.length - 1];
+    tail = current.children[current.children.length - 1];
+    if (tail && tail.type === "text") {
+      tail.value += value;
+    } else {
+      current.children.push({ type: "text", value });
+    }
+  }
+  function open(name) {
+    var stack = this.stack;
+    var className = this.options.classPrefix + name;
+    var current = stack[stack.length - 1];
+    var child5 = {
+      type: "element",
+      tagName: "span",
+      properties: { className: [className] },
+      children: []
+    };
+    current.children.push(child5);
+    stack.push(child5);
+  }
+  function close5() {
+    this.stack.pop();
+  }
+  function toHtmlNoop() {
+    return "";
+  }
+  function noop2() {
+  }
+  function parseNodes(nodes, className = []) {
+    return nodes.map((node5) => {
+      const classes = [
+        ...className,
+        ...node5.properties ? node5.properties.className : []
+      ];
+      if (node5.children) {
+        return parseNodes(node5.children, classes);
+      }
+      return {
+        text: node5.value,
+        classes
+      };
+    }).flat();
+  }
+  function getHighlightNodes(result2) {
+    return result2.value || result2.children || [];
+  }
+  function getDecorations({ doc: doc2, name, lowlight: lowlight2, defaultLanguage }) {
+    const decorations = [];
+    findChildren(doc2, (node5) => node5.type.name === name).forEach((block) => {
+      let from5 = block.pos + 1;
+      const language = block.node.attrs.language || defaultLanguage;
+      const languages = lowlight2.listLanguages();
+      const nodes = language && languages.includes(language) ? getHighlightNodes(lowlight2.highlight(language, block.node.textContent)) : getHighlightNodes(lowlight2.highlightAuto(block.node.textContent));
+      parseNodes(nodes).forEach((node5) => {
+        const to = from5 + node5.text.length;
+        if (node5.classes.length) {
+          const decoration = Decoration.inline(from5, to, {
+            class: node5.classes.join(" ")
+          });
+          decorations.push(decoration);
+        }
+        from5 = to;
+      });
+    });
+    return DecorationSet.create(doc2, decorations);
+  }
+  function LowlightPlugin({ name, lowlight: lowlight2, defaultLanguage }) {
+    return new Plugin({
+      key: new PluginKey("lowlight"),
+      state: {
+        init: (_, { doc: doc2 }) => getDecorations({
+          doc: doc2,
+          name,
+          lowlight: lowlight2,
+          defaultLanguage
+        }),
+        apply: (transaction, decorationSet, oldState, newState) => {
+          const oldNodeName = oldState.selection.$head.parent.type.name;
+          const newNodeName = newState.selection.$head.parent.type.name;
+          const oldNodes = findChildren(oldState.doc, (node5) => node5.type.name === name);
+          const newNodes = findChildren(newState.doc, (node5) => node5.type.name === name);
+          if (transaction.docChanged && ([oldNodeName, newNodeName].includes(name) || newNodes.length !== oldNodes.length || transaction.steps.some((step3) => {
+            return step3.from !== void 0 && step3.to !== void 0 && oldNodes.some((node5) => {
+              return node5.pos >= step3.from && node5.pos + node5.node.nodeSize <= step3.to;
+            });
+          }))) {
+            return getDecorations({
+              doc: transaction.doc,
+              name,
+              lowlight: lowlight2,
+              defaultLanguage
+            });
+          }
+          return decorationSet.map(transaction.mapping, transaction.doc);
+        }
+      },
+      props: {
+        decorations(state) {
+          return this.getState(state);
+        }
+      }
+    });
+  }
+  var CodeBlockLowlight = CodeBlock.extend({
+    addOptions() {
+      var _a;
+      return {
+        ...(_a = this.parent) === null || _a === void 0 ? void 0 : _a.call(this),
+        lowlight: core$1,
+        defaultLanguage: null
+      };
+    },
+    addProseMirrorPlugins() {
+      var _a;
+      return [
+        ...((_a = this.parent) === null || _a === void 0 ? void 0 : _a.call(this)) || [],
+        LowlightPlugin({
+          name: this.name,
+          lowlight: this.options.lowlight,
+          defaultLanguage: this.options.defaultLanguage
+        })
+      ];
+    }
+  });
+
+  // app/javascript/documentation/controllers/rich_text_editor_controller.js
+  var import_core33 = __toESM(require_core2());
+  var import_css = __toESM(require_css());
+  var import_javascript = __toESM(require_javascript());
+  var import_json = __toESM(require_json());
+  var import_ruby = __toESM(require_ruby());
+  var import_scss = __toESM(require_scss());
+  var import_sql = __toESM(require_sql());
+  var import_xml = __toESM(require_xml());
+  var import_yaml = __toESM(require_yaml());
+
   // app/javascript/documentation/rich_text_editor/popup_list_component.js
   var createRoot = () => {
     const div2 = document.createElement("div");
@@ -34145,6 +40627,14 @@ img.ProseMirror-separator {
 
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
   var import_lodash = __toESM(require_lodash());
+  import_core33.default.registerLanguage("css", import_css.default);
+  import_core33.default.registerLanguage("javascript", import_javascript.default);
+  import_core33.default.registerLanguage("json", import_json.default);
+  import_core33.default.registerLanguage("ruby", import_ruby.default);
+  import_core33.default.registerLanguage("scss", import_scss.default);
+  import_core33.default.registerLanguage("sql", import_sql.default);
+  import_core33.default.registerLanguage("xml", import_xml.default);
+  import_core33.default.registerLanguage("yaml", import_yaml.default);
   var RichTextEditorController = class extends Controller {
     toolbarMarks = [
       { target: "bold", name: "bold" },
@@ -34187,6 +40677,11 @@ img.ProseMirror-separator {
         text: "Quote"
       },
       {
+        name: "codeBlock",
+        target: "codeBlock",
+        text: "Code"
+      },
+      {
         name: "paragraph",
         target: "text",
         text: "Text"
@@ -34194,38 +40689,47 @@ img.ProseMirror-separator {
     ];
     allMenuButtons = this.toolbarMarks.concat(this.toolbarTypes);
     connect() {
+      const extensions2 = [
+        StarterKit,
+        Underline,
+        Placeholder.configure({
+          placeholder: this.placeholderValue
+        }),
+        Link.configure({
+          openOnClick: false
+        }),
+        CodeBlockLowlight.configure({
+          lowlight: import_core33.default
+        }),
+        Table.configure({
+          resizable: false
+        }),
+        TableRow,
+        TableCell,
+        TableHeader,
+        Mention.configure({
+          HTMLAttributes: {
+            class: "suggestion"
+          },
+          renderLabel({ options, node: node5 }) {
+            return `${options.suggestion.char}${node5.attrs.label}`;
+          },
+          suggestion: suggestion_default
+        })
+      ];
+      if (this.editableValue && this.hasBubbleMenuTarget) {
+        extensions2.push(BubbleMenu.configure({
+          element: this.bubbleMenuTarget,
+          tippyOptions: { appendTo: this.element, duration: 100 }
+        }));
+      }
       this.editor = new Editor({
         element: this.element,
-        extensions: [
-          StarterKit,
-          Underline,
-          BubbleMenu.configure({
-            element: this.bubbleMenuTarget,
-            tippyOptions: { appendTo: this.element, duration: 100 }
-          }),
-          Placeholder.configure({
-            placeholder: this.placeholderValue
-          }),
-          Link.configure({
-            openOnClick: false
-          }),
-          Table,
-          TableRow,
-          TableCell,
-          TableHeader,
-          Mention.configure({
-            HTMLAttributes: {
-              class: "suggestion"
-            },
-            renderLabel({ options, node: node5 }) {
-              return `${options.suggestion.char}${node5.attrs.label}`;
-            },
-            suggestion: suggestion_default
-          })
-        ],
+        extensions: extensions2,
         autofocus: true,
         content: this.contentValue,
-        onUpdate: this.throttledUpdate
+        onUpdate: this.throttledUpdate,
+        editable: this.editableValue
       });
       this.editor.on("transaction", () => {
         this.resetMenuButtons();
@@ -34236,6 +40740,8 @@ img.ProseMirror-separator {
       });
     }
     onUpdate = ({ editor }) => {
+      if (!this.hasOutputTarget)
+        return;
       this.outputTarget.value = editor.getHTML();
     };
     throttledUpdate = (0, import_lodash.default)(this.onUpdate, 1e3);
@@ -34308,6 +40814,9 @@ img.ProseMirror-separator {
     }
     toggleBlockquote() {
       this.runCommand("toggleBlockquote");
+    }
+    toggleCodeBlock() {
+      this.runCommand("toggleCodeBlock");
     }
     insertTable() {
       this.runCommand("insertTable", { rows: 3, cols: 3, withHeaderRow: true });
@@ -34411,6 +40920,7 @@ img.ProseMirror-separator {
     "ol",
     "tablePanel",
     "blockquote",
+    "codeBlock",
     "bold",
     "italic",
     "underline",
@@ -34419,7 +40929,8 @@ img.ProseMirror-separator {
   ]);
   __publicField(RichTextEditorController, "values", {
     content: { type: String, default: "" },
-    placeholder: { type: String, default: "" }
+    placeholder: { type: String, default: "" },
+    editable: { type: Boolean, default: true }
   });
 
   // app/javascript/documentation/application.js
