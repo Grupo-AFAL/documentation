@@ -2,7 +2,12 @@
   <h1 class="title is-1"><%= page.title %></h1>
   <p class="subtitle"><%= page.description %></p>
 
-  <div class="rich-editor-content">
-    <%= sanitize page.content %>
+  <div
+    data-turbo-cache="false"
+    class="rich-text-editor-component input mb-4 rich-editor-content"
+    data-controller="rich-text-editor"
+    data-rich-text-editor-content-value='<%= page.content %>'
+    data-rich-text-editor-editable-value='false'
+  >
   </div>
 </div>

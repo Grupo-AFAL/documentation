@@ -11,6 +11,26 @@ import TableRow from '@tiptap/extension-table-row'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
+import lowlight from 'lowlight/lib/core'
+import css from 'highlight.js/lib/languages/css'
+import javascript from 'highlight.js/lib/languages/javascript'
+import json from 'highlight.js/lib/languages/json'
+import ruby from 'highlight.js/lib/languages/ruby'
+import scss from 'highlight.js/lib/languages/scss'
+import sql from 'highlight.js/lib/languages/sql'
+import xml from 'highlight.js/lib/languages/xml'
+import yaml from 'highlight.js/lib/languages/yaml'
+
+lowlight.registerLanguage('css', css)
+lowlight.registerLanguage('javascript', javascript)
+lowlight.registerLanguage('json', json)
+lowlight.registerLanguage('ruby', ruby)
+lowlight.registerLanguage('scss', scss)
+lowlight.registerLanguage('sql', sql)
+lowlight.registerLanguage('xml', xml)
+lowlight.registerLanguage('yaml', yaml)
+
 import suggestion from '../rich_text_editor/suggestion'
 
 import throttle from 'lodash.throttle'
@@ -30,6 +50,7 @@ export default class RichTextEditorController extends Controller {
     'ol',
     'tablePanel',
     'blockquote',
+    'codeBlock',
     'bold',
     'italic',
     'underline',
@@ -38,7 +59,8 @@ export default class RichTextEditorController extends Controller {
   ]
   static values = {
     content: { type: String, default: '' },
-    placeholder: { type: String, default: '' }
+    placeholder: { type: String, default: '' },
+    editable: { type: Boolean, default: true }
   }
 
   toolbarMarks = [
@@ -83,6 +105,11 @@ export default class RichTextEditorController extends Controller {
       text: 'Quote'
     },
     {
+      name: 'codeBlock',
+      target: 'codeBlock',
+      text: 'Code'
+    },
+    {
       name: 'paragraph',
       target: 'text',
       text: 'Text'
@@ -92,38 +119,51 @@ export default class RichTextEditorController extends Controller {
   allMenuButtons = this.toolbarMarks.concat(this.toolbarTypes)
 
   connect () {
-    this.editor = new Editor({
-      element: this.element,
-      extensions: [
-        StarterKit,
-        Underline,
+    const extensions = [
+      StarterKit,
+      Underline,
+      Placeholder.configure({
+        placeholder: this.placeholderValue
+      }),
+      Link.configure({
+        openOnClick: false
+      }),
+      CodeBlockLowlight.configure({
+        lowlight
+      }),
+      Table.configure({
+        resizable: false
+      }),
+      TableRow,
+      TableCell,
+      TableHeader,
+      Mention.configure({
+        HTMLAttributes: {
+          class: 'suggestion'
+        },
+        renderLabel ({ options, node }) {
+          return `${options.suggestion.char}${node.attrs.label}`
+        },
+        suggestion
+      })
+    ]
+
+    if (this.editableValue && this.hasBubbleMenuTarget) {
+      extensions.push(
         BubbleMenu.configure({
           element: this.bubbleMenuTarget,
           tippyOptions: { appendTo: this.element, duration: 100 }
-        }),
-        Placeholder.configure({
-          placeholder: this.placeholderValue
-        }),
-        Link.configure({
-          openOnClick: false
-        }),
-        Table,
-        TableRow,
-        TableCell,
-        TableHeader,
-        Mention.configure({
-          HTMLAttributes: {
-            class: 'suggestion'
-          },
-          renderLabel ({ options, node }) {
-            return `${options.suggestion.char}${node.attrs.label}`
-          },
-          suggestion
         })
-      ],
+      )
+    }
+
+    this.editor = new Editor({
+      element: this.element,
+      extensions,
       autofocus: true,
       content: this.contentValue,
-      onUpdate: this.throttledUpdate
+      onUpdate: this.throttledUpdate,
+      editable: this.editableValue
     })
 
     this.editor.on('transaction', () => {
@@ -136,6 +176,8 @@ export default class RichTextEditorController extends Controller {
   }
 
   onUpdate = ({ editor }) => {
+    if (!this.hasOutputTarget) return
+
     this.outputTarget.value = editor.getHTML()
   }
   throttledUpdate = throttle(this.onUpdate, 1000)
@@ -244,6 +286,10 @@ export default class RichTextEditorController extends Controller {
 
   toggleBlockquote () {
     this.runCommand('toggleBlockquote')
+  }
+
+  toggleCodeBlock () {
+    this.runCommand('toggleCodeBlock')
   }
 
   insertTable () {
