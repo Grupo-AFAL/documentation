@@ -4,14 +4,13 @@ import StarterKit from '@tiptap/starter-kit'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
-import Mention from '@tiptap/extension-mention'
 
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import lowlight from './rich_text_editor/lowlight'
 
-import suggestion from '../rich_text_editor/suggestion'
 import withTable from './rich_text_editor/with_table'
 import withLink from './rich_text_editor/with_link'
+import withMention from './rich_text_editor/with_mention'
 
 import throttle from 'lodash.throttle'
 
@@ -101,6 +100,7 @@ export default class RichTextEditorController extends Controller {
   connect () {
     const { TableExtensions } = withTable(this)
     const { LinkExtensions } = withLink(this)
+    const { MentionExtensions } = withMention(this)
 
     const extensions = [
       StarterKit.configure({
@@ -132,15 +132,7 @@ export default class RichTextEditorController extends Controller {
       }),
       ...LinkExtensions,
       ...TableExtensions,
-      Mention.configure({
-        HTMLAttributes: {
-          class: 'suggestion'
-        },
-        renderLabel ({ options, node }) {
-          return `${options.suggestion.char}${node.attrs.label}`
-        },
-        suggestion
-      })
+      ...MentionExtensions
     ]
 
     if (this.editableValue && this.hasBubbleMenuTarget) {

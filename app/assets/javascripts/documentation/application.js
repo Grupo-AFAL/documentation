@@ -30772,312 +30772,6 @@ img.ProseMirror-separator {
     }
   });
 
-  // node_modules/@tiptap/suggestion/dist/tiptap-suggestion.esm.js
-  function findSuggestionMatch(config) {
-    const { char, allowSpaces, prefixSpace, startOfLine, $position } = config;
-    const escapedChar = escapeForRegEx(char);
-    const suffix = new RegExp(`\\s${escapedChar}$`);
-    const prefix = startOfLine ? "^" : "";
-    const regexp = allowSpaces ? new RegExp(`${prefix}${escapedChar}.*?(?=\\s${escapedChar}|$)`, "gm") : new RegExp(`${prefix}(?:^)?${escapedChar}[^\\s${escapedChar}]*`, "gm");
-    const isTopLevelNode = $position.depth <= 0;
-    const textFrom = isTopLevelNode ? 0 : $position.before();
-    const textTo = $position.pos;
-    const text4 = $position.doc.textBetween(textFrom, textTo, "\0", "\0");
-    const match = Array.from(text4.matchAll(regexp)).pop();
-    if (!match || match.input === void 0 || match.index === void 0) {
-      return null;
-    }
-    const matchPrefix = match.input.slice(Math.max(0, match.index - 1), match.index);
-    const matchPrefixIsSpace = /^[\s\0]?$/.test(matchPrefix);
-    if (prefixSpace && !matchPrefixIsSpace) {
-      return null;
-    }
-    const from5 = match.index + $position.start();
-    let to = from5 + match[0].length;
-    if (allowSpaces && suffix.test(text4.slice(to - 1, to + 1))) {
-      match[0] += " ";
-      to += 1;
-    }
-    if (from5 < $position.pos && to >= $position.pos) {
-      return {
-        range: {
-          from: from5,
-          to
-        },
-        query: match[0].slice(char.length),
-        text: match[0]
-      };
-    }
-    return null;
-  }
-  var SuggestionPluginKey = new PluginKey("suggestion");
-  function Suggestion({ pluginKey = SuggestionPluginKey, editor, char = "@", allowSpaces = false, prefixSpace = true, startOfLine = false, decorationTag = "span", decorationClass = "suggestion", command: command2 = () => null, items = () => [], render: render2 = () => ({}), allow = () => true }) {
-    let props;
-    const renderer = render2 === null || render2 === void 0 ? void 0 : render2();
-    return new Plugin({
-      key: pluginKey,
-      view() {
-        return {
-          update: async (view, prevState) => {
-            var _a, _b, _c, _d, _e;
-            const prev = (_a = this.key) === null || _a === void 0 ? void 0 : _a.getState(prevState);
-            const next = (_b = this.key) === null || _b === void 0 ? void 0 : _b.getState(view.state);
-            const moved = prev.active && next.active && prev.range.from !== next.range.from;
-            const started = !prev.active && next.active;
-            const stopped = prev.active && !next.active;
-            const changed = !started && !stopped && prev.query !== next.query;
-            const handleStart = started || moved;
-            const handleChange = changed && !moved;
-            const handleExit = stopped || moved;
-            if (!handleStart && !handleChange && !handleExit) {
-              return;
-            }
-            const state = handleExit && !handleStart ? prev : next;
-            const decorationNode = document.querySelector(`[data-decoration-id="${state.decorationId}"]`);
-            props = {
-              editor,
-              range: state.range,
-              query: state.query,
-              text: state.text,
-              items: handleChange || handleStart ? await items({
-                editor,
-                query: state.query
-              }) : [],
-              command: (commandProps) => {
-                command2({
-                  editor,
-                  range: state.range,
-                  props: commandProps
-                });
-              },
-              decorationNode,
-              clientRect: decorationNode ? () => {
-                var _a2;
-                const { decorationId } = (_a2 = this.key) === null || _a2 === void 0 ? void 0 : _a2.getState(editor.state);
-                const currentDecorationNode = document.querySelector(`[data-decoration-id="${decorationId}"]`);
-                return currentDecorationNode.getBoundingClientRect();
-              } : null
-            };
-            if (handleExit) {
-              (_c = renderer === null || renderer === void 0 ? void 0 : renderer.onExit) === null || _c === void 0 ? void 0 : _c.call(renderer, props);
-            }
-            if (handleChange) {
-              (_d = renderer === null || renderer === void 0 ? void 0 : renderer.onUpdate) === null || _d === void 0 ? void 0 : _d.call(renderer, props);
-            }
-            if (handleStart) {
-              (_e = renderer === null || renderer === void 0 ? void 0 : renderer.onStart) === null || _e === void 0 ? void 0 : _e.call(renderer, props);
-            }
-          },
-          destroy: () => {
-            var _a;
-            if (!props) {
-              return;
-            }
-            (_a = renderer === null || renderer === void 0 ? void 0 : renderer.onExit) === null || _a === void 0 ? void 0 : _a.call(renderer, props);
-          }
-        };
-      },
-      state: {
-        init() {
-          return {
-            active: false,
-            range: {},
-            query: null,
-            text: null,
-            composing: false
-          };
-        },
-        apply(transaction, prev, oldState, state) {
-          const { composing } = editor.view;
-          const { selection } = transaction;
-          const { empty: empty2, from: from5 } = selection;
-          const next = { ...prev };
-          next.composing = composing;
-          if (empty2 || editor.view.composing) {
-            if ((from5 < prev.range.from || from5 > prev.range.to) && !composing && !prev.composing) {
-              next.active = false;
-            }
-            const match = findSuggestionMatch({
-              char,
-              allowSpaces,
-              prefixSpace,
-              startOfLine,
-              $position: selection.$from
-            });
-            const decorationId = `id_${Math.floor(Math.random() * 4294967295)}`;
-            if (match && allow({ editor, state, range: match.range })) {
-              next.active = true;
-              next.decorationId = prev.decorationId ? prev.decorationId : decorationId;
-              next.range = match.range;
-              next.query = match.query;
-              next.text = match.text;
-            } else {
-              next.active = false;
-            }
-          } else {
-            next.active = false;
-          }
-          if (!next.active) {
-            next.decorationId = null;
-            next.range = {};
-            next.query = null;
-            next.text = null;
-          }
-          return next;
-        }
-      },
-      props: {
-        handleKeyDown(view, event) {
-          var _a;
-          const { active, range } = this.getState(view.state);
-          if (!active) {
-            return false;
-          }
-          return ((_a = renderer === null || renderer === void 0 ? void 0 : renderer.onKeyDown) === null || _a === void 0 ? void 0 : _a.call(renderer, { view, event, range })) || false;
-        },
-        decorations(state) {
-          const { active, range, decorationId } = this.getState(state);
-          if (!active) {
-            return null;
-          }
-          return DecorationSet.create(state.doc, [
-            Decoration.inline(range.from, range.to, {
-              nodeName: decorationTag,
-              class: decorationClass,
-              "data-decoration-id": decorationId
-            })
-          ]);
-        }
-      }
-    });
-  }
-
-  // node_modules/@tiptap/extension-mention/dist/tiptap-extension-mention.esm.js
-  var MentionPluginKey = new PluginKey("mention");
-  var Mention = Node4.create({
-    name: "mention",
-    addOptions() {
-      return {
-        HTMLAttributes: {},
-        renderLabel({ options, node: node5 }) {
-          var _a;
-          return `${options.suggestion.char}${(_a = node5.attrs.label) !== null && _a !== void 0 ? _a : node5.attrs.id}`;
-        },
-        suggestion: {
-          char: "@",
-          pluginKey: MentionPluginKey,
-          command: ({ editor, range, props }) => {
-            var _a;
-            const nodeAfter = editor.view.state.selection.$to.nodeAfter;
-            const overrideSpace = (_a = nodeAfter === null || nodeAfter === void 0 ? void 0 : nodeAfter.text) === null || _a === void 0 ? void 0 : _a.startsWith(" ");
-            if (overrideSpace) {
-              range.to += 1;
-            }
-            editor.chain().focus().insertContentAt(range, [
-              {
-                type: this.name,
-                attrs: props
-              },
-              {
-                type: "text",
-                text: " "
-              }
-            ]).run();
-          },
-          allow: ({ state, range }) => {
-            const $from = state.doc.resolve(range.from);
-            const type = state.schema.nodes[this.name];
-            const allow = !!$from.parent.type.contentMatch.matchType(type);
-            return allow;
-          }
-        }
-      };
-    },
-    group: "inline",
-    inline: true,
-    selectable: false,
-    atom: true,
-    addAttributes() {
-      return {
-        id: {
-          default: null,
-          parseHTML: (element) => element.getAttribute("data-id"),
-          renderHTML: (attributes) => {
-            if (!attributes.id) {
-              return {};
-            }
-            return {
-              "data-id": attributes.id
-            };
-          }
-        },
-        label: {
-          default: null,
-          parseHTML: (element) => element.getAttribute("data-label"),
-          renderHTML: (attributes) => {
-            if (!attributes.label) {
-              return {};
-            }
-            return {
-              "data-label": attributes.label
-            };
-          }
-        }
-      };
-    },
-    parseHTML() {
-      return [
-        {
-          tag: `span[data-type="${this.name}"]`
-        }
-      ];
-    },
-    renderHTML({ node: node5, HTMLAttributes }) {
-      return [
-        "span",
-        mergeAttributes({ "data-type": this.name }, this.options.HTMLAttributes, HTMLAttributes),
-        this.options.renderLabel({
-          options: this.options,
-          node: node5
-        })
-      ];
-    },
-    renderText({ node: node5 }) {
-      return this.options.renderLabel({
-        options: this.options,
-        node: node5
-      });
-    },
-    addKeyboardShortcuts() {
-      return {
-        Backspace: () => this.editor.commands.command(({ tr, state }) => {
-          let isMention = false;
-          const { selection } = state;
-          const { empty: empty2, anchor } = selection;
-          if (!empty2) {
-            return false;
-          }
-          state.doc.nodesBetween(anchor - 1, anchor, (node5, pos) => {
-            if (node5.type.name === this.name) {
-              isMention = true;
-              tr.insertText(this.options.suggestion.char || "", pos, pos + node5.nodeSize);
-              return false;
-            }
-          });
-          return isMention;
-        })
-      };
-    },
-    addProseMirrorPlugins() {
-      return [
-        Suggestion({
-          editor: this.editor,
-          ...this.options.suggestion
-        })
-      ];
-    }
-  });
-
   // node_modules/@tiptap/extension-code-block-lowlight/dist/tiptap-extension-code-block-lowlight.esm.js
   var core$1 = {};
   function deepFreeze(obj) {
@@ -32862,7 +32556,7 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/lowlight.js
-  var import_core27 = __toESM(require_core2());
+  var import_core25 = __toESM(require_core2());
   var import_css = __toESM(require_css());
   var import_javascript = __toESM(require_javascript());
   var import_json = __toESM(require_json());
@@ -32871,124 +32565,15 @@ img.ProseMirror-separator {
   var import_sql = __toESM(require_sql());
   var import_xml = __toESM(require_xml());
   var import_yaml = __toESM(require_yaml());
-  import_core27.default.registerLanguage("css", import_css.default);
-  import_core27.default.registerLanguage("javascript", import_javascript.default);
-  import_core27.default.registerLanguage("json", import_json.default);
-  import_core27.default.registerLanguage("ruby", import_ruby.default);
-  import_core27.default.registerLanguage("scss", import_scss.default);
-  import_core27.default.registerLanguage("sql", import_sql.default);
-  import_core27.default.registerLanguage("xml", import_xml.default);
-  import_core27.default.registerLanguage("yaml", import_yaml.default);
-  var lowlight_default = import_core27.default;
-
-  // app/javascript/documentation/rich_text_editor/popup_list_component.js
-  var createRoot = () => {
-    const div2 = document.createElement("div");
-    div2.classList.add("dropdown-content");
-    return div2;
-  };
-  var createItem = (item, classNames = "") => {
-    const div2 = document.createElement("div");
-    div2.classList.add("dropdown-item", classNames);
-    div2.innerHTML = item.title;
-    return div2;
-  };
-  var PopUpListComponent = class {
-    constructor(items = [], command2 = () => {
-    }) {
-      this.selectedIndex = 0;
-      this.items = items;
-      this.element = createRoot();
-      this.command = command2;
-    }
-    render() {
-      this.element.innerHTML = "";
-      this.items.forEach((item, index3) => {
-        const classNames = index3 === this.selectedIndex ? "is-active" : "inactive";
-        this.element.appendChild(createItem(item, classNames));
-      });
-      return this.element;
-    }
-    updateProps({ items, command: command2 }) {
-      this.items = items;
-      this.command = command2;
-    }
-    selectActiveItem() {
-      const { id, url, title } = this.items[this.selectedIndex];
-      this.command({ id: url, url, label: title });
-    }
-    updateActiveItem(index3) {
-      this.selectedIndex = index3;
-      this.render();
-    }
-    goUp() {
-      const newSelectedIndex = (this.selectedIndex + this.items.length - 1) % this.items.length;
-      this.updateActiveItem(newSelectedIndex);
-    }
-    goDown() {
-      const newSelectedIndex = (this.selectedIndex + 1) % this.items.length;
-      this.updateActiveItem(newSelectedIndex);
-    }
-    destroy() {
-      this.element.remove();
-    }
-  };
-
-  // app/javascript/documentation/rich_text_editor/suggestion.js
-  var suggestion_default = {
-    items: async ({ query }) => {
-      const response = await get("/documentation/pages", {
-        query: { title: query },
-        responseKind: "json"
-      });
-      if (!response.ok)
-        return [];
-      return await response.json;
-    },
-    render: () => {
-      let component = new PopUpListComponent();
-      let popup;
-      return {
-        onStart: ({ clientRect: clientRect2 }) => {
-          popup = tippy_esm_default("body", {
-            getReferenceClientRect: clientRect2,
-            appendTo: () => document.body,
-            allowHTML: true,
-            content: component.render(),
-            showOnCreate: true,
-            interactive: true,
-            trigger: "manual",
-            placement: "bottom-start",
-            arrow: false
-          });
-        },
-        onUpdate({ items, command: command2, clientRect: clientRect2 }) {
-          component.updateProps({ items, command: command2 });
-          component.render();
-          popup[0].setProps({ getReferenceClientRect: clientRect2 });
-        },
-        onKeyDown({ event }) {
-          if (event.key === "Escape") {
-            popup[0].hide();
-            return true;
-          } else if (event.key === "Enter") {
-            component.selectActiveItem();
-            return true;
-          } else if (event.key === "ArrowUp") {
-            component.goUp();
-            return true;
-          } else if (event.key === "ArrowDown") {
-            component.goDown();
-            return true;
-          }
-        },
-        onExit() {
-          popup[0].destroy();
-          component.destroy();
-        }
-      };
-    }
-  };
+  import_core25.default.registerLanguage("css", import_css.default);
+  import_core25.default.registerLanguage("javascript", import_javascript.default);
+  import_core25.default.registerLanguage("json", import_json.default);
+  import_core25.default.registerLanguage("ruby", import_ruby.default);
+  import_core25.default.registerLanguage("scss", import_scss.default);
+  import_core25.default.registerLanguage("sql", import_sql.default);
+  import_core25.default.registerLanguage("xml", import_xml.default);
+  import_core25.default.registerLanguage("yaml", import_yaml.default);
+  var lowlight_default = import_core25.default;
 
   // node_modules/prosemirror-tables/dist/index.es.js
   var readFromCache;
@@ -40749,6 +40334,437 @@ img.ProseMirror-separator {
     return { LinkExtensions };
   };
 
+  // node_modules/@tiptap/suggestion/dist/tiptap-suggestion.esm.js
+  function findSuggestionMatch(config) {
+    const { char, allowSpaces, prefixSpace, startOfLine, $position } = config;
+    const escapedChar = escapeForRegEx(char);
+    const suffix = new RegExp(`\\s${escapedChar}$`);
+    const prefix = startOfLine ? "^" : "";
+    const regexp = allowSpaces ? new RegExp(`${prefix}${escapedChar}.*?(?=\\s${escapedChar}|$)`, "gm") : new RegExp(`${prefix}(?:^)?${escapedChar}[^\\s${escapedChar}]*`, "gm");
+    const isTopLevelNode = $position.depth <= 0;
+    const textFrom = isTopLevelNode ? 0 : $position.before();
+    const textTo = $position.pos;
+    const text4 = $position.doc.textBetween(textFrom, textTo, "\0", "\0");
+    const match = Array.from(text4.matchAll(regexp)).pop();
+    if (!match || match.input === void 0 || match.index === void 0) {
+      return null;
+    }
+    const matchPrefix = match.input.slice(Math.max(0, match.index - 1), match.index);
+    const matchPrefixIsSpace = /^[\s\0]?$/.test(matchPrefix);
+    if (prefixSpace && !matchPrefixIsSpace) {
+      return null;
+    }
+    const from5 = match.index + $position.start();
+    let to = from5 + match[0].length;
+    if (allowSpaces && suffix.test(text4.slice(to - 1, to + 1))) {
+      match[0] += " ";
+      to += 1;
+    }
+    if (from5 < $position.pos && to >= $position.pos) {
+      return {
+        range: {
+          from: from5,
+          to
+        },
+        query: match[0].slice(char.length),
+        text: match[0]
+      };
+    }
+    return null;
+  }
+  var SuggestionPluginKey = new PluginKey("suggestion");
+  function Suggestion({ pluginKey = SuggestionPluginKey, editor, char = "@", allowSpaces = false, prefixSpace = true, startOfLine = false, decorationTag = "span", decorationClass = "suggestion", command: command2 = () => null, items = () => [], render: render2 = () => ({}), allow = () => true }) {
+    let props;
+    const renderer = render2 === null || render2 === void 0 ? void 0 : render2();
+    return new Plugin({
+      key: pluginKey,
+      view() {
+        return {
+          update: async (view, prevState) => {
+            var _a, _b, _c, _d, _e;
+            const prev = (_a = this.key) === null || _a === void 0 ? void 0 : _a.getState(prevState);
+            const next = (_b = this.key) === null || _b === void 0 ? void 0 : _b.getState(view.state);
+            const moved = prev.active && next.active && prev.range.from !== next.range.from;
+            const started = !prev.active && next.active;
+            const stopped = prev.active && !next.active;
+            const changed = !started && !stopped && prev.query !== next.query;
+            const handleStart = started || moved;
+            const handleChange = changed && !moved;
+            const handleExit = stopped || moved;
+            if (!handleStart && !handleChange && !handleExit) {
+              return;
+            }
+            const state = handleExit && !handleStart ? prev : next;
+            const decorationNode = document.querySelector(`[data-decoration-id="${state.decorationId}"]`);
+            props = {
+              editor,
+              range: state.range,
+              query: state.query,
+              text: state.text,
+              items: handleChange || handleStart ? await items({
+                editor,
+                query: state.query
+              }) : [],
+              command: (commandProps) => {
+                command2({
+                  editor,
+                  range: state.range,
+                  props: commandProps
+                });
+              },
+              decorationNode,
+              clientRect: decorationNode ? () => {
+                var _a2;
+                const { decorationId } = (_a2 = this.key) === null || _a2 === void 0 ? void 0 : _a2.getState(editor.state);
+                const currentDecorationNode = document.querySelector(`[data-decoration-id="${decorationId}"]`);
+                return currentDecorationNode.getBoundingClientRect();
+              } : null
+            };
+            if (handleExit) {
+              (_c = renderer === null || renderer === void 0 ? void 0 : renderer.onExit) === null || _c === void 0 ? void 0 : _c.call(renderer, props);
+            }
+            if (handleChange) {
+              (_d = renderer === null || renderer === void 0 ? void 0 : renderer.onUpdate) === null || _d === void 0 ? void 0 : _d.call(renderer, props);
+            }
+            if (handleStart) {
+              (_e = renderer === null || renderer === void 0 ? void 0 : renderer.onStart) === null || _e === void 0 ? void 0 : _e.call(renderer, props);
+            }
+          },
+          destroy: () => {
+            var _a;
+            if (!props) {
+              return;
+            }
+            (_a = renderer === null || renderer === void 0 ? void 0 : renderer.onExit) === null || _a === void 0 ? void 0 : _a.call(renderer, props);
+          }
+        };
+      },
+      state: {
+        init() {
+          return {
+            active: false,
+            range: {},
+            query: null,
+            text: null,
+            composing: false
+          };
+        },
+        apply(transaction, prev, oldState, state) {
+          const { composing } = editor.view;
+          const { selection } = transaction;
+          const { empty: empty2, from: from5 } = selection;
+          const next = { ...prev };
+          next.composing = composing;
+          if (empty2 || editor.view.composing) {
+            if ((from5 < prev.range.from || from5 > prev.range.to) && !composing && !prev.composing) {
+              next.active = false;
+            }
+            const match = findSuggestionMatch({
+              char,
+              allowSpaces,
+              prefixSpace,
+              startOfLine,
+              $position: selection.$from
+            });
+            const decorationId = `id_${Math.floor(Math.random() * 4294967295)}`;
+            if (match && allow({ editor, state, range: match.range })) {
+              next.active = true;
+              next.decorationId = prev.decorationId ? prev.decorationId : decorationId;
+              next.range = match.range;
+              next.query = match.query;
+              next.text = match.text;
+            } else {
+              next.active = false;
+            }
+          } else {
+            next.active = false;
+          }
+          if (!next.active) {
+            next.decorationId = null;
+            next.range = {};
+            next.query = null;
+            next.text = null;
+          }
+          return next;
+        }
+      },
+      props: {
+        handleKeyDown(view, event) {
+          var _a;
+          const { active, range } = this.getState(view.state);
+          if (!active) {
+            return false;
+          }
+          return ((_a = renderer === null || renderer === void 0 ? void 0 : renderer.onKeyDown) === null || _a === void 0 ? void 0 : _a.call(renderer, { view, event, range })) || false;
+        },
+        decorations(state) {
+          const { active, range, decorationId } = this.getState(state);
+          if (!active) {
+            return null;
+          }
+          return DecorationSet.create(state.doc, [
+            Decoration.inline(range.from, range.to, {
+              nodeName: decorationTag,
+              class: decorationClass,
+              "data-decoration-id": decorationId
+            })
+          ]);
+        }
+      }
+    });
+  }
+
+  // node_modules/@tiptap/extension-mention/dist/tiptap-extension-mention.esm.js
+  var MentionPluginKey = new PluginKey("mention");
+  var Mention = Node4.create({
+    name: "mention",
+    addOptions() {
+      return {
+        HTMLAttributes: {},
+        renderLabel({ options, node: node5 }) {
+          var _a;
+          return `${options.suggestion.char}${(_a = node5.attrs.label) !== null && _a !== void 0 ? _a : node5.attrs.id}`;
+        },
+        suggestion: {
+          char: "@",
+          pluginKey: MentionPluginKey,
+          command: ({ editor, range, props }) => {
+            var _a;
+            const nodeAfter = editor.view.state.selection.$to.nodeAfter;
+            const overrideSpace = (_a = nodeAfter === null || nodeAfter === void 0 ? void 0 : nodeAfter.text) === null || _a === void 0 ? void 0 : _a.startsWith(" ");
+            if (overrideSpace) {
+              range.to += 1;
+            }
+            editor.chain().focus().insertContentAt(range, [
+              {
+                type: this.name,
+                attrs: props
+              },
+              {
+                type: "text",
+                text: " "
+              }
+            ]).run();
+          },
+          allow: ({ state, range }) => {
+            const $from = state.doc.resolve(range.from);
+            const type = state.schema.nodes[this.name];
+            const allow = !!$from.parent.type.contentMatch.matchType(type);
+            return allow;
+          }
+        }
+      };
+    },
+    group: "inline",
+    inline: true,
+    selectable: false,
+    atom: true,
+    addAttributes() {
+      return {
+        id: {
+          default: null,
+          parseHTML: (element) => element.getAttribute("data-id"),
+          renderHTML: (attributes) => {
+            if (!attributes.id) {
+              return {};
+            }
+            return {
+              "data-id": attributes.id
+            };
+          }
+        },
+        label: {
+          default: null,
+          parseHTML: (element) => element.getAttribute("data-label"),
+          renderHTML: (attributes) => {
+            if (!attributes.label) {
+              return {};
+            }
+            return {
+              "data-label": attributes.label
+            };
+          }
+        }
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: `span[data-type="${this.name}"]`
+        }
+      ];
+    },
+    renderHTML({ node: node5, HTMLAttributes }) {
+      return [
+        "span",
+        mergeAttributes({ "data-type": this.name }, this.options.HTMLAttributes, HTMLAttributes),
+        this.options.renderLabel({
+          options: this.options,
+          node: node5
+        })
+      ];
+    },
+    renderText({ node: node5 }) {
+      return this.options.renderLabel({
+        options: this.options,
+        node: node5
+      });
+    },
+    addKeyboardShortcuts() {
+      return {
+        Backspace: () => this.editor.commands.command(({ tr, state }) => {
+          let isMention = false;
+          const { selection } = state;
+          const { empty: empty2, anchor } = selection;
+          if (!empty2) {
+            return false;
+          }
+          state.doc.nodesBetween(anchor - 1, anchor, (node5, pos) => {
+            if (node5.type.name === this.name) {
+              isMention = true;
+              tr.insertText(this.options.suggestion.char || "", pos, pos + node5.nodeSize);
+              return false;
+            }
+          });
+          return isMention;
+        })
+      };
+    },
+    addProseMirrorPlugins() {
+      return [
+        Suggestion({
+          editor: this.editor,
+          ...this.options.suggestion
+        })
+      ];
+    }
+  });
+
+  // app/javascript/documentation/controllers/rich_text_editor/popup_list_component.js
+  var createRoot = () => {
+    const div2 = document.createElement("div");
+    div2.classList.add("dropdown-content");
+    return div2;
+  };
+  var createItem = (item, classNames = "") => {
+    const div2 = document.createElement("div");
+    div2.classList.add("dropdown-item", classNames);
+    div2.innerHTML = item.title;
+    return div2;
+  };
+  var PopUpListComponent = class {
+    constructor(items = [], command2 = () => {
+    }) {
+      this.selectedIndex = 0;
+      this.items = items;
+      this.element = createRoot();
+      this.command = command2;
+    }
+    render() {
+      this.element.innerHTML = "";
+      this.items.forEach((item, index3) => {
+        const classNames = index3 === this.selectedIndex ? "is-active" : "inactive";
+        this.element.appendChild(createItem(item, classNames));
+      });
+      return this.element;
+    }
+    updateProps({ items, command: command2 }) {
+      this.items = items;
+      this.command = command2;
+    }
+    selectActiveItem() {
+      const { id, url, title } = this.items[this.selectedIndex];
+      this.command({ id: url, url, label: title });
+    }
+    updateActiveItem(index3) {
+      this.selectedIndex = index3;
+      this.render();
+    }
+    goUp() {
+      const newSelectedIndex = (this.selectedIndex + this.items.length - 1) % this.items.length;
+      this.updateActiveItem(newSelectedIndex);
+    }
+    goDown() {
+      const newSelectedIndex = (this.selectedIndex + 1) % this.items.length;
+      this.updateActiveItem(newSelectedIndex);
+    }
+    destroy() {
+      this.element.remove();
+    }
+  };
+
+  // app/javascript/documentation/controllers/rich_text_editor/suggestion.js
+  var suggestion_default = {
+    items: async ({ query }) => {
+      const response = await get("/documentation/pages", {
+        query: { title: query },
+        responseKind: "json"
+      });
+      if (!response.ok)
+        return [];
+      return await response.json;
+    },
+    render: () => {
+      let component = new PopUpListComponent();
+      let popup;
+      return {
+        onStart: ({ clientRect: clientRect2 }) => {
+          popup = tippy_esm_default("body", {
+            getReferenceClientRect: clientRect2,
+            appendTo: () => document.body,
+            allowHTML: true,
+            content: component.render(),
+            showOnCreate: true,
+            interactive: true,
+            trigger: "manual",
+            placement: "bottom-start",
+            arrow: false
+          });
+        },
+        onUpdate({ items, command: command2, clientRect: clientRect2 }) {
+          component.updateProps({ items, command: command2 });
+          component.render();
+          popup[0].setProps({ getReferenceClientRect: clientRect2 });
+        },
+        onKeyDown({ event }) {
+          if (event.key === "Escape") {
+            popup[0].hide();
+            return true;
+          } else if (event.key === "Enter") {
+            component.selectActiveItem();
+            return true;
+          } else if (event.key === "ArrowUp") {
+            component.goUp();
+            return true;
+          } else if (event.key === "ArrowDown") {
+            component.goDown();
+            return true;
+          }
+        },
+        onExit() {
+          popup[0].destroy();
+          component.destroy();
+        }
+      };
+    }
+  };
+
+  // app/javascript/documentation/controllers/rich_text_editor/with_mention.js
+  var with_mention_default = (_controller, _options = {}) => {
+    const MentionExtensions = [
+      Mention.configure({
+        HTMLAttributes: {
+          class: "suggestion"
+        },
+        renderLabel({ options, node: node5 }) {
+          return `${options.suggestion.char}${node5.attrs.label}`;
+        },
+        suggestion: suggestion_default
+      })
+    ];
+    return { MentionExtensions };
+  };
+
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
   var import_lodash = __toESM(require_lodash());
   var RichTextEditorController = class extends Controller {
@@ -40807,6 +40823,7 @@ img.ProseMirror-separator {
     connect() {
       const { TableExtensions } = with_table_default(this);
       const { LinkExtensions } = with_link_default(this);
+      const { MentionExtensions } = with_mention_default(this);
       const extensions2 = [
         StarterKit.configure({
           blockquote: true,
@@ -40837,15 +40854,7 @@ img.ProseMirror-separator {
         }),
         ...LinkExtensions,
         ...TableExtensions,
-        Mention.configure({
-          HTMLAttributes: {
-            class: "suggestion"
-          },
-          renderLabel({ options, node: node5 }) {
-            return `${options.suggestion.char}${node5.attrs.label}`;
-          },
-          suggestion: suggestion_default
-        })
+        ...MentionExtensions
       ];
       if (this.editableValue && this.hasBubbleMenuTarget) {
         extensions2.push(BubbleMenu.configure({
