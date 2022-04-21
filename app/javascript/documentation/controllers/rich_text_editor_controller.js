@@ -6,15 +6,12 @@ import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 import Link from '@tiptap/extension-link'
 import Mention from '@tiptap/extension-mention'
-import Table from '@tiptap/extension-table'
-import TableRow from '@tiptap/extension-table-row'
-import TableCell from '@tiptap/extension-table-cell'
-import TableHeader from '@tiptap/extension-table-header'
 
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import lowlight from './rich_text_editor/lowlight'
 
 import suggestion from '../rich_text_editor/suggestion'
+import withTable from './rich_text_editor/with_table'
 
 import throttle from 'lodash.throttle'
 
@@ -102,8 +99,29 @@ export default class RichTextEditorController extends Controller {
   allMenuButtons = this.toolbarMarks.concat(this.toolbarTypes)
 
   connect () {
+    const { TableExtensions } = withTable(this)
+
     const extensions = [
-      StarterKit,
+      StarterKit.configure({
+        blockquote: true,
+        bold: true,
+        bulletList: true,
+        code: true,
+        codeBlock: true,
+        document: true,
+        dropcursor: true,
+        gapcursor: true,
+        hardBreak: true,
+        heading: true,
+        history: true,
+        horizontalRule: true,
+        italic: true,
+        listItem: true,
+        orderedList: true,
+        paragraph: true,
+        strike: true,
+        text: true
+      }),
       Underline,
       Placeholder.configure({
         placeholder: this.placeholderValue
@@ -114,12 +132,7 @@ export default class RichTextEditorController extends Controller {
       CodeBlockLowlight.configure({
         lowlight
       }),
-      Table.configure({
-        resizable: false
-      }),
-      TableRow,
-      TableCell,
-      TableHeader,
+      ...TableExtensions,
       Mention.configure({
         HTMLAttributes: {
           class: 'suggestion'
@@ -156,6 +169,12 @@ export default class RichTextEditorController extends Controller {
       this.setCurrentToolbarType()
       this.updateTableModifiers()
     })
+
+    withTable(this)
+  }
+
+  disconnect () {
+    this.editor.destroy()
   }
 
   onUpdate = ({ editor }) => {
@@ -190,17 +209,6 @@ export default class RichTextEditorController extends Controller {
     const link = this.editor.getAttributes('link')
     this.linkInputTarget.innerHTML = link.href || ''
     this.linkInputTarget.focus()
-  }
-
-  openTablePanel () {
-    this.closeNodeSelectDropdown()
-    this.closeLinkPanel()
-  }
-
-  closeTablePanel () {
-    if (!this.hasTablePanelTarget) return
-
-    this.tablePanelTarget.classList.remove('is-active')
   }
 
   openNodeSelect () {
@@ -273,58 +281,6 @@ export default class RichTextEditorController extends Controller {
 
   toggleCodeBlock () {
     this.runCommand('toggleCodeBlock')
-  }
-
-  insertTable () {
-    this.runCommand('insertTable', { rows: 3, cols: 3, withHeaderRow: true })
-  }
-
-  addColumnBefore (e) {
-    this.runTableCommand(e, 'addColumnBefore')
-  }
-
-  addColumnAfter (e) {
-    this.runTableCommand(e, 'addColumnAfter')
-  }
-
-  addRowBefore (e) {
-    this.runTableCommand(e, 'addRowBefore')
-  }
-
-  addRowAfter (e) {
-    this.runTableCommand(e, 'addRowAfter')
-  }
-
-  deleteColumn (e) {
-    this.runTableCommand(e, 'deleteColumn')
-  }
-
-  deleteRow (e) {
-    this.runTableCommand(e, 'deleteRow')
-  }
-
-  runTableCommand (event, name) {
-    if (!this.editor.isActive('table')) {
-      return event.stopPropagation()
-    }
-
-    this.runCommand(name)
-  }
-
-  updateTableModifiers () {
-    const tableIsActive = this.editor.isActive('table')
-
-    this.tableModifierTargets().forEach(modifier => {
-      tableIsActive
-        ? modifier.classList.remove('disabled')
-        : modifier.classList.add('disabled')
-    })
-  }
-
-  tableModifierTargets () {
-    if (!this.hasTablePanelTarget) return []
-
-    return Array.from(this.tablePanelTarget.querySelectorAll('.modifier'))
   }
 
   runCommand (name, attributes) {
