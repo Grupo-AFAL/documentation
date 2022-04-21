@@ -29095,15 +29095,15 @@ img.ProseMirror-separator {
     if (generatorOptions === void 0) {
       generatorOptions = {};
     }
-    var _generatorOptions = generatorOptions, _generatorOptions$def = _generatorOptions.defaultModifiers, defaultModifiers2 = _generatorOptions$def === void 0 ? [] : _generatorOptions$def, _generatorOptions$def2 = _generatorOptions.defaultOptions, defaultOptions2 = _generatorOptions$def2 === void 0 ? DEFAULT_OPTIONS : _generatorOptions$def2;
+    var _generatorOptions = generatorOptions, _generatorOptions$def = _generatorOptions.defaultModifiers, defaultModifiers2 = _generatorOptions$def === void 0 ? [] : _generatorOptions$def, _generatorOptions$def2 = _generatorOptions.defaultOptions, defaultOptions3 = _generatorOptions$def2 === void 0 ? DEFAULT_OPTIONS : _generatorOptions$def2;
     return function createPopper2(reference2, popper2, options) {
       if (options === void 0) {
-        options = defaultOptions2;
+        options = defaultOptions3;
       }
       var state = {
         placement: "bottom",
         orderedModifiers: [],
-        options: Object.assign({}, DEFAULT_OPTIONS, defaultOptions2),
+        options: Object.assign({}, DEFAULT_OPTIONS, defaultOptions3),
         modifiersData: {},
         elements: {
           reference: reference2,
@@ -29119,7 +29119,7 @@ img.ProseMirror-separator {
         setOptions: function setOptions(setOptionsAction) {
           var options2 = typeof setOptionsAction === "function" ? setOptionsAction(state.options) : setOptionsAction;
           cleanupModifierEffects();
-          state.options = Object.assign({}, defaultOptions2, state.options, options2);
+          state.options = Object.assign({}, defaultOptions3, state.options, options2);
           state.scrollParents = {
             reference: isElement(reference2) ? listScrollParents(reference2) : reference2.contextElement ? listScrollParents(reference2.contextElement) : [],
             popper: listScrollParents(popper2)
@@ -40635,10 +40635,14 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/with_table.js
+  var defaultOptions2 = {
+    resizable: false
+  };
   var with_table_default = (controller, options = {}) => {
+    const { resizable } = Object.assign({}, defaultOptions2, options);
     const TableExtensions = [
       Table.configure({
-        resizable: false
+        resizable
       }),
       TableRow,
       TableCell,

@@ -3,16 +3,16 @@ import TableRow from '@tiptap/extension-table-row'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 
-// const defaultOptions = {
-//   resizable: false
-// }
+const defaultOptions = {
+  resizable: false
+}
 
 export default (controller, options = {}) => {
-  // const { resizable } = Object.assign({}, defaultOptions, options)
+  const { resizable } = Object.assign({}, defaultOptions, options)
 
   const TableExtensions = [
     Table.configure({
-      resizable: false
+      resizable
     }),
     TableRow,
     TableCell,
