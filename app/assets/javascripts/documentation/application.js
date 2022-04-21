@@ -40505,8 +40505,8 @@ img.ProseMirror-separator {
     }
   });
 
-  // app/javascript/documentation/controllers/rich_text_editor_controller.js
-  var import_core33 = __toESM(require_core2());
+  // app/javascript/documentation/controllers/rich_text_editor/lowlight.js
+  var import_core32 = __toESM(require_core2());
   var import_css = __toESM(require_css());
   var import_javascript = __toESM(require_javascript());
   var import_json = __toESM(require_json());
@@ -40515,6 +40515,15 @@ img.ProseMirror-separator {
   var import_sql = __toESM(require_sql());
   var import_xml = __toESM(require_xml());
   var import_yaml = __toESM(require_yaml());
+  import_core32.default.registerLanguage("css", import_css.default);
+  import_core32.default.registerLanguage("javascript", import_javascript.default);
+  import_core32.default.registerLanguage("json", import_json.default);
+  import_core32.default.registerLanguage("ruby", import_ruby.default);
+  import_core32.default.registerLanguage("scss", import_scss.default);
+  import_core32.default.registerLanguage("sql", import_sql.default);
+  import_core32.default.registerLanguage("xml", import_xml.default);
+  import_core32.default.registerLanguage("yaml", import_yaml.default);
+  var lowlight_default = import_core32.default;
 
   // app/javascript/documentation/rich_text_editor/popup_list_component.js
   var createRoot = () => {
@@ -40627,14 +40636,6 @@ img.ProseMirror-separator {
 
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
   var import_lodash = __toESM(require_lodash());
-  import_core33.default.registerLanguage("css", import_css.default);
-  import_core33.default.registerLanguage("javascript", import_javascript.default);
-  import_core33.default.registerLanguage("json", import_json.default);
-  import_core33.default.registerLanguage("ruby", import_ruby.default);
-  import_core33.default.registerLanguage("scss", import_scss.default);
-  import_core33.default.registerLanguage("sql", import_sql.default);
-  import_core33.default.registerLanguage("xml", import_xml.default);
-  import_core33.default.registerLanguage("yaml", import_yaml.default);
   var RichTextEditorController = class extends Controller {
     toolbarMarks = [
       { target: "bold", name: "bold" },
@@ -40699,7 +40700,7 @@ img.ProseMirror-separator {
           openOnClick: false
         }),
         CodeBlockLowlight.configure({
-          lowlight: import_core33.default
+          lowlight: lowlight_default
         }),
         Table.configure({
           resizable: false

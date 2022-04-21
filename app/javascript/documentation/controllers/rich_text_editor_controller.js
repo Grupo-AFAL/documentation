@@ -12,24 +12,7 @@ import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
 
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import lowlight from 'lowlight/lib/core'
-import css from 'highlight.js/lib/languages/css'
-import javascript from 'highlight.js/lib/languages/javascript'
-import json from 'highlight.js/lib/languages/json'
-import ruby from 'highlight.js/lib/languages/ruby'
-import scss from 'highlight.js/lib/languages/scss'
-import sql from 'highlight.js/lib/languages/sql'
-import xml from 'highlight.js/lib/languages/xml'
-import yaml from 'highlight.js/lib/languages/yaml'
-
-lowlight.registerLanguage('css', css)
-lowlight.registerLanguage('javascript', javascript)
-lowlight.registerLanguage('json', json)
-lowlight.registerLanguage('ruby', ruby)
-lowlight.registerLanguage('scss', scss)
-lowlight.registerLanguage('sql', sql)
-lowlight.registerLanguage('xml', xml)
-lowlight.registerLanguage('yaml', yaml)
+import lowlight from './rich_text_editor/lowlight'
 
 import suggestion from '../rich_text_editor/suggestion'
 
