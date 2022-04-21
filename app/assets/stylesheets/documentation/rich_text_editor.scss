@@ -328,6 +328,7 @@ $menu-icon-size: 0.75em;
   box-shadow: $menu-box-shadow;
   text-align: center;
   border-radius: $menu-border-radius;
+  width: fit-content;
 
   .toolbar-icon {
     .svg-inline {
@@ -346,7 +347,7 @@ $menu-icon-size: 0.75em;
 
   .dropdown-trigger {
     a {
-      width: auto;
+      width: max-content;
       border-radius: $menu-border-radius 0 0 $menu-border-radius;
     }
   }

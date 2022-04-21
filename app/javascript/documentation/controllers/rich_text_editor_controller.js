@@ -4,7 +4,6 @@ import StarterKit from '@tiptap/starter-kit'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
-import Link from '@tiptap/extension-link'
 import Mention from '@tiptap/extension-mention'
 
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
@@ -12,6 +11,7 @@ import lowlight from './rich_text_editor/lowlight'
 
 import suggestion from '../rich_text_editor/suggestion'
 import withTable from './rich_text_editor/with_table'
+import withLink from './rich_text_editor/with_link'
 
 import throttle from 'lodash.throttle'
 
@@ -100,6 +100,7 @@ export default class RichTextEditorController extends Controller {
 
   connect () {
     const { TableExtensions } = withTable(this)
+    const { LinkExtensions } = withLink(this)
 
     const extensions = [
       StarterKit.configure({
@@ -126,12 +127,10 @@ export default class RichTextEditorController extends Controller {
       Placeholder.configure({
         placeholder: this.placeholderValue
       }),
-      Link.configure({
-        openOnClick: false
-      }),
       CodeBlockLowlight.configure({
         lowlight
       }),
+      ...LinkExtensions,
       ...TableExtensions,
       Mention.configure({
         HTMLAttributes: {
@@ -196,59 +195,9 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleUnderline')
   }
 
-  closeLinkPanel () {
-    if (!this.hasLinkPanelTarget) return
-
-    this.linkPanelTarget.classList.remove('is-active')
-  }
-
-  openLinkPanel () {
-    this.closeNodeSelectDropdown()
-    this.closeTablePanel()
-
-    const link = this.editor.getAttributes('link')
-    this.linkInputTarget.innerHTML = link.href || ''
-    this.linkInputTarget.focus()
-  }
-
   openNodeSelect () {
     this.closeLinkPanel()
     this.closeTablePanel()
-  }
-
-  saveLinkUrl (event) {
-    if (event.key !== 'Enter') return
-    const url = event.target.innerHTML
-
-    if (url == '') {
-      this.editor
-        .chain()
-        .focus()
-        .extendMarkRange('link')
-        .unsetLink()
-        .run()
-    } else {
-      this.editor
-        .chain()
-        .focus()
-        .extendMarkRange('link')
-        .setLink({ href: event.target.innerHTML, target: '_blank' })
-        .run()
-    }
-
-    this.linkInputTarget.innerHTML = ''
-  }
-
-  // TODO: Create PageLink extension to be able to store reference to the page.
-  savePageLink (event) {
-    const { url } = event.target.dataset
-
-    this.editor
-      .chain()
-      .focus()
-      .extendMarkRange('link')
-      .setLink({ href: url, target: '_blank' })
-      .run()
   }
 
   toggleH1 () {
