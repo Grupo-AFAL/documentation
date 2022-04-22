@@ -61,7 +61,7 @@ export default (controller, options = {}) => {
   }
 
   const openTablePanel = () => {
-    controller.closeNodeSelectDropdown()
+    controller.closeNodeSelect()
     controller.closeLinkPanel()
   }
 

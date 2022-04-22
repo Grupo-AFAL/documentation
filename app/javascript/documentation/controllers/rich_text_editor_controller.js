@@ -5,12 +5,10 @@ import BubbleMenu from '@tiptap/extension-bubble-menu'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 
-import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import lowlight from './rich_text_editor/lowlight'
-
 import withTable, { tableTargets } from './rich_text_editor/with_table'
 import withLink, { linkTargets } from './rich_text_editor/with_link'
 import withMention from './rich_text_editor/with_mention'
+import withCodeBlock from './rich_text_editor/with_code_block'
 
 import throttle from 'lodash.throttle'
 
@@ -101,6 +99,7 @@ export default class RichTextEditorController extends Controller {
     const { TableExtensions } = withTable(this)
     const { LinkExtensions } = withLink(this)
     const { MentionExtensions } = withMention(this)
+    const { CodeBlockExtenstions } = withCodeBlock(this)
 
     const extensions = [
       StarterKit.configure({
@@ -127,9 +126,7 @@ export default class RichTextEditorController extends Controller {
       Placeholder.configure({
         placeholder: this.placeholderValue
       }),
-      CodeBlockLowlight.configure({
-        lowlight
-      }),
+      ...CodeBlockExtenstions,
       ...LinkExtensions,
       ...TableExtensions,
       ...MentionExtensions
@@ -160,8 +157,6 @@ export default class RichTextEditorController extends Controller {
       this.setCurrentToolbarType()
       this.updateTableModifiers()
     })
-
-    withTable(this)
   }
 
   disconnect () {
@@ -220,10 +215,6 @@ export default class RichTextEditorController extends Controller {
     this.runCommand('toggleBlockquote')
   }
 
-  toggleCodeBlock () {
-    this.runCommand('toggleCodeBlock')
-  }
-
   runCommand (name, attributes) {
     this.editor
       .chain()
@@ -233,7 +224,7 @@ export default class RichTextEditorController extends Controller {
   }
 
   resetMenuButtons () {
-    this.closeNodeSelectDropdown()
+    this.closeNodeSelect()
     this.closeLinkPanel()
 
     this.allMenuButtons.forEach(({ target }) => {
@@ -280,7 +271,7 @@ export default class RichTextEditorController extends Controller {
     return this[`has${capitalizedName}Target`]
   }
 
-  closeNodeSelectDropdown () {
+  closeNodeSelect () {
     if (!this.hasNodeSelectTarget) return
 
     this.nodeSelectTarget.classList.remove('is-active')

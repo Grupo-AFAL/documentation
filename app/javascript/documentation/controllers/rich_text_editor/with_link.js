@@ -22,7 +22,7 @@ export default (controller, options = {}) => {
   }
 
   const openLinkPanel = () => {
-    controller.closeNodeSelectDropdown()
+    controller.closeNodeSelect()
     controller.closeTablePanel()
 
     const link = controller.editor.getAttributes('link')
