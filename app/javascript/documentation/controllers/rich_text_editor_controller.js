@@ -8,8 +8,8 @@ import Placeholder from '@tiptap/extension-placeholder'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import lowlight from './rich_text_editor/lowlight'
 
-import withTable from './rich_text_editor/with_table'
-import withLink from './rich_text_editor/with_link'
+import withTable, { tableTargets } from './rich_text_editor/with_table'
+import withLink, { linkTargets } from './rich_text_editor/with_link'
 import withMention from './rich_text_editor/with_mention'
 
 import throttle from 'lodash.throttle'
@@ -19,23 +19,23 @@ export default class RichTextEditorController extends Controller {
     'bubbleMenu',
     'nodeSelect',
     'nodeSelectTrigger',
-    'linkPanel',
-    'linkInput',
     'text',
     'h1',
     'h2',
     'h3',
     'ul',
     'ol',
-    'tablePanel',
     'blockquote',
     'codeBlock',
     'bold',
     'italic',
     'underline',
     'link',
-    'output'
+    'output',
+    ...linkTargets,
+    ...tableTargets
   ]
+
   static values = {
     content: { type: String, default: '' },
     placeholder: { type: String, default: '' },

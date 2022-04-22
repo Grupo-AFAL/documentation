@@ -4,6 +4,8 @@ const defaultOptions = {
   openOnClick: false
 }
 
+export const linkTargets = ['linkPanel', 'linkInput']
+
 export default (controller, options = {}) => {
   const { openOnClick } = Object.assign({}, defaultOptions, options)
 

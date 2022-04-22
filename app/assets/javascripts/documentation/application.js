@@ -39278,6 +39278,7 @@ img.ProseMirror-separator {
   var defaultOptions2 = {
     resizable: false
   };
+  var tableTargets = ["tablePanel"];
   var with_table_default = (controller, options = {}) => {
     const { resizable } = Object.assign({}, defaultOptions2, options);
     const TableExtensions = [
@@ -40291,6 +40292,7 @@ img.ProseMirror-separator {
   var defaultOptions3 = {
     openOnClick: false
   };
+  var linkTargets = ["linkPanel", "linkInput"];
   var with_link_default = (controller, options = {}) => {
     const { openOnClick } = Object.assign({}, defaultOptions3, options);
     const LinkExtensions = [
@@ -40979,22 +40981,21 @@ img.ProseMirror-separator {
     "bubbleMenu",
     "nodeSelect",
     "nodeSelectTrigger",
-    "linkPanel",
-    "linkInput",
     "text",
     "h1",
     "h2",
     "h3",
     "ul",
     "ol",
-    "tablePanel",
     "blockquote",
     "codeBlock",
     "bold",
     "italic",
     "underline",
     "link",
-    "output"
+    "output",
+    ...linkTargets,
+    ...tableTargets
   ]);
   __publicField(RichTextEditorController, "values", {
     content: { type: String, default: "" },

@@ -7,6 +7,8 @@ const defaultOptions = {
   resizable: false
 }
 
+export const tableTargets = ['tablePanel']
+
 export default (controller, options = {}) => {
   const { resizable } = Object.assign({}, defaultOptions, options)
 
