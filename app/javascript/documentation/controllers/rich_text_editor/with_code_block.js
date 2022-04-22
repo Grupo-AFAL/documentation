@@ -1,5 +1,5 @@
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import lowlight from './rich_text_editor/lowlight'
+import lowlight from './lowlight'
 
 export default (controller, _options = {}) => {
   const CodeBlockExtenstions = [

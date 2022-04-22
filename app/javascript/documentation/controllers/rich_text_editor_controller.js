@@ -2,9 +2,13 @@ import { Controller } from '@hotwired/stimulus'
 import { Editor } from '@tiptap/core'
 import StarterKit from '@tiptap/starter-kit'
 import BubbleMenu from '@tiptap/extension-bubble-menu'
-import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 
+// import withDefaults from './rich_text_editor/with_defaults'
+import withMarks, {
+  marksTargets,
+  toolbarMarks
+} from './rich_text_editor/with_marks'
 import withTable, { tableTargets } from './rich_text_editor/with_table'
 import withLink, { linkTargets } from './rich_text_editor/with_link'
 import withMention from './rich_text_editor/with_mention'
@@ -25,11 +29,8 @@ export default class RichTextEditorController extends Controller {
     'ol',
     'blockquote',
     'codeBlock',
-    'bold',
-    'italic',
-    'underline',
-    'link',
     'output',
+    ...marksTargets,
     ...linkTargets,
     ...tableTargets
   ]
@@ -39,13 +40,6 @@ export default class RichTextEditorController extends Controller {
     placeholder: { type: String, default: '' },
     editable: { type: Boolean, default: true }
   }
-
-  toolbarMarks = [
-    { target: 'bold', name: 'bold' },
-    { target: 'italic', name: 'italic' },
-    { target: 'underline', name: 'underline' },
-    { target: 'link', name: 'link' }
-  ]
 
   toolbarTypes = [
     {
@@ -93,9 +87,11 @@ export default class RichTextEditorController extends Controller {
     }
   ]
 
-  allMenuButtons = this.toolbarMarks.concat(this.toolbarTypes)
+  allMenuButtons = toolbarMarks.concat(this.toolbarTypes)
 
   connect () {
+    // const { DefaultExtensions } = withDefaults(this)
+    const { MarkExtensions } = withMarks(this)
     const { TableExtensions } = withTable(this)
     const { LinkExtensions } = withLink(this)
     const { MentionExtensions } = withMention(this)
@@ -104,9 +100,9 @@ export default class RichTextEditorController extends Controller {
     const extensions = [
       StarterKit.configure({
         blockquote: true,
-        bold: true,
+        bold: false,
         bulletList: true,
-        code: true,
+        code: false,
         codeBlock: true,
         document: true,
         dropcursor: true,
@@ -115,17 +111,17 @@ export default class RichTextEditorController extends Controller {
         heading: true,
         history: true,
         horizontalRule: true,
-        italic: true,
+        italic: false,
         listItem: true,
         orderedList: true,
         paragraph: true,
-        strike: true,
+        strike: false,
         text: true
       }),
-      Underline,
       Placeholder.configure({
         placeholder: this.placeholderValue
       }),
+      ...MarkExtensions,
       ...CodeBlockExtenstions,
       ...LinkExtensions,
       ...TableExtensions,
@@ -169,18 +165,6 @@ export default class RichTextEditorController extends Controller {
     this.outputTarget.value = editor.getHTML()
   }
   throttledUpdate = throttle(this.onUpdate, 1000)
-
-  toggleBold () {
-    this.runCommand('toggleBold')
-  }
-
-  toggleItalic () {
-    this.runCommand('toggleItalic')
-  }
-
-  toggleUnderline () {
-    this.runCommand('toggleUnderline')
-  }
 
   openNodeSelect () {
     this.closeLinkPanel()
@@ -230,14 +214,6 @@ export default class RichTextEditorController extends Controller {
     this.allMenuButtons.forEach(({ target }) => {
       if (this.hasTarget(target)) {
         this[`${target}Target`].classList.remove('is-active')
-      }
-    })
-  }
-
-  enableSelectedToolbarMarks () {
-    this.toolbarMarks.forEach(({ target, name, attributes }) => {
-      if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
-        this[`${target}Target`].classList.add('is-active')
       }
     })
   }
