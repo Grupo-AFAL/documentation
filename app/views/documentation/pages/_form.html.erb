@@ -77,17 +77,18 @@
         <% end %>
 
         <%= c.item(data: { action: 'rich-text-editor#insertTable' }) { 'Insert Table' } %>
-        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addColumnBefore' }) { 'Insert Left' } %>
-        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addColumnAfter' }) { 'Insert Right' } %>
-        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addRowBefore' }) { 'Insert Above' } %>
-        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addRowAfter' }) { 'Insert Below' } %>
-        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteColumn' }) { 'Remove Column' } %>
-        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteRow' }) { 'Remove Row' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addColumnBefore', 'rich-text-editor-target': 'tableModifier' }) { 'Insert Left' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addColumnAfter', 'rich-text-editor-target': 'tableModifier' }) { 'Insert Right' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addRowBefore', 'rich-text-editor-target': 'tableModifier' }) { 'Insert Above' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#addRowAfter', 'rich-text-editor-target': 'tableModifier' }) { 'Insert Below' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteColumn', 'rich-text-editor-target': 'tableModifier' }) { 'Remove Column' } %>
+        <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteRow', 'rich-text-editor-target': 'tableModifier' }) { 'Remove Row' } %>
       <% end %>
 
       <a class="mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
       <a class="mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
       <a class="mark underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
+      <a class="mark strike" data-action="rich-text-editor#toggleStrike" data-rich-text-editor-target="strike">S</a>
     </div>
 
     <div data-rich-text-editor-target="tippy"></div>

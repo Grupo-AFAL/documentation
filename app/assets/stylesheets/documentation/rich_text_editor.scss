@@ -158,10 +158,10 @@ $resize-handle-color: #adf;
     }
 
     /* purposely do not highlight these things */
-    .hljs-formula,
-    .hljs-params,
-    .hljs-property {
-    }
+    // .hljs-formula,
+    // .hljs-params,
+    // .hljs-property {
+    // }
 
     /* base03 - #545862 -  Comments, Invisibles, Line Highlighting */
     .hljs-comment {
@@ -328,6 +328,7 @@ $menu-icon-size: 0.75em;
   box-shadow: $menu-box-shadow;
   text-align: center;
   border-radius: $menu-border-radius;
+  width: fit-content;
 
   .toolbar-icon {
     .svg-inline {
@@ -346,17 +347,18 @@ $menu-icon-size: 0.75em;
 
   .dropdown-trigger {
     a {
-      width: auto;
-      border-radius: $menu-border-radius 0 0 $menu-border-radius;
+      width: max-content;
     }
   }
 
-  > :first-child {
+  > :first-child,
+  > :first-child a {
     border-radius: $menu-border-radius 0 0 $menu-border-radius;
   }
 
   > :last-child {
     border-radius: 0 $menu-border-radius $menu-border-radius 0;
+    border-right: none;
   }
 
   a {
@@ -416,8 +418,12 @@ $menu-icon-size: 0.75em;
       text-decoration: underline;
     }
 
-    &.link {
+    &.strike {
+      text-decoration: line-through;
     }
+
+    // &.link {
+    // }
   }
 
   .link-panel {
