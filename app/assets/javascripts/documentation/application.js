@@ -30182,8 +30182,11 @@ img.ProseMirror-separator {
     };
     const enableSelectedToolbarMarks = () => {
       toolbarMarks.forEach(({ target, name, attributes }) => {
-        if (controller.editor.isActive(name, attributes) && controller.hasTarget(target)) {
-          controller[`${target}Target`].classList.add("is-active");
+        if (!controller.editor.isActive(name, attributes))
+          return;
+        const targetNode = controller.targets.find(target);
+        if (targetNode) {
+          targetNode.classList.add("is-active");
         }
       });
     };
@@ -40860,9 +40863,11 @@ img.ProseMirror-separator {
     };
     const enableSelectedToolbarNode = () => {
       toolbarNodes.some(({ target, name, attributes }) => {
-        if (controller.editor.isActive(name, attributes) && controller.hasTarget(target)) {
-          controller[`${target}Target`].classList.add("is-active");
-          return true;
+        if (!controller.editor.isActive(name, attributes))
+          return;
+        const targetNode = controller.targets.find(target);
+        if (targetNode) {
+          targetNode.classList.add("is-active");
         }
       });
     };
@@ -40951,14 +40956,11 @@ img.ProseMirror-separator {
       this.closeNodeSelect();
       this.closeLinkPanel();
       this.allMenuButtons.forEach(({ target }) => {
-        if (this.hasTarget(target)) {
-          this[`${target}Target`].classList.remove("is-active");
+        const targetNode = this.targets.find(target);
+        if (targetNode) {
+          targetNode.classList.remove("is-active");
         }
       });
-    }
-    hasTarget(name) {
-      const capitalizedName = name[0].toUpperCase() + name.slice(1).toLowerCase();
-      return this[`has${capitalizedName}Target`];
     }
   };
   __publicField(RichTextEditorController, "targets", [
