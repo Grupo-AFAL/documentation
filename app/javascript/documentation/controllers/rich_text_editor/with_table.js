@@ -7,7 +7,7 @@ const defaultOptions = {
   resizable: false
 }
 
-export const tableTargets = ['tablePanel']
+export const tableTargets = ['tablePanel', 'tableModifier']
 
 export default (controller, options = {}) => {
   const { resizable } = Object.assign({}, defaultOptions, options)
@@ -29,12 +29,6 @@ export default (controller, options = {}) => {
     controller.runCommand(name)
   }
 
-  const tableModifierTargets = () => {
-    if (!controller.hasTablePanelTarget) return []
-
-    return Array.from(controller.tablePanelTarget.querySelectorAll('.modifier'))
-  }
-
   const insertTable = () => {
     controller.runCommand('insertTable', {
       rows: 3,
@@ -53,7 +47,7 @@ export default (controller, options = {}) => {
   const updateTableModifiers = () => {
     const tableIsActive = controller.editor.isActive('table')
 
-    tableModifierTargets().forEach(modifier => {
+    controller.tableModifierTargets.forEach(modifier => {
       tableIsActive
         ? modifier.classList.remove('disabled')
         : modifier.classList.add('disabled')

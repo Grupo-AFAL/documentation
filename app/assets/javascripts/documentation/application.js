@@ -25793,407 +25793,8 @@ img.ProseMirror-separator {
     };
   }
 
-  // node_modules/@tiptap/extension-blockquote/dist/tiptap-extension-blockquote.esm.js
-  var inputRegex = /^\s*>\s$/;
-  var Blockquote = Node4.create({
-    name: "blockquote",
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    content: "block+",
-    group: "block",
-    defining: true,
-    parseHTML() {
-      return [
-        { tag: "blockquote" }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["blockquote", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setBlockquote: () => ({ commands }) => {
-          return commands.wrapIn(this.name);
-        },
-        toggleBlockquote: () => ({ commands }) => {
-          return commands.toggleWrap(this.name);
-        },
-        unsetBlockquote: () => ({ commands }) => {
-          return commands.lift(this.name);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Shift-b": () => this.editor.commands.toggleBlockquote()
-      };
-    },
-    addInputRules() {
-      return [
-        wrappingInputRule({
-          find: inputRegex,
-          type: this.type
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-bold/dist/tiptap-extension-bold.esm.js
-  var starInputRegex = /(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))$/;
-  var starPasteRegex = /(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))/g;
-  var underscoreInputRegex = /(?:^|\s)((?:__)((?:[^__]+))(?:__))$/;
-  var underscorePasteRegex = /(?:^|\s)((?:__)((?:[^__]+))(?:__))/g;
-  var Bold = Mark3.create({
-    name: "bold",
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    parseHTML() {
-      return [
-        {
-          tag: "strong"
-        },
-        {
-          tag: "b",
-          getAttrs: (node5) => node5.style.fontWeight !== "normal" && null
-        },
-        {
-          style: "font-weight",
-          getAttrs: (value) => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
-        }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["strong", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setBold: () => ({ commands }) => {
-          return commands.setMark(this.name);
-        },
-        toggleBold: () => ({ commands }) => {
-          return commands.toggleMark(this.name);
-        },
-        unsetBold: () => ({ commands }) => {
-          return commands.unsetMark(this.name);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-b": () => this.editor.commands.toggleBold(),
-        "Mod-B": () => this.editor.commands.toggleBold()
-      };
-    },
-    addInputRules() {
-      return [
-        markInputRule({
-          find: starInputRegex,
-          type: this.type
-        }),
-        markInputRule({
-          find: underscoreInputRegex,
-          type: this.type
-        })
-      ];
-    },
-    addPasteRules() {
-      return [
-        markPasteRule({
-          find: starPasteRegex,
-          type: this.type
-        }),
-        markPasteRule({
-          find: underscorePasteRegex,
-          type: this.type
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-bullet-list/dist/tiptap-extension-bullet-list.esm.js
-  var inputRegex2 = /^\s*([-+*])\s$/;
-  var BulletList = Node4.create({
-    name: "bulletList",
-    addOptions() {
-      return {
-        itemTypeName: "listItem",
-        HTMLAttributes: {}
-      };
-    },
-    group: "block list",
-    content() {
-      return `${this.options.itemTypeName}+`;
-    },
-    parseHTML() {
-      return [
-        { tag: "ul" }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["ul", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        toggleBulletList: () => ({ commands }) => {
-          return commands.toggleList(this.name, this.options.itemTypeName);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Shift-8": () => this.editor.commands.toggleBulletList()
-      };
-    },
-    addInputRules() {
-      return [
-        wrappingInputRule({
-          find: inputRegex2,
-          type: this.type
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-code/dist/tiptap-extension-code.esm.js
-  var inputRegex3 = /(?:^|\s)((?:`)((?:[^`]+))(?:`))$/;
-  var pasteRegex = /(?:^|\s)((?:`)((?:[^`]+))(?:`))/g;
-  var Code = Mark3.create({
-    name: "code",
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    excludes: "_",
-    code: true,
-    parseHTML() {
-      return [
-        { tag: "code" }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["code", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setCode: () => ({ commands }) => {
-          return commands.setMark(this.name);
-        },
-        toggleCode: () => ({ commands }) => {
-          return commands.toggleMark(this.name);
-        },
-        unsetCode: () => ({ commands }) => {
-          return commands.unsetMark(this.name);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-e": () => this.editor.commands.toggleCode()
-      };
-    },
-    addInputRules() {
-      return [
-        markInputRule({
-          find: inputRegex3,
-          type: this.type
-        })
-      ];
-    },
-    addPasteRules() {
-      return [
-        markPasteRule({
-          find: pasteRegex,
-          type: this.type
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-code-block/dist/tiptap-extension-code-block.esm.js
-  var backtickInputRegex = /^```([a-z]+)?[\s\n]$/;
-  var tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/;
-  var CodeBlock = Node4.create({
-    name: "codeBlock",
-    addOptions() {
-      return {
-        languageClassPrefix: "language-",
-        exitOnTripleEnter: true,
-        exitOnArrowDown: true,
-        HTMLAttributes: {}
-      };
-    },
-    content: "text*",
-    marks: "",
-    group: "block",
-    code: true,
-    defining: true,
-    addAttributes() {
-      return {
-        language: {
-          default: null,
-          parseHTML: (element) => {
-            var _a;
-            const { languageClassPrefix } = this.options;
-            const classNames = [...((_a = element.firstElementChild) === null || _a === void 0 ? void 0 : _a.classList) || []];
-            const languages = classNames.filter((className) => className.startsWith(languageClassPrefix)).map((className) => className.replace(languageClassPrefix, ""));
-            const language = languages[0];
-            if (!language) {
-              return null;
-            }
-            return language;
-          },
-          rendered: false
-        }
-      };
-    },
-    parseHTML() {
-      return [
-        {
-          tag: "pre",
-          preserveWhitespace: "full"
-        }
-      ];
-    },
-    renderHTML({ node: node5, HTMLAttributes }) {
-      return [
-        "pre",
-        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-        [
-          "code",
-          {
-            class: node5.attrs.language ? this.options.languageClassPrefix + node5.attrs.language : null
-          },
-          0
-        ]
-      ];
-    },
-    addCommands() {
-      return {
-        setCodeBlock: (attributes) => ({ commands }) => {
-          return commands.setNode(this.name, attributes);
-        },
-        toggleCodeBlock: (attributes) => ({ commands }) => {
-          return commands.toggleNode(this.name, "paragraph", attributes);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Alt-c": () => this.editor.commands.toggleCodeBlock(),
-        Backspace: () => {
-          const { empty: empty2, $anchor } = this.editor.state.selection;
-          const isAtStart = $anchor.pos === 1;
-          if (!empty2 || $anchor.parent.type.name !== this.name) {
-            return false;
-          }
-          if (isAtStart || !$anchor.parent.textContent.length) {
-            return this.editor.commands.clearNodes();
-          }
-          return false;
-        },
-        Enter: ({ editor }) => {
-          if (!this.options.exitOnTripleEnter) {
-            return false;
-          }
-          const { state } = editor;
-          const { selection } = state;
-          const { $from, empty: empty2 } = selection;
-          if (!empty2 || $from.parent.type !== this.type) {
-            return false;
-          }
-          const isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
-          const endsWithDoubleNewline = $from.parent.textContent.endsWith("\n\n");
-          if (!isAtEnd || !endsWithDoubleNewline) {
-            return false;
-          }
-          return editor.chain().command(({ tr }) => {
-            tr.delete($from.pos - 2, $from.pos);
-            return true;
-          }).exitCode().run();
-        },
-        ArrowDown: ({ editor }) => {
-          if (!this.options.exitOnArrowDown) {
-            return false;
-          }
-          const { state } = editor;
-          const { selection, doc: doc2 } = state;
-          const { $from, empty: empty2 } = selection;
-          if (!empty2 || $from.parent.type !== this.type) {
-            return false;
-          }
-          const isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
-          if (!isAtEnd) {
-            return false;
-          }
-          const after3 = $from.after();
-          if (after3 === void 0) {
-            return false;
-          }
-          const nodeAfter = doc2.nodeAt(after3);
-          if (nodeAfter) {
-            return false;
-          }
-          return editor.commands.exitCode();
-        }
-      };
-    },
-    addInputRules() {
-      return [
-        textblockTypeInputRule({
-          find: backtickInputRegex,
-          type: this.type,
-          getAttributes: (match) => ({
-            language: match[1]
-          })
-        }),
-        textblockTypeInputRule({
-          find: tildeInputRegex,
-          type: this.type,
-          getAttributes: (match) => ({
-            language: match[1]
-          })
-        })
-      ];
-    },
-    addProseMirrorPlugins() {
-      return [
-        new Plugin({
-          key: new PluginKey("codeBlockVSCodeHandler"),
-          props: {
-            handlePaste: (view, event) => {
-              if (!event.clipboardData) {
-                return false;
-              }
-              if (this.editor.isActive(this.type.name)) {
-                return false;
-              }
-              const text4 = event.clipboardData.getData("text/plain");
-              const vscode = event.clipboardData.getData("vscode-editor-data");
-              const vscodeData = vscode ? JSON.parse(vscode) : void 0;
-              const language = vscodeData === null || vscodeData === void 0 ? void 0 : vscodeData.mode;
-              if (!text4 || !language) {
-                return false;
-              }
-              const { tr } = view.state;
-              tr.replaceSelectionWith(this.type.create({ language }));
-              tr.setSelection(TextSelection.near(tr.doc.resolve(Math.max(0, tr.selection.from - 2))));
-              tr.insertText(text4.replace(/\r\n?/g, "\n"));
-              tr.setMeta("paste", true);
-              view.dispatch(tr);
-              return true;
-            }
-          }
-        })
-      ];
-    }
-  });
+  // app/javascript/documentation/controllers/rich_text_editor_controller.js
+  var import_lodash = __toESM(require_lodash());
 
   // node_modules/@tiptap/extension-document/dist/tiptap-extension-document.esm.js
   var Document = Node4.create({
@@ -26596,130 +26197,6 @@ img.ProseMirror-separator {
       return {
         allowGapCursor: (_a = callOrReturn(getExtensionField(extension, "allowGapCursor", context))) !== null && _a !== void 0 ? _a : null
       };
-    }
-  });
-
-  // node_modules/@tiptap/extension-hard-break/dist/tiptap-extension-hard-break.esm.js
-  var HardBreak = Node4.create({
-    name: "hardBreak",
-    addOptions() {
-      return {
-        keepMarks: true,
-        HTMLAttributes: {}
-      };
-    },
-    inline: true,
-    group: "inline",
-    selectable: false,
-    parseHTML() {
-      return [
-        { tag: "br" }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["br", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
-    },
-    renderText() {
-      return "\n";
-    },
-    addCommands() {
-      return {
-        setHardBreak: () => ({ commands, chain, state, editor }) => {
-          return commands.first([
-            () => commands.exitCode(),
-            () => commands.command(() => {
-              const { selection, storedMarks } = state;
-              if (selection.$from.parent.type.spec.isolating) {
-                return false;
-              }
-              const { keepMarks } = this.options;
-              const { splittableMarks } = editor.extensionManager;
-              const marks3 = storedMarks || selection.$to.parentOffset && selection.$from.marks();
-              return chain().insertContent({ type: this.name }).command(({ tr, dispatch: dispatch3 }) => {
-                if (dispatch3 && marks3 && keepMarks) {
-                  const filteredMarks = marks3.filter((mark4) => splittableMarks.includes(mark4.type.name));
-                  tr.ensureMarks(filteredMarks);
-                }
-                return true;
-              }).run();
-            })
-          ]);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Enter": () => this.editor.commands.setHardBreak(),
-        "Shift-Enter": () => this.editor.commands.setHardBreak()
-      };
-    }
-  });
-
-  // node_modules/@tiptap/extension-heading/dist/tiptap-extension-heading.esm.js
-  var Heading = Node4.create({
-    name: "heading",
-    addOptions() {
-      return {
-        levels: [1, 2, 3, 4, 5, 6],
-        HTMLAttributes: {}
-      };
-    },
-    content: "inline*",
-    group: "block",
-    defining: true,
-    addAttributes() {
-      return {
-        level: {
-          default: 1,
-          rendered: false
-        }
-      };
-    },
-    parseHTML() {
-      return this.options.levels.map((level) => ({
-        tag: `h${level}`,
-        attrs: { level }
-      }));
-    },
-    renderHTML({ node: node5, HTMLAttributes }) {
-      const hasLevel = this.options.levels.includes(node5.attrs.level);
-      const level = hasLevel ? node5.attrs.level : this.options.levels[0];
-      return [`h${level}`, mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setHeading: (attributes) => ({ commands }) => {
-          if (!this.options.levels.includes(attributes.level)) {
-            return false;
-          }
-          return commands.setNode(this.name, attributes);
-        },
-        toggleHeading: (attributes) => ({ commands }) => {
-          if (!this.options.levels.includes(attributes.level)) {
-            return false;
-          }
-          return commands.toggleNode(this.name, "paragraph", attributes);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return this.options.levels.reduce((items, level) => ({
-        ...items,
-        ...{
-          [`Mod-Alt-${level}`]: () => this.editor.commands.toggleHeading({ level })
-        }
-      }), {});
-    },
-    addInputRules() {
-      return this.options.levels.map((level) => {
-        return textblockTypeInputRule({
-          find: new RegExp(`^(#{1,${level}})\\s$`),
-          type: this.type,
-          getAttributes: {
-            level
-          }
-        });
-      });
     }
   });
 
@@ -27317,386 +26794,56 @@ img.ProseMirror-separator {
     }
   });
 
-  // node_modules/@tiptap/extension-horizontal-rule/dist/tiptap-extension-horizontal-rule.esm.js
-  var HorizontalRule = Node4.create({
-    name: "horizontalRule",
+  // node_modules/@tiptap/extension-placeholder/dist/tiptap-extension-placeholder.esm.js
+  var Placeholder = Extension.create({
+    name: "placeholder",
     addOptions() {
       return {
-        HTMLAttributes: {}
+        emptyEditorClass: "is-editor-empty",
+        emptyNodeClass: "is-empty",
+        placeholder: "Write something \u2026",
+        showOnlyWhenEditable: true,
+        showOnlyCurrent: true,
+        includeChildren: false
       };
     },
-    group: "block",
-    parseHTML() {
+    addProseMirrorPlugins() {
       return [
-        { tag: "hr" }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["hr", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
-    },
-    addCommands() {
-      return {
-        setHorizontalRule: () => ({ chain }) => {
-          return chain().insertContent({ type: this.name }).command(({ tr, dispatch: dispatch3 }) => {
-            var _a;
-            if (dispatch3) {
-              const { $to } = tr.selection;
-              const posAfter = $to.end();
-              if ($to.nodeAfter) {
-                tr.setSelection(TextSelection.create(tr.doc, $to.pos));
-              } else {
-                const node5 = (_a = $to.parent.type.contentMatch.defaultType) === null || _a === void 0 ? void 0 : _a.create();
-                if (node5) {
-                  tr.insert(posAfter, node5);
-                  tr.setSelection(TextSelection.create(tr.doc, posAfter));
-                }
+        new Plugin({
+          props: {
+            decorations: ({ doc: doc2, selection }) => {
+              const active = this.editor.isEditable || !this.options.showOnlyWhenEditable;
+              const { anchor } = selection;
+              const decorations = [];
+              if (!active) {
+                return;
               }
-              tr.scrollIntoView();
+              doc2.descendants((node5, pos) => {
+                const hasAnchor = anchor >= pos && anchor <= pos + node5.nodeSize;
+                const isEmpty2 = !node5.isLeaf && !node5.childCount;
+                if ((hasAnchor || !this.options.showOnlyCurrent) && isEmpty2) {
+                  const classes = [this.options.emptyNodeClass];
+                  if (this.editor.isEmpty) {
+                    classes.push(this.options.emptyEditorClass);
+                  }
+                  const decoration = Decoration.node(pos, pos + node5.nodeSize, {
+                    class: classes.join(" "),
+                    "data-placeholder": typeof this.options.placeholder === "function" ? this.options.placeholder({
+                      editor: this.editor,
+                      node: node5,
+                      pos,
+                      hasAnchor
+                    }) : this.options.placeholder
+                  });
+                  decorations.push(decoration);
+                }
+                return this.options.includeChildren;
+              });
+              return DecorationSet.create(doc2, decorations);
             }
-            return true;
-          }).run();
-        }
-      };
-    },
-    addInputRules() {
-      return [
-        nodeInputRule({
-          find: /^(?:---|—-|___\s|\*\*\*\s)$/,
-          type: this.type
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-italic/dist/tiptap-extension-italic.esm.js
-  var starInputRegex2 = /(?:^|\s)((?:\*)((?:[^*]+))(?:\*))$/;
-  var starPasteRegex2 = /(?:^|\s)((?:\*)((?:[^*]+))(?:\*))/g;
-  var underscoreInputRegex2 = /(?:^|\s)((?:_)((?:[^_]+))(?:_))$/;
-  var underscorePasteRegex2 = /(?:^|\s)((?:_)((?:[^_]+))(?:_))/g;
-  var Italic = Mark3.create({
-    name: "italic",
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    parseHTML() {
-      return [
-        {
-          tag: "em"
-        },
-        {
-          tag: "i",
-          getAttrs: (node5) => node5.style.fontStyle !== "normal" && null
-        },
-        {
-          style: "font-style=italic"
-        }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["em", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setItalic: () => ({ commands }) => {
-          return commands.setMark(this.name);
-        },
-        toggleItalic: () => ({ commands }) => {
-          return commands.toggleMark(this.name);
-        },
-        unsetItalic: () => ({ commands }) => {
-          return commands.unsetMark(this.name);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-i": () => this.editor.commands.toggleItalic(),
-        "Mod-I": () => this.editor.commands.toggleItalic()
-      };
-    },
-    addInputRules() {
-      return [
-        markInputRule({
-          find: starInputRegex2,
-          type: this.type
-        }),
-        markInputRule({
-          find: underscoreInputRegex2,
-          type: this.type
-        })
-      ];
-    },
-    addPasteRules() {
-      return [
-        markPasteRule({
-          find: starPasteRegex2,
-          type: this.type
-        }),
-        markPasteRule({
-          find: underscorePasteRegex2,
-          type: this.type
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-list-item/dist/tiptap-extension-list-item.esm.js
-  var ListItem = Node4.create({
-    name: "listItem",
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    content: "paragraph block*",
-    defining: true,
-    parseHTML() {
-      return [
-        {
-          tag: "li"
-        }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["li", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addKeyboardShortcuts() {
-      return {
-        Enter: () => this.editor.commands.splitListItem(this.name),
-        Tab: () => this.editor.commands.sinkListItem(this.name),
-        "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
-      };
-    }
-  });
-
-  // node_modules/@tiptap/extension-ordered-list/dist/tiptap-extension-ordered-list.esm.js
-  var inputRegex4 = /^(\d+)\.\s$/;
-  var OrderedList = Node4.create({
-    name: "orderedList",
-    addOptions() {
-      return {
-        itemTypeName: "listItem",
-        HTMLAttributes: {}
-      };
-    },
-    group: "block list",
-    content() {
-      return `${this.options.itemTypeName}+`;
-    },
-    addAttributes() {
-      return {
-        start: {
-          default: 1,
-          parseHTML: (element) => {
-            return element.hasAttribute("start") ? parseInt(element.getAttribute("start") || "", 10) : 1;
           }
-        }
-      };
-    },
-    parseHTML() {
-      return [
-        {
-          tag: "ol"
-        }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      const { start: start6, ...attributesWithoutStart } = HTMLAttributes;
-      return start6 === 1 ? ["ol", mergeAttributes(this.options.HTMLAttributes, attributesWithoutStart), 0] : ["ol", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        toggleOrderedList: () => ({ commands }) => {
-          return commands.toggleList(this.name, this.options.itemTypeName);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Shift-7": () => this.editor.commands.toggleOrderedList()
-      };
-    },
-    addInputRules() {
-      return [
-        wrappingInputRule({
-          find: inputRegex4,
-          type: this.type,
-          getAttributes: (match) => ({ start: +match[1] }),
-          joinPredicate: (match, node5) => node5.childCount + node5.attrs.start === +match[1]
         })
       ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-paragraph/dist/tiptap-extension-paragraph.esm.js
-  var Paragraph = Node4.create({
-    name: "paragraph",
-    priority: 1e3,
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    group: "block",
-    content: "inline*",
-    parseHTML() {
-      return [
-        { tag: "p" }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["p", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setParagraph: () => ({ commands }) => {
-          return commands.setNode(this.name);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Alt-0": () => this.editor.commands.setParagraph()
-      };
-    }
-  });
-
-  // node_modules/@tiptap/extension-strike/dist/tiptap-extension-strike.esm.js
-  var inputRegex5 = /(?:^|\s)((?:~~)((?:[^~]+))(?:~~))$/;
-  var pasteRegex2 = /(?:^|\s)((?:~~)((?:[^~]+))(?:~~))/g;
-  var Strike = Mark3.create({
-    name: "strike",
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    parseHTML() {
-      return [
-        {
-          tag: "s"
-        },
-        {
-          tag: "del"
-        },
-        {
-          tag: "strike"
-        },
-        {
-          style: "text-decoration",
-          consuming: false,
-          getAttrs: (style2) => style2.includes("line-through") ? {} : false
-        }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["s", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setStrike: () => ({ commands }) => {
-          return commands.setMark(this.name);
-        },
-        toggleStrike: () => ({ commands }) => {
-          return commands.toggleMark(this.name);
-        },
-        unsetStrike: () => ({ commands }) => {
-          return commands.unsetMark(this.name);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Shift-x": () => this.editor.commands.toggleStrike()
-      };
-    },
-    addInputRules() {
-      return [
-        markInputRule({
-          find: inputRegex5,
-          type: this.type
-        })
-      ];
-    },
-    addPasteRules() {
-      return [
-        markPasteRule({
-          find: pasteRegex2,
-          type: this.type
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-text/dist/tiptap-extension-text.esm.js
-  var Text = Node4.create({
-    name: "text",
-    group: "inline"
-  });
-
-  // node_modules/@tiptap/starter-kit/dist/tiptap-starter-kit.esm.js
-  var StarterKit = Extension.create({
-    name: "starterKit",
-    addExtensions() {
-      var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
-      const extensions2 = [];
-      if (this.options.blockquote !== false) {
-        extensions2.push(Blockquote.configure((_a = this.options) === null || _a === void 0 ? void 0 : _a.blockquote));
-      }
-      if (this.options.bold !== false) {
-        extensions2.push(Bold.configure((_b = this.options) === null || _b === void 0 ? void 0 : _b.bold));
-      }
-      if (this.options.bulletList !== false) {
-        extensions2.push(BulletList.configure((_c = this.options) === null || _c === void 0 ? void 0 : _c.bulletList));
-      }
-      if (this.options.code !== false) {
-        extensions2.push(Code.configure((_d = this.options) === null || _d === void 0 ? void 0 : _d.code));
-      }
-      if (this.options.codeBlock !== false) {
-        extensions2.push(CodeBlock.configure((_e = this.options) === null || _e === void 0 ? void 0 : _e.codeBlock));
-      }
-      if (this.options.document !== false) {
-        extensions2.push(Document.configure((_f = this.options) === null || _f === void 0 ? void 0 : _f.document));
-      }
-      if (this.options.dropcursor !== false) {
-        extensions2.push(Dropcursor.configure((_g = this.options) === null || _g === void 0 ? void 0 : _g.dropcursor));
-      }
-      if (this.options.gapcursor !== false) {
-        extensions2.push(Gapcursor.configure((_h = this.options) === null || _h === void 0 ? void 0 : _h.gapcursor));
-      }
-      if (this.options.hardBreak !== false) {
-        extensions2.push(HardBreak.configure((_j = this.options) === null || _j === void 0 ? void 0 : _j.hardBreak));
-      }
-      if (this.options.heading !== false) {
-        extensions2.push(Heading.configure((_k = this.options) === null || _k === void 0 ? void 0 : _k.heading));
-      }
-      if (this.options.history !== false) {
-        extensions2.push(History2.configure((_l = this.options) === null || _l === void 0 ? void 0 : _l.history));
-      }
-      if (this.options.horizontalRule !== false) {
-        extensions2.push(HorizontalRule.configure((_m = this.options) === null || _m === void 0 ? void 0 : _m.horizontalRule));
-      }
-      if (this.options.italic !== false) {
-        extensions2.push(Italic.configure((_o = this.options) === null || _o === void 0 ? void 0 : _o.italic));
-      }
-      if (this.options.listItem !== false) {
-        extensions2.push(ListItem.configure((_p = this.options) === null || _p === void 0 ? void 0 : _p.listItem));
-      }
-      if (this.options.orderedList !== false) {
-        extensions2.push(OrderedList.configure((_q = this.options) === null || _q === void 0 ? void 0 : _q.orderedList));
-      }
-      if (this.options.paragraph !== false) {
-        extensions2.push(Paragraph.configure((_r = this.options) === null || _r === void 0 ? void 0 : _r.paragraph));
-      }
-      if (this.options.strike !== false) {
-        extensions2.push(Strike.configure((_s = this.options) === null || _s === void 0 ? void 0 : _s.strike));
-      }
-      if (this.options.text !== false) {
-        extensions2.push(Text.configure((_t = this.options) === null || _t === void 0 ? void 0 : _t.text));
-      }
-      return extensions2;
     }
   });
 
@@ -30675,54 +29822,292 @@ img.ProseMirror-separator {
     }
   });
 
-  // node_modules/@tiptap/extension-placeholder/dist/tiptap-extension-placeholder.esm.js
-  var Placeholder = Extension.create({
-    name: "placeholder",
+  // app/javascript/documentation/controllers/rich_text_editor/with_defaults.js
+  var defaultTargets = ["bubbleMenu"];
+  var with_defaults_default = (controller, _options = {}) => {
+    const DefaultExtensions = [
+      Document,
+      Dropcursor,
+      Gapcursor,
+      History2,
+      Placeholder
+    ];
+    if (controller.editableValue && controller.hasBubbleMenuTarget) {
+      DefaultExtensions.push(BubbleMenu.configure({
+        element: controller.bubbleMenuTarget,
+        tippyOptions: { appendTo: controller.element, duration: 100 }
+      }));
+    }
+    return { DefaultExtensions };
+  };
+
+  // node_modules/@tiptap/extension-bold/dist/tiptap-extension-bold.esm.js
+  var starInputRegex = /(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))$/;
+  var starPasteRegex = /(?:^|\s)((?:\*\*)((?:[^*]+))(?:\*\*))/g;
+  var underscoreInputRegex = /(?:^|\s)((?:__)((?:[^__]+))(?:__))$/;
+  var underscorePasteRegex = /(?:^|\s)((?:__)((?:[^__]+))(?:__))/g;
+  var Bold = Mark3.create({
+    name: "bold",
     addOptions() {
       return {
-        emptyEditorClass: "is-editor-empty",
-        emptyNodeClass: "is-empty",
-        placeholder: "Write something \u2026",
-        showOnlyWhenEditable: true,
-        showOnlyCurrent: true,
-        includeChildren: false
+        HTMLAttributes: {}
       };
     },
-    addProseMirrorPlugins() {
+    parseHTML() {
       return [
-        new Plugin({
-          props: {
-            decorations: ({ doc: doc2, selection }) => {
-              const active = this.editor.isEditable || !this.options.showOnlyWhenEditable;
-              const { anchor } = selection;
-              const decorations = [];
-              if (!active) {
-                return;
-              }
-              doc2.descendants((node5, pos) => {
-                const hasAnchor = anchor >= pos && anchor <= pos + node5.nodeSize;
-                const isEmpty2 = !node5.isLeaf && !node5.childCount;
-                if ((hasAnchor || !this.options.showOnlyCurrent) && isEmpty2) {
-                  const classes = [this.options.emptyNodeClass];
-                  if (this.editor.isEmpty) {
-                    classes.push(this.options.emptyEditorClass);
-                  }
-                  const decoration = Decoration.node(pos, pos + node5.nodeSize, {
-                    class: classes.join(" "),
-                    "data-placeholder": typeof this.options.placeholder === "function" ? this.options.placeholder({
-                      editor: this.editor,
-                      node: node5,
-                      pos,
-                      hasAnchor
-                    }) : this.options.placeholder
-                  });
-                  decorations.push(decoration);
-                }
-                return this.options.includeChildren;
-              });
-              return DecorationSet.create(doc2, decorations);
-            }
-          }
+        {
+          tag: "strong"
+        },
+        {
+          tag: "b",
+          getAttrs: (node5) => node5.style.fontWeight !== "normal" && null
+        },
+        {
+          style: "font-weight",
+          getAttrs: (value) => /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["strong", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setBold: () => ({ commands }) => {
+          return commands.setMark(this.name);
+        },
+        toggleBold: () => ({ commands }) => {
+          return commands.toggleMark(this.name);
+        },
+        unsetBold: () => ({ commands }) => {
+          return commands.unsetMark(this.name);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-b": () => this.editor.commands.toggleBold(),
+        "Mod-B": () => this.editor.commands.toggleBold()
+      };
+    },
+    addInputRules() {
+      return [
+        markInputRule({
+          find: starInputRegex,
+          type: this.type
+        }),
+        markInputRule({
+          find: underscoreInputRegex,
+          type: this.type
+        })
+      ];
+    },
+    addPasteRules() {
+      return [
+        markPasteRule({
+          find: starPasteRegex,
+          type: this.type
+        }),
+        markPasteRule({
+          find: underscorePasteRegex,
+          type: this.type
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-code/dist/tiptap-extension-code.esm.js
+  var inputRegex = /(?:^|\s)((?:`)((?:[^`]+))(?:`))$/;
+  var pasteRegex = /(?:^|\s)((?:`)((?:[^`]+))(?:`))/g;
+  var Code = Mark3.create({
+    name: "code",
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    excludes: "_",
+    code: true,
+    parseHTML() {
+      return [
+        { tag: "code" }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["code", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setCode: () => ({ commands }) => {
+          return commands.setMark(this.name);
+        },
+        toggleCode: () => ({ commands }) => {
+          return commands.toggleMark(this.name);
+        },
+        unsetCode: () => ({ commands }) => {
+          return commands.unsetMark(this.name);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-e": () => this.editor.commands.toggleCode()
+      };
+    },
+    addInputRules() {
+      return [
+        markInputRule({
+          find: inputRegex,
+          type: this.type
+        })
+      ];
+    },
+    addPasteRules() {
+      return [
+        markPasteRule({
+          find: pasteRegex,
+          type: this.type
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-italic/dist/tiptap-extension-italic.esm.js
+  var starInputRegex2 = /(?:^|\s)((?:\*)((?:[^*]+))(?:\*))$/;
+  var starPasteRegex2 = /(?:^|\s)((?:\*)((?:[^*]+))(?:\*))/g;
+  var underscoreInputRegex2 = /(?:^|\s)((?:_)((?:[^_]+))(?:_))$/;
+  var underscorePasteRegex2 = /(?:^|\s)((?:_)((?:[^_]+))(?:_))/g;
+  var Italic = Mark3.create({
+    name: "italic",
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: "em"
+        },
+        {
+          tag: "i",
+          getAttrs: (node5) => node5.style.fontStyle !== "normal" && null
+        },
+        {
+          style: "font-style=italic"
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["em", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setItalic: () => ({ commands }) => {
+          return commands.setMark(this.name);
+        },
+        toggleItalic: () => ({ commands }) => {
+          return commands.toggleMark(this.name);
+        },
+        unsetItalic: () => ({ commands }) => {
+          return commands.unsetMark(this.name);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-i": () => this.editor.commands.toggleItalic(),
+        "Mod-I": () => this.editor.commands.toggleItalic()
+      };
+    },
+    addInputRules() {
+      return [
+        markInputRule({
+          find: starInputRegex2,
+          type: this.type
+        }),
+        markInputRule({
+          find: underscoreInputRegex2,
+          type: this.type
+        })
+      ];
+    },
+    addPasteRules() {
+      return [
+        markPasteRule({
+          find: starPasteRegex2,
+          type: this.type
+        }),
+        markPasteRule({
+          find: underscorePasteRegex2,
+          type: this.type
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-strike/dist/tiptap-extension-strike.esm.js
+  var inputRegex2 = /(?:^|\s)((?:~~)((?:[^~]+))(?:~~))$/;
+  var pasteRegex2 = /(?:^|\s)((?:~~)((?:[^~]+))(?:~~))/g;
+  var Strike = Mark3.create({
+    name: "strike",
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: "s"
+        },
+        {
+          tag: "del"
+        },
+        {
+          tag: "strike"
+        },
+        {
+          style: "text-decoration",
+          consuming: false,
+          getAttrs: (style2) => style2.includes("line-through") ? {} : false
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["s", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setStrike: () => ({ commands }) => {
+          return commands.setMark(this.name);
+        },
+        toggleStrike: () => ({ commands }) => {
+          return commands.toggleMark(this.name);
+        },
+        unsetStrike: () => ({ commands }) => {
+          return commands.unsetMark(this.name);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Shift-x": () => this.editor.commands.toggleStrike()
+      };
+    },
+    addInputRules() {
+      return [
+        markInputRule({
+          find: inputRegex2,
+          type: this.type
+        })
+      ];
+    },
+    addPasteRules() {
+      return [
+        markPasteRule({
+          find: pasteRegex2,
+          type: this.type
         })
       ];
     }
@@ -37510,7 +36895,7 @@ img.ProseMirror-separator {
   var defaultOptions2 = {
     resizable: false
   };
-  var tableTargets = ["tablePanel"];
+  var tableTargets = ["tablePanel", "tableModifier"];
   var with_table_default = (controller, options = {}) => {
     const { resizable } = Object.assign({}, defaultOptions2, options);
     const TableExtensions = [
@@ -37527,11 +36912,6 @@ img.ProseMirror-separator {
       }
       controller.runCommand(name);
     };
-    const tableModifierTargets = () => {
-      if (!controller.hasTablePanelTarget)
-        return [];
-      return Array.from(controller.tablePanelTarget.querySelectorAll(".modifier"));
-    };
     const insertTable = () => {
       controller.runCommand("insertTable", {
         rows: 3,
@@ -37547,7 +36927,7 @@ img.ProseMirror-separator {
     const deleteRow2 = (e) => runTableCommand(e, "deleteRow");
     const updateTableModifiers = () => {
       const tableIsActive = controller.editor.isActive("table");
-      tableModifierTargets().forEach((modifier) => {
+      controller.tableModifierTargets.forEach((modifier) => {
         tableIsActive ? modifier.classList.remove("disabled") : modifier.classList.add("disabled");
       });
     };
@@ -38036,7 +37416,7 @@ img.ProseMirror-separator {
       return "mailto:" + this.toString();
     }
   });
-  var Text2 = createTokenClass("text");
+  var Text = createTokenClass("text");
   var Nl = createTokenClass("nl");
   var Url = createTokenClass("url", {
     isLink: true,
@@ -38077,7 +37457,7 @@ img.ProseMirror-separator {
     createTokenClass,
     MailtoEmail,
     Email,
-    Text: Text2,
+    Text,
     Nl,
     Url
   });
@@ -38255,7 +37635,7 @@ img.ProseMirror-separator {
         }
       } else {
         if (textTokens.length > 0) {
-          multis.push(parserCreateMultiToken(Text2, input, textTokens));
+          multis.push(parserCreateMultiToken(Text, input, textTokens));
           textTokens = [];
         }
         cursor -= sinceAccepts;
@@ -38266,7 +37646,7 @@ img.ProseMirror-separator {
       }
     }
     if (textTokens.length > 0) {
-      multis.push(parserCreateMultiToken(Text2, input, textTokens));
+      multis.push(parserCreateMultiToken(Text, input, textTokens));
     }
     return multis;
   }
@@ -38998,6 +38378,277 @@ img.ProseMirror-separator {
     ];
     return { MentionExtensions };
   };
+
+  // node_modules/@tiptap/extension-blockquote/dist/tiptap-extension-blockquote.esm.js
+  var inputRegex3 = /^\s*>\s$/;
+  var Blockquote = Node4.create({
+    name: "blockquote",
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    content: "block+",
+    group: "block",
+    defining: true,
+    parseHTML() {
+      return [
+        { tag: "blockquote" }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["blockquote", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setBlockquote: () => ({ commands }) => {
+          return commands.wrapIn(this.name);
+        },
+        toggleBlockquote: () => ({ commands }) => {
+          return commands.toggleWrap(this.name);
+        },
+        unsetBlockquote: () => ({ commands }) => {
+          return commands.lift(this.name);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Shift-b": () => this.editor.commands.toggleBlockquote()
+      };
+    },
+    addInputRules() {
+      return [
+        wrappingInputRule({
+          find: inputRegex3,
+          type: this.type
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-bullet-list/dist/tiptap-extension-bullet-list.esm.js
+  var inputRegex4 = /^\s*([-+*])\s$/;
+  var BulletList = Node4.create({
+    name: "bulletList",
+    addOptions() {
+      return {
+        itemTypeName: "listItem",
+        HTMLAttributes: {}
+      };
+    },
+    group: "block list",
+    content() {
+      return `${this.options.itemTypeName}+`;
+    },
+    parseHTML() {
+      return [
+        { tag: "ul" }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["ul", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        toggleBulletList: () => ({ commands }) => {
+          return commands.toggleList(this.name, this.options.itemTypeName);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Shift-8": () => this.editor.commands.toggleBulletList()
+      };
+    },
+    addInputRules() {
+      return [
+        wrappingInputRule({
+          find: inputRegex4,
+          type: this.type
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-code-block/dist/tiptap-extension-code-block.esm.js
+  var backtickInputRegex = /^```([a-z]+)?[\s\n]$/;
+  var tildeInputRegex = /^~~~([a-z]+)?[\s\n]$/;
+  var CodeBlock = Node4.create({
+    name: "codeBlock",
+    addOptions() {
+      return {
+        languageClassPrefix: "language-",
+        exitOnTripleEnter: true,
+        exitOnArrowDown: true,
+        HTMLAttributes: {}
+      };
+    },
+    content: "text*",
+    marks: "",
+    group: "block",
+    code: true,
+    defining: true,
+    addAttributes() {
+      return {
+        language: {
+          default: null,
+          parseHTML: (element) => {
+            var _a;
+            const { languageClassPrefix } = this.options;
+            const classNames = [...((_a = element.firstElementChild) === null || _a === void 0 ? void 0 : _a.classList) || []];
+            const languages = classNames.filter((className) => className.startsWith(languageClassPrefix)).map((className) => className.replace(languageClassPrefix, ""));
+            const language = languages[0];
+            if (!language) {
+              return null;
+            }
+            return language;
+          },
+          rendered: false
+        }
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: "pre",
+          preserveWhitespace: "full"
+        }
+      ];
+    },
+    renderHTML({ node: node5, HTMLAttributes }) {
+      return [
+        "pre",
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+        [
+          "code",
+          {
+            class: node5.attrs.language ? this.options.languageClassPrefix + node5.attrs.language : null
+          },
+          0
+        ]
+      ];
+    },
+    addCommands() {
+      return {
+        setCodeBlock: (attributes) => ({ commands }) => {
+          return commands.setNode(this.name, attributes);
+        },
+        toggleCodeBlock: (attributes) => ({ commands }) => {
+          return commands.toggleNode(this.name, "paragraph", attributes);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Alt-c": () => this.editor.commands.toggleCodeBlock(),
+        Backspace: () => {
+          const { empty: empty2, $anchor } = this.editor.state.selection;
+          const isAtStart = $anchor.pos === 1;
+          if (!empty2 || $anchor.parent.type.name !== this.name) {
+            return false;
+          }
+          if (isAtStart || !$anchor.parent.textContent.length) {
+            return this.editor.commands.clearNodes();
+          }
+          return false;
+        },
+        Enter: ({ editor }) => {
+          if (!this.options.exitOnTripleEnter) {
+            return false;
+          }
+          const { state } = editor;
+          const { selection } = state;
+          const { $from, empty: empty2 } = selection;
+          if (!empty2 || $from.parent.type !== this.type) {
+            return false;
+          }
+          const isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
+          const endsWithDoubleNewline = $from.parent.textContent.endsWith("\n\n");
+          if (!isAtEnd || !endsWithDoubleNewline) {
+            return false;
+          }
+          return editor.chain().command(({ tr }) => {
+            tr.delete($from.pos - 2, $from.pos);
+            return true;
+          }).exitCode().run();
+        },
+        ArrowDown: ({ editor }) => {
+          if (!this.options.exitOnArrowDown) {
+            return false;
+          }
+          const { state } = editor;
+          const { selection, doc: doc2 } = state;
+          const { $from, empty: empty2 } = selection;
+          if (!empty2 || $from.parent.type !== this.type) {
+            return false;
+          }
+          const isAtEnd = $from.parentOffset === $from.parent.nodeSize - 2;
+          if (!isAtEnd) {
+            return false;
+          }
+          const after3 = $from.after();
+          if (after3 === void 0) {
+            return false;
+          }
+          const nodeAfter = doc2.nodeAt(after3);
+          if (nodeAfter) {
+            return false;
+          }
+          return editor.commands.exitCode();
+        }
+      };
+    },
+    addInputRules() {
+      return [
+        textblockTypeInputRule({
+          find: backtickInputRegex,
+          type: this.type,
+          getAttributes: (match) => ({
+            language: match[1]
+          })
+        }),
+        textblockTypeInputRule({
+          find: tildeInputRegex,
+          type: this.type,
+          getAttributes: (match) => ({
+            language: match[1]
+          })
+        })
+      ];
+    },
+    addProseMirrorPlugins() {
+      return [
+        new Plugin({
+          key: new PluginKey("codeBlockVSCodeHandler"),
+          props: {
+            handlePaste: (view, event) => {
+              if (!event.clipboardData) {
+                return false;
+              }
+              if (this.editor.isActive(this.type.name)) {
+                return false;
+              }
+              const text4 = event.clipboardData.getData("text/plain");
+              const vscode = event.clipboardData.getData("vscode-editor-data");
+              const vscodeData = vscode ? JSON.parse(vscode) : void 0;
+              const language = vscodeData === null || vscodeData === void 0 ? void 0 : vscodeData.mode;
+              if (!text4 || !language) {
+                return false;
+              }
+              const { tr } = view.state;
+              tr.replaceSelectionWith(this.type.create({ language }));
+              tr.setSelection(TextSelection.near(tr.doc.resolve(Math.max(0, tr.selection.from - 2))));
+              tr.insertText(text4.replace(/\r\n?/g, "\n"));
+              tr.setMeta("paste", true);
+              view.dispatch(tr);
+              return true;
+            }
+          }
+        })
+      ];
+    }
+  });
 
   // node_modules/@tiptap/extension-code-block-lowlight/dist/tiptap-extension-code-block-lowlight.esm.js
   var core$1 = {};
@@ -40782,8 +40433,310 @@ img.ProseMirror-separator {
     }
   });
 
+  // node_modules/@tiptap/extension-hard-break/dist/tiptap-extension-hard-break.esm.js
+  var HardBreak = Node4.create({
+    name: "hardBreak",
+    addOptions() {
+      return {
+        keepMarks: true,
+        HTMLAttributes: {}
+      };
+    },
+    inline: true,
+    group: "inline",
+    selectable: false,
+    parseHTML() {
+      return [
+        { tag: "br" }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["br", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
+    },
+    renderText() {
+      return "\n";
+    },
+    addCommands() {
+      return {
+        setHardBreak: () => ({ commands, chain, state, editor }) => {
+          return commands.first([
+            () => commands.exitCode(),
+            () => commands.command(() => {
+              const { selection, storedMarks } = state;
+              if (selection.$from.parent.type.spec.isolating) {
+                return false;
+              }
+              const { keepMarks } = this.options;
+              const { splittableMarks } = editor.extensionManager;
+              const marks3 = storedMarks || selection.$to.parentOffset && selection.$from.marks();
+              return chain().insertContent({ type: this.name }).command(({ tr, dispatch: dispatch3 }) => {
+                if (dispatch3 && marks3 && keepMarks) {
+                  const filteredMarks = marks3.filter((mark4) => splittableMarks.includes(mark4.type.name));
+                  tr.ensureMarks(filteredMarks);
+                }
+                return true;
+              }).run();
+            })
+          ]);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Enter": () => this.editor.commands.setHardBreak(),
+        "Shift-Enter": () => this.editor.commands.setHardBreak()
+      };
+    }
+  });
+
+  // node_modules/@tiptap/extension-heading/dist/tiptap-extension-heading.esm.js
+  var Heading = Node4.create({
+    name: "heading",
+    addOptions() {
+      return {
+        levels: [1, 2, 3, 4, 5, 6],
+        HTMLAttributes: {}
+      };
+    },
+    content: "inline*",
+    group: "block",
+    defining: true,
+    addAttributes() {
+      return {
+        level: {
+          default: 1,
+          rendered: false
+        }
+      };
+    },
+    parseHTML() {
+      return this.options.levels.map((level) => ({
+        tag: `h${level}`,
+        attrs: { level }
+      }));
+    },
+    renderHTML({ node: node5, HTMLAttributes }) {
+      const hasLevel = this.options.levels.includes(node5.attrs.level);
+      const level = hasLevel ? node5.attrs.level : this.options.levels[0];
+      return [`h${level}`, mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setHeading: (attributes) => ({ commands }) => {
+          if (!this.options.levels.includes(attributes.level)) {
+            return false;
+          }
+          return commands.setNode(this.name, attributes);
+        },
+        toggleHeading: (attributes) => ({ commands }) => {
+          if (!this.options.levels.includes(attributes.level)) {
+            return false;
+          }
+          return commands.toggleNode(this.name, "paragraph", attributes);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return this.options.levels.reduce((items, level) => ({
+        ...items,
+        ...{
+          [`Mod-Alt-${level}`]: () => this.editor.commands.toggleHeading({ level })
+        }
+      }), {});
+    },
+    addInputRules() {
+      return this.options.levels.map((level) => {
+        return textblockTypeInputRule({
+          find: new RegExp(`^(#{1,${level}})\\s$`),
+          type: this.type,
+          getAttributes: {
+            level
+          }
+        });
+      });
+    }
+  });
+
+  // node_modules/@tiptap/extension-horizontal-rule/dist/tiptap-extension-horizontal-rule.esm.js
+  var HorizontalRule = Node4.create({
+    name: "horizontalRule",
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    group: "block",
+    parseHTML() {
+      return [
+        { tag: "hr" }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["hr", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
+    },
+    addCommands() {
+      return {
+        setHorizontalRule: () => ({ chain }) => {
+          return chain().insertContent({ type: this.name }).command(({ tr, dispatch: dispatch3 }) => {
+            var _a;
+            if (dispatch3) {
+              const { $to } = tr.selection;
+              const posAfter = $to.end();
+              if ($to.nodeAfter) {
+                tr.setSelection(TextSelection.create(tr.doc, $to.pos));
+              } else {
+                const node5 = (_a = $to.parent.type.contentMatch.defaultType) === null || _a === void 0 ? void 0 : _a.create();
+                if (node5) {
+                  tr.insert(posAfter, node5);
+                  tr.setSelection(TextSelection.create(tr.doc, posAfter));
+                }
+              }
+              tr.scrollIntoView();
+            }
+            return true;
+          }).run();
+        }
+      };
+    },
+    addInputRules() {
+      return [
+        nodeInputRule({
+          find: /^(?:---|—-|___\s|\*\*\*\s)$/,
+          type: this.type
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-list-item/dist/tiptap-extension-list-item.esm.js
+  var ListItem = Node4.create({
+    name: "listItem",
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    content: "paragraph block*",
+    defining: true,
+    parseHTML() {
+      return [
+        {
+          tag: "li"
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["li", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addKeyboardShortcuts() {
+      return {
+        Enter: () => this.editor.commands.splitListItem(this.name),
+        Tab: () => this.editor.commands.sinkListItem(this.name),
+        "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
+      };
+    }
+  });
+
+  // node_modules/@tiptap/extension-ordered-list/dist/tiptap-extension-ordered-list.esm.js
+  var inputRegex5 = /^(\d+)\.\s$/;
+  var OrderedList = Node4.create({
+    name: "orderedList",
+    addOptions() {
+      return {
+        itemTypeName: "listItem",
+        HTMLAttributes: {}
+      };
+    },
+    group: "block list",
+    content() {
+      return `${this.options.itemTypeName}+`;
+    },
+    addAttributes() {
+      return {
+        start: {
+          default: 1,
+          parseHTML: (element) => {
+            return element.hasAttribute("start") ? parseInt(element.getAttribute("start") || "", 10) : 1;
+          }
+        }
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: "ol"
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      const { start: start6, ...attributesWithoutStart } = HTMLAttributes;
+      return start6 === 1 ? ["ol", mergeAttributes(this.options.HTMLAttributes, attributesWithoutStart), 0] : ["ol", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        toggleOrderedList: () => ({ commands }) => {
+          return commands.toggleList(this.name, this.options.itemTypeName);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Shift-7": () => this.editor.commands.toggleOrderedList()
+      };
+    },
+    addInputRules() {
+      return [
+        wrappingInputRule({
+          find: inputRegex5,
+          type: this.type,
+          getAttributes: (match) => ({ start: +match[1] }),
+          joinPredicate: (match, node5) => node5.childCount + node5.attrs.start === +match[1]
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-paragraph/dist/tiptap-extension-paragraph.esm.js
+  var Paragraph = Node4.create({
+    name: "paragraph",
+    priority: 1e3,
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    group: "block",
+    content: "inline*",
+    parseHTML() {
+      return [
+        { tag: "p" }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["p", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setParagraph: () => ({ commands }) => {
+          return commands.setNode(this.name);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Alt-0": () => this.editor.commands.setParagraph()
+      };
+    }
+  });
+
+  // node_modules/@tiptap/extension-text/dist/tiptap-extension-text.esm.js
+  var Text2 = Node4.create({
+    name: "text",
+    group: "inline"
+  });
+
   // app/javascript/documentation/controllers/rich_text_editor/lowlight.js
-  var import_core32 = __toESM(require_core2());
+  var import_core31 = __toESM(require_core2());
   var import_css = __toESM(require_css());
   var import_javascript = __toESM(require_javascript());
   var import_json = __toESM(require_json());
@@ -40792,126 +40745,178 @@ img.ProseMirror-separator {
   var import_sql = __toESM(require_sql());
   var import_xml = __toESM(require_xml());
   var import_yaml = __toESM(require_yaml());
-  import_core32.default.registerLanguage("css", import_css.default);
-  import_core32.default.registerLanguage("javascript", import_javascript.default);
-  import_core32.default.registerLanguage("json", import_json.default);
-  import_core32.default.registerLanguage("ruby", import_ruby.default);
-  import_core32.default.registerLanguage("scss", import_scss.default);
-  import_core32.default.registerLanguage("sql", import_sql.default);
-  import_core32.default.registerLanguage("xml", import_xml.default);
-  import_core32.default.registerLanguage("yaml", import_yaml.default);
-  var lowlight_default = import_core32.default;
+  import_core31.default.registerLanguage("css", import_css.default);
+  import_core31.default.registerLanguage("javascript", import_javascript.default);
+  import_core31.default.registerLanguage("json", import_json.default);
+  import_core31.default.registerLanguage("ruby", import_ruby.default);
+  import_core31.default.registerLanguage("scss", import_scss.default);
+  import_core31.default.registerLanguage("sql", import_sql.default);
+  import_core31.default.registerLanguage("xml", import_xml.default);
+  import_core31.default.registerLanguage("yaml", import_yaml.default);
+  var lowlight_default = import_core31.default;
 
-  // app/javascript/documentation/controllers/rich_text_editor/with_code_block.js
-  var with_code_block_default = (controller, _options = {}) => {
-    const CodeBlockExtenstions = [
+  // app/javascript/documentation/controllers/rich_text_editor/with_nodes.js
+  var nodesTargets = [
+    "nodeSelect",
+    "nodeSelectTrigger",
+    "text",
+    "h1",
+    "h2",
+    "h3",
+    "ul",
+    "ol",
+    "blockquote",
+    "codeBlock"
+  ];
+  var toolbarNodes = [
+    {
+      target: "h1",
+      name: "heading",
+      attributes: { level: 1 },
+      text: "Heading 1"
+    },
+    {
+      target: "h2",
+      name: "heading",
+      attributes: { level: 2 },
+      text: "Heading 2"
+    },
+    {
+      target: "h3",
+      name: "heading",
+      attributes: { level: 3 },
+      text: "Heading 3"
+    },
+    {
+      name: "bulletList",
+      target: "ul",
+      text: "Bulleted List"
+    },
+    {
+      name: "orderedList",
+      target: "ol",
+      text: "Ordered List"
+    },
+    {
+      name: "blockquote",
+      target: "blockquote",
+      text: "Quote"
+    },
+    {
+      name: "codeBlock",
+      target: "codeBlock",
+      text: "Code"
+    },
+    {
+      name: "paragraph",
+      target: "text",
+      text: "Text"
+    }
+  ];
+  var with_nodes_default = (controller, _options = {}) => {
+    const NodesExtensions = [
+      Blockquote,
+      BulletList,
+      CodeBlock,
       CodeBlockLowlight.configure({
         lowlight: lowlight_default
-      })
+      }),
+      HardBreak,
+      Heading,
+      HorizontalRule,
+      ListItem,
+      OrderedList,
+      Paragraph,
+      Text2
     ];
+    const toggleH1 = () => {
+      controller.runCommand("toggleHeading", { level: 1 });
+    };
+    const toggleH2 = () => {
+      controller.runCommand("toggleHeading", { level: 2 });
+    };
+    const toggleH3 = () => {
+      controller.runCommand("toggleHeading", { level: 3 });
+    };
+    const setParagraph = () => {
+      controller.runCommand("setParagraph");
+    };
+    const toggleBulletList = () => {
+      controller.runCommand("toggleBulletList");
+    };
+    const toggleOrderedList = () => {
+      controller.runCommand("toggleOrderedList");
+    };
+    const toggleBlockquote = () => {
+      controller.runCommand("toggleBlockquote");
+    };
     const toggleCodeBlock = () => {
       controller.runCommand("toggleCodeBlock");
     };
+    const enableSelectedToolbarNode = () => {
+      toolbarNodes.some(({ target, name, attributes }) => {
+        if (controller.editor.isActive(name, attributes) && controller.hasTarget(target)) {
+          controller[`${target}Target`].classList.add("is-active");
+          return true;
+        }
+      });
+    };
+    const setCurrentToolbarNode = () => {
+      if (!controller.hasNodeSelectTriggerTarget)
+        return;
+      const selectedType = toolbarNodes.find(({ name, attributes }) => {
+        return controller.editor.isActive(name, attributes);
+      });
+      if (selectedType) {
+        controller.nodeSelectTriggerTarget.innerHTML = selectedType.text;
+      }
+    };
+    const openNodeSelect = () => {
+      controller.closeLinkPanel();
+      controller.closeTablePanel();
+    };
+    const closeNodeSelect = () => {
+      if (!controller.hasNodeSelectTarget)
+        return;
+      controller.nodeSelectTarget.classList.remove("is-active");
+    };
     Object.assign(controller, {
-      toggleCodeBlock
+      toggleH1,
+      toggleH2,
+      toggleH3,
+      setParagraph,
+      toggleBulletList,
+      toggleOrderedList,
+      toggleBlockquote,
+      toggleCodeBlock,
+      enableSelectedToolbarNode,
+      setCurrentToolbarNode,
+      openNodeSelect,
+      closeNodeSelect
     });
-    return { CodeBlockExtenstions };
+    return { NodesExtensions };
   };
 
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
-  var import_lodash = __toESM(require_lodash());
   var RichTextEditorController = class extends Controller {
-    toolbarTypes = [
-      {
-        target: "h1",
-        name: "heading",
-        attributes: { level: 1 },
-        text: "Heading 1"
-      },
-      {
-        target: "h2",
-        name: "heading",
-        attributes: { level: 2 },
-        text: "Heading 2"
-      },
-      {
-        target: "h3",
-        name: "heading",
-        attributes: { level: 3 },
-        text: "Heading 3"
-      },
-      {
-        name: "bulletList",
-        target: "ul",
-        text: "Bulleted List"
-      },
-      {
-        name: "orderedList",
-        target: "ol",
-        text: "Ordered List"
-      },
-      {
-        name: "blockquote",
-        target: "blockquote",
-        text: "Quote"
-      },
-      {
-        name: "codeBlock",
-        target: "codeBlock",
-        text: "Code"
-      },
-      {
-        name: "paragraph",
-        target: "text",
-        text: "Text"
-      }
-    ];
-    allMenuButtons = toolbarMarks.concat(this.toolbarTypes);
+    allMenuButtons = toolbarMarks.concat(toolbarNodes);
     connect() {
+      const { DefaultExtensions } = with_defaults_default(this);
+      const { NodesExtensions } = with_nodes_default(this);
       const { MarkExtensions } = with_marks_default(this);
       const { TableExtensions } = with_table_default(this);
       const { LinkExtensions } = with_link_default(this);
       const { MentionExtensions } = with_mention_default(this);
-      const { CodeBlockExtenstions } = with_code_block_default(this);
-      const extensions2 = [
-        StarterKit.configure({
-          blockquote: true,
-          bold: false,
-          bulletList: true,
-          code: false,
-          codeBlock: true,
-          document: true,
-          dropcursor: true,
-          gapcursor: true,
-          hardBreak: true,
-          heading: true,
-          history: true,
-          horizontalRule: true,
-          italic: false,
-          listItem: true,
-          orderedList: true,
-          paragraph: true,
-          strike: false,
-          text: true
-        }),
-        Placeholder.configure({
-          placeholder: this.placeholderValue
-        }),
-        ...MarkExtensions,
-        ...CodeBlockExtenstions,
-        ...LinkExtensions,
-        ...TableExtensions,
-        ...MentionExtensions
-      ];
-      if (this.editableValue && this.hasBubbleMenuTarget) {
-        extensions2.push(BubbleMenu.configure({
-          element: this.bubbleMenuTarget,
-          tippyOptions: { appendTo: this.element, duration: 100 }
-        }));
-      }
       this.editor = new Editor({
         element: this.element,
-        extensions: extensions2,
+        extensions: [
+          ...DefaultExtensions,
+          ...NodesExtensions,
+          ...MarkExtensions,
+          ...LinkExtensions,
+          ...TableExtensions,
+          ...MentionExtensions
+        ],
         autofocus: true,
         content: this.contentValue,
         onUpdate: this.throttledUpdate,
@@ -40920,8 +40925,8 @@ img.ProseMirror-separator {
       this.editor.on("transaction", () => {
         this.resetMenuButtons();
         this.enableSelectedToolbarMarks();
-        this.enableSelectedToolbarType();
-        this.setCurrentToolbarType();
+        this.enableSelectedToolbarNode();
+        this.setCurrentToolbarNode();
         this.updateTableModifiers();
       });
     }
@@ -40934,31 +40939,6 @@ img.ProseMirror-separator {
       this.outputTarget.value = editor.getHTML();
     };
     throttledUpdate = (0, import_lodash.default)(this.onUpdate, 1e3);
-    openNodeSelect() {
-      this.closeLinkPanel();
-      this.closeTablePanel();
-    }
-    toggleH1() {
-      this.runCommand("toggleHeading", { level: 1 });
-    }
-    toggleH2() {
-      this.runCommand("toggleHeading", { level: 2 });
-    }
-    toggleH3() {
-      this.runCommand("toggleHeading", { level: 3 });
-    }
-    setParagraph() {
-      this.runCommand("setParagraph");
-    }
-    toggleBulletList() {
-      this.runCommand("toggleBulletList");
-    }
-    toggleOrderedList() {
-      this.runCommand("toggleOrderedList");
-    }
-    toggleBlockquote() {
-      this.runCommand("toggleBlockquote");
-    }
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }
@@ -40971,53 +40951,18 @@ img.ProseMirror-separator {
         }
       });
     }
-    enableSelectedToolbarType() {
-      this.toolbarTypes.some(({ target, name, attributes }) => {
-        if (this.editor.isActive(name, attributes) && this.hasTarget(target)) {
-          this[`${target}Target`].classList.add("is-active");
-          return true;
-        }
-      });
-    }
-    setCurrentToolbarType() {
-      if (!this.hasNodeSelectTriggerTarget)
-        return;
-      const selectedType = this.selectedToolbarType();
-      if (selectedType) {
-        this.nodeSelectTriggerTarget.innerHTML = selectedType.text;
-      }
-    }
-    selectedToolbarType() {
-      return this.toolbarTypes.find(({ name, attributes }) => {
-        return this.editor.isActive(name, attributes);
-      });
-    }
     hasTarget(name) {
       const capitalizedName = name[0].toUpperCase() + name.slice(1).toLowerCase();
       return this[`has${capitalizedName}Target`];
     }
-    closeNodeSelect() {
-      if (!this.hasNodeSelectTarget)
-        return;
-      this.nodeSelectTarget.classList.remove("is-active");
-    }
   };
   __publicField(RichTextEditorController, "targets", [
-    "bubbleMenu",
-    "nodeSelect",
-    "nodeSelectTrigger",
-    "text",
-    "h1",
-    "h2",
-    "h3",
-    "ul",
-    "ol",
-    "blockquote",
-    "codeBlock",
-    "output",
+    ...defaultTargets,
+    ...nodesTargets,
     ...marksTargets,
     ...linkTargets,
-    ...tableTargets
+    ...tableTargets,
+    "output"
   ]);
   __publicField(RichTextEditorController, "values", {
     content: { type: String, default: "" },

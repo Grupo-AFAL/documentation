@@ -1,4 +1,3 @@
-// Marks
 import Bold from '@tiptap/extension-bold'
 import Code from '@tiptap/extension-code'
 // import Highlight from '@tiptap/extension-highlight'
