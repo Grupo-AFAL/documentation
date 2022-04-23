@@ -8,11 +8,12 @@ import Strike from '@tiptap/extension-strike'
 // import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 
-export const marksTargets = ['bold', 'italic', 'underline', 'link']
+export const marksTargets = ['bold', 'italic', 'underline', 'strike', 'link']
 export const toolbarMarks = [
   { target: 'bold', name: 'bold' },
   { target: 'italic', name: 'italic' },
   { target: 'underline', name: 'underline' },
+  { target: 'strike', name: 'strike' },
   { target: 'link', name: 'link' }
 ]
 
@@ -31,6 +32,10 @@ export default (controller, _options = {}) => {
     controller.runCommand('toggleUnderline')
   }
 
+  const toggleStrike = () => {
+    controller.runCommand('toggleStrike')
+  }
+
   const enableSelectedToolbarMarks = () => {
     toolbarMarks.forEach(({ target, name, attributes }) => {
       if (
@@ -46,6 +51,7 @@ export default (controller, _options = {}) => {
     toggleBold,
     toggleItalic,
     toggleUnderline,
+    toggleStrike,
     enableSelectedToolbarMarks
   })
 

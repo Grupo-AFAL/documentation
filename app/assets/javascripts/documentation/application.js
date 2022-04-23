@@ -30158,11 +30158,12 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/with_marks.js
-  var marksTargets = ["bold", "italic", "underline", "link"];
+  var marksTargets = ["bold", "italic", "underline", "strike", "link"];
   var toolbarMarks = [
     { target: "bold", name: "bold" },
     { target: "italic", name: "italic" },
     { target: "underline", name: "underline" },
+    { target: "strike", name: "strike" },
     { target: "link", name: "link" }
   ];
   var with_marks_default = (controller, _options = {}) => {
@@ -30176,6 +30177,9 @@ img.ProseMirror-separator {
     const toggleUnderline = () => {
       controller.runCommand("toggleUnderline");
     };
+    const toggleStrike = () => {
+      controller.runCommand("toggleStrike");
+    };
     const enableSelectedToolbarMarks = () => {
       toolbarMarks.forEach(({ target, name, attributes }) => {
         if (controller.editor.isActive(name, attributes) && controller.hasTarget(target)) {
@@ -30187,6 +30191,7 @@ img.ProseMirror-separator {
       toggleBold,
       toggleItalic,
       toggleUnderline,
+      toggleStrike,
       enableSelectedToolbarMarks
     });
     return { MarkExtensions };

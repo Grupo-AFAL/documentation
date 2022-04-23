@@ -418,6 +418,10 @@ $menu-icon-size: 0.75em;
       text-decoration: underline;
     }
 
+    &.strike {
+      text-decoration: line-through;
+    }
+
     // &.link {
     // }
   }
