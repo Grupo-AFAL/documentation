@@ -38,11 +38,11 @@ export default (controller, _options = {}) => {
 
   const enableSelectedToolbarMarks = () => {
     toolbarMarks.forEach(({ target, name, attributes }) => {
-      if (
-        controller.editor.isActive(name, attributes) &&
-        controller.hasTarget(target)
-      ) {
-        controller[`${target}Target`].classList.add('is-active')
+      if (!controller.editor.isActive(name, attributes)) return
+
+      const targetNode = controller.targets.find(target)
+      if (targetNode) {
+        targetNode.classList.add('is-active')
       }
     })
   }

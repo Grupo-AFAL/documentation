@@ -90,14 +90,10 @@ export default class RichTextEditorController extends Controller {
     this.closeLinkPanel()
 
     this.allMenuButtons.forEach(({ target }) => {
-      if (this.hasTarget(target)) {
-        this[`${target}Target`].classList.remove('is-active')
+      const targetNode = this.targets.find(target)
+      if (targetNode) {
+        targetNode.classList.remove('is-active')
       }
     })
-  }
-
-  hasTarget (name) {
-    const capitalizedName = name[0].toUpperCase() + name.slice(1).toLowerCase()
-    return this[`has${capitalizedName}Target`]
   }
 }
