@@ -40862,24 +40862,18 @@ img.ProseMirror-separator {
       controller.runCommand("toggleCodeBlock");
     };
     const enableSelectedToolbarNode = () => {
-      toolbarNodes.some(({ target, name, attributes }) => {
+      toolbarNodes.some(({ target, name, text: text4, attributes }) => {
         if (!controller.editor.isActive(name, attributes))
           return;
         const targetNode = controller.targets.find(target);
-        if (targetNode) {
-          targetNode.classList.add("is-active");
+        if (!targetNode)
+          return;
+        if (controller.hasNodeSelectTriggerTarget) {
+          controller.nodeSelectTriggerTarget.innerHTML = text4;
         }
+        targetNode.classList.add("is-active");
+        return true;
       });
-    };
-    const setCurrentToolbarNode = () => {
-      if (!controller.hasNodeSelectTriggerTarget)
-        return;
-      const selectedType = toolbarNodes.find(({ name, attributes }) => {
-        return controller.editor.isActive(name, attributes);
-      });
-      if (selectedType) {
-        controller.nodeSelectTriggerTarget.innerHTML = selectedType.text;
-      }
     };
     const openNodeSelect = () => {
       controller.closeLinkPanel();
@@ -40900,7 +40894,6 @@ img.ProseMirror-separator {
       toggleBlockquote,
       toggleCodeBlock,
       enableSelectedToolbarNode,
-      setCurrentToolbarNode,
       openNodeSelect,
       closeNodeSelect
     });
@@ -40936,7 +40929,6 @@ img.ProseMirror-separator {
         this.resetMenuButtons();
         this.enableSelectedToolbarMarks();
         this.enableSelectedToolbarNode();
-        this.setCurrentToolbarNode();
         this.updateTableModifiers();
       });
     }

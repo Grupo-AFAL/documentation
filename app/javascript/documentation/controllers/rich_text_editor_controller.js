@@ -61,7 +61,6 @@ export default class RichTextEditorController extends Controller {
       this.resetMenuButtons()
       this.enableSelectedToolbarMarks()
       this.enableSelectedToolbarNode()
-      this.setCurrentToolbarNode()
       this.updateTableModifiers()
     })
   }

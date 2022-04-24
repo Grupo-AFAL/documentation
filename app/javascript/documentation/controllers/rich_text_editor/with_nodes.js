@@ -124,26 +124,19 @@ export default (controller, _options = {}) => {
   }
 
   const enableSelectedToolbarNode = () => {
-    toolbarNodes.some(({ target, name, attributes }) => {
+    toolbarNodes.some(({ target, name, text, attributes }) => {
       if (!controller.editor.isActive(name, attributes)) return
 
       const targetNode = controller.targets.find(target)
-      if (targetNode) {
-        targetNode.classList.add('is-active')
+      if (!targetNode) return
+
+      if (controller.hasNodeSelectTriggerTarget) {
+        controller.nodeSelectTriggerTarget.innerHTML = text
       }
+
+      targetNode.classList.add('is-active')
+      return true
     })
-  }
-
-  const setCurrentToolbarNode = () => {
-    if (!controller.hasNodeSelectTriggerTarget) return
-
-    const selectedType = toolbarNodes.find(({ name, attributes }) => {
-      return controller.editor.isActive(name, attributes)
-    })
-
-    if (selectedType) {
-      controller.nodeSelectTriggerTarget.innerHTML = selectedType.text
-    }
   }
 
   const openNodeSelect = () => {
@@ -167,7 +160,6 @@ export default (controller, _options = {}) => {
     toggleBlockquote,
     toggleCodeBlock,
     enableSelectedToolbarNode,
-    setCurrentToolbarNode,
     openNodeSelect,
     closeNodeSelect
   })
