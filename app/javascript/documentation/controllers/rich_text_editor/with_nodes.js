@@ -157,6 +157,7 @@ export default (controller, _options = {}) => {
   const openNodeSelect = () => {
     controller.closeLinkPanel()
     controller.closeTablePanel()
+    controller.closeImagePanel()
   }
 
   const closeNodeSelect = () => {

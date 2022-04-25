@@ -24,6 +24,7 @@ export default (controller, options = {}) => {
   const openLinkPanel = () => {
     controller.closeNodeSelect()
     controller.closeTablePanel()
+    controller.closeImagePanel()
 
     const link = controller.editor.getAttributes('link')
     controller.linkInputTarget.innerHTML = link.href || ''

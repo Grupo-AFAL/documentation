@@ -14,6 +14,9 @@ import withNodes, {
   nodesTargets,
   toolbarNodes
 } from './rich_text_editor/with_nodes'
+import useImagePanel, {
+  imagePanelTargets
+} from './rich_text_editor/useImagePanel'
 
 export default class RichTextEditorController extends Controller {
   static targets = [
@@ -22,6 +25,7 @@ export default class RichTextEditorController extends Controller {
     ...marksTargets,
     ...linkTargets,
     ...tableTargets,
+    ...imagePanelTargets,
     'output'
   ]
 
@@ -41,6 +45,8 @@ export default class RichTextEditorController extends Controller {
     const { LinkExtensions } = withLink(this)
     const { MentionExtensions } = withMention(this)
 
+    useImagePanel(this)
+
     this.editor = new Editor({
       element: this.element,
       extensions: [
@@ -58,6 +64,7 @@ export default class RichTextEditorController extends Controller {
     })
 
     this.editor.on('transaction', () => {
+      this.closeAllPanels()
       this.resetMenuButtons()
       this.enableSelectedToolbarMarks()
       this.enableSelectedToolbarNode()
@@ -84,10 +91,14 @@ export default class RichTextEditorController extends Controller {
       .run()
   }
 
-  resetMenuButtons () {
+  closeAllPanels () {
     this.closeNodeSelect()
     this.closeLinkPanel()
+    this.closeTablePanel()
+    this.closeImagePanel()
+  }
 
+  resetMenuButtons () {
     this.allMenuButtons.forEach(({ target }) => {
       const targetNode = this.targets.find(target)
       if (targetNode) {

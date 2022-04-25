@@ -37098,6 +37098,7 @@ img.ProseMirror-separator {
     const openTablePanel = () => {
       controller.closeNodeSelect();
       controller.closeLinkPanel();
+      controller.closeImagePanel();
     };
     const closeTablePanel = () => {
       if (!controller.hasTablePanelTarget)
@@ -38084,6 +38085,7 @@ img.ProseMirror-separator {
     const openLinkPanel = () => {
       controller.closeNodeSelect();
       controller.closeTablePanel();
+      controller.closeImagePanel();
       const link = controller.editor.getAttributes("link");
       controller.linkInputTarget.innerHTML = link.href || "";
       controller.linkInputTarget.focus();
@@ -41112,6 +41114,7 @@ img.ProseMirror-separator {
     const openNodeSelect = () => {
       controller.closeLinkPanel();
       controller.closeTablePanel();
+      controller.closeImagePanel();
     };
     const closeNodeSelect = () => {
       if (!controller.hasNodeSelectTarget)
@@ -41135,6 +41138,31 @@ img.ProseMirror-separator {
     return { NodesExtensions };
   };
 
+  // app/javascript/documentation/controllers/rich_text_editor/useImagePanel.js
+  var imagePanelTargets = ["imagePanel"];
+  var useImagePanel_default = (controller, _options = {}) => {
+    const openImagePanel = () => {
+      controller.closeNodeSelect();
+      controller.closeTablePanel();
+      controller.closeLinkPanel();
+    };
+    const closeImagePanel = () => {
+      if (!controller.hasImagePanelTarget)
+        return;
+      controller.imagePanelTarget.classList.remove("is-active");
+    };
+    const addImage = (event) => {
+      controller.runCommand("setImage", {
+        src: event.target.dataset.sourceUrl
+      });
+    };
+    Object.assign(controller, {
+      openImagePanel,
+      closeImagePanel,
+      addImage
+    });
+  };
+
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
   var RichTextEditorController = class extends Controller {
     allMenuButtons = toolbarMarks.concat(toolbarNodes);
@@ -41145,6 +41173,7 @@ img.ProseMirror-separator {
       const { TableExtensions } = with_table_default(this);
       const { LinkExtensions } = with_link_default(this);
       const { MentionExtensions } = with_mention_default(this);
+      useImagePanel_default(this);
       this.editor = new Editor({
         element: this.element,
         extensions: [
@@ -41161,6 +41190,7 @@ img.ProseMirror-separator {
         editable: this.editableValue
       });
       this.editor.on("transaction", () => {
+        this.closeAllPanels();
         this.resetMenuButtons();
         this.enableSelectedToolbarMarks();
         this.enableSelectedToolbarNode();
@@ -41179,9 +41209,13 @@ img.ProseMirror-separator {
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }
-    resetMenuButtons() {
+    closeAllPanels() {
       this.closeNodeSelect();
       this.closeLinkPanel();
+      this.closeTablePanel();
+      this.closeImagePanel();
+    }
+    resetMenuButtons() {
       this.allMenuButtons.forEach(({ target }) => {
         const targetNode = this.targets.find(target);
         if (targetNode) {
@@ -41196,6 +41230,7 @@ img.ProseMirror-separator {
     ...marksTargets,
     ...linkTargets,
     ...tableTargets,
+    ...imagePanelTargets,
     "output"
   ]);
   __publicField(RichTextEditorController, "values", {
