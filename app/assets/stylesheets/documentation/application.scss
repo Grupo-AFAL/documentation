@@ -26,7 +26,7 @@
 @import 'sass/base/generic';
 @import 'sass/base/animations';
 
-// @import 'sass/elements/box';
+@import 'sass/elements/box';
 @import 'sass/elements/button';
 @import 'sass/elements/container';
 // @import 'sass/elements/content';
@@ -53,7 +53,7 @@
 // @import 'sass/components/media';
 // @import 'sass/components/menu';
 // @import 'sass/components/message';
-@import 'sass/components/modal';
+// @import 'sass/components/modal';
 // @import 'sass/components/navbar';
 // @import 'sass/components/pagination';
 // @import 'sass/components/panel';
@@ -91,5 +91,6 @@
 @import 'rich_text_editor';
 
 // Bali Styles
-@import 'bali/tabs/index';
 @import 'bali/dropdown/index';
+@import 'bali/modal/index';
+@import 'bali/tabs/index';

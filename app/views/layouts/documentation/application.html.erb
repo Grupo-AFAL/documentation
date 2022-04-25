@@ -8,7 +8,7 @@
     <%= stylesheet_link_tag "documentation/application", media: "all" %>
     <%= javascript_include_tag "documentation/application", "data-turbo-track": "reload", defer: true %>
   </head>
-  <body>
+  <body data-controller="modal">
 
     <section class="section">
       <div class="container <%= yield :container_class %>">
@@ -18,5 +18,6 @@
       </div>
     </section>
 
+    <%= render Bali::Modal::Component.new(active: false) %>
   </body>
 </html>
