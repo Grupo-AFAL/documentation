@@ -1,9 +1,20 @@
 <% content_for :container_class, 'is-max-desktop' %>
 
-<nav class="breadcrumb" aria-label="breadcrumbs">
-  <ul>
-    <li><%= link_with_icon "Back to pages", 'arrow-back', pages_path %></li>
-  </ul>
-</nav>
+<div class="level">
+  <div class="level-left">
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        <li><%= link_with_icon "Back to pages", 'arrow-back', pages_path %></li>
+      </ul>
+    </nav>
+  </div>
+
+  <div class="level-right">
+    <%= link_to_modal page_images_path(@page), class: 'button is-primary' do %>
+      <%= icon_tag('image') %>
+      <span>Images</span>
+    <% end %>
+  </div>
+</div>
 
 <%= render "form", page: @page %>

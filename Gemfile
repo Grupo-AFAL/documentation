@@ -12,6 +12,7 @@ gem 'jsbundling-rails'
 gem 'sassc-rails'
 gem 'bulma-rails', '~> 0.9.3'
 gem 'jbuilder'
+gem "image_processing", ">= 1.2"
 
 gem 'frontend_helpers', github: 'Grupo-AFAL/frontend-helpers', branch: 'main'
 # gem 'frontend_helpers', path: ENV['RUBY_FRONTEND_HELPERS_PATH']

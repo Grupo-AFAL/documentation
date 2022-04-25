@@ -40616,6 +40616,71 @@ img.ProseMirror-separator {
     }
   });
 
+  // node_modules/@tiptap/extension-image/dist/tiptap-extension-image.esm.js
+  var inputRegex5 = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
+  var Image = Node4.create({
+    name: "image",
+    addOptions() {
+      return {
+        inline: false,
+        allowBase64: false,
+        HTMLAttributes: {}
+      };
+    },
+    inline() {
+      return this.options.inline;
+    },
+    group() {
+      return this.options.inline ? "inline" : "block";
+    },
+    draggable: true,
+    addAttributes() {
+      return {
+        src: {
+          default: null
+        },
+        alt: {
+          default: null
+        },
+        title: {
+          default: null
+        }
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: this.options.allowBase64 ? "img[src]" : 'img[src]:not([src^="data:"])'
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["img", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
+    },
+    addCommands() {
+      return {
+        setImage: (options) => ({ commands }) => {
+          return commands.insertContent({
+            type: this.name,
+            attrs: options
+          });
+        }
+      };
+    },
+    addInputRules() {
+      return [
+        nodeInputRule({
+          find: inputRegex5,
+          type: this.type,
+          getAttributes: (match) => {
+            const [, , alt, src, title] = match;
+            return { src, alt, title };
+          }
+        })
+      ];
+    }
+  });
+
   // node_modules/@tiptap/extension-list-item/dist/tiptap-extension-list-item.esm.js
   var ListItem = Node4.create({
     name: "listItem",
@@ -40646,7 +40711,7 @@ img.ProseMirror-separator {
   });
 
   // node_modules/@tiptap/extension-ordered-list/dist/tiptap-extension-ordered-list.esm.js
-  var inputRegex5 = /^(\d+)\.\s$/;
+  var inputRegex6 = /^(\d+)\.\s$/;
   var OrderedList = Node4.create({
     name: "orderedList",
     addOptions() {
@@ -40695,7 +40760,7 @@ img.ProseMirror-separator {
     addInputRules() {
       return [
         wrappingInputRule({
-          find: inputRegex5,
+          find: inputRegex6,
           type: this.type,
           getAttributes: (match) => ({ start: +match[1] }),
           joinPredicate: (match, node5) => node5.childCount + node5.attrs.start === +match[1]
@@ -40744,7 +40809,7 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/lowlight.js
-  var import_core31 = __toESM(require_core2());
+  var import_core32 = __toESM(require_core2());
   var import_css = __toESM(require_css());
   var import_javascript = __toESM(require_javascript());
   var import_json = __toESM(require_json());
@@ -40753,15 +40818,15 @@ img.ProseMirror-separator {
   var import_sql = __toESM(require_sql());
   var import_xml = __toESM(require_xml());
   var import_yaml = __toESM(require_yaml());
-  import_core31.default.registerLanguage("css", import_css.default);
-  import_core31.default.registerLanguage("javascript", import_javascript.default);
-  import_core31.default.registerLanguage("json", import_json.default);
-  import_core31.default.registerLanguage("ruby", import_ruby.default);
-  import_core31.default.registerLanguage("scss", import_scss.default);
-  import_core31.default.registerLanguage("sql", import_sql.default);
-  import_core31.default.registerLanguage("xml", import_xml.default);
-  import_core31.default.registerLanguage("yaml", import_yaml.default);
-  var lowlight_default = import_core31.default;
+  import_core32.default.registerLanguage("css", import_css.default);
+  import_core32.default.registerLanguage("javascript", import_javascript.default);
+  import_core32.default.registerLanguage("json", import_json.default);
+  import_core32.default.registerLanguage("ruby", import_ruby.default);
+  import_core32.default.registerLanguage("scss", import_scss.default);
+  import_core32.default.registerLanguage("sql", import_sql.default);
+  import_core32.default.registerLanguage("xml", import_xml.default);
+  import_core32.default.registerLanguage("yaml", import_yaml.default);
+  var lowlight_default = import_core32.default;
 
   // app/javascript/documentation/controllers/rich_text_editor/with_nodes.js
   var nodesTargets = [
@@ -40774,7 +40839,8 @@ img.ProseMirror-separator {
     "ul",
     "ol",
     "blockquote",
-    "codeBlock"
+    "codeBlock",
+    "image"
   ];
   var toolbarNodes = [
     {
@@ -40816,6 +40882,11 @@ img.ProseMirror-separator {
       text: "Code"
     },
     {
+      name: "image",
+      target: "image",
+      text: "Image"
+    },
+    {
       name: "paragraph",
       target: "text",
       text: "Text"
@@ -40832,6 +40903,7 @@ img.ProseMirror-separator {
       HardBreak,
       Heading,
       HorizontalRule,
+      Image,
       ListItem,
       OrderedList,
       Paragraph,
@@ -40860,6 +40932,12 @@ img.ProseMirror-separator {
     };
     const toggleCodeBlock = () => {
       controller.runCommand("toggleCodeBlock");
+    };
+    const setImage = () => {
+      const url = window.prompt("URL");
+      if (url) {
+        controller.runCommand("setImage", { src: url });
+      }
     };
     const enableSelectedToolbarNode = () => {
       toolbarNodes.some(({ target, name, text: text4, attributes }) => {
@@ -40893,6 +40971,7 @@ img.ProseMirror-separator {
       toggleOrderedList,
       toggleBlockquote,
       toggleCodeBlock,
+      setImage,
       enableSelectedToolbarNode,
       openNodeSelect,
       closeNodeSelect
