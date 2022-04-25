@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 3683ba9ccffebfde6cee4c6fce95c72e3c37d2d0
+  revision: 45e68fd04838721d748a9db3f2102108912fa586
   branch: main
   specs:
     bali_view_components (0.1.0)
@@ -221,7 +221,7 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
-    view_component (2.52.0)
+    view_component (2.53.0)
       activesupport (>= 5.0.0, < 8.0)
       method_source (~> 1.0)
     view_component-contrib (0.1.1)

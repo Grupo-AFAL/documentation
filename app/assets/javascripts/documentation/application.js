@@ -11484,28 +11484,6 @@
   });
   __publicField(SlimSelectController, "targets", ["select", "selectAllButton", "deselectAllButton"]);
 
-  // node_modules/bali-view-components/app/components/bali/tabs/index.js
-  var TabsController = class extends Controller {
-    open(event) {
-      event.preventDefault();
-      const index3 = event.currentTarget.getAttribute("data-tab-index");
-      this._hideAllTabs();
-      this._openTab(index3);
-    }
-    _hideAllTabs() {
-      const allContents = this.element.querySelectorAll("[data-content-index]");
-      Array.from(allContents).forEach((t) => t.classList.add("is-hidden"));
-      const allTabs = this.element.querySelectorAll("[data-tab-index]");
-      Array.from(allTabs).forEach((t) => t.classList.remove("is-active"));
-    }
-    _openTab(index3) {
-      const contentDiv = this.element.querySelector(`[data-content-index="${index3}"]`);
-      contentDiv.classList.remove("is-hidden");
-      const tabLi = this.element.querySelector(`[data-tab-index="${index3}"]`);
-      tabLi.classList.add("is-active");
-    }
-  };
-
   // node_modules/bali-view-components/app/components/bali/dropdown/index.js
   var DropdownController = class extends Controller {
     connect() {
@@ -11539,6 +11517,167 @@
     hoverable: { type: Boolean, default: false },
     closeOnClick: { type: Boolean, default: true }
   });
+
+  // node_modules/bali-view-components/app/javascript/bali/utils/form.js
+  var autoFocusInput = (element) => {
+    const autofocusNode = element.querySelector("[autofocus]");
+    if (autofocusNode)
+      autofocusNode.focus();
+  };
+
+  // node_modules/bali-view-components/app/components/bali/modal/index.js
+  var ModalController = class extends Controller {
+    async connect() {
+      this.wrapperClass = this.wrapperTarget.getAttribute("data-wrapper-class");
+      this.backgroundTarget.addEventListener("click", this._closeModal);
+      if (this.hasCloseBtnTarget) {
+        this.closeBtnTarget.addEventListener("click", this._closeModal);
+      }
+      document.addEventListener("openModal", (e) => {
+        this.setOptions(e.detail.options);
+        this.openModal(e.detail.content);
+      });
+    }
+    disconnect() {
+      this.backgroundTarget.removeEventListener("click", this._closeModal);
+      if (this.hasCloseBtnTarget) {
+        this.closeBtnTarget.removeEventListener("click", this._closeModal);
+      }
+    }
+    templateTargetConnected() {
+      this.backgroundTarget.addEventListener("click", this._closeModal);
+    }
+    templateTargetDisconnected() {
+      this.backgroundTarget.removeEventListener("click", this._closeModal);
+    }
+    openModal(content3) {
+      this.wrapperTarget.classList.add(this.wrapperClass);
+      this.templateTarget.classList.add("is-active");
+      this.contentTarget.innerHTML = content3;
+      autoFocusInput(this.contentTarget);
+    }
+    setOptions(options) {
+      const keys2 = Object.keys(options);
+      keys2.forEach((key2, _i) => {
+        this[key2] = options[key2];
+      });
+    }
+    _closeModal = () => {
+      this.templateTarget.classList.remove("is-active");
+      if (this.wrapperClass) {
+        this.wrapperTarget.classList.remove(this.wrapperClass);
+      }
+      this.contentTarget.innerHTML = "";
+    };
+    _buildURL = (path, redirectTo = null) => {
+      const url = new URL(path, window.location.origin);
+      url.searchParams.set("layout", "false");
+      if (redirectTo) {
+        url.searchParams.set("redirect_to", redirectTo);
+      }
+      return url.toString();
+    };
+    _extractResponseBodyAndTitle = (html) => {
+      const element = document.createElement("html");
+      element.innerHTML = html;
+      return {
+        body: element.querySelector("body").innerHTML,
+        title: element.querySelector("title").text
+      };
+    };
+    _replaceBodyAndURL = (html, url) => {
+      const { body, title } = this._extractResponseBodyAndTitle(html);
+      document.body.innerHTML = body;
+      history.pushState({}, title, url);
+    };
+    open = (event) => {
+      event.preventDefault();
+      const target = event.currentTarget;
+      this.wrapperClass = target.getAttribute("data-wrapper-class");
+      this.redirectTo = target.getAttribute("data-redirect-to");
+      this.skipRender = Boolean(target.getAttribute("data-skip-render"));
+      this.extraProps = JSON.parse(target.getAttribute("data-extra-props"));
+      fetch(this._buildURL(target.href)).then((response) => response.text()).then((body) => this.openModal(body));
+    };
+    close = (event) => {
+      event.preventDefault();
+      this._closeModal();
+    };
+    submit = (event) => {
+      event.preventDefault();
+      event.target.classList.add("is-loading");
+      event.target.setAttribute("disabled", "");
+      const form = event.target.closest("form");
+      const formURL = form.getAttribute("action");
+      const enableTurbo = event.target.dataset.turbo;
+      const url = this._buildURL(formURL, this.redirectTo);
+      const options = {
+        method: "POST",
+        mode: "same-origin",
+        redirect: "follow",
+        credentials: "include",
+        body: new FormData(form)
+      };
+      if (enableTurbo) {
+        options.headers = {
+          Accept: "text/vnd.turbo-stream.html, text/html, application/xhtml+xml"
+        };
+      } else {
+        options.headers = {
+          Accept: "text/html, application/xhtml+xml"
+        };
+      }
+      let redirected = false;
+      let redirectURL = null;
+      const redirectData = this.extraProps || {};
+      fetch(url, options).then((response) => {
+        redirected = response.redirected;
+        redirectURL = response.url;
+        const url2 = new URL(response.url);
+        url2.searchParams.forEach((value, key2) => {
+          redirectData[key2] = value;
+        });
+        return response.text();
+      }).then((responseText) => {
+        if (redirected) {
+          const event2 = new CustomEvent("modal:success", {
+            detail: redirectData
+          });
+          document.dispatchEvent(event2);
+          if (this.skipRender) {
+            this._closeModal();
+          } else {
+            this._replaceBodyAndURL(responseText, redirectURL);
+          }
+        } else {
+          this.openModal(responseText);
+        }
+      });
+    };
+  };
+  __publicField(ModalController, "targets", ["template", "background", "wrapper", "content", "closeBtn"]);
+
+  // node_modules/bali-view-components/app/components/bali/tabs/index.js
+  var TabsController = class extends Controller {
+    open(event) {
+      event.preventDefault();
+      const index3 = event.currentTarget.getAttribute("data-tab-index");
+      this._hideAllTabs();
+      this._openTab(index3);
+    }
+    _hideAllTabs() {
+      const allContents = this.element.querySelectorAll("[data-content-index]");
+      Array.from(allContents).forEach((t) => t.classList.add("is-hidden"));
+      const allTabs = this.element.querySelectorAll("[data-tab-index]");
+      Array.from(allTabs).forEach((t) => t.classList.remove("is-active"));
+    }
+    _openTab(index3) {
+      const contentDiv = this.element.querySelector(`[data-content-index="${index3}"]`);
+      contentDiv.classList.remove("is-hidden");
+      const tabLi = this.element.querySelector(`[data-tab-index="${index3}"]`);
+      tabLi.classList.add("is-active");
+    }
+  };
 
   // node_modules/orderedmap/index.es.js
   function OrderedMap(content3) {
@@ -40980,6 +41119,7 @@ img.ProseMirror-separator {
   // app/javascript/documentation/application.js
   var application = Application.start();
   application.register("dropdown", DropdownController);
+  application.register("modal", ModalController);
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
