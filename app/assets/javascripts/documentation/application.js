@@ -11400,6 +11400,23 @@
     remove: Boolean
   });
 
+  // node_modules/frontend-helpers/javascript/src/controllers/file-input-controller.js
+  var FileInputController = class extends Controller {
+    onChange(event) {
+      let fileName;
+      if (event.target.value.length === 0) {
+        fileName = this.nonSelectedTextValue;
+      } else {
+        fileName = event.target.value.split("\\").pop();
+      }
+      this.valueTarget.innerHTML = fileName;
+    }
+  };
+  __publicField(FileInputController, "targets", ["value", "input"]);
+  __publicField(FileInputController, "values", {
+    nonSelectedText: String
+  });
+
   // node_modules/frontend-helpers/javascript/src/controllers/notification-controller.js
   var NotificationController = class extends DisappearController {
     connect() {
@@ -41190,6 +41207,7 @@ img.ProseMirror-separator {
   // app/javascript/documentation/application.js
   var application = Application.start();
   application.register("dropdown", DropdownController);
+  application.register("file-input", FileInputController);
   application.register("modal", ModalController);
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);

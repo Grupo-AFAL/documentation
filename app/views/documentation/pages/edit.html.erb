@@ -10,7 +10,8 @@
   </div>
 
   <div class="level-right">
-    <%= link_to_modal page_images_path(@page), class: 'button is-primary' do %>
+    <%= link_to page_images_path(@page), class: 'button is-primary',
+        data: { action: 'modal#open', 'wrapper-class': 'extra-wide' } do %>
       <%= icon_tag('image') %>
       <span>Images</span>
     <% end %>

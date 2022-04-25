@@ -341,6 +341,22 @@ $menu-icon-size: 0.75em;
     }
   }
 
+  .toolbar-icon.image-icon {
+    .svg-inline {
+      width: 1em;
+      height: 1em;
+    }
+  }
+
+  .image-grid-component {
+    padding: 0.25rem 0.75rem;
+    width: 25rem;
+
+    .column {
+      padding: 0.5rem;
+    }
+  }
+
   .dropdown-menu {
     min-width: unset;
   }

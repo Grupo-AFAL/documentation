@@ -71,6 +71,20 @@
         <% end %>
       </div>
 
+      <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'imagePanel' }) do |c| %>
+        <% c.trigger(data: { action: '' }) do %>
+          <%= icon_tag('image', class: 'toolbar-icon image-icon') %>
+        <% end %>
+
+        <%= render Bali::ImageGrid::Component.new do |c| %>
+          <%= @page.images.each do |image| %>
+            <%= c.image do %>
+              <%= image_tag main_app.url_for(image.variant(:small_thumb)) %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'tablePanel' }) do |c| %>
         <% c.trigger(data: { action: 'rich-text-editor#openTablePanel' }) do %>
           <span>Table</span>

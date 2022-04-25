@@ -4,9 +4,15 @@ module Documentation
 
     def index
       @images = @page.images
+
+      render layout: false
     end
 
-    def create; end
+    def create
+      @page.images.attach(params[:images])
+
+      redirect_to page_images_path(@page)
+    end
 
     def destroy; end
 

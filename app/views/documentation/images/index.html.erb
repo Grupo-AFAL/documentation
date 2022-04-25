@@ -1,2 +1,21 @@
-<h1>Page::Images#index</h1>
-<p>Find me in app/views/documentation/page/images/index.html.erb</p>
+<%= turbo_frame_tag 'page_images' do %>
+  <h1 class="title is-4">Images</h1>
+
+  <%= form_with(url: page_images_path(@page), class: 'is-flex is-flex-direction-row') do |f| %>
+    <%= f.file_field_group :images, :multiple => true, :required => 'required', 
+                             :accept => '.jpg, .jpeg, .png', 
+                             choose_file_text: 'Select image',
+                             non_selected_text: 'No image selected' %>
+    <%= f.submit "Save", class: 'button is-primary ml-4' %>
+  <% end %>
+
+  <hr />
+
+  <%= render Bali::ImageGrid::Component.new do |c| %>
+    <%= @images.each do |image| %>
+      <%= c.image do %>
+        <%= image_tag main_app.url_for(image.variant(:thumb)) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

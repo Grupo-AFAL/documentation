@@ -1,7 +1,11 @@
 import '@hotwired/turbo-rails'
 
 import { Application } from '@hotwired/stimulus'
-import { NotificationController, SlimSelectController } from 'frontend-helpers'
+import {
+  FileInputController,
+  NotificationController,
+  SlimSelectController
+} from 'frontend-helpers'
 
 import {
   DropdownController,
@@ -14,6 +18,7 @@ import RichTextEditorController from './controllers/rich_text_editor_controller'
 const application = Application.start()
 
 application.register('dropdown', DropdownController)
+application.register('file-input', FileInputController)
 application.register('modal', ModalController)
 application.register('notification', NotificationController)
 application.register('rich-text-editor', RichTextEditorController)
