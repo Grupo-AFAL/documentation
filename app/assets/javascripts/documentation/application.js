@@ -40774,9 +40774,295 @@ img.ProseMirror-separator {
     }
   });
 
+  // node_modules/@tiptap/extension-list-item/dist/tiptap-extension-list-item.esm.js
+  var ListItem = Node4.create({
+    name: "listItem",
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    content: "paragraph block*",
+    defining: true,
+    parseHTML() {
+      return [
+        {
+          tag: "li"
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["li", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addKeyboardShortcuts() {
+      return {
+        Enter: () => this.editor.commands.splitListItem(this.name),
+        Tab: () => this.editor.commands.sinkListItem(this.name),
+        "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
+      };
+    }
+  });
+
+  // node_modules/@tiptap/extension-ordered-list/dist/tiptap-extension-ordered-list.esm.js
+  var inputRegex5 = /^(\d+)\.\s$/;
+  var OrderedList = Node4.create({
+    name: "orderedList",
+    addOptions() {
+      return {
+        itemTypeName: "listItem",
+        HTMLAttributes: {}
+      };
+    },
+    group: "block list",
+    content() {
+      return `${this.options.itemTypeName}+`;
+    },
+    addAttributes() {
+      return {
+        start: {
+          default: 1,
+          parseHTML: (element) => {
+            return element.hasAttribute("start") ? parseInt(element.getAttribute("start") || "", 10) : 1;
+          }
+        }
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: "ol"
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      const { start: start6, ...attributesWithoutStart } = HTMLAttributes;
+      return start6 === 1 ? ["ol", mergeAttributes(this.options.HTMLAttributes, attributesWithoutStart), 0] : ["ol", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        toggleOrderedList: () => ({ commands }) => {
+          return commands.toggleList(this.name, this.options.itemTypeName);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Shift-7": () => this.editor.commands.toggleOrderedList()
+      };
+    },
+    addInputRules() {
+      return [
+        wrappingInputRule({
+          find: inputRegex5,
+          type: this.type,
+          getAttributes: (match) => ({ start: +match[1] }),
+          joinPredicate: (match, node5) => node5.childCount + node5.attrs.start === +match[1]
+        })
+      ];
+    }
+  });
+
+  // node_modules/@tiptap/extension-paragraph/dist/tiptap-extension-paragraph.esm.js
+  var Paragraph = Node4.create({
+    name: "paragraph",
+    priority: 1e3,
+    addOptions() {
+      return {
+        HTMLAttributes: {}
+      };
+    },
+    group: "block",
+    content: "inline*",
+    parseHTML() {
+      return [
+        { tag: "p" }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["p", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+    },
+    addCommands() {
+      return {
+        setParagraph: () => ({ commands }) => {
+          return commands.setNode(this.name);
+        }
+      };
+    },
+    addKeyboardShortcuts() {
+      return {
+        "Mod-Alt-0": () => this.editor.commands.setParagraph()
+      };
+    }
+  });
+
+  // node_modules/@tiptap/extension-text/dist/tiptap-extension-text.esm.js
+  var Text2 = Node4.create({
+    name: "text",
+    group: "inline"
+  });
+
+  // app/javascript/documentation/controllers/rich_text_editor/lowlight.js
+  var import_core31 = __toESM(require_core2());
+  var import_css = __toESM(require_css());
+  var import_javascript = __toESM(require_javascript());
+  var import_json = __toESM(require_json());
+  var import_ruby = __toESM(require_ruby());
+  var import_scss = __toESM(require_scss());
+  var import_sql = __toESM(require_sql());
+  var import_xml = __toESM(require_xml());
+  var import_yaml = __toESM(require_yaml());
+  import_core31.default.registerLanguage("css", import_css.default);
+  import_core31.default.registerLanguage("javascript", import_javascript.default);
+  import_core31.default.registerLanguage("json", import_json.default);
+  import_core31.default.registerLanguage("ruby", import_ruby.default);
+  import_core31.default.registerLanguage("scss", import_scss.default);
+  import_core31.default.registerLanguage("sql", import_sql.default);
+  import_core31.default.registerLanguage("xml", import_xml.default);
+  import_core31.default.registerLanguage("yaml", import_yaml.default);
+  var lowlight_default = import_core31.default;
+
+  // app/javascript/documentation/controllers/rich_text_editor/with_nodes.js
+  var nodesTargets = [
+    "nodeSelect",
+    "nodeSelectTrigger",
+    "text",
+    "h1",
+    "h2",
+    "h3",
+    "ul",
+    "ol",
+    "blockquote",
+    "codeBlock"
+  ];
+  var toolbarNodes = [
+    {
+      target: "h1",
+      name: "heading",
+      attributes: { level: 1 },
+      text: "Heading 1"
+    },
+    {
+      target: "h2",
+      name: "heading",
+      attributes: { level: 2 },
+      text: "Heading 2"
+    },
+    {
+      target: "h3",
+      name: "heading",
+      attributes: { level: 3 },
+      text: "Heading 3"
+    },
+    {
+      name: "bulletList",
+      target: "ul",
+      text: "Bulleted List"
+    },
+    {
+      name: "orderedList",
+      target: "ol",
+      text: "Ordered List"
+    },
+    {
+      name: "blockquote",
+      target: "blockquote",
+      text: "Quote"
+    },
+    {
+      name: "codeBlock",
+      target: "codeBlock",
+      text: "Code"
+    },
+    {
+      name: "paragraph",
+      target: "text",
+      text: "Text"
+    }
+  ];
+  var with_nodes_default = (controller, _options = {}) => {
+    const NodesExtensions = [
+      Blockquote,
+      BulletList,
+      CodeBlock,
+      CodeBlockLowlight.configure({
+        lowlight: lowlight_default
+      }),
+      HardBreak,
+      Heading,
+      HorizontalRule,
+      Image,
+      ListItem,
+      OrderedList,
+      Paragraph,
+      Text2
+    ];
+    const toggleH1 = () => {
+      controller.runCommand("toggleHeading", { level: 1 });
+    };
+    const toggleH2 = () => {
+      controller.runCommand("toggleHeading", { level: 2 });
+    };
+    const toggleH3 = () => {
+      controller.runCommand("toggleHeading", { level: 3 });
+    };
+    const setParagraph = () => {
+      controller.runCommand("setParagraph");
+    };
+    const toggleBulletList = () => {
+      controller.runCommand("toggleBulletList");
+    };
+    const toggleOrderedList = () => {
+      controller.runCommand("toggleOrderedList");
+    };
+    const toggleBlockquote = () => {
+      controller.runCommand("toggleBlockquote");
+    };
+    const toggleCodeBlock = () => {
+      controller.runCommand("toggleCodeBlock");
+    };
+    const enableSelectedToolbarNode = () => {
+      toolbarNodes.some(({ target, name, text: text4, attributes }) => {
+        if (!controller.editor.isActive(name, attributes))
+          return;
+        const targetNode = controller.targets.find(target);
+        if (!targetNode)
+          return;
+        if (controller.hasNodeSelectTriggerTarget) {
+          controller.nodeSelectTriggerTarget.innerHTML = text4;
+        }
+        targetNode.classList.add("is-active");
+        return true;
+      });
+    };
+    const openNodeSelect = () => {
+      controller.closeLinkPanel();
+      controller.closeTablePanel();
+      controller.closeImagePanel();
+    };
+    const closeNodeSelect = () => {
+      if (!controller.hasNodeSelectTarget)
+        return;
+      controller.nodeSelectTarget.classList.remove("is-active");
+    };
+    Object.assign(controller, {
+      toggleH1,
+      toggleH2,
+      toggleH3,
+      setParagraph,
+      toggleBulletList,
+      toggleOrderedList,
+      toggleBlockquote,
+      toggleCodeBlock,
+      enableSelectedToolbarNode,
+      openNodeSelect,
+      closeNodeSelect
+    });
+    return { NodesExtensions };
+  };
+
   // node_modules/@tiptap/extension-image/dist/tiptap-extension-image.esm.js
-  var inputRegex5 = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
-  var Image = Node4.create({
+  var inputRegex6 = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
+  var Image2 = Node4.create({
     name: "image",
     addOptions() {
       return {
@@ -40828,7 +41114,7 @@ img.ProseMirror-separator {
     addInputRules() {
       return [
         nodeInputRule({
-          find: inputRegex5,
+          find: inputRegex6,
           type: this.type,
           getAttributes: (match) => {
             const [, , alt, src, title] = match;
@@ -40839,308 +41125,10 @@ img.ProseMirror-separator {
     }
   });
 
-  // node_modules/@tiptap/extension-list-item/dist/tiptap-extension-list-item.esm.js
-  var ListItem = Node4.create({
-    name: "listItem",
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    content: "paragraph block*",
-    defining: true,
-    parseHTML() {
-      return [
-        {
-          tag: "li"
-        }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["li", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addKeyboardShortcuts() {
-      return {
-        Enter: () => this.editor.commands.splitListItem(this.name),
-        Tab: () => this.editor.commands.sinkListItem(this.name),
-        "Shift-Tab": () => this.editor.commands.liftListItem(this.name)
-      };
-    }
-  });
-
-  // node_modules/@tiptap/extension-ordered-list/dist/tiptap-extension-ordered-list.esm.js
-  var inputRegex6 = /^(\d+)\.\s$/;
-  var OrderedList = Node4.create({
-    name: "orderedList",
-    addOptions() {
-      return {
-        itemTypeName: "listItem",
-        HTMLAttributes: {}
-      };
-    },
-    group: "block list",
-    content() {
-      return `${this.options.itemTypeName}+`;
-    },
-    addAttributes() {
-      return {
-        start: {
-          default: 1,
-          parseHTML: (element) => {
-            return element.hasAttribute("start") ? parseInt(element.getAttribute("start") || "", 10) : 1;
-          }
-        }
-      };
-    },
-    parseHTML() {
-      return [
-        {
-          tag: "ol"
-        }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      const { start: start6, ...attributesWithoutStart } = HTMLAttributes;
-      return start6 === 1 ? ["ol", mergeAttributes(this.options.HTMLAttributes, attributesWithoutStart), 0] : ["ol", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        toggleOrderedList: () => ({ commands }) => {
-          return commands.toggleList(this.name, this.options.itemTypeName);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Shift-7": () => this.editor.commands.toggleOrderedList()
-      };
-    },
-    addInputRules() {
-      return [
-        wrappingInputRule({
-          find: inputRegex6,
-          type: this.type,
-          getAttributes: (match) => ({ start: +match[1] }),
-          joinPredicate: (match, node5) => node5.childCount + node5.attrs.start === +match[1]
-        })
-      ];
-    }
-  });
-
-  // node_modules/@tiptap/extension-paragraph/dist/tiptap-extension-paragraph.esm.js
-  var Paragraph = Node4.create({
-    name: "paragraph",
-    priority: 1e3,
-    addOptions() {
-      return {
-        HTMLAttributes: {}
-      };
-    },
-    group: "block",
-    content: "inline*",
-    parseHTML() {
-      return [
-        { tag: "p" }
-      ];
-    },
-    renderHTML({ HTMLAttributes }) {
-      return ["p", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
-    },
-    addCommands() {
-      return {
-        setParagraph: () => ({ commands }) => {
-          return commands.setNode(this.name);
-        }
-      };
-    },
-    addKeyboardShortcuts() {
-      return {
-        "Mod-Alt-0": () => this.editor.commands.setParagraph()
-      };
-    }
-  });
-
-  // node_modules/@tiptap/extension-text/dist/tiptap-extension-text.esm.js
-  var Text2 = Node4.create({
-    name: "text",
-    group: "inline"
-  });
-
-  // app/javascript/documentation/controllers/rich_text_editor/lowlight.js
-  var import_core32 = __toESM(require_core2());
-  var import_css = __toESM(require_css());
-  var import_javascript = __toESM(require_javascript());
-  var import_json = __toESM(require_json());
-  var import_ruby = __toESM(require_ruby());
-  var import_scss = __toESM(require_scss());
-  var import_sql = __toESM(require_sql());
-  var import_xml = __toESM(require_xml());
-  var import_yaml = __toESM(require_yaml());
-  import_core32.default.registerLanguage("css", import_css.default);
-  import_core32.default.registerLanguage("javascript", import_javascript.default);
-  import_core32.default.registerLanguage("json", import_json.default);
-  import_core32.default.registerLanguage("ruby", import_ruby.default);
-  import_core32.default.registerLanguage("scss", import_scss.default);
-  import_core32.default.registerLanguage("sql", import_sql.default);
-  import_core32.default.registerLanguage("xml", import_xml.default);
-  import_core32.default.registerLanguage("yaml", import_yaml.default);
-  var lowlight_default = import_core32.default;
-
-  // app/javascript/documentation/controllers/rich_text_editor/with_nodes.js
-  var nodesTargets = [
-    "nodeSelect",
-    "nodeSelectTrigger",
-    "text",
-    "h1",
-    "h2",
-    "h3",
-    "ul",
-    "ol",
-    "blockquote",
-    "codeBlock",
-    "image"
-  ];
-  var toolbarNodes = [
-    {
-      target: "h1",
-      name: "heading",
-      attributes: { level: 1 },
-      text: "Heading 1"
-    },
-    {
-      target: "h2",
-      name: "heading",
-      attributes: { level: 2 },
-      text: "Heading 2"
-    },
-    {
-      target: "h3",
-      name: "heading",
-      attributes: { level: 3 },
-      text: "Heading 3"
-    },
-    {
-      name: "bulletList",
-      target: "ul",
-      text: "Bulleted List"
-    },
-    {
-      name: "orderedList",
-      target: "ol",
-      text: "Ordered List"
-    },
-    {
-      name: "blockquote",
-      target: "blockquote",
-      text: "Quote"
-    },
-    {
-      name: "codeBlock",
-      target: "codeBlock",
-      text: "Code"
-    },
-    {
-      name: "image",
-      target: "image",
-      text: "Image"
-    },
-    {
-      name: "paragraph",
-      target: "text",
-      text: "Text"
-    }
-  ];
-  var with_nodes_default = (controller, _options = {}) => {
-    const NodesExtensions = [
-      Blockquote,
-      BulletList,
-      CodeBlock,
-      CodeBlockLowlight.configure({
-        lowlight: lowlight_default
-      }),
-      HardBreak,
-      Heading,
-      HorizontalRule,
-      Image,
-      ListItem,
-      OrderedList,
-      Paragraph,
-      Text2
-    ];
-    const toggleH1 = () => {
-      controller.runCommand("toggleHeading", { level: 1 });
-    };
-    const toggleH2 = () => {
-      controller.runCommand("toggleHeading", { level: 2 });
-    };
-    const toggleH3 = () => {
-      controller.runCommand("toggleHeading", { level: 3 });
-    };
-    const setParagraph = () => {
-      controller.runCommand("setParagraph");
-    };
-    const toggleBulletList = () => {
-      controller.runCommand("toggleBulletList");
-    };
-    const toggleOrderedList = () => {
-      controller.runCommand("toggleOrderedList");
-    };
-    const toggleBlockquote = () => {
-      controller.runCommand("toggleBlockquote");
-    };
-    const toggleCodeBlock = () => {
-      controller.runCommand("toggleCodeBlock");
-    };
-    const setImage = () => {
-      const url = window.prompt("URL");
-      if (url) {
-        controller.runCommand("setImage", { src: url });
-      }
-    };
-    const enableSelectedToolbarNode = () => {
-      toolbarNodes.some(({ target, name, text: text4, attributes }) => {
-        if (!controller.editor.isActive(name, attributes))
-          return;
-        const targetNode = controller.targets.find(target);
-        if (!targetNode)
-          return;
-        if (controller.hasNodeSelectTriggerTarget) {
-          controller.nodeSelectTriggerTarget.innerHTML = text4;
-        }
-        targetNode.classList.add("is-active");
-        return true;
-      });
-    };
-    const openNodeSelect = () => {
-      controller.closeLinkPanel();
-      controller.closeTablePanel();
-      controller.closeImagePanel();
-    };
-    const closeNodeSelect = () => {
-      if (!controller.hasNodeSelectTarget)
-        return;
-      controller.nodeSelectTarget.classList.remove("is-active");
-    };
-    Object.assign(controller, {
-      toggleH1,
-      toggleH2,
-      toggleH3,
-      setParagraph,
-      toggleBulletList,
-      toggleOrderedList,
-      toggleBlockquote,
-      toggleCodeBlock,
-      setImage,
-      enableSelectedToolbarNode,
-      openNodeSelect,
-      closeNodeSelect
-    });
-    return { NodesExtensions };
-  };
-
-  // app/javascript/documentation/controllers/rich_text_editor/useImagePanel.js
-  var imagePanelTargets = ["imagePanel"];
-  var useImagePanel_default = (controller, _options = {}) => {
+  // app/javascript/documentation/controllers/rich_text_editor/useImage.js
+  var imageTargets = ["imagePanel"];
+  var useImage_default = (controller, _options = {}) => {
+    const ImageExtensions = [Image2];
     const openImagePanel = () => {
       controller.closeNodeSelect();
       controller.closeTablePanel();
@@ -41161,6 +41149,7 @@ img.ProseMirror-separator {
       closeImagePanel,
       addImage
     });
+    return { ImageExtensions };
   };
 
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
@@ -41173,7 +41162,7 @@ img.ProseMirror-separator {
       const { TableExtensions } = with_table_default(this);
       const { LinkExtensions } = with_link_default(this);
       const { MentionExtensions } = with_mention_default(this);
-      useImagePanel_default(this);
+      const { ImageExtensions } = useImage_default(this);
       this.editor = new Editor({
         element: this.element,
         extensions: [
@@ -41182,7 +41171,8 @@ img.ProseMirror-separator {
           ...MarkExtensions,
           ...LinkExtensions,
           ...TableExtensions,
-          ...MentionExtensions
+          ...MentionExtensions,
+          ...ImageExtensions
         ],
         autofocus: true,
         content: this.contentValue,
@@ -41230,7 +41220,7 @@ img.ProseMirror-separator {
     ...marksTargets,
     ...linkTargets,
     ...tableTargets,
-    ...imagePanelTargets,
+    ...imageTargets,
     "output"
   ]);
   __publicField(RichTextEditorController, "values", {

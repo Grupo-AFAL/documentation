@@ -14,9 +14,7 @@ import withNodes, {
   nodesTargets,
   toolbarNodes
 } from './rich_text_editor/with_nodes'
-import useImagePanel, {
-  imagePanelTargets
-} from './rich_text_editor/useImagePanel'
+import useImage, { imageTargets } from './rich_text_editor/useImage'
 
 export default class RichTextEditorController extends Controller {
   static targets = [
@@ -25,7 +23,7 @@ export default class RichTextEditorController extends Controller {
     ...marksTargets,
     ...linkTargets,
     ...tableTargets,
-    ...imagePanelTargets,
+    ...imageTargets,
     'output'
   ]
 
@@ -44,8 +42,7 @@ export default class RichTextEditorController extends Controller {
     const { TableExtensions } = withTable(this)
     const { LinkExtensions } = withLink(this)
     const { MentionExtensions } = withMention(this)
-
-    useImagePanel(this)
+    const { ImageExtensions } = useImage(this)
 
     this.editor = new Editor({
       element: this.element,
@@ -55,7 +52,8 @@ export default class RichTextEditorController extends Controller {
         ...MarkExtensions,
         ...LinkExtensions,
         ...TableExtensions,
-        ...MentionExtensions
+        ...MentionExtensions,
+        ...ImageExtensions
       ],
       autofocus: true,
       content: this.contentValue,

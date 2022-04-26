@@ -5,7 +5,6 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import HardBreak from '@tiptap/extension-hard-break'
 import Heading from '@tiptap/extension-heading'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
-import Image from '@tiptap/extension-image'
 import ListItem from '@tiptap/extension-list-item'
 import OrderedList from '@tiptap/extension-ordered-list'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -25,8 +24,7 @@ export const nodesTargets = [
   'ul',
   'ol',
   'blockquote',
-  'codeBlock',
-  'image'
+  'codeBlock'
 ]
 
 export const toolbarNodes = [
@@ -67,11 +65,6 @@ export const toolbarNodes = [
     name: 'codeBlock',
     target: 'codeBlock',
     text: 'Code'
-  },
-  {
-    name: 'image',
-    target: 'image',
-    text: 'Image'
   },
   {
     name: 'paragraph',
@@ -130,14 +123,6 @@ export default (controller, _options = {}) => {
     controller.runCommand('toggleCodeBlock')
   }
 
-  const setImage = () => {
-    const url = window.prompt('URL')
-
-    if (url) {
-      controller.runCommand('setImage', { src: url })
-    }
-  }
-
   const enableSelectedToolbarNode = () => {
     toolbarNodes.some(({ target, name, text, attributes }) => {
       if (!controller.editor.isActive(name, attributes)) return
@@ -175,7 +160,6 @@ export default (controller, _options = {}) => {
     toggleOrderedList,
     toggleBlockquote,
     toggleCodeBlock,
-    setImage,
     enableSelectedToolbarNode,
     openNodeSelect,
     closeNodeSelect

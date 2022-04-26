@@ -38,7 +38,6 @@
         <%= c.item(class: 'ol', data: { action: 'rich-text-editor#toggleOrderedList', 'rich-text-editor-target': 'ol' }) { 'Ordered list' } %>
         <%= c.item(class: 'blockquote', data: { action: 'rich-text-editor#toggleBlockquote', 'rich-text-editor-target': 'blockquote' }) { 'Quote' } %>
         <%= c.item(class: 'codeBlock', data: { action: 'rich-text-editor#toggleCodeBlock', 'rich-text-editor-target': 'codeBlock' }) { 'Code' } %>
-        <%= c.item(class: 'image', data: { action: 'rich-text-editor#setImage', 'rich-text-editor-target': 'image' }) { 'Image' } %>
       <% end %>
 
       <%= render Bali::Dropdown::Component.new(close_on_click: false, data: { 'rich-text-editor-target': 'linkPanel' }) do |c| %>

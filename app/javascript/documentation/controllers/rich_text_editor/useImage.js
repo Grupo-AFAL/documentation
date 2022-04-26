@@ -1,6 +1,10 @@
-export const imagePanelTargets = ['imagePanel']
+import Image from '@tiptap/extension-image'
+
+export const imageTargets = ['imagePanel']
 
 export default (controller, _options = {}) => {
+  const ImageExtensions = [Image]
+
   const openImagePanel = () => {
     controller.closeNodeSelect()
     controller.closeTablePanel()
@@ -24,4 +28,6 @@ export default (controller, _options = {}) => {
     closeImagePanel,
     addImage
   })
+
+  return { ImageExtensions }
 }
