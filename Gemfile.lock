@@ -1,4 +1,14 @@
 GIT
+  remote: https://github.com/Grupo-AFAL/bali-view-components.git
+  revision: b663e48b42b1640739a0b89d43b2a802555250aa
+  branch: main
+  specs:
+    bali_view_components (0.1.0)
+      rails (>= 7.0.2.3)
+      view_component (>= 2.0.0, < 3.0)
+      view_component-contrib
+
+GIT
   remote: https://github.com/Grupo-AFAL/frontend-helpers.git
   revision: a816a3f355a5262fcdb364250cc7ba63c3626b67
   branch: main
@@ -16,14 +26,6 @@ PATH
       jbuilder
       rails (>= 7.0.2.3)
       turbo-rails (>= 1.0.1)
-
-PATH
-  remote: /Users/fede/code/grupoafal/bali
-  specs:
-    bali_view_components (0.1.0)
-      rails (>= 7.0.2.3)
-      view_component (>= 2.0.0, < 3.0)
-      view_component-contrib
 
 GEM
   remote: https://rubygems.org/
