@@ -11400,6 +11400,23 @@
     remove: Boolean
   });
 
+  // node_modules/frontend-helpers/javascript/src/controllers/file-input-controller.js
+  var FileInputController = class extends Controller {
+    onChange(event) {
+      let fileName;
+      if (event.target.value.length === 0) {
+        fileName = this.nonSelectedTextValue;
+      } else {
+        fileName = event.target.value.split("\\").pop();
+      }
+      this.valueTarget.innerHTML = fileName;
+    }
+  };
+  __publicField(FileInputController, "targets", ["value", "input"]);
+  __publicField(FileInputController, "values", {
+    nonSelectedText: String
+  });
+
   // node_modules/frontend-helpers/javascript/src/controllers/notification-controller.js
   var NotificationController = class extends DisappearController {
     connect() {
@@ -37081,6 +37098,7 @@ img.ProseMirror-separator {
     const openTablePanel = () => {
       controller.closeNodeSelect();
       controller.closeLinkPanel();
+      controller.closeImagePanel();
     };
     const closeTablePanel = () => {
       if (!controller.hasTablePanelTarget)
@@ -38067,6 +38085,7 @@ img.ProseMirror-separator {
     const openLinkPanel = () => {
       controller.closeNodeSelect();
       controller.closeTablePanel();
+      controller.closeImagePanel();
       const link = controller.editor.getAttributes("link");
       controller.linkInputTarget.innerHTML = link.href || "";
       controller.linkInputTarget.focus();
@@ -40971,6 +40990,7 @@ img.ProseMirror-separator {
       HardBreak,
       Heading,
       HorizontalRule,
+      Image,
       ListItem,
       OrderedList,
       Paragraph,
@@ -41001,28 +41021,23 @@ img.ProseMirror-separator {
       controller.runCommand("toggleCodeBlock");
     };
     const enableSelectedToolbarNode = () => {
-      toolbarNodes.some(({ target, name, attributes }) => {
+      toolbarNodes.some(({ target, name, text: text4, attributes }) => {
         if (!controller.editor.isActive(name, attributes))
           return;
         const targetNode = controller.targets.find(target);
-        if (targetNode) {
-          targetNode.classList.add("is-active");
+        if (!targetNode)
+          return;
+        if (controller.hasNodeSelectTriggerTarget) {
+          controller.nodeSelectTriggerTarget.innerHTML = text4;
         }
+        targetNode.classList.add("is-active");
+        return true;
       });
-    };
-    const setCurrentToolbarNode = () => {
-      if (!controller.hasNodeSelectTriggerTarget)
-        return;
-      const selectedType = toolbarNodes.find(({ name, attributes }) => {
-        return controller.editor.isActive(name, attributes);
-      });
-      if (selectedType) {
-        controller.nodeSelectTriggerTarget.innerHTML = selectedType.text;
-      }
     };
     const openNodeSelect = () => {
       controller.closeLinkPanel();
       controller.closeTablePanel();
+      controller.closeImagePanel();
     };
     const closeNodeSelect = () => {
       if (!controller.hasNodeSelectTarget)
@@ -41039,11 +41054,102 @@ img.ProseMirror-separator {
       toggleBlockquote,
       toggleCodeBlock,
       enableSelectedToolbarNode,
-      setCurrentToolbarNode,
       openNodeSelect,
       closeNodeSelect
     });
     return { NodesExtensions };
+  };
+
+  // node_modules/@tiptap/extension-image/dist/tiptap-extension-image.esm.js
+  var inputRegex6 = /(!\[(.+|:?)]\((\S+)(?:(?:\s+)["'](\S+)["'])?\))$/;
+  var Image2 = Node4.create({
+    name: "image",
+    addOptions() {
+      return {
+        inline: false,
+        allowBase64: false,
+        HTMLAttributes: {}
+      };
+    },
+    inline() {
+      return this.options.inline;
+    },
+    group() {
+      return this.options.inline ? "inline" : "block";
+    },
+    draggable: true,
+    addAttributes() {
+      return {
+        src: {
+          default: null
+        },
+        alt: {
+          default: null
+        },
+        title: {
+          default: null
+        }
+      };
+    },
+    parseHTML() {
+      return [
+        {
+          tag: this.options.allowBase64 ? "img[src]" : 'img[src]:not([src^="data:"])'
+        }
+      ];
+    },
+    renderHTML({ HTMLAttributes }) {
+      return ["img", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes)];
+    },
+    addCommands() {
+      return {
+        setImage: (options) => ({ commands }) => {
+          return commands.insertContent({
+            type: this.name,
+            attrs: options
+          });
+        }
+      };
+    },
+    addInputRules() {
+      return [
+        nodeInputRule({
+          find: inputRegex6,
+          type: this.type,
+          getAttributes: (match) => {
+            const [, , alt, src, title] = match;
+            return { src, alt, title };
+          }
+        })
+      ];
+    }
+  });
+
+  // app/javascript/documentation/controllers/rich_text_editor/useImage.js
+  var imageTargets = ["imagePanel"];
+  var useImage_default = (controller, _options = {}) => {
+    const ImageExtensions = [Image2];
+    const openImagePanel = () => {
+      controller.closeNodeSelect();
+      controller.closeTablePanel();
+      controller.closeLinkPanel();
+    };
+    const closeImagePanel = () => {
+      if (!controller.hasImagePanelTarget)
+        return;
+      controller.imagePanelTarget.classList.remove("is-active");
+    };
+    const addImage = (event) => {
+      controller.runCommand("setImage", {
+        src: event.target.dataset.sourceUrl
+      });
+    };
+    Object.assign(controller, {
+      openImagePanel,
+      closeImagePanel,
+      addImage
+    });
+    return { ImageExtensions };
   };
 
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
@@ -41056,6 +41162,7 @@ img.ProseMirror-separator {
       const { TableExtensions } = with_table_default(this);
       const { LinkExtensions } = with_link_default(this);
       const { MentionExtensions } = with_mention_default(this);
+      const { ImageExtensions } = useImage_default(this);
       this.editor = new Editor({
         element: this.element,
         extensions: [
@@ -41064,7 +41171,8 @@ img.ProseMirror-separator {
           ...MarkExtensions,
           ...LinkExtensions,
           ...TableExtensions,
-          ...MentionExtensions
+          ...MentionExtensions,
+          ...ImageExtensions
         ],
         autofocus: true,
         content: this.contentValue,
@@ -41072,10 +41180,10 @@ img.ProseMirror-separator {
         editable: this.editableValue
       });
       this.editor.on("transaction", () => {
+        this.closeAllPanels();
         this.resetMenuButtons();
         this.enableSelectedToolbarMarks();
         this.enableSelectedToolbarNode();
-        this.setCurrentToolbarNode();
         this.updateTableModifiers();
       });
     }
@@ -41091,9 +41199,13 @@ img.ProseMirror-separator {
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }
-    resetMenuButtons() {
+    closeAllPanels() {
       this.closeNodeSelect();
       this.closeLinkPanel();
+      this.closeTablePanel();
+      this.closeImagePanel();
+    }
+    resetMenuButtons() {
       this.allMenuButtons.forEach(({ target }) => {
         const targetNode = this.targets.find(target);
         if (targetNode) {
@@ -41108,6 +41220,7 @@ img.ProseMirror-separator {
     ...marksTargets,
     ...linkTargets,
     ...tableTargets,
+    ...imageTargets,
     "output"
   ]);
   __publicField(RichTextEditorController, "values", {
@@ -41119,6 +41232,7 @@ img.ProseMirror-separator {
   // app/javascript/documentation/application.js
   var application = Application.start();
   application.register("dropdown", DropdownController);
+  application.register("file-input", FileInputController);
   application.register("modal", ModalController);
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);

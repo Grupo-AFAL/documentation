@@ -5,7 +5,6 @@ import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
 import HardBreak from '@tiptap/extension-hard-break'
 import Heading from '@tiptap/extension-heading'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
-// import Image from '@tiptap/extension-image'
 import ListItem from '@tiptap/extension-list-item'
 import OrderedList from '@tiptap/extension-ordered-list'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -85,6 +84,7 @@ export default (controller, _options = {}) => {
     HardBreak,
     Heading,
     HorizontalRule,
+    Image,
     ListItem,
     OrderedList,
     Paragraph,
@@ -124,31 +124,25 @@ export default (controller, _options = {}) => {
   }
 
   const enableSelectedToolbarNode = () => {
-    toolbarNodes.some(({ target, name, attributes }) => {
+    toolbarNodes.some(({ target, name, text, attributes }) => {
       if (!controller.editor.isActive(name, attributes)) return
 
       const targetNode = controller.targets.find(target)
-      if (targetNode) {
-        targetNode.classList.add('is-active')
+      if (!targetNode) return
+
+      if (controller.hasNodeSelectTriggerTarget) {
+        controller.nodeSelectTriggerTarget.innerHTML = text
       }
+
+      targetNode.classList.add('is-active')
+      return true
     })
-  }
-
-  const setCurrentToolbarNode = () => {
-    if (!controller.hasNodeSelectTriggerTarget) return
-
-    const selectedType = toolbarNodes.find(({ name, attributes }) => {
-      return controller.editor.isActive(name, attributes)
-    })
-
-    if (selectedType) {
-      controller.nodeSelectTriggerTarget.innerHTML = selectedType.text
-    }
   }
 
   const openNodeSelect = () => {
     controller.closeLinkPanel()
     controller.closeTablePanel()
+    controller.closeImagePanel()
   }
 
   const closeNodeSelect = () => {
@@ -167,7 +161,6 @@ export default (controller, _options = {}) => {
     toggleBlockquote,
     toggleCodeBlock,
     enableSelectedToolbarNode,
-    setCurrentToolbarNode,
     openNodeSelect,
     closeNodeSelect
   })

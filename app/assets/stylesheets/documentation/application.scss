@@ -31,7 +31,7 @@
 @import 'sass/elements/container';
 // @import 'sass/elements/content';
 @import 'sass/elements/icon';
-// @import 'sass/elements/image';
+@import 'sass/elements/image';
 @import 'sass/elements/notification';
 // @import 'sass/elements/progress';
 @import 'sass/elements/table';
@@ -63,7 +63,7 @@
 // @import 'sass/grid/tiles';
 
 @import 'sass/helpers/color';
-// @import 'sass/helpers/flexbox';
+@import 'sass/helpers/flexbox';
 // @import 'sass/helpers/float';
 // @import 'sass/helpers/other';
 // @import 'sass/helpers/overflow';
@@ -92,5 +92,6 @@
 
 // Bali Styles
 @import 'bali/dropdown/index';
+@import 'bali/image_grid/index';
 @import 'bali/modal/index';
 @import 'bali/tabs/index';

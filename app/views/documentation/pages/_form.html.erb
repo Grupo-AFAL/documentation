@@ -70,6 +70,23 @@
         <% end %>
       </div>
 
+      <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'imagePanel' }) do |c| %>
+        <% c.trigger(data: { action: 'rich-text-editor#openImagePanel' }, class: 'full-height') do %>
+          <div class="is-flex is-align-items-center full-height">
+            <%= icon_tag('image', class: 'toolbar-icon image-icon') %>
+          </div>
+        <% end %>
+
+        <%= render Bali::ImageGrid::Component.new do |c| %>
+          <%= @page.images.each do |image| %>
+            <%= c.image do %>
+              <%= image_tag main_app.url_for(image.variant(:small_thumb)),
+                  data: { action: 'click->rich-text-editor#addImage', 'source-url': main_app.url_for(image) } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'tablePanel' }) do |c| %>
         <% c.trigger(data: { action: 'rich-text-editor#openTablePanel' }) do %>
           <span>Table</span>

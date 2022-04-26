@@ -6,6 +6,7 @@
     "@tiptap/extension-bubble-menu": "^2.0.0-beta.55",
     "@tiptap/extension-code-block": "^2.0.0-beta.37",
     "@tiptap/extension-code-block-lowlight": "^2.0.0-beta.68",
+    "@tiptap/extension-image": "^2.0.0-beta.27",
     "@tiptap/extension-link": "^2.0.0-beta.36",
     "@tiptap/extension-mention": "^2.0.0-beta.95",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
