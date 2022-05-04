@@ -1,5 +1,5 @@
-import imagePlaceholderUrl from './assets/image_placeholder.png'
-import SuggestionRenderer from './suggestion_renderer'
+import imagePlaceholderUrl from '../assets/image_placeholder.png'
+import SuggestionRenderer from './renderer'
 
 /**
  * Tiptap suggestion utility

@@ -2,18 +2,18 @@ import { Controller } from '@hotwired/stimulus'
 import { Editor } from '@tiptap/core'
 import throttle from 'lodash.throttle'
 
-import withDefaults, { defaultTargets } from './rich_text_editor/with_defaults'
-import withMarks, {
+import useDefaults, { defaultTargets } from './rich_text_editor/useDefaults'
+import useMarks, {
   marksTargets,
   toolbarMarks
-} from './rich_text_editor/with_marks'
-import withTable, { tableTargets } from './rich_text_editor/with_table'
-import withLink, { linkTargets } from './rich_text_editor/with_link'
-import withMention from './rich_text_editor/with_mention'
-import withNodes, {
+} from './rich_text_editor/useMarks'
+import useTable, { tableTargets } from './rich_text_editor/useTable'
+import useLink, { linkTargets } from './rich_text_editor/useLink'
+import useMention from './rich_text_editor/useMention'
+import useNodes, {
   nodesTargets,
   toolbarNodes
-} from './rich_text_editor/with_nodes'
+} from './rich_text_editor/useNodes'
 import useImage, { imageTargets } from './rich_text_editor/useImage'
 import useSlashCommands from './rich_text_editor/useSlashCommands'
 
@@ -37,12 +37,12 @@ export default class RichTextEditorController extends Controller {
   allMenuButtons = toolbarMarks.concat(toolbarNodes)
 
   connect () {
-    const { DefaultExtensions } = withDefaults(this)
-    const { NodesExtensions } = withNodes(this)
-    const { MarkExtensions } = withMarks(this)
-    const { TableExtensions } = withTable(this)
-    const { LinkExtensions } = withLink(this)
-    const { MentionExtensions } = withMention(this)
+    const { DefaultExtensions } = useDefaults(this)
+    const { NodesExtensions } = useNodes(this)
+    const { MarkExtensions } = useMarks(this)
+    const { TableExtensions } = useTable(this)
+    const { LinkExtensions } = useLink(this)
+    const { MentionExtensions } = useMention(this)
     const { ImageExtensions } = useImage(this)
     const { SlashCommandsExtension } = useSlashCommands(this)
 
