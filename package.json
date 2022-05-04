@@ -23,6 +23,6 @@
     "tippy.js": "^6.3.7"
   },
   "scripts": {
-    "build": "esbuild app/javascript/documentation/application.js --bundle --sourcemap --outdir=app/assets/javascripts/documentation"
+    "build": "esbuild app/javascript/documentation/application.js --bundle --loader:.png=dataurl --sourcemap --outdir=app/assets/javascripts/documentation"
   }
 }

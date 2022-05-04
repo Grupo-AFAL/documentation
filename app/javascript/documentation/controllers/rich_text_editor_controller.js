@@ -15,6 +15,7 @@ import withNodes, {
   toolbarNodes
 } from './rich_text_editor/with_nodes'
 import useImage, { imageTargets } from './rich_text_editor/useImage'
+import useSlashCommands from './rich_text_editor/useSlashCommands'
 
 export default class RichTextEditorController extends Controller {
   static targets = [
@@ -43,6 +44,7 @@ export default class RichTextEditorController extends Controller {
     const { LinkExtensions } = withLink(this)
     const { MentionExtensions } = withMention(this)
     const { ImageExtensions } = useImage(this)
+    const { SlashCommandsExtension } = useSlashCommands(this)
 
     this.editor = new Editor({
       element: this.element,
@@ -53,7 +55,8 @@ export default class RichTextEditorController extends Controller {
         ...LinkExtensions,
         ...TableExtensions,
         ...MentionExtensions,
-        ...ImageExtensions
+        ...ImageExtensions,
+        ...SlashCommandsExtension
       ],
       autofocus: true,
       content: this.contentValue,

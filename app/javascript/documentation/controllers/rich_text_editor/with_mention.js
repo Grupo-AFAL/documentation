@@ -1,5 +1,5 @@
 import Mention from '@tiptap/extension-mention'
-import suggestion from './suggestion'
+import suggestion from './pages_suggestion_options'
 
 export default (_controller, _options = {}) => {
   const MentionExtensions = [

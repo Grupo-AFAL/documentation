@@ -38453,8 +38453,8 @@ img.ProseMirror-separator {
       this.command = command2;
     }
     selectActiveItem() {
-      const { id, url, title } = this.items[this.selectedIndex];
-      this.command({ id: url, url, label: title });
+      const { id, url, title, command: command2 } = this.items[this.selectedIndex];
+      this.command({ id: url, url, label: title, command: command2 });
     }
     updateActiveItem(index3) {
       this.selectedIndex = index3;
@@ -38473,8 +38473,54 @@ img.ProseMirror-separator {
     }
   };
 
-  // app/javascript/documentation/controllers/rich_text_editor/suggestion.js
-  var suggestion_default = {
+  // app/javascript/documentation/controllers/rich_text_editor/suggestion_renderer.js
+  var suggestion_renderer_default = () => {
+    let component = new PopUpListComponent();
+    let popup;
+    return {
+      onStart: function({ items, command: command2, clientRect: clientRect2 }) {
+        popup = tippy_esm_default("body", {
+          getReferenceClientRect: clientRect2,
+          appendTo: () => document.body,
+          allowHTML: true,
+          content: component.render(),
+          showOnCreate: true,
+          interactive: true,
+          trigger: "manual",
+          placement: "bottom-start",
+          arrow: false
+        });
+        this.onUpdate({ items, command: command2, clientRect: clientRect2 });
+      },
+      onUpdate({ items, command: command2, clientRect: clientRect2 }) {
+        component.updateProps({ items, command: command2 });
+        component.render();
+        popup[0].setProps({ getReferenceClientRect: clientRect2 });
+      },
+      onKeyDown({ event }) {
+        if (event.key === "Escape") {
+          popup[0].hide();
+          return true;
+        } else if (event.key === "Enter") {
+          component.selectActiveItem();
+          return true;
+        } else if (event.key === "ArrowUp") {
+          component.goUp();
+          return true;
+        } else if (event.key === "ArrowDown") {
+          component.goDown();
+          return true;
+        }
+      },
+      onExit() {
+        popup[0].destroy();
+        component.destroy();
+      }
+    };
+  };
+
+  // app/javascript/documentation/controllers/rich_text_editor/pages_suggestion_options.js
+  var pages_suggestion_options_default = {
     items: async ({ query }) => {
       const response = await get("/documentation/pages", {
         query: { title: query },
@@ -38484,49 +38530,7 @@ img.ProseMirror-separator {
         return [];
       return await response.json;
     },
-    render: () => {
-      let component = new PopUpListComponent();
-      let popup;
-      return {
-        onStart: ({ clientRect: clientRect2 }) => {
-          popup = tippy_esm_default("body", {
-            getReferenceClientRect: clientRect2,
-            appendTo: () => document.body,
-            allowHTML: true,
-            content: component.render(),
-            showOnCreate: true,
-            interactive: true,
-            trigger: "manual",
-            placement: "bottom-start",
-            arrow: false
-          });
-        },
-        onUpdate({ items, command: command2, clientRect: clientRect2 }) {
-          component.updateProps({ items, command: command2 });
-          component.render();
-          popup[0].setProps({ getReferenceClientRect: clientRect2 });
-        },
-        onKeyDown({ event }) {
-          if (event.key === "Escape") {
-            popup[0].hide();
-            return true;
-          } else if (event.key === "Enter") {
-            component.selectActiveItem();
-            return true;
-          } else if (event.key === "ArrowUp") {
-            component.goUp();
-            return true;
-          } else if (event.key === "ArrowDown") {
-            component.goDown();
-            return true;
-          }
-        },
-        onExit() {
-          popup[0].destroy();
-          component.destroy();
-        }
-      };
-    }
+    render: suggestion_renderer_default
   };
 
   // app/javascript/documentation/controllers/rich_text_editor/with_mention.js
@@ -38539,7 +38543,7 @@ img.ProseMirror-separator {
         renderLabel({ options, node: node5 }) {
           return `${options.suggestion.char}${node5.attrs.label}`;
         },
-        suggestion: suggestion_default
+        suggestion: pages_suggestion_options_default
       })
     ];
     return { MentionExtensions };
@@ -41133,6 +41137,9 @@ img.ProseMirror-separator {
       controller.closeNodeSelect();
       controller.closeTablePanel();
       controller.closeLinkPanel();
+      if (!controller.hasImagePanelTarget)
+        return;
+      controller.imagePanelTarget.classList.add("is-active");
     };
     const closeImagePanel = () => {
       if (!controller.hasImagePanelTarget)
@@ -41152,6 +41159,60 @@ img.ProseMirror-separator {
     return { ImageExtensions };
   };
 
+  // app/javascript/documentation/controllers/rich_text_editor/extensions/slashCommands.js
+  var slashCommands_default = Extension.create({
+    name: "slashCommands",
+    addOptions() {
+      return {
+        suggestion: {
+          char: "/",
+          command: ({ editor, range, props }) => {
+            props.command({ editor, range });
+          }
+        }
+      };
+    },
+    addProseMirrorPlugins() {
+      return [
+        Suggestion({
+          editor: this.editor,
+          ...this.options.suggestion
+        })
+      ];
+    }
+  });
+
+  // app/javascript/documentation/controllers/rich_text_editor/assets/image_placeholder.png
+  var image_placeholder_default = "data:image/png;base64,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";
+
+  // app/javascript/documentation/controllers/rich_text_editor/commands_suggestion_options.js
+  var commands_suggestion_options_default = {
+    decorationClass: "slash-command",
+    items: ({ query }) => {
+      return [
+        {
+          title: "Table",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+          }
+        },
+        {
+          title: "Image",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).setImage({ src: image_placeholder_default }).run();
+          }
+        }
+      ].filter((item) => item.title.toLowerCase().startsWith(query.toLowerCase())).slice(0, 10);
+    },
+    render: suggestion_renderer_default
+  };
+
+  // app/javascript/documentation/controllers/rich_text_editor/useSlashCommands.js
+  var useSlashCommands_default = (_controller, _options = {}) => {
+    const SlashCommandsExtension = [slashCommands_default.configure({ suggestion: commands_suggestion_options_default })];
+    return { SlashCommandsExtension };
+  };
+
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
   var RichTextEditorController = class extends Controller {
     allMenuButtons = toolbarMarks.concat(toolbarNodes);
@@ -41163,6 +41224,7 @@ img.ProseMirror-separator {
       const { LinkExtensions } = with_link_default(this);
       const { MentionExtensions } = with_mention_default(this);
       const { ImageExtensions } = useImage_default(this);
+      const { SlashCommandsExtension } = useSlashCommands_default(this);
       this.editor = new Editor({
         element: this.element,
         extensions: [
@@ -41172,7 +41234,8 @@ img.ProseMirror-separator {
           ...LinkExtensions,
           ...TableExtensions,
           ...MentionExtensions,
-          ...ImageExtensions
+          ...ImageExtensions,
+          ...SlashCommandsExtension
         ],
         autofocus: true,
         content: this.contentValue,

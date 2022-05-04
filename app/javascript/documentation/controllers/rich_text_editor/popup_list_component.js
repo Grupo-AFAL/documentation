@@ -34,8 +34,8 @@ export default class PopUpListComponent {
   }
 
   selectActiveItem () {
-    const { id, url, title } = this.items[this.selectedIndex]
-    this.command({ id: url, url, label: title })
+    const { id, url, title, command } = this.items[this.selectedIndex]
+    this.command({ id: url, url, label: title, command })
   }
 
   updateActiveItem (index) {
