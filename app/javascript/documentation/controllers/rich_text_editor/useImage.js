@@ -9,6 +9,9 @@ export default (controller, _options = {}) => {
     controller.closeNodeSelect()
     controller.closeTablePanel()
     controller.closeLinkPanel()
+
+    if (!controller.hasImagePanelTarget) return
+    controller.imagePanelTarget.classList.add('is-active')
   }
 
   const closeImagePanel = () => {
