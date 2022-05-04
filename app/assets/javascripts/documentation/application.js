@@ -38421,9 +38421,9 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/suggestions/popup_list_component.js
-  var createRoot = () => {
+  var createRoot = ({ className } = {}) => {
     const div2 = document.createElement("div");
-    div2.classList.add("dropdown-content");
+    div2.classList.add("dropdown-content", className);
     return div2;
   };
   var createItem = (item, classNames = "") => {
@@ -38433,12 +38433,12 @@ img.ProseMirror-separator {
     return div2;
   };
   var PopUpListComponent = class {
-    constructor(items = [], command2 = () => {
-    }) {
+    constructor({ rootOptions } = {}) {
       this.selectedIndex = 0;
-      this.items = items;
-      this.element = createRoot();
-      this.command = command2;
+      this.items = [];
+      this.command = () => {
+      };
+      this.element = createRoot(rootOptions);
     }
     render() {
       this.element.innerHTML = "";
@@ -38474,48 +38474,50 @@ img.ProseMirror-separator {
   };
 
   // app/javascript/documentation/controllers/rich_text_editor/suggestions/renderer.js
-  var renderer_default = () => {
-    let component = new PopUpListComponent();
-    let popup;
-    return {
-      onStart: function({ items, command: command2, clientRect: clientRect2 }) {
-        popup = tippy_esm_default("body", {
-          getReferenceClientRect: clientRect2,
-          appendTo: () => document.body,
-          allowHTML: true,
-          content: component.render(),
-          showOnCreate: true,
-          interactive: true,
-          trigger: "manual",
-          placement: "bottom-start",
-          arrow: false
-        });
-        this.onUpdate({ items, command: command2, clientRect: clientRect2 });
-      },
-      onUpdate({ items, command: command2, clientRect: clientRect2 }) {
-        component.updateProps({ items, command: command2 });
-        component.render();
-        popup[0].setProps({ getReferenceClientRect: clientRect2 });
-      },
-      onKeyDown({ event }) {
-        if (event.key === "Escape") {
-          popup[0].hide();
-          return true;
-        } else if (event.key === "Enter") {
-          component.selectActiveItem();
-          return true;
-        } else if (event.key === "ArrowUp") {
-          component.goUp();
-          return true;
-        } else if (event.key === "ArrowDown") {
-          component.goDown();
-          return true;
+  var renderer_default = ({ popUpOptions } = {}) => {
+    return () => {
+      let component = new PopUpListComponent(popUpOptions);
+      let popup;
+      return {
+        onStart: function({ items, command: command2, clientRect: clientRect2 }) {
+          popup = tippy_esm_default("body", {
+            getReferenceClientRect: clientRect2,
+            appendTo: () => document.body,
+            allowHTML: true,
+            content: component.render(),
+            showOnCreate: true,
+            interactive: true,
+            trigger: "manual",
+            placement: "bottom-start",
+            arrow: false
+          });
+          this.onUpdate({ items, command: command2, clientRect: clientRect2 });
+        },
+        onUpdate({ items, command: command2, clientRect: clientRect2 }) {
+          component.updateProps({ items, command: command2 });
+          component.render();
+          popup[0].setProps({ getReferenceClientRect: clientRect2 });
+        },
+        onKeyDown({ event }) {
+          if (event.key === "Escape") {
+            popup[0].hide();
+            return true;
+          } else if (event.key === "Enter") {
+            component.selectActiveItem();
+            return true;
+          } else if (event.key === "ArrowUp") {
+            component.goUp();
+            return true;
+          } else if (event.key === "ArrowDown") {
+            component.goDown();
+            return true;
+          }
+        },
+        onExit() {
+          popup[0].destroy();
+          component.destroy();
         }
-      },
-      onExit() {
-        popup[0].destroy();
-        component.destroy();
-      }
+      };
     };
   };
 
@@ -38530,7 +38532,7 @@ img.ProseMirror-separator {
         return [];
       return await response.json;
     },
-    render: renderer_default
+    render: renderer_default()
   };
 
   // app/javascript/documentation/controllers/rich_text_editor/useMention.js
@@ -41204,7 +41206,11 @@ img.ProseMirror-separator {
         }
       ].filter((item) => item.title.toLowerCase().startsWith(query.toLowerCase())).slice(0, 10);
     },
-    render: renderer_default
+    render: renderer_default({
+      popUpOptions: {
+        rootOptions: { className: "slash-commands-dropdown" }
+      }
+    })
   };
 
   // app/javascript/documentation/controllers/rich_text_editor/useSlashCommands.js

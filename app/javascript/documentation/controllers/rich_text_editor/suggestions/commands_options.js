@@ -37,5 +37,9 @@ export default {
       .slice(0, 10)
   },
 
-  render: SuggestionRenderer
+  render: SuggestionRenderer({
+    popUpOptions: {
+      rootOptions: { className: 'slash-commands-dropdown' }
+    }
+  })
 }

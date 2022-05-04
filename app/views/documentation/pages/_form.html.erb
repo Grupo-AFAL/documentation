@@ -27,7 +27,7 @@
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'nodeSelect'}) do |c| %>
         <% c.trigger(data: { action: 'rich-text-editor#openNodeSelect' }) do %>
           <span class="text" data-rich-text-editor-target="nodeSelectTrigger">Text</span>
-          <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
+          <%= icon_tag('chevron-down', class: 'dropdown-icon') %>
         <% end %>
 
         <%= c.item(class: 'text', data: { action: 'rich-text-editor#setParagraph', 'rich-text-editor-target': 'text' }) { 'Text' } %>
@@ -41,9 +41,8 @@
       <% end %>
 
       <%= render Bali::Dropdown::Component.new(close_on_click: false, data: { 'rich-text-editor-target': 'linkPanel' }) do |c| %>
-        <% c.trigger(class: 'link', data: { action: 'rich-text-editor#openLinkPanel' }) do %>
-          <span>Link</span>
-          <%= icon_tag('arrow-right-up', class: 'toolbar-icon') %>
+        <% c.trigger(class: 'mark link', data: { action: 'rich-text-editor#openLinkPanel', 'rich-text-editor-target': 'link' }) do %>
+          <%= icon_tag('link') %>
         <% end %>
 
         <div class="link-panel">
@@ -73,7 +72,7 @@
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'imagePanel' }) do |c| %>
         <% c.trigger(data: { action: 'rich-text-editor#openImagePanel' }, class: 'full-height') do %>
           <div class="is-flex is-align-items-center full-height">
-            <%= icon_tag('image', class: 'toolbar-icon image-icon') %>
+            <%= icon_tag('image') %>
           </div>
         <% end %>
 
@@ -89,8 +88,7 @@
 
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'tablePanel' }) do |c| %>
         <% c.trigger(data: { action: 'rich-text-editor#openTablePanel' }) do %>
-          <span>Table</span>
-          <%= icon_tag('chevron-down', class: 'toolbar-icon') %>
+          <%= icon_tag('table') %>
         <% end %>
 
         <%= c.item(data: { action: 'rich-text-editor#insertTable' }) { 'Insert Table' } %>
@@ -102,10 +100,18 @@
         <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteRow', 'rich-text-editor-target': 'tableModifier' }) { 'Remove Row' } %>
       <% end %>
 
-      <a class="mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">B</a>
-      <a class="mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">I</a>
-      <a class="mark underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">U</a>
-      <a class="mark strike" data-action="rich-text-editor#toggleStrike" data-rich-text-editor-target="strike">S</a>
+      <a class="mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">
+        <%= icon_tag('bold') %>
+      </a>
+      <a class="mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">
+        <%= icon_tag('italic') %>
+      </a>
+      <a class="mark underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">
+        <%= icon_tag('underline') %>
+      </a>
+      <a class="mark strike" data-action="rich-text-editor#toggleStrike" data-rich-text-editor-target="strike">
+        <%= icon_tag('strikethrough') %>
+      </a>
     </div>
 
     <div data-rich-text-editor-target="tippy"></div>

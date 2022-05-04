@@ -18,5 +18,5 @@ export default {
     return await response.json
   },
 
-  render: SuggestionRenderer
+  render: SuggestionRenderer()
 }

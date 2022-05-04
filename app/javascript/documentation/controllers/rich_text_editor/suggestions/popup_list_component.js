@@ -1,6 +1,6 @@
-const createRoot = () => {
+const createRoot = ({ className } = {}) => {
   const div = document.createElement('div')
-  div.classList.add('dropdown-content')
+  div.classList.add('dropdown-content', className)
   return div
 }
 
@@ -12,11 +12,11 @@ const createItem = (item, classNames = '') => {
 }
 
 export default class PopUpListComponent {
-  constructor (items = [], command = () => {}) {
+  constructor ({ rootOptions } = {}) {
     this.selectedIndex = 0
-    this.items = items
-    this.element = createRoot()
-    this.command = command
+    this.items = []
+    this.command = () => {}
+    this.element = createRoot(rootOptions)
   }
 
   render () {
