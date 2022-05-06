@@ -37,7 +37,9 @@ export default class RichTextEditorController extends Controller {
   allMenuButtons = toolbarMarks.concat(toolbarNodes)
 
   connect () {
-    const { DefaultExtensions } = useDefaults(this)
+    const { DefaultExtensions } = useDefaults(this, {
+      placeholder: this.placeholderValue
+    })
     const { NodesExtensions } = useNodes(this)
     const { MarkExtensions } = useMarks(this)
     const { TableExtensions } = useTable(this)

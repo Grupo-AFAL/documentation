@@ -5,6 +5,7 @@ $resize-handle-color: #adf;
 
 @import './rich_text_editor/content';
 @import './rich_text_editor/bubble_menu';
+@import './rich_text_editor/slash_commands_dropdown';
 
 .tippy-box .dropdown-item {
   &.is-active {
@@ -22,7 +23,7 @@ $resize-handle-color: #adf;
     outline: none;
     min-height: 16rem;
 
-    p.is-editor-empty:first-child:before {
+    p.is-empty:before {
       content: attr(data-placeholder);
       float: left;
       color: #adb5bd;

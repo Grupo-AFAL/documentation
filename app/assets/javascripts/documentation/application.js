@@ -687,7 +687,7 @@
         debounced.flush = flush2;
         return debounced;
       }
-      function throttle2(func, wait, options) {
+      function throttle3(func, wait, options) {
         var leading = true, trailing = true;
         if (typeof func != "function") {
           throw new TypeError(FUNC_ERROR_TEXT);
@@ -730,7 +730,7 @@
         var isBinary = reIsBinary.test(value);
         return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
       }
-      module2.exports = throttle2;
+      module2.exports = throttle3;
     }
   });
 
@@ -25950,7 +25950,7 @@ img.ProseMirror-separator {
   }
 
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
-  var import_lodash = __toESM(require_lodash());
+  var import_lodash2 = __toESM(require_lodash());
 
   // node_modules/@tiptap/extension-document/dist/tiptap-extension-document.esm.js
   var Document = Node4.create({
@@ -29980,13 +29980,15 @@ img.ProseMirror-separator {
 
   // app/javascript/documentation/controllers/rich_text_editor/useDefaults.js
   var defaultTargets = ["bubbleMenu"];
-  var useDefaults_default = (controller, _options = {}) => {
+  var useDefaults_default = (controller, options = {}) => {
     const DefaultExtensions = [
       Document,
       Dropcursor,
       Gapcursor,
       History2,
-      Placeholder
+      Placeholder.configure({
+        placeholder: options.placeholder
+      })
     ];
     if (controller.editableValue && controller.hasBubbleMenuTarget) {
       DefaultExtensions.push(BubbleMenu.configure({
@@ -38421,15 +38423,22 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/suggestions/popup_list_component.js
+  var import_lodash = __toESM(require_lodash());
   var createRoot = ({ className } = {}) => {
     const div2 = document.createElement("div");
     div2.classList.add("dropdown-content", className);
     return div2;
   };
-  var createItem = (item, classNames = "") => {
+  var createItem = (list, index3, item, classNames = "") => {
     const div2 = document.createElement("div");
     div2.classList.add("dropdown-item", classNames);
-    div2.innerHTML = item.title;
+    if (item.icon) {
+      div2.innerHTML = `<span class='icon'>${item.icon}</span><span>${item.title}</span>`;
+    } else {
+      div2.innerHTML = item.title;
+    }
+    div2.addEventListener("mouseover", () => list.throttledUpdateActiveItem(index3));
+    div2.addEventListener("mousedown", () => list.selectItem(index3));
     return div2;
   };
   var PopUpListComponent = class {
@@ -38444,7 +38453,7 @@ img.ProseMirror-separator {
       this.element.innerHTML = "";
       this.items.forEach((item, index3) => {
         const classNames = index3 === this.selectedIndex ? "is-active" : "inactive";
-        this.element.appendChild(createItem(item, classNames));
+        this.element.appendChild(createItem(this, index3, item, classNames));
       });
       return this.element;
     }
@@ -38452,9 +38461,13 @@ img.ProseMirror-separator {
       this.items = items;
       this.command = command2;
     }
-    selectActiveItem() {
-      const { id, url, title, command: command2 } = this.items[this.selectedIndex];
+    throttledUpdateActiveItem = (0, import_lodash.default)(this.updateActiveItem, 100);
+    selectItem(index3) {
+      const { url, title, command: command2 } = this.items[index3];
       this.command({ id: url, url, label: title, command: command2 });
+    }
+    selectActiveItem() {
+      this.selectItem(this.selectedIndex);
     }
     updateActiveItem(index3) {
       this.selectedIndex = index3;
@@ -41194,12 +41207,18 @@ img.ProseMirror-separator {
       return [
         {
           title: "Table",
+          icon: `<svg viewBox="0 0 24 24" class="svg-inline">
+                <path d="M21.75 3.75012H2.25C1.83516 3.75012 1.5 4.08528 1.5 4.50012V19.5001C1.5 19.915 1.83516 20.2501 2.25 20.2501H21.75C22.1648 20.2501 22.5 19.915 22.5 19.5001V4.50012C22.5 4.08528 22.1648 3.75012 21.75 3.75012ZM20.8125 8.62512H15.8438V5.43762H20.8125V8.62512ZM20.8125 13.8751H15.8438V10.1251H20.8125V13.8751ZM9.65625 10.1251H14.3438V13.8751H9.65625V10.1251ZM14.3438 8.62512H9.65625V5.43762H14.3438V8.62512ZM3.1875 10.1251H8.15625V13.8751H3.1875V10.1251ZM3.1875 5.43762H8.15625V8.62512H3.1875V5.43762ZM3.1875 15.3751H8.15625V18.5626H3.1875V15.3751ZM9.65625 15.3751H14.3438V18.5626H9.65625V15.3751ZM20.8125 18.5626H15.8438V15.3751H20.8125V18.5626Z" fill="#262626" />
+              </svg>`,
           command: ({ editor, range }) => {
             editor.chain().focus().deleteRange(range).insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
           }
         },
         {
           title: "Image",
+          icon: `<svg viewBox="0 0 512 512" class="svg-inline">
+                <path fill="currentColor" d="M464 448H48c-26.51 0-48-21.49-48-48V112c0-26.51 21.49-48 48-48h416c26.51 0 48 21.49 48 48v288c0 26.51-21.49 48-48 48zM112 120c-30.928 0-56 25.072-56 56s25.072 56 56 56 56-25.072 56-56-25.072-56-56-56zM64 384h384V272l-87.515-87.515c-4.686-4.686-12.284-4.686-16.971 0L208 320l-55.515-55.515c-4.686-4.686-12.284-4.686-16.971 0L64 336v48z" class=""></path>
+              </svg>`,
           command: ({ editor, range }) => {
             editor.chain().focus().deleteRange(range).setImage({ src: image_placeholder_default }).run();
           }
@@ -41223,7 +41242,9 @@ img.ProseMirror-separator {
   var RichTextEditorController = class extends Controller {
     allMenuButtons = toolbarMarks.concat(toolbarNodes);
     connect() {
-      const { DefaultExtensions } = useDefaults_default(this);
+      const { DefaultExtensions } = useDefaults_default(this, {
+        placeholder: this.placeholderValue
+      });
       const { NodesExtensions } = useNodes_default(this);
       const { MarkExtensions } = useMarks_default(this);
       const { TableExtensions } = useTable_default(this);
@@ -41264,7 +41285,7 @@ img.ProseMirror-separator {
         return;
       this.outputTarget.value = editor.getHTML();
     };
-    throttledUpdate = (0, import_lodash.default)(this.onUpdate, 1e3);
+    throttledUpdate = (0, import_lodash2.default)(this.onUpdate, 1e3);
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }

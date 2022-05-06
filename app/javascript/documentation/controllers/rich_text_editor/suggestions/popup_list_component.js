@@ -1,13 +1,23 @@
+import throttle from 'lodash.throttle'
+
 const createRoot = ({ className } = {}) => {
   const div = document.createElement('div')
   div.classList.add('dropdown-content', className)
   return div
 }
 
-const createItem = (item, classNames = '') => {
+const createItem = (list, index, item, classNames = '') => {
   const div = document.createElement('div')
   div.classList.add('dropdown-item', classNames)
-  div.innerHTML = item.title
+
+  if (item.icon) {
+    div.innerHTML = `<span class='icon'>${item.icon}</span><span>${item.title}</span>`
+  } else {
+    div.innerHTML = item.title
+  }
+
+  div.addEventListener('mouseover', () => list.throttledUpdateActiveItem(index))
+  div.addEventListener('mousedown', () => list.selectItem(index))
   return div
 }
 
@@ -23,7 +33,7 @@ export default class PopUpListComponent {
     this.element.innerHTML = ''
     this.items.forEach((item, index) => {
       const classNames = index === this.selectedIndex ? 'is-active' : 'inactive'
-      this.element.appendChild(createItem(item, classNames))
+      this.element.appendChild(createItem(this, index, item, classNames))
     })
     return this.element
   }
@@ -33,9 +43,15 @@ export default class PopUpListComponent {
     this.command = command
   }
 
-  selectActiveItem () {
-    const { id, url, title, command } = this.items[this.selectedIndex]
+  throttledUpdateActiveItem = throttle(this.updateActiveItem, 100)
+
+  selectItem (index) {
+    const { url, title, command } = this.items[index]
     this.command({ id: url, url, label: title, command })
+  }
+
+  selectActiveItem () {
+    this.selectItem(this.selectedIndex)
   }
 
   updateActiveItem (index) {
