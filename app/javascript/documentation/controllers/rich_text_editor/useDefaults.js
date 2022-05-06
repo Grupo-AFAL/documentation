@@ -7,13 +7,23 @@ import BubbleMenu from '@tiptap/extension-bubble-menu'
 
 export const defaultTargets = ['bubbleMenu']
 
-export default (controller, _options = {}) => {
+export default (controller, options = {}) => {
   const DefaultExtensions = [
     Document,
     Dropcursor,
     Gapcursor,
     History,
-    Placeholder
+    Placeholder.configure({
+      placeholder: ({ node }) => {
+        if (node.type.name === 'heading') {
+          return `Heading ${node.attrs.level}`
+        }
+
+        if (node.type.name === 'codeBlock') return ''
+
+        return options.placeholder
+      }
+    })
   ]
 
   if (controller.editableValue && controller.hasBubbleMenuTarget) {

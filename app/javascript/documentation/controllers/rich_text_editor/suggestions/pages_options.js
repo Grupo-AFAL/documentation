@@ -1,5 +1,5 @@
 import { get } from '@rails/request.js'
-import SuggestionRenderer from './suggestion_renderer'
+import SuggestionRenderer from './renderer'
 
 /**
  * Tiptap suggestion utility
@@ -18,5 +18,5 @@ export default {
     return await response.json
   },
 
-  render: SuggestionRenderer
+  render: SuggestionRenderer()
 }

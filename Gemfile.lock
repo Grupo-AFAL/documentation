@@ -10,10 +10,10 @@ GIT
 
 GIT
   remote: https://github.com/Grupo-AFAL/frontend-helpers.git
-  revision: a816a3f355a5262fcdb364250cc7ba63c3626b67
+  revision: 835ebd5ba8c04504b9d419672b10196337d8abcf
   branch: main
   specs:
-    frontend_helpers (0.5.17)
+    frontend_helpers (0.5.24)
       rails (> 6.1)
       ransack
 
@@ -179,7 +179,7 @@ GEM
       thor (~> 1.0)
       zeitwerk (~> 2.5)
     rake (13.0.6)
-    ransack (3.0.0)
+    ransack (3.1.0)
       activerecord (>= 6.0.4)
       activesupport (>= 6.0.4)
       i18n
