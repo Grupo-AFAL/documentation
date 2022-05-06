@@ -11696,6 +11696,16 @@
     }
   };
 
+  // app/components/documentation/tree_view/index.js
+  var TreeViewController = class extends Controller {
+    toggle(event) {
+      if (event.target.parentElement.nextElementSibling) {
+        event.target.parentElement.nextElementSibling.classList.toggle("is-hidden");
+      }
+      event.target.classList.toggle("caret-down");
+    }
+  };
+
   // node_modules/orderedmap/index.es.js
   function OrderedMap(content3) {
     this.content = content3;
@@ -41377,5 +41387,6 @@ img.ProseMirror-separator {
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
   application.register("tabs", TabsController);
+  application.register("tree-view", TreeViewController);
 })();
 //# sourceMappingURL=application.js.map

@@ -1,0 +1,25 @@
+.tree-view-component {
+  .tree-view-item-component {
+    display: block;
+  }
+
+  .children {
+    padding-left: 1rem;
+  }
+
+  .caret {
+    cursor: pointer;
+    user-select: none;
+
+    &:before {
+      content: '\25B6';
+      color: $black-ter;
+      display: inline-block;
+      margin-right: 0.5rem;
+    }
+  }
+
+  .caret-down::before {
+    transform: rotate(90deg);
+  }
+}

@@ -1,3 +1,19 @@
+<%= content_for :menu do %>
+  <div class="page-menu">
+    <%= render Documentation::TreeView::Component.new do |c| %>
+      <% @root_pages.each do |page| %>
+        <%= c.item(name: page.title, path: page_path(page)) do |sub_item| %>
+
+          <% page.children.each do |child| %>
+            <%= sub_item.item(name: child.title, path: page_path(child)) %>
+          <% end %>
+        <% end %>
+
+      <% end %>
+    <% end %>
+  </div>
+<% end %>
+
 <nav class="breadcrumb" aria-label="breadcrumbs">
   <ul>
     <li><%= link_with_icon "Back to pages", 'arrow-back', pages_path %></li>
