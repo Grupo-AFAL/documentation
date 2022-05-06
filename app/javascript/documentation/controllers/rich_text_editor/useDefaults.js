@@ -14,7 +14,15 @@ export default (controller, options = {}) => {
     Gapcursor,
     History,
     Placeholder.configure({
-      placeholder: options.placeholder
+      placeholder: ({ node }) => {
+        if (node.type.name === 'heading') {
+          return `Heading ${node.attrs.level}`
+        }
+
+        if (node.type.name === 'codeBlock') return ''
+
+        return options.placeholder
+      }
     })
   ]
 

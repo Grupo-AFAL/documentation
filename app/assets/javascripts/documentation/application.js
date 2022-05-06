@@ -29987,7 +29987,14 @@ img.ProseMirror-separator {
       Gapcursor,
       History2,
       Placeholder.configure({
-        placeholder: options.placeholder
+        placeholder: ({ node: node5 }) => {
+          if (node5.type.name === "heading") {
+            return `Heading ${node5.attrs.level}`;
+          }
+          if (node5.type.name === "codeBlock")
+            return "";
+          return options.placeholder;
+        }
       })
     ];
     if (controller.editableValue && controller.hasBubbleMenuTarget) {
@@ -38437,7 +38444,7 @@ img.ProseMirror-separator {
     } else {
       div2.innerHTML = item.title;
     }
-    div2.addEventListener("mouseover", () => list.throttledUpdateActiveItem(index3));
+    div2.addEventListener("mousemove", () => list.throttledUpdateActiveItem(index3));
     div2.addEventListener("mousedown", () => list.selectItem(index3));
     return div2;
   };
@@ -41205,6 +41212,48 @@ img.ProseMirror-separator {
     decorationClass: "slash-command",
     items: ({ query }) => {
       return [
+        {
+          title: "Heading 1",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).toggleHeading({ level: 1 }).run();
+          }
+        },
+        {
+          title: "Heading 2",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).toggleHeading({ level: 2 }).run();
+          }
+        },
+        {
+          title: "Heading 3",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).toggleHeading({ level: 3 }).run();
+          }
+        },
+        {
+          title: "Bulleted list",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).toggleBulletList().run();
+          }
+        },
+        {
+          title: "Ordered list",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).toggleOrderedList().run();
+          }
+        },
+        {
+          title: "Quote",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).toggleBlockquote().run();
+          }
+        },
+        {
+          title: "Code",
+          command: ({ editor, range }) => {
+            editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
+          }
+        },
         {
           title: "Table",
           icon: `<svg viewBox="0 0 24 24" class="svg-inline">

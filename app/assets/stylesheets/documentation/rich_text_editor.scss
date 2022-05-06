@@ -23,7 +23,7 @@ $resize-handle-color: #adf;
     outline: none;
     min-height: 16rem;
 
-    p.is-empty:before {
+    .is-empty:before {
       content: attr(data-placeholder);
       float: left;
       color: #adb5bd;

@@ -16,7 +16,7 @@ const createItem = (list, index, item, classNames = '') => {
     div.innerHTML = item.title
   }
 
-  div.addEventListener('mouseover', () => list.throttledUpdateActiveItem(index))
+  div.addEventListener('mousemove', () => list.throttledUpdateActiveItem(index))
   div.addEventListener('mousedown', () => list.selectItem(index))
   return div
 }
