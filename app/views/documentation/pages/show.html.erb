@@ -1,6 +1,6 @@
 <%= content_for :menu do %>
   <div class="page-menu">
-    <%= render Documentation::TreeView::Component.new do |c| %>
+    <%= render Bali::TreeView::Component.new do |c| %>
       <% @root_pages.each do |page| %>
         <%= c.item(name: page.title, path: page_path(page)) do |sub_item| %>
 

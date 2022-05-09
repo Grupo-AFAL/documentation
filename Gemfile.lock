@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: b663e48b42b1640739a0b89d43b2a802555250aa
-  branch: main
+  revision: 6e7e3ae87f36fa6183b9d5ea2742931f0a783b23
+  branch: tree-view-component
   specs:
     bali_view_components (0.1.0)
       rails (>= 7.0.2.3)

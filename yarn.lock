@@ -376,9 +376,9 @@
     "@types/prosemirror-state" "*"
     "@types/prosemirror-transform" "*"
 
-"bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git":
+"bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git#tree-view-component":
   version "0.0.1"
-  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#45e68fd04838721d748a9db3f2102108912fa586"
+  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#6e7e3ae87f36fa6183b9d5ea2742931f0a783b23"
   dependencies:
     "@hotwired/stimulus" "^3.0.1"
 
