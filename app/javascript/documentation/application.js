@@ -10,7 +10,8 @@ import {
 import {
   DropdownController,
   ModalController,
-  TabsController
+  TabsController,
+  TreeViewItemController
 } from 'bali-view-components'
 
 import RichTextEditorController from './controllers/rich_text_editor_controller'
@@ -24,3 +25,4 @@ application.register('notification', NotificationController)
 application.register('rich-text-editor', RichTextEditorController)
 application.register('slim-select', SlimSelectController)
 application.register('tabs', TabsController)
+application.register('tree-view-item', TreeViewItemController)

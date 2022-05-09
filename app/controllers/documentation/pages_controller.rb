@@ -8,7 +8,9 @@ module Documentation
       @pages = @pages.merge!(Page.search(params[:title])) if params[:title]
     end
 
-    def show; end
+    def show
+      @root_pages = Page.roots.includes(:children)
+    end
 
     def new
       @parent = Page.find(params[:parent_id]) if params[:parent_id]

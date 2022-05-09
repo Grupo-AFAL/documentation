@@ -11696,6 +11696,24 @@
     }
   };
 
+  // node_modules/bali-view-components/app/components/bali/tree_view/item/index.js
+  var TreeViewItemController = class extends Controller {
+    toggle(event) {
+      event.preventDefault();
+      this.caretTarget.classList.toggle("caret-down");
+      if (this.hasChildrenTarget) {
+        this.childrenTarget.classList.toggle("is-hidden");
+      }
+    }
+    navigateTo(event) {
+      if (this.caretTarget === event.target)
+        return;
+      window.Turbo.visit(this.urlValue);
+    }
+  };
+  __publicField(TreeViewItemController, "targets", ["caret", "children"]);
+  __publicField(TreeViewItemController, "values", { url: String });
+
   // node_modules/orderedmap/index.es.js
   function OrderedMap(content3) {
     this.content = content3;
@@ -41377,5 +41395,6 @@ img.ProseMirror-separator {
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
   application.register("tabs", TabsController);
+  application.register("tree-view-item", TreeViewItemController);
 })();
 //# sourceMappingURL=application.js.map

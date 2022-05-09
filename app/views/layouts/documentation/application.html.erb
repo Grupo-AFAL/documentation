@@ -10,7 +10,9 @@
   </head>
   <body data-controller="modal">
 
-    <section class="section">
+    <%= yield :menu %>
+
+    <section class="section app-frame">
       <div class="container <%= yield :container_class %>">
         <%= render 'layouts/documentation/notifications' %>
 
