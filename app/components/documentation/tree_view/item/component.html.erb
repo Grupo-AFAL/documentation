@@ -1,14 +1,14 @@
 <%= tag.div **@options do %>
-  <%= tag.div class: class_names('has-items': items?, 'is-root': @root) do %>
-    <span class="caret" data-action="click->tree-view#toggle"></span>
+  <%= tag.div class: class_names('item', 'is-childless': !items?, 'is-root': @root, 'is-active': active?) do %>
+    <span class="caret" data-action="click->tree-view-item#toggle" data-tree-view-item-target="caret"></span>
     <%= link_to @name, @path %>
   <% end %>
 
   <% if items? %>
-    <div class="children is-hidden">
+    <%= tag.div class: class_names('children', 'is-hidden': !active_child?), data: { 'tree-view-item-target': 'children' } do %>
       <% items.each do |item| %>
         <%= item %>
       <% end %>
-    </div>
+    <% end %>
   <% end %>
 <% end %>

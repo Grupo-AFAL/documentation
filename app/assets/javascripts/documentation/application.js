@@ -11696,15 +11696,23 @@
     }
   };
 
-  // app/components/documentation/tree_view/index.js
-  var TreeViewController = class extends Controller {
+  // app/components/documentation/tree_view/item/index.js
+  var TreeViewItemController = class extends Controller {
     toggle(event) {
-      if (event.target.parentElement.nextElementSibling) {
-        event.target.parentElement.nextElementSibling.classList.toggle("is-hidden");
+      event.preventDefault();
+      this.caretTarget.classList.toggle("caret-down");
+      if (this.hasChildrenTarget) {
+        this.childrenTarget.classList.toggle("is-hidden");
       }
-      event.target.classList.toggle("caret-down");
+    }
+    navigateTo(event) {
+      if (this.caretTarget === event.target)
+        return;
+      window.Turbo.visit(this.urlValue);
     }
   };
+  __publicField(TreeViewItemController, "targets", ["caret", "children"]);
+  __publicField(TreeViewItemController, "values", { url: String });
 
   // node_modules/orderedmap/index.es.js
   function OrderedMap(content3) {
@@ -41387,6 +41395,6 @@ img.ProseMirror-separator {
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
   application.register("tabs", TabsController);
-  application.register("tree-view", TreeViewController);
+  application.register("tree-view-item", TreeViewItemController);
 })();
 //# sourceMappingURL=application.js.map

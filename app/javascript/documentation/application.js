@@ -13,7 +13,7 @@ import {
   TabsController
 } from 'bali-view-components'
 
-import { TreeViewController } from '../../components/documentation/tree_view'
+import { TreeViewItemController } from '../../components/documentation/tree_view/item'
 
 import RichTextEditorController from './controllers/rich_text_editor_controller'
 
@@ -26,4 +26,4 @@ application.register('notification', NotificationController)
 application.register('rich-text-editor', RichTextEditorController)
 application.register('slim-select', SlimSelectController)
 application.register('tabs', TabsController)
-application.register('tree-view', TreeViewController)
+application.register('tree-view-item', TreeViewItemController)
