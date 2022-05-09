@@ -378,7 +378,7 @@
 
 "bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git#tree-view-component":
   version "0.0.1"
-  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#6e7e3ae87f36fa6183b9d5ea2742931f0a783b23"
+  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#303d9353e4297a662de15d21caef5bcc1bb9b80e"
   dependencies:
     "@hotwired/stimulus" "^3.0.1"
 

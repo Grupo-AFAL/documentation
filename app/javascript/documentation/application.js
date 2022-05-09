@@ -10,10 +10,9 @@ import {
 import {
   DropdownController,
   ModalController,
-  TabsController
+  TabsController,
+  TreeViewItemController
 } from 'bali-view-components'
-
-import { TreeViewItemController } from '../../components/documentation/tree_view/item'
 
 import RichTextEditorController from './controllers/rich_text_editor_controller'
 

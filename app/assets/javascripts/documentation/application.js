@@ -11696,7 +11696,7 @@
     }
   };
 
-  // app/components/documentation/tree_view/item/index.js
+  // node_modules/bali-view-components/app/components/bali/tree_view/item/index.js
   var TreeViewItemController = class extends Controller {
     toggle(event) {
       event.preventDefault();
