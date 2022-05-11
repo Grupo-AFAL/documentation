@@ -10,6 +10,14 @@
   </div>
 </div>
 
-<% @workspaces.each do |workspace| %>
-  <%= link_to workspace.name, workspace_path(workspace) %>
-<% end %>
+<hr class="mb-6" />
+
+<div class="columns">
+  <% @workspaces.each do |workspace| %>
+    <div class="column is-3 box">
+      <h1 class="title is-3">
+        <%= link_to workspace.name, workspace_path(workspace) %>
+      </h1>
+    </div>
+  <% end %>
+</div>
