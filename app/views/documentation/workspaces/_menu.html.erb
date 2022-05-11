@@ -1,7 +1,7 @@
 <%= content_for :menu do %>
   <div class="page-menu">
-    <%= render Bali::Dropdown::Component.new(class: 'workspace-switch') do |c| %>
-      <%= c.trigger(class: 'has-text-weight-bold') do %>
+    <%= render Bali::Dropdown::Component.new(class: 'workspace-switch vh-centered') do |c| %>
+      <%= c.trigger(class: 'has-text-weight-bold vh-centered') do %>
         <span><%= @workspace.name %></span>
         <%= icon_tag('chevron-down') %>
       <% end %>
@@ -13,7 +13,7 @@
       <%= c.item(href: workspaces_path) { 'All Workspaces' } %>
     <% end %>
 
-    <hr />
+    <hr class="my-4" />
 
     <%= render Bali::TreeView::Component.new do |c| %>
       <% pages.each do |page| %>
@@ -37,7 +37,13 @@
       <% end %>
     <% end %>
 
-    <%= link_to 'New page', new_workspace_page_path(@workspace),
-        class: 'button is-primary', data: { action: 'modal#open' } %>
+    <hr class="my-4" />
+
+    <%= link_to new_workspace_page_path(@workspace),
+        class: 'button is-primary is-small vh-centered m-2',
+        data: { action: 'modal#open' } do %>
+      <%= icon_tag('plus') %>
+      <span>New page</span>
+    <% end %>
   </div>
 <% end %>
