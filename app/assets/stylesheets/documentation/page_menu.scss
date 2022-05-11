@@ -5,4 +5,9 @@
   padding: 0;
   background: $white;
   box-shadow: $box-shadow;
+  overflow: auto;
+
+  .workspace-switch {
+    margin: 1rem 0.5rem;
+  }
 }

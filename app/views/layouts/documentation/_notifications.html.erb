@@ -6,7 +6,7 @@
 <% end %>
 
 <% if alert %>
-  <div data-controller="notification" class="notification fixed is-danger" data-turbo-cache="false">
+  <div data-controller="notification" data-notification-delay-value="3000" class="notification fixed is-danger" data-turbo-cache="false">
     <button data-action="notification#close" class="delete"></button>
     <%= alert %>
   </div>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_04_25_000306) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_10_195956) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -49,9 +49,18 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_25_000306) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "parent_id"
+    t.bigint "documentation_workspace_id"
+    t.index ["documentation_workspace_id"], name: "index_documentation_pages_on_documentation_workspace_id"
     t.index ["parent_id"], name: "index_documentation_pages_on_parent_id"
+  end
+
+  create_table "documentation_workspaces", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "documentation_pages", "documentation_workspaces"
 end

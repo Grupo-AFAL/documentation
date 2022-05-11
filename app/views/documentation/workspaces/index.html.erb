@@ -1,0 +1,23 @@
+<%= content_for :app_frame_class, 'without-menu' %>
+
+<div class="level">
+  <div class="level-left">
+    <h1 class="title is-1">Workspaces</h1>
+  </div>
+
+  <div class="level-right">
+    <%= link_to "New Workspace", new_workspace_path, class: 'button is-primary', data: { action: 'modal#open' } %>
+  </div>
+</div>
+
+<hr class="mb-6" />
+
+<div class="columns">
+  <% @workspaces.each do |workspace| %>
+    <div class="column is-3 box">
+      <h1 class="title is-3">
+        <%= link_to workspace.name, workspace_path(workspace) %>
+      </h1>
+    </div>
+  <% end %>
+</div>

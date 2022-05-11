@@ -1,6 +1,8 @@
 <div id="<%= dom_id page %>">
-  <h1 class="title is-1"><%= page.title %></h1>
-  <p class="subtitle"><%= page.description %></p>
+  <div class="mb-6">
+    <h1 class="title is-1"><%= page.title %></h1>
+    <p class="subtitle"><%= page.description %></p>
+  </div>
 
   <div
     data-turbo-cache="false"
@@ -10,4 +12,31 @@
     data-rich-text-editor-editable-value='false'
   >
   </div>
+</div>
+
+<hr/>
+
+<div>
+  <%= link_with_icon "Edit", 'edit', edit_workspace_page_path(@workspace, page) %> |
+
+  <%= render Bali::Dropdown::Component.new do |c| %>
+    <%= c.trigger do %>
+      <%= icon_tag('arrow-right') %>
+      <span>Transfer to another workspace</span>
+    <% end %>
+
+    <% (@workspaces - [@workspace]).each do |workspace| %>
+      <%= c.item(
+          href: workspace_page_path(
+            @workspace, page, { page: { documentation_workspace_id: workspace.id } }
+          ),
+          data: { 'turbo-method' => :put }
+      ) do %>
+        <%= workspace.name %>
+      <% end %>
+    <% end %>
+  <% end %> |
+
+  <%= link_with_icon "Delete", 'trash', workspace_page_path(@workspace, page), class: 'has-text-danger',
+      data: { 'turbo-confirm' => '¿Estás seguro?', 'turbo-method' => :delete } %>
 </div>

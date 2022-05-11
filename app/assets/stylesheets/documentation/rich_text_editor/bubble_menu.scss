@@ -147,4 +147,9 @@ $menu-dropdown-icon-size: 0.75em;
       border: none;
     }
   }
+
+  .page-selection {
+    max-height: 200px;
+    overflow: auto;
+  }
 }

@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: f964a33fee490421e30c52e30cf5ba7f4567759c
+  revision: a1321a3d0e828349495cf47720e157340814f5d6
   branch: main
   specs:
     bali_view_components (0.1.0)
@@ -118,7 +118,7 @@ GEM
       activesupport (>= 5.0.0)
     jsbundling-rails (1.0.2)
       railties (>= 6.0.0)
-    loofah (2.17.0)
+    loofah (2.18.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -218,7 +218,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    strscan (3.0.2)
+    strscan (3.0.3)
     thor (1.2.1)
     tilt (2.0.10)
     timeout (0.2.0)
@@ -227,7 +227,7 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
-    view_component (2.53.0)
+    view_component (2.54.1)
       activesupport (>= 5.0.0, < 8.0)
       method_source (~> 1.0)
     view_component-contrib (0.1.1)

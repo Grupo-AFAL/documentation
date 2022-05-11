@@ -1,7 +1,11 @@
 Documentation::Engine.routes.draw do
-  root to: 'pages#index'
+  root to: 'workspaces#index'
 
-  resources :pages do
+  resources :workspaces do
+    resources :pages
+  end
+
+  resources :pages, only: %i[] do
     resources :images
   end
 end
