@@ -49,7 +49,7 @@
               </div>
             <% end %>
 
-            <%= c.tab(title: 'Pages', active: false) do %>
+            <%= c.tab(title: 'Pages', active: false, class: 'page-selection') do %>
               <% @pages.each do |page| %>
                 <%= tag.a page.title, class: 'page-link',
                     data: {
