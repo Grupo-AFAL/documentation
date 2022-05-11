@@ -1,0 +1,7 @@
+<%= form_with(model: @workspace) do |form| %>
+  <%= render 'layouts/documentation/target_errors', target: @workspace %>
+
+  <%= form.text_field_group :name, placeholder: 'Workspace name' %>
+
+  <%= form.submit_actions 'Save', class: 'button is-primary' %>
+<% end %>

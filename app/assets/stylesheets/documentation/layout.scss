@@ -6,4 +6,14 @@
     padding-left: $menu-width + $section-side-padding-desktop;
     padding-right: $section-side-padding-desktop;
   }
+
+  &.without-menu {
+    padding-left: $section-side-padding-mobile;
+    padding-right: $section-side-padding-mobile;
+
+    @include desktop {
+      padding-left: $section-side-padding-desktop;
+      padding-right: $section-side-padding-desktop;
+    }
+  }
 }

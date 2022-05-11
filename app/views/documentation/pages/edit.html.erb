@@ -1,10 +1,10 @@
-<% content_for :container_class, 'is-max-desktop' %>
+<%= render 'documentation/workspaces/menu', pages: @root_pages %>
 
 <div class="level">
   <div class="level-left">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><%= link_with_icon "Back to pages", 'arrow-back', pages_path %></li>
+        <li><%= link_with_icon "Cancel", 'arrow-back', workspace_page_path(@workspace, @page) %></li>
       </ul>
     </nav>
   </div>

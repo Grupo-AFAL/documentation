@@ -1,0 +1,43 @@
+<%= content_for :menu do %>
+  <div class="page-menu">
+    <%= render Bali::Dropdown::Component.new(class: 'workspace-switch') do |c| %>
+      <%= c.trigger(class: 'has-text-weight-bold') do %>
+        <span><%= @workspace.name %></span>
+        <%= icon_tag('chevron-down') %>
+      <% end %>
+
+      <% @workspaces.each do |workspace| %>
+        <%= c.item(href: workspace_path(workspace)) { workspace.name } %>
+      <% end %>
+
+      <%= c.item(href: workspaces_path) { 'All Workspaces' } %>
+    <% end %>
+
+    <hr />
+
+    <%= render Bali::TreeView::Component.new do |c| %>
+      <% pages.each do |page| %>
+        <%= c.item(name: page.title, path: workspace_page_path(@workspace, page)) do |sub_item| %>
+
+          <% page.children.each do |child| %>
+            <%= sub_item.item(name: child.title, path: workspace_page_path(@workspace, child)) do |sub_sub_item| %>
+
+              <%= child.children.each do |grand_child| %>
+                <%= sub_sub_item.item(name: grand_child.title, path: workspace_page_path(@workspace, grand_child)) do |sub_sub_sub_item| %>
+
+                  <%= grand_child.children.each do |great_grand_child| %>
+                    <%= sub_sub_sub_item.item(name: great_grand_child.title, path: workspace_page_path(@workspace, great_grand_child)) %>
+                  <% end %>
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+      <% end %>
+    <% end %>
+
+    <%= link_to 'New page', new_workspace_page_path(@workspace),
+        class: 'button is-primary', data: { action: 'modal#open' } %>
+  </div>
+<% end %>

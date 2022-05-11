@@ -12,7 +12,7 @@
 
     <%= yield :menu %>
 
-    <section class="section app-frame">
+    <section class="section app-frame <%= yield :app_frame_class %>">
       <div class="container <%= yield :container_class %>">
         <%= render 'layouts/documentation/notifications' %>
 

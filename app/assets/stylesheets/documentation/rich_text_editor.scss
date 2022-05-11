@@ -17,6 +17,12 @@ $resize-handle-color: #adf;
   &.input {
     height: unset;
     min-height: 5rem;
+
+    &[data-rich-text-editor-editable-value='false'] {
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
   }
 
   .ProseMirror {

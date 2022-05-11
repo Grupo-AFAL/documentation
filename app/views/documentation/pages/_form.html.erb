@@ -1,17 +1,10 @@
-<%= form_with(model: page) do |form| %>
-  <% if page.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(page.errors.count, "error") %> prohibited this page from being saved:</h2>
+<%= form_with(model: [@workspace, page]) do |form| %>
+  <%= render 'layouts/documentation/target_errors', target: page %>
 
-      <ul>
-        <% page.errors.each do |error| %>
-          <li><%= error.full_message %></li>
-        <% end %>
-      </ul>
-    </div>
+  <% unless page.workspace_home_page? %>
+    <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title, p.id] }, include_blank: 'Select page parent', label: false %>
   <% end %>
 
-  <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title, p.id] }, include_blank: 'Select page parent', label: false %>
   <%= form.text_field_group :title, label: false, placeholder: 'Title', class: 'is-large' %>
   <%= form.text_field_group :description, label: false, placeholder: 'Description' %>
 
@@ -62,7 +55,7 @@
                     data: {
                       action: 'click->rich-text-editor#savePageLink',
                       id: page.id,
-                      url: page_url(page) } %>
+                      url: workspace_page_path(@workspace, page) } %>
               <% end %>
             <% end %>
           <% end %>
@@ -118,5 +111,5 @@
     <%= form.hidden_field :content, 'data-rich-text-editor-target': 'output' %>
   </div>
 
-  <%= form.submit_actions 'Guardar', class: 'button is-primary' %>
+  <%= form.submit_actions 'Guardar', class: 'button is-primary', cancel_path: workspace_page_path(@workspace, page) %>
 <% end %>
