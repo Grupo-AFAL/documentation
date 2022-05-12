@@ -13,7 +13,7 @@ module Documentation
     def show
       @workspaces = Workspace.all
       @home_page = @workspace.home_page
-      @root_pages = @workspace.pages.roots.includes(:children)
+      @root_pages = @workspace.pages.roots.include_tree
     end
 
     def edit; end
