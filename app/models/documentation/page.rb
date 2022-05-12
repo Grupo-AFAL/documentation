@@ -17,6 +17,8 @@ module Documentation
 
     validates :title, presence: true
 
+    scope :include_tree, -> { includes(children: { children: [:children] }) }
+
     def self.search(query)
       where('title ILIKE ?', "%#{query}%")
     end

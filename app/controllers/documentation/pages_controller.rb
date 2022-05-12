@@ -10,9 +10,7 @@ module Documentation
       @pages = @pages.merge!(Page.search(params[:title])) if params[:title]
     end
 
-    def show
-      @root_pages = @workspace.pages.roots.includes(:children)
-    end
+    def show; end
 
     def new
       @parent = @workspace.pages.find(params[:parent_id]) if params[:parent_id]
@@ -75,7 +73,7 @@ module Documentation
     end
 
     def set_root_pages
-      @root_pages = @workspace.pages.roots.includes(:children)
+      @root_pages = @workspace.pages.roots.include_tree
     end
   end
 end
