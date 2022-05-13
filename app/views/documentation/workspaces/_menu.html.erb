@@ -37,13 +37,15 @@
       <% end %>
     <% end %>
 
-    <hr class="my-4" />
+    <% if policy(Documentation::Page).new? %>
+      <hr class="my-4" />
 
-    <%= link_to new_workspace_page_path(@workspace),
-        class: 'button is-primary is-small vh-centered m-2',
-        data: { action: 'modal#open' } do %>
-      <%= icon_tag('plus') %>
-      <span>New page</span>
+      <%= link_to new_workspace_page_path(@workspace),
+          class: 'button is-primary is-small vh-centered m-2',
+          data: { action: 'modal#open' } do %>
+        <%= icon_tag('plus') %>
+        <span>New page</span>
+      <% end %>
     <% end %>
 
     <hr class="my-4" />

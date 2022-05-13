@@ -6,6 +6,10 @@ module Documentation
       true
     end
 
+    def create?
+      user.super_admin?
+    end
+
     def update?
       workspace_permissions.any? do |permission|
         permission.member?(user) && permission.can_edit?
@@ -19,6 +23,7 @@ module Documentation
     end
 
     private
+
     def workspace_permissions
       @workspace_permissions ||= workspace.permissions.includes(:subject)
     end
