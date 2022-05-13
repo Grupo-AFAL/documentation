@@ -3,6 +3,7 @@ Documentation::Engine.routes.draw do
 
   resources :workspaces do
     resources :pages
+    resources :permissions
   end
 
   resources :pages, only: %i[] do

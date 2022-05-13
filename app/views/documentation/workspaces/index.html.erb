@@ -19,7 +19,18 @@
         <h1 class="title is-3">
           <%= link_to workspace.name, workspace_path(workspace) %>
         </h1>
+
+        <%= link_to 'Permissions', workspace_permissions_path(workspace), data: { action: 'modal#open' } %>
       </div>
     </div>
+  <% end %>
+</div>
+
+<hr class="mb-6" />
+
+<div>
+  <%= link_to main_app.root_path, class: 'vh-centered inline' do %>
+    <%= icon_tag('arrow-left') %>
+    <span>Back to main App</span>
   <% end %>
 </div>

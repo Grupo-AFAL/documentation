@@ -17,26 +17,34 @@
 <hr/>
 
 <div>
-  <%= link_with_icon "Edit", 'edit', edit_workspace_page_path(@workspace, page) %> |
+  <% if policy(page).edit? %>
+    <%= link_with_icon "Edit", 'edit', edit_workspace_page_path(@workspace, page) %>
 
-  <%= render Bali::Dropdown::Component.new do |c| %>
-    <%= c.trigger do %>
-      <%= icon_tag('arrow-right') %>
-      <span>Transfer to another workspace</span>
-    <% end %>
+    |
 
-    <% (@workspaces - [@workspace]).each do |workspace| %>
-      <%= c.item(
-          href: workspace_page_path(
-            @workspace, page, { page: { documentation_workspace_id: workspace.id } }
-          ),
-          data: { 'turbo-method' => :put }
-      ) do %>
-        <%= workspace.name %>
+    <%= render Bali::Dropdown::Component.new do |c| %>
+      <%= c.trigger do %>
+        <%= icon_tag('arrow-right') %>
+        <span>Transfer to another workspace</span>
+      <% end %>
+
+      <% (@workspaces - [@workspace]).each do |workspace| %>
+        <%= c.item(
+            href: workspace_page_path(
+              @workspace, page, { page: { documentation_workspace_id: workspace.id } }
+            ),
+            data: { 'turbo-method' => :put }
+        ) do %>
+          <%= workspace.name %>
+        <% end %>
       <% end %>
     <% end %>
-  <% end %> |
+  <% end %>
 
-  <%= link_with_icon "Delete", 'trash', workspace_page_path(@workspace, page), class: 'has-text-danger',
-      data: { 'turbo-confirm' => '¿Estás seguro?', 'turbo-method' => :delete } %>
+  <% if policy(page).destroy? %>
+    |
+
+    <%= link_with_icon "Delete", 'trash', workspace_page_path(@workspace, page), class: 'has-text-danger',
+        data: { 'turbo-confirm' => '¿Estás seguro?', 'turbo-method' => :delete } %>
+  <% end %>
 </div>

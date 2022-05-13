@@ -24,6 +24,7 @@ PATH
       acts_as_tree
       bulma-rails (~> 0.9.3)
       jbuilder
+      pundit (~> 2.2)
       rails (>= 7.0.2.3)
       turbo-rails (>= 1.0.1)
 
@@ -148,6 +149,8 @@ GEM
     pg (1.3.4)
     puma (5.6.2)
       nio4r (~> 2.0)
+    pundit (2.2.0)
+      activesupport (>= 3.0.0)
     racc (1.6.0)
     rack (2.2.3)
     rack-test (1.1.0)

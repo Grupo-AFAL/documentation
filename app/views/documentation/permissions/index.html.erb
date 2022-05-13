@@ -1,0 +1,15 @@
+<table class="table is-fullwidth">
+  <% @permissions.group_by(&:subject_type).each do |subject_type, permissions| %>
+    <tr>
+      <th><%= subject_type %></th>
+      <th></th>
+    </tr>
+
+    <% permissions.each do |permission| %>
+      <tr>
+        <td><%= permission.display_name %></td>
+        <td><%= permission.action %></td>
+      </tr>
+    <% end %>
+  <% end %>
+</table>

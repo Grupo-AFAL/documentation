@@ -1,5 +1,7 @@
 module Documentation
   class ApplicationRecord < ActiveRecord::Base
+    include Pundit::Authorization
+
     self.abstract_class = true
 
     private
