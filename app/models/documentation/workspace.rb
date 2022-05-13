@@ -4,6 +4,8 @@ module Documentation
                      foreign_key: :documentation_workspace_id,
                      dependent: :destroy,
                      inverse_of: :workspace
+    has_many :permissions, class_name: 'Documentation::Permission',
+                           as: :object
 
     belongs_to :home_page, class_name: 'Documentation::Page', optional: true
 

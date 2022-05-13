@@ -3,9 +3,10 @@ Documentation::Engine.routes.draw do
 
   resources :workspaces do
     resources :pages
+    resources :permissions, only: %i[index]
   end
 
   resources :pages, only: %i[] do
-    resources :images
+    resources :images, only: %i[index create destroy]
   end
 end

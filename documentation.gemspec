@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bulma-rails', '~> 0.9.3'
   spec.add_dependency 'acts_as_tree'
   spec.add_dependency 'jbuilder'
+  spec.add_dependency 'pundit', '~> 2.2'
 
   spec.add_development_dependency 'rspec-rails', '~> 5.0.0'
   spec.add_development_dependency 'puma', '~> 5.6'

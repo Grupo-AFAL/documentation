@@ -14,7 +14,7 @@ module Documentation
 
     def new
       @parent = @workspace.pages.find(params[:parent_id]) if params[:parent_id]
-      @page = @workspace.pages.build(parent_id: @parent&.id)
+      @page = authorize @workspace.pages.build(parent_id: @parent&.id)
       @pages = @workspace.pages
     end
 
@@ -23,7 +23,7 @@ module Documentation
     end
 
     def create
-      @page = @workspace.pages.build(page_params)
+      @page = authorize @workspace.pages.build(page_params)
 
       if @page.save
         redirect_to edit_workspace_page_path(@workspace, @page),
@@ -55,7 +55,7 @@ module Documentation
     private
 
     def set_page
-      @page = Page.find(params[:id])
+      @page = authorize Page.find(params[:id])
     end
 
     def page_params
