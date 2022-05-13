@@ -7,7 +7,7 @@ require 'documentation/engine'
 module Documentation
   mattr_accessor :subject_config, default: {}
 
-  def self.add_subject(class_name, member:, display_name:)
+  def self.add_permission_subject(class_name, member:, display_name:)
     subject_config[class_name] = {
       member: member,
       display_name: display_name
