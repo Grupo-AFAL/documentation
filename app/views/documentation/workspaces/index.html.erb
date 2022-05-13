@@ -6,7 +6,9 @@
   </div>
 
   <div class="level-right">
-    <%= link_to "New Workspace", new_workspace_path, class: 'button is-primary', data: { action: 'modal#open' } %>
+    <% if policy(Documentation::Workspace).new? %>
+      <%= link_to "New Workspace", new_workspace_path, class: 'button is-primary', data: { action: 'modal#open' } %>
+    <% end %>
   </div>
 </div>
 
@@ -20,7 +22,9 @@
           <%= link_to workspace.name, workspace_path(workspace) %>
         </h1>
 
-        <%= link_to 'Permissions', workspace_permissions_path(workspace), data: { action: 'modal#open' } %>
+        <% if policy(Documentation::Permission).index? %>
+          <%= link_to 'Permissions', workspace_permissions_path(workspace), data: { action: 'modal#open' } %>
+        <% end %>
       </div>
     </div>
   <% end %>
