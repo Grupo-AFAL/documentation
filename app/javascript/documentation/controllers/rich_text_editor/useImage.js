@@ -1,9 +1,20 @@
 import Image from '@tiptap/extension-image'
+import { get } from '@rails/request.js'
 
-export const imageTargets = ['imagePanel']
+export const imageTargets = ['imagePanel', 'imageGrid']
 
 export default (controller, _options = {}) => {
   const ImageExtensions = [Image]
+
+  const reloadImages = async () => {
+    const response = await get(controller.imagesUrlValue)
+
+    if (response.ok) {
+      controller.imageGridTarget.innerHTML = await response.html
+    }
+  }
+
+  let isOpen = false
 
   const openImagePanel = () => {
     controller.closeNodeSelect()
@@ -11,13 +22,25 @@ export default (controller, _options = {}) => {
     controller.closeLinkPanel()
 
     if (!controller.hasImagePanelTarget) return
+
+    isOpen = true
+    reloadImages()
     controller.imagePanelTarget.classList.add('is-active')
   }
 
   const closeImagePanel = () => {
     if (!controller.hasImagePanelTarget) return
 
+    isOpen = false
     controller.imagePanelTarget.classList.remove('is-active')
+  }
+
+  const toggleImagePanel = () => {
+    if (isOpen) {
+      closeImagePanel()
+    } else {
+      openImagePanel()
+    }
   }
 
   const addImage = event => {
@@ -29,6 +52,7 @@ export default (controller, _options = {}) => {
   Object.assign(controller, {
     openImagePanel,
     closeImagePanel,
+    toggleImagePanel,
     addImage
   })
 

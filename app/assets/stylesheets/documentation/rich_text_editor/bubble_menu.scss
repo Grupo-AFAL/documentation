@@ -8,11 +8,6 @@ $menu-dropdown-icon-size: 0.75em;
   border-radius: $menu-border-radius;
   width: fit-content;
 
-  .full-height {
-    display: block;
-    height: 100%;
-  }
-
   .mark.is-active {
     color: $primary;
 
@@ -55,7 +50,7 @@ $menu-dropdown-icon-size: 0.75em;
 
   .dropdown-trigger {
     a {
-      width: max-content;
+      // width: max-content;
       height: 2rem;
     }
   }
@@ -70,7 +65,7 @@ $menu-dropdown-icon-size: 0.75em;
     border-right: none;
   }
 
-  a {
+  a.toolbar-link {
     display: inline-block;
     color: $black-ter;
     background-color: white;
@@ -93,24 +88,24 @@ $menu-dropdown-icon-size: 0.75em;
       cursor: not-allowed;
     }
 
-    &.dropdown-item {
-      display: block;
-      border: none;
-      width: 100%;
-      text-align: left;
-      padding: 0.25rem 1rem;
-      margin: 0;
+    &:hover {
+      background-color: $grey-lightest;
+    }
+  }
 
-      &.is-active {
-        background-color: $white;
-        color: $black;
-        font-weight: bold;
-        text-decoration: underline;
-      }
+  .dropdown-item {
+    display: block;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 0.25rem 1rem;
+    margin: 0;
 
-      &:hover {
-        background-color: $grey-lightest;
-      }
+    &.is-active {
+      background-color: $white;
+      color: $black;
+      font-weight: bold;
+      text-decoration: underline;
     }
 
     &:hover {

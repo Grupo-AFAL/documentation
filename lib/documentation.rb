@@ -1,5 +1,6 @@
 # dependencies
 require 'acts_as_tree'
+require 'pundit'
 
 require 'documentation/version'
 require 'documentation/engine'

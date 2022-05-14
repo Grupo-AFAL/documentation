@@ -31,7 +31,8 @@ export default class RichTextEditorController extends Controller {
   static values = {
     content: { type: String, default: '' },
     placeholder: { type: String, default: '' },
-    editable: { type: Boolean, default: true }
+    editable: { type: Boolean, default: true },
+    imagesUrl: String
   }
 
   allMenuButtons = toolbarMarks.concat(toolbarNodes)
@@ -108,5 +109,13 @@ export default class RichTextEditorController extends Controller {
         targetNode.classList.remove('is-active')
       }
     })
+  }
+
+  hideMenu () {
+    this.editor
+      .chain()
+      .focus()
+      .blur()
+      .run()
   }
 }

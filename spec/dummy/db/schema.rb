@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_05_10_195956) do
+ActiveRecord::Schema[7.0].define(version: 2022_05_13_194418) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -42,6 +42,9 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_10_195956) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
+  end
+
   create_table "documentation_pages", force: :cascade do |t|
     t.string "title"
     t.string "description"
@@ -54,8 +57,29 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_10_195956) do
     t.index ["parent_id"], name: "index_documentation_pages_on_parent_id"
   end
 
+  create_table "documentation_permissions", force: :cascade do |t|
+    t.string "subject_type", null: false
+    t.bigint "subject_id", null: false
+    t.string "object_type", null: false
+    t.bigint "object_id", null: false
+    t.integer "action", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["object_type", "object_id"], name: "index_documentation_permissions_on_object"
+    t.index ["subject_type", "subject_id"], name: "index_documentation_permissions_on_subject"
+  end
+
   create_table "documentation_workspaces", force: :cascade do |t|
     t.string "name"
+    t.bigint "home_page_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["home_page_id"], name: "index_documentation_workspaces_on_home_page_id"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "name"
+    t.boolean "super_admin"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
