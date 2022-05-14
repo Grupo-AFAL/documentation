@@ -41170,21 +41170,38 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/useImage.js
-  var imageTargets = ["imagePanel"];
+  var imageTargets = ["imagePanel", "imageGrid"];
   var useImage_default = (controller, _options = {}) => {
     const ImageExtensions = [Image2];
+    const reloadImages = async () => {
+      const response = await get(controller.imagesUrlValue);
+      if (response.ok) {
+        controller.imageGridTarget.innerHTML = await response.html;
+      }
+    };
+    let isOpen = false;
     const openImagePanel = () => {
       controller.closeNodeSelect();
       controller.closeTablePanel();
       controller.closeLinkPanel();
       if (!controller.hasImagePanelTarget)
         return;
+      isOpen = true;
+      reloadImages();
       controller.imagePanelTarget.classList.add("is-active");
     };
     const closeImagePanel = () => {
       if (!controller.hasImagePanelTarget)
         return;
+      isOpen = false;
       controller.imagePanelTarget.classList.remove("is-active");
+    };
+    const toggleImagePanel = () => {
+      if (isOpen) {
+        closeImagePanel();
+      } else {
+        openImagePanel();
+      }
     };
     const addImage = (event) => {
       controller.runCommand("setImage", {
@@ -41194,6 +41211,7 @@ img.ProseMirror-separator {
     Object.assign(controller, {
       openImagePanel,
       closeImagePanel,
+      toggleImagePanel,
       addImage
     });
     return { ImageExtensions };
@@ -41370,6 +41388,9 @@ img.ProseMirror-separator {
         }
       });
     }
+    hideMenu() {
+      this.editor.chain().focus().blur().run();
+    }
   };
   __publicField(RichTextEditorController, "targets", [
     ...defaultTargets,
@@ -41383,7 +41404,8 @@ img.ProseMirror-separator {
   __publicField(RichTextEditorController, "values", {
     content: { type: String, default: "" },
     placeholder: { type: String, default: "" },
-    editable: { type: Boolean, default: true }
+    editable: { type: Boolean, default: true },
+    imagesUrl: String
   });
 
   // app/javascript/documentation/application.js

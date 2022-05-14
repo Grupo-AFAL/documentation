@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: a1321a3d0e828349495cf47720e157340814f5d6
+  revision: fd07dc4a78bac68d85ebc44e6cdab827868a9392
   branch: main
   specs:
     bali_view_components (0.1.0)
@@ -103,6 +103,9 @@ GEM
       sassc (~> 2.0)
     concurrent-ruby (1.1.10)
     crass (1.0.6)
+    data_migrate (8.0.0)
+      activerecord (>= 5.0)
+      railties (>= 5.0)
     diff-lcs (1.5.0)
     digest (3.1.0)
     erubi (1.10.0)
@@ -230,7 +233,7 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
-    view_component (2.54.1)
+    view_component (2.55.0)
       activesupport (>= 5.0.0, < 8.0)
       method_source (~> 1.0)
     view_component-contrib (0.1.1)
@@ -248,6 +251,7 @@ DEPENDENCIES
   acts_as_tree
   bali_view_components!
   bulma-rails (~> 0.9.3)
+  data_migrate
   documentation!
   frontend_helpers!
   image_processing (>= 1.2)

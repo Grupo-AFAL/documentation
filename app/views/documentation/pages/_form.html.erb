@@ -13,12 +13,13 @@
     class="rich-text-editor-component input mb-4 rich-editor-content"
     data-controller="rich-text-editor"
     data-rich-text-editor-content-value='<%= page.content %>'
-    data-rich-text-editor-placeholder-value="Type '/' for commands"
+    data-rich-text-editor-placeholder-value="Type '/' for commands",
+    data-rich-text-editor-images-url-value='<%= page_image_thumbnails_path(@page) %>'
   >
     <div class="rich-text-editor-menu" data-rich-text-editor-target="bubbleMenu">
 
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'nodeSelect'}) do |c| %>
-        <% c.trigger(data: { action: 'rich-text-editor#openNodeSelect' }) do %>
+        <% c.trigger(class: 'toolbar-link', data: { action: 'rich-text-editor#openNodeSelect' }) do %>
           <span class="text" data-rich-text-editor-target="nodeSelectTrigger">Text</span>
           <%= icon_tag('chevron-down', class: 'dropdown-icon') %>
         <% end %>
@@ -34,7 +35,7 @@
       <% end %>
 
       <%= render Bali::Dropdown::Component.new(close_on_click: false, data: { 'rich-text-editor-target': 'linkPanel' }) do |c| %>
-        <% c.trigger(class: 'mark link', data: { action: 'rich-text-editor#openLinkPanel', 'rich-text-editor-target': 'link' }) do %>
+        <% c.trigger(class: 'toolbar-link mark link', data: { action: 'rich-text-editor#openLinkPanel', 'rich-text-editor-target': 'link' }) do %>
           <%= icon_tag('link') %>
         <% end %>
 
@@ -63,24 +64,27 @@
       </div>
 
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'imagePanel' }) do |c| %>
-        <% c.trigger(data: { action: 'rich-text-editor#openImagePanel' }, class: 'full-height') do %>
-          <div class="is-flex is-align-items-center full-height">
+        <% c.trigger(class: 'toolbar-link', data: { action: 'rich-text-editor#toggleImagePanel' }) do %>
+          <div class="is-flex is-align-items-center">
             <%= icon_tag('image') %>
           </div>
         <% end %>
 
-        <%= render Bali::ImageGrid::Component.new do |c| %>
-          <%= @page.images.each do |image| %>
-            <%= c.image do %>
-              <%= image_tag main_app.url_for(image.variant(:small_thumb)),
-                  data: { action: 'click->rich-text-editor#addImage', 'source-url': main_app.url_for(image) } %>
-            <% end %>
-          <% end %>
+        <div data-rich-text-editor-target="imageGrid">
+          <%= render 'images', images: @page.images %>
+        </div>
+
+        <hr />
+
+        <%= link_to page_images_path(@page), class: 'button is-primary is-small',
+            data: { action: 'modal#open rich-text-editor#hideMenu', 'wrapper-class': 'extra-wide' } do %>
+          <%= icon_tag('image') %>
+          <span>Upload Images</span>
         <% end %>
       <% end %>
 
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'tablePanel' }) do |c| %>
-        <% c.trigger(data: { action: 'rich-text-editor#openTablePanel' }) do %>
+        <% c.trigger(class: 'toolbar-link', data: { action: 'rich-text-editor#openTablePanel' }) do %>
           <%= icon_tag('table') %>
         <% end %>
 
@@ -93,16 +97,16 @@
         <%= c.item(class: 'modifier disabled', data: { action: 'rich-text-editor#deleteRow', 'rich-text-editor-target': 'tableModifier' }) { 'Remove Row' } %>
       <% end %>
 
-      <a class="mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">
+      <a class="toolbar-link mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">
         <%= icon_tag('bold') %>
       </a>
-      <a class="mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">
+      <a class="toolbar-link mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">
         <%= icon_tag('italic') %>
       </a>
-      <a class="mark underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">
+      <a class="toolbar-link mark underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">
         <%= icon_tag('underline') %>
       </a>
-      <a class="mark strike" data-action="rich-text-editor#toggleStrike" data-rich-text-editor-target="strike">
+      <a class="toolbar-link mark strike" data-action="rich-text-editor#toggleStrike" data-rich-text-editor-target="strike">
         <%= icon_tag('strikethrough') %>
       </a>
     </div>
