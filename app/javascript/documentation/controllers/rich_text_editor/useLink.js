@@ -62,7 +62,9 @@ export default (controller, options = {}) => {
       .chain()
       .focus()
       .extendMarkRange('link')
-      .setLink({ href: url, target: '_blank' })
+      // TODO: Make it work with Turbo. So it doesn't do a full page reload
+      //       every time an internal link is clicked
+      .setLink({ href: url, target: '_self' })
       .run()
   }
 

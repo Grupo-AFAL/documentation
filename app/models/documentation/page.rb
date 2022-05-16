@@ -13,7 +13,10 @@ module Documentation
       attachable.variant :small_thumb, resize_to_fill: [84, 56]
     end
 
-    before_destroy -> { halt(msg: "Workspace home page can't be deleted") if workspace_home_page? }
+    before_destroy -> { halt(msg: "Workspace home page can't be deleted") }, if: :home_page?
+    before_update -> { halt(msg: "Workspace home page can't be transfered") },
+                  if: -> { workspace_changed? && was_home_page? }
+    before_update -> { self.parent_id = nil }, if: :workspace_changed?
 
     validates :title, presence: true
 
@@ -23,8 +26,20 @@ module Documentation
       where('title ILIKE ?', "%#{query}%")
     end
 
-    def workspace_home_page?
+    def home_page?
       id == workspace.home_page_id
+    end
+
+    def was_home_page?
+      id == previous_workspace.home_page_id
+    end
+
+    def previous_workspace
+      Workspace.find(documentation_workspace_id_was)
+    end
+
+    def workspace_changed?
+      documentation_workspace_id_changed?
     end
   end
 end

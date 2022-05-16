@@ -1,7 +1,7 @@
 <%= form_with(model: [@workspace, page]) do |form| %>
   <%= render 'layouts/documentation/target_errors', target: page %>
 
-  <% unless page.workspace_home_page? %>
+  <% unless page.home_page? %>
     <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title, p.id] }, include_blank: 'Select page parent', label: false %>
   <% end %>
 
@@ -56,7 +56,7 @@
                     data: {
                       action: 'click->rich-text-editor#savePageLink',
                       id: page.id,
-                      url: workspace_page_path(@workspace, page) } %>
+                      url: workspace_page_url(@workspace, page) } %>
               <% end %>
             <% end %>
           <% end %>
