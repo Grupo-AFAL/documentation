@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class Engine < ::Rails::Engine
     isolate_namespace Documentation
@@ -24,7 +26,8 @@ module Documentation
       app.config.action_view.sanitized_allowed_tags = all_tags
 
       extra_attributes = %w[colspan rowspan colwidth style]
-      all_attributes = Rails::Html::Sanitizer.safe_list_sanitizer.allowed_attributes + extra_attributes
+      all_attributes = Rails::Html::Sanitizer.safe_list_sanitizer
+                                             .allowed_attributes + extra_attributes
       app.config.action_view.sanitized_allowed_attributes = all_attributes
     end
   end

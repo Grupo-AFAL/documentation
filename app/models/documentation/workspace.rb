@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class Workspace < ApplicationRecord
     has_many :pages, class_name: 'Documentation::Page',
@@ -5,7 +7,8 @@ module Documentation
                      dependent: :destroy,
                      inverse_of: :workspace
     has_many :permissions, class_name: 'Documentation::Permission',
-                           as: :object
+                           as: :object,
+                           dependent: :destroy
 
     belongs_to :home_page, class_name: 'Documentation::Page', optional: true
 

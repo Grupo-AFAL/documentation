@@ -51,6 +51,7 @@ $menu-dropdown-icon-size: 0.75em;
   .dropdown-trigger {
     a {
       height: 2rem;
+      width: max-content;
     }
   }
 

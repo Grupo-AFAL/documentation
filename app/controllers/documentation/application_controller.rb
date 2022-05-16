@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class ApplicationController < ActionController::Base
     include FrontendHelpers::LayoutConcern

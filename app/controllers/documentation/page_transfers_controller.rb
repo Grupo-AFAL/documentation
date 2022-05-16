@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class PageTransfersController < ApplicationController
     def update
@@ -5,10 +7,10 @@ module Documentation
 
       if @page.update(page_params)
         redirect_to workspace_page_path(@page.workspace, @page),
-                    notice: 'Page was successfully updated.', status: 303
+                    notice: 'Page was successfully updated.', status: :see_other
       else
         redirect_to workspace_page_path(@page.workspace, @page),
-                    alert: @page.errors.full_messages.join(', '), status: 303
+                    alert: @page.errors.full_messages.join(', '), status: :see_other
       end
     end
 

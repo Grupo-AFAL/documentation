@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class Permission < ApplicationRecord
     belongs_to :subject, polymorphic: true

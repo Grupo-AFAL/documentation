@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class PagesController < ApplicationController
     before_action :set_workspaces, except: %i[index]
@@ -7,7 +9,7 @@ module Documentation
 
     def index
       @pages = @workspace.pages
-      @pages = @pages.merge!(Page.search(params[:title])) if params[:title]
+      @pages.merge!(Page.search(params[:title])) if params[:title]
     end
 
     def show; end
@@ -36,7 +38,7 @@ module Documentation
     def update
       if @page.update(page_params)
         redirect_to workspace_page_path(@page.workspace, @page),
-                    notice: 'Page was successfully updated.', status: 303
+                    notice: 'Page was successfully updated.', status: :see_other
       else
         render :edit, status: :unprocessable_entity
       end
@@ -45,10 +47,10 @@ module Documentation
     def destroy
       if @page.destroy
         redirect_to workspace_url(@workspace),
-                    notice: 'Page was successfully destroyed.', status: 303
+                    notice: 'Page was successfully destroyed.', status: :see_other
       else
         redirect_to workspace_url(@workspace),
-                    alert: @page.errors.full_messages.join(', '), status: 303
+                    alert: @page.errors.full_messages.join(', '), status: :see_other
       end
     end
 

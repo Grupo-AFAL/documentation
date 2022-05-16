@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Original Engine test_helper
 # Need to figure out if will need to modify the rspec spec or rails helper.
 

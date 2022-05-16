@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class Page < ApplicationRecord
     extend ActsAsTree::TreeWalker
@@ -13,10 +15,10 @@ module Documentation
       attachable.variant :small_thumb, resize_to_fill: [84, 56]
     end
 
-    before_destroy -> { halt(msg: "Workspace home page can't be deleted") }, if: :home_page?
     before_update -> { halt(msg: "Workspace home page can't be transfered") },
                   if: -> { workspace_changed? && was_home_page? }
     before_update -> { self.parent_id = nil }, if: :workspace_changed?
+    before_destroy -> { halt(msg: "Workspace home page can't be deleted") }, if: :home_page?
 
     validates :title, presence: true
 

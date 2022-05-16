@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class PermissionsController < ApplicationController
     before_action :set_workspace
