@@ -17,6 +17,7 @@ AllCops:
     - 'bin/**/*'
     - 'spec/spec_helper.rb'
     - 'spec/dummy/db/**/*'
+    - 'vendor/**/*'
     - !ruby/regexp /old_and_unused\.rb$/
 
 Gemspec/RequiredRubyVersion:
