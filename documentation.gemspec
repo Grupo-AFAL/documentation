@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'lib/documentation/version'
 
 Gem::Specification.new do |spec|
@@ -22,13 +24,14 @@ Gem::Specification.new do |spec|
     Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
   end
 
-  spec.add_dependency 'rails', '>= 7.0.2.3'
-  spec.add_dependency 'turbo-rails', '>= 1.0.1'
-  spec.add_dependency 'bulma-rails', '~> 0.9.3'
   spec.add_dependency 'acts_as_tree'
+  spec.add_dependency 'bulma-rails', '~> 0.9.3'
   spec.add_dependency 'jbuilder'
   spec.add_dependency 'pundit', '~> 2.2'
+  spec.add_dependency 'rails', '>= 7.0.2.3'
+  spec.add_dependency 'turbo-rails', '>= 1.0.1'
 
-  spec.add_development_dependency 'rspec-rails', '~> 5.0.0'
   spec.add_development_dependency 'puma', '~> 5.6'
+  spec.add_development_dependency 'rspec-rails', '~> 5.0.0'
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end

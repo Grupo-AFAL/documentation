@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # dependencies
 require 'acts_as_tree'
 require 'pundit'
@@ -10,8 +12,8 @@ module Documentation
 
   def self.add_permission_subject(class_name, member:, display_name:)
     subject_config[class_name] = {
-      member: member,
-      display_name: display_name
+      member:,
+      display_name:
     }
   end
 

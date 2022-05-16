@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Documentation
   class PagePolicy < ApplicationPolicy
     delegate :workspace, to: :record
