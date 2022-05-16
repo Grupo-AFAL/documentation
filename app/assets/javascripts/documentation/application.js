@@ -38130,7 +38130,7 @@ img.ProseMirror-separator {
     };
     const savePageLink = (event) => {
       const { url } = event.target.dataset;
-      controller.editor.chain().focus().extendMarkRange("link").setLink({ href: url, target: "_blank" }).run();
+      controller.editor.chain().focus().extendMarkRange("link").setLink({ href: url, target: "_self" }).run();
     };
     Object.assign(controller, {
       closeLinkPanel,
