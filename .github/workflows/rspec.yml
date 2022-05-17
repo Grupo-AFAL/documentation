@@ -9,6 +9,10 @@ on:
       CC_TEST_REPORTER_ID:
         description: 'Code Climate Reporter ID for current repo'
         required: false
+
+env:
+  RAILS_ENV: test
+
 jobs:
   test:
     runs-on: ubuntu-latest
