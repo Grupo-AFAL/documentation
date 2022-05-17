@@ -23,5 +23,9 @@ module Dummy
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # ViewComponents
+    config.autoload_paths << Rails.root.parent.parent.join('app', 'components')
+    config.view_component.preview_paths << Rails.root.parent.parent.join('app', 'components')
   end
 end
