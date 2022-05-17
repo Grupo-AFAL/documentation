@@ -28,6 +28,7 @@ gem 'debug', '>= 1.0.0'
 
 group :development, :test do
   gem 'data_migrate'
+  gem 'rspec-rails', '~> 5'
 end
 
 group :development do

@@ -3,22 +3,28 @@
 require 'rails_helper'
 
 RSpec.describe 'Images', type: :request do
+  fixtures 'documentation/pages'
+
+  let(:page) { documentation_pages(:home_page) }
+
   describe 'GET /index' do
-    it 'returns http success' do
-      get '/page/images/index'
+    it 'renders a list of images' do
+      get documentation.page_images_path(page)
+
       expect(response).to have_http_status(:success)
+      expect(response.body).to include('Images')
     end
   end
 
   describe 'GET /create' do
-    it 'returns http success' do
+    xit 'creates a new image' do
       get '/page/images/create'
       expect(response).to have_http_status(:success)
     end
   end
 
   describe 'GET /destroy' do
-    it 'returns http success' do
+    xit 'returns http success' do
       get '/page/images/destroy'
       expect(response).to have_http_status(:success)
     end

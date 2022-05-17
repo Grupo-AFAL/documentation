@@ -296,7 +296,7 @@ DEPENDENCIES
   jsbundling-rails
   pg
   puma (~> 5.6)
-  rspec-rails (~> 5.0.0)
+  rspec-rails (~> 5)
   rubocop (~> 1)
   rubocop-rails (~> 2)
   sassc-rails
