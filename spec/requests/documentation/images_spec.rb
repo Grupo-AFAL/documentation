@@ -6,7 +6,7 @@ module Documentation
   RSpec.describe 'Images', type: :request do
     fixtures 'documentation/pages'
 
-    let(:page) { documentation_pages(:home_page) }
+    let(:page) { documentation_pages(:comedor_home_page) }
 
     describe 'GET /index' do
       it 'renders a list of images' do
