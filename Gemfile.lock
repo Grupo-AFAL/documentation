@@ -27,6 +27,8 @@ PATH
       pundit (~> 2.2)
       rails (>= 7.0.2.3)
       turbo-rails (>= 1.0.1)
+      view_component (>= 2.0.0, < 3.0)
+      view_component-contrib
 
 GEM
   remote: https://rubygems.org/
