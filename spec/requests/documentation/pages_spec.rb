@@ -9,10 +9,23 @@ module Documentation
 
     let(:comedor) { documentation_workspaces(:comedor) }
     let(:comedor_recipes) { documentation_pages(:comedor_recipes) }
+    let(:comedor_recipes_details) { documentation_pages(:comedor_recipes_details) }
     let(:headers) { { 'ACCEPT' => 'application/json' } }
+    let(:create_page_full_permission) do
+      Documentation::Permission.create(subject: @user, object: comedor, action: :full)
+    end
+
+    let(:valid_attributes) do
+      {
+        title: 'Documenting stuff',
+        description: 'stuff description',
+        content: '<h1>Stuff</h1>',
+        parent_id: nil
+      }
+    end
 
     before(:all) do
-      User.create(super_admin: true)
+      @user = User.create(super_admin: true)
     end
 
     after(:all) do
@@ -49,90 +62,88 @@ module Documentation
     end
 
     describe 'GET /new' do
-      xit 'renders a successful response' do
-        get new_page_url
+      it 'renders a new page form' do
+        get new_workspace_page_url(comedor)
         expect(response).to be_successful
       end
     end
 
     describe 'GET /edit' do
-      xit 'render a successful response' do
-        page = Page.create! valid_attributes
-        get edit_page_url(page)
+      before { create_page_full_permission }
+
+      it 'renders an existing page form' do
+        get edit_workspace_page_url(comedor, comedor_recipes)
         expect(response).to be_successful
       end
     end
 
     describe 'POST /create' do
       context 'with valid parameters' do
-        xit 'creates a new Page' do
+        it 'creates a new Page' do
           expect do
-            post pages_url, params: { page: valid_attributes }
+            post workspace_pages_url(comedor), params: { page: valid_attributes }
           end.to change(Page, :count).by(1)
         end
 
-        xit 'redirects to the created page' do
-          post pages_url, params: { page: valid_attributes }
-          expect(response).to redirect_to(page_url(Page.last))
+        it 'redirects to the created page edit form' do
+          post workspace_pages_url(comedor), params: { page: valid_attributes }
+          expect(response).to redirect_to(edit_workspace_page_path(comedor, Page.last))
         end
       end
 
       context 'with invalid parameters' do
-        xit 'does not create a new Page' do
+        it 'does not create a new Page' do
           expect do
-            post pages_url, params: { page: invalid_attributes }
+            post workspace_pages_url(comedor), params: { page: { title: '' } }
           end.to change(Page, :count).by(0)
         end
 
-        xit "renders a successful response (i.e. to display the 'new' template)" do
-          post pages_url, params: { page: invalid_attributes }
-          expect(response).to be_successful
+        it 'returns a unprocessable entity status' do
+          post workspace_pages_url(comedor), params: { page: { title: '' } }
+          expect(response).to have_http_status(:unprocessable_entity)
         end
       end
     end
 
     describe 'PATCH /update' do
+      before { create_page_full_permission }
+
       context 'with valid parameters' do
-        let(:new_attributes) do
-          skip('Add a hash of attributes valid for your model')
+        it 'updates the requested page' do
+          patch workspace_page_url(comedor, comedor_recipes),
+                params: { page: { title: 'Nuevas recetas!' } }
+          comedor_recipes.reload
+          expect(comedor_recipes.title).to eql('Nuevas recetas!')
         end
 
-        xit 'updates the requested page' do
-          page = Page.create! valid_attributes
-          patch page_url(page), params: { page: new_attributes }
-          page.reload
-          skip('Add assertions for updated state')
-        end
-
-        xit 'redirects to the page' do
-          page = Page.create! valid_attributes
-          patch page_url(page), params: { page: new_attributes }
-          page.reload
-          expect(response).to redirect_to(page_url(page))
+        it 'redirects to the page' do
+          patch workspace_page_url(comedor, comedor_recipes),
+                params: { page: { title: 'Nuevas recetas!' } }
+          expect(response).to redirect_to(workspace_page_path(comedor, comedor_recipes))
         end
       end
 
       context 'with invalid parameters' do
-        xit "renders a successful response (i.e. to display the 'edit' template)" do
-          page = Page.create! valid_attributes
-          patch page_url(page), params: { page: invalid_attributes }
-          expect(response).to be_successful
+        it 'returns a unprocessable entity status' do
+          patch workspace_page_url(comedor, comedor_recipes),
+                params: { page: { title: '' } }
+          expect(response).to have_http_status(:unprocessable_entity)
         end
       end
     end
 
     describe 'DELETE /destroy' do
-      xit 'destroys the requested page' do
-        page = Page.create! valid_attributes
+      before { create_page_full_permission }
+
+      it 'destroys the requested page' do
         expect do
-          delete page_url(page)
+          delete workspace_page_url(comedor, comedor_recipes_details)
         end.to change(Page, :count).by(-1)
       end
 
-      xit 'redirects to the pages list' do
-        page = Page.create! valid_attributes
-        delete page_url(page)
-        expect(response).to redirect_to(pages_url)
+      it 'redirects to the workspace home' do
+        delete workspace_page_url(comedor, comedor_recipes_details)
+        expect(response).to redirect_to(workspace_url(comedor))
       end
     end
   end

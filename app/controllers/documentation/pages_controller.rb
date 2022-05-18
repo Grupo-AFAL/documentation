@@ -26,6 +26,7 @@ module Documentation
 
     def create
       @page = authorize @workspace.pages.build(page_params)
+      @pages = @workspace.pages
 
       if @page.save
         redirect_to edit_workspace_page_path(@workspace, @page),
@@ -36,6 +37,8 @@ module Documentation
     end
 
     def update
+      @pages = @workspace.pages.excluding(@page)
+
       if @page.update(page_params)
         redirect_to workspace_page_path(@page.workspace, @page),
                     notice: 'Page was successfully updated.', status: :see_other
@@ -62,7 +65,7 @@ module Documentation
 
     def page_params
       params.require(:page).permit(
-        :title, :description, :content, :parent_id, :documentation_workspace_id
+        :title, :description, :content, :parent_id
       )
     end
 
