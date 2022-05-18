@@ -8,14 +8,14 @@ module Documentation
       @workspaces = Workspace.all
     end
 
-    def new
-      @workspace = Workspace.new
-    end
-
     def show
       @workspaces = Workspace.all
       @home_page = @workspace.home_page
       @root_pages = @workspace.pages.roots.include_tree
+    end
+
+    def new
+      @workspace = Workspace.new
     end
 
     def edit; end

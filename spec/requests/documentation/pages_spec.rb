@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+
 module Documentation
   RSpec.describe '/pages', type: :request do
     include Engine.routes.url_helpers
