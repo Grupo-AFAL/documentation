@@ -10,17 +10,22 @@ on:
         description: 'Code Climate Reporter ID for current repo'
         required: false
 
-env:
-  RAILS_ENV: test
-
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:11-alpine
+        ports:
+          - "5432:5432"
+        env:
+          POSTGRES_DB: rails_test
+          POSTGRES_USER: rails
+          POSTGRES_PASSWORD: password
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: "postgres://rails:password@localhost:5432/rails_test"
     steps:
-      - uses: amancevice/setup-code-climate@v0
-        name: CodeClimate Install
-        with:
-          cc_test_reporter_id: ${{ secrets.CC_TEST_REPORTER_ID }}
       - name: Checkout code
         uses: actions/checkout@v3
       # Add or replace dependency steps here
@@ -31,7 +36,11 @@ jobs:
       - name: CodeClimate Pre-build Notification
         run: cc-test-reporter before-build
       # Add or replace test runners here
-      - name: Run RSpec
-        run: bundle exec rspec spec/
-      - name: CodeClimate Post-build Notification
-        run: cc-test-reporter after-build -t simplecov -r ${{secrets.CC_TEST_REPORTER_ID}}
+      - name: Set up database schema
+        run: bin/rails db:schema:load
+      - name: Run Rspec & publish code coverage
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+        with:
+          coverageCommand: bundle exec rspec spec/
