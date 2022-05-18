@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-# require 'simplecov'
+require 'simplecov'
 
-# SimpleCov.start 'rails' do
-#   add_filter 'spec/'
+SimpleCov.start 'rails' do
+  add_filter 'spec/'
 
-#   add_group 'Components', 'app/components/documentation'
+  add_group 'Components', 'app/components/documentation'
 
-#   add_filter(/preview.rb/)
-#   add_filter(/stories.rb/)
-# end
+  add_filter(/preview.rb/)
+  add_filter(/stories.rb/)
+end
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
