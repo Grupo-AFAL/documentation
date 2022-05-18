@@ -9,7 +9,7 @@ module Documentation
 
     def index
       @pages = @workspace.pages
-      @pages = @pages.merge!(Page.search(params[:title])) if params[:title]
+      @pages = @pages.merge(Page.search(params[:title])) if params[:title]
     end
 
     def show; end

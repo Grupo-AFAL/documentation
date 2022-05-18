@@ -80,6 +80,10 @@ Metrics/BlockLength:
     - spec/*
     - lib/tasks/*
 
+Metrics/ModuleLength:
+  Exclude:
+    - spec/**/*
+
 Naming/VariableNumber:
   Enabled: false
 

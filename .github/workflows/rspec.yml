@@ -36,6 +36,8 @@ jobs:
       # Add or replace test runners here
       - name: Set up database schema
         run: bin/rails db:schema:load
+      - name: Precompile Assets
+        run: bin/rails app:assets:precompile
       - name: Run Rspec & publish code coverage
         uses: paambaati/codeclimate-action@v3.0.0
         env:
