@@ -4,6 +4,8 @@ require 'rails_helper'
 
 module Documentation
   RSpec.describe 'Images', type: :request do
+    include Engine.routes.url_helpers
+
     fixtures 'documentation/pages'
 
     let(:page) { documentation_pages(:comedor_home_page) }
@@ -11,7 +13,7 @@ module Documentation
 
     describe 'GET /index' do
       it 'renders a list of images' do
-        get documentation.page_images_path(page)
+        get page_images_path(page)
 
         expect(response).to have_http_status(:success)
         expect(response.body).to include('Images')
@@ -20,10 +22,10 @@ module Documentation
 
     describe 'GET /create' do
       it 'creates a new image' do
-        post documentation.page_images_path(page), params: {
+        post page_images_path(page), params: {
           images: [image_file]
         }
-        expect(response).to redirect_to(documentation.page_images_path(page))
+        expect(response).to redirect_to(page_images_path(page))
       end
     end
 
@@ -31,7 +33,7 @@ module Documentation
       it 'destroys an image' do
         page.images.attach(image_file)
 
-        delete documentation.page_image_path(page, page.images.first)
+        delete page_image_path(page, page.images.first)
         expect(response).to have_http_status(:success)
       end
     end

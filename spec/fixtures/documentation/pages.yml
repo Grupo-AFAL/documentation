@@ -11,7 +11,7 @@ comedor_recipes:
   workspace: comedor
 
 comedor_recipes_details:
-  title: My Recipes detais
+  title: My Recipes details
   description: Comedor recipes
   workspace: comedor
   parent: comedor_recipes
