@@ -15,3 +15,4 @@ yarn-debug.log*
 /spec/dummy/log/*.log
 /spec/dummy/storage/
 /spec/dummy/tmp/
+/spec/dummy/public/
