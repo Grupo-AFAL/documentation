@@ -7,6 +7,7 @@ module Documentation
     fixtures 'documentation/pages'
 
     let(:page) { documentation_pages(:comedor_home_page) }
+    let(:image_file) { fixture_file_upload('document.png', 'image/png') }
 
     describe 'GET /index' do
       it 'renders a list of images' do
@@ -18,15 +19,19 @@ module Documentation
     end
 
     describe 'GET /create' do
-      xit 'creates a new image' do
-        get '/page/images/create'
-        expect(response).to have_http_status(:success)
+      it 'creates a new image' do
+        post documentation.page_images_path(page), params: {
+          images: [image_file]
+        }
+        expect(response).to redirect_to(documentation.page_images_path(page))
       end
     end
 
     describe 'GET /destroy' do
-      xit 'returns http success' do
-        get '/page/images/destroy'
+      it 'destroys an image' do
+        page.images.attach(image_file)
+
+        delete documentation.page_image_path(page, page.images.first)
         expect(response).to have_http_status(:success)
       end
     end
