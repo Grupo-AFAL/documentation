@@ -15,9 +15,8 @@ module Documentation
       attachable.variant :small_thumb, resize_to_fill: [84, 56]
     end
 
-    before_update -> { halt(msg: "Workspace home page can't be transfered") },
-                  if: -> { workspace_changed? && was_home_page? }
-    before_update -> { self.parent_id = nil }, if: :workspace_changed?
+    before_update -> { halt(msg: "Workspace home page can't be transfered") }, if: :was_home_page?
+    before_update -> { self.parent_id = nil }, if: :documentation_workspace_id_changed?
     before_destroy -> { halt(msg: "Workspace home page can't be deleted") }, if: :home_page?
 
     validates :title, presence: true
@@ -33,15 +32,11 @@ module Documentation
     end
 
     def was_home_page?
-      id == previous_workspace.home_page_id
+      documentation_workspace_id_changed? && id == previous_workspace.home_page_id
     end
 
     def previous_workspace
       Workspace.find(documentation_workspace_id_was)
-    end
-
-    def workspace_changed?
-      documentation_workspace_id_changed?
     end
   end
 end

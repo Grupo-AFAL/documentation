@@ -9,3 +9,9 @@ comedor_recipes:
   title: My Recipes
   description: Comedor recipes
   workspace: comedor
+
+comedor_recipes_details:
+  title: My Recipes detais
+  description: Comedor recipes
+  workspace: comedor
+  parent: comedor_recipes
