@@ -4,10 +4,10 @@ module Documentation
   class Engine < ::Rails::Engine
     isolate_namespace Documentation
 
-    config.eager_load_paths = %W[
-      #{root}/app/components
-      #{root}/app/lib
-    ]
+    # config.eager_load_paths = %W[
+    #   #{root}/app/components
+    #   #{root}/app/lib
+    # ]
 
     config.generators do |g|
       g.test_framework :rspec, fixture: true

@@ -2,5 +2,5 @@
 
 require 'rails_helper'
 
-RSpec.describe Documentation::Workspace, type: :model do
-end
+# RSpec.describe Documentation::Workspace, type: :model do
+# end
