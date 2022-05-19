@@ -6,16 +6,13 @@ module Documentation
   RSpec.describe '/pages', type: :request do
     include Engine.routes.url_helpers
 
-    fixtures 'documentation/pages', 'documentation/workspaces'
+    fixtures 'documentation/permissions', 'documentation/pages',
+             'documentation/workspaces', 'users'
 
     let(:comedor) { documentation_workspaces(:comedor) }
     let(:comedor_recipes) { documentation_pages(:comedor_recipes) }
     let(:comedor_recipes_details) { documentation_pages(:comedor_recipes_details) }
     let(:headers) { { 'ACCEPT' => 'application/json' } }
-    let(:create_page_full_permission) do
-      Documentation::Permission.create(subject: @user, object: comedor, action: :full)
-    end
-
     let(:valid_attributes) do
       {
         title: 'Documenting stuff',
@@ -23,14 +20,6 @@ module Documentation
         content: '<h1>Stuff</h1>',
         parent_id: nil
       }
-    end
-
-    before(:all) do
-      @user = User.create(super_admin: true)
-    end
-
-    after(:all) do
-      User.destroy_all
     end
 
     describe 'GET /index' do
@@ -70,8 +59,6 @@ module Documentation
     end
 
     describe 'GET /edit' do
-      before { create_page_full_permission }
-
       it 'renders an existing page form' do
         get edit_workspace_page_url(comedor, comedor_recipes)
         expect(response).to be_successful
@@ -107,8 +94,6 @@ module Documentation
     end
 
     describe 'PATCH /update' do
-      before { create_page_full_permission }
-
       context 'with valid parameters' do
         it 'updates the requested page' do
           patch workspace_page_url(comedor, comedor_recipes),
@@ -134,8 +119,6 @@ module Documentation
     end
 
     describe 'DELETE /destroy' do
-      before { create_page_full_permission }
-
       it 'destroys the requested page' do
         expect do
           delete workspace_page_url(comedor, comedor_recipes_details)

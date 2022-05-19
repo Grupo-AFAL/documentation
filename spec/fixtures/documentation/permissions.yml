@@ -1,11 +1,6 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  subject: 
-  object: 
-  action: 
-
-two:
-  subject: 
-  object: 
-  action: 
+user_comedor:
+  subject: super_admin (User)
+  object: comedor (Documentation::Workspace)
+  action: full

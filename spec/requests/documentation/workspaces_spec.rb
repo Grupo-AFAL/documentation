@@ -6,18 +6,11 @@ module Documentation
   RSpec.describe '/workspaces', type: :request do
     include Engine.routes.url_helpers
 
-    fixtures 'documentation/workspaces', 'documentation/pages'
+    fixtures 'documentation/permissions', 'documentation/pages',
+             'documentation/workspaces', 'users'
 
     let(:comedor) { documentation_workspaces(:comedor) }
     let(:comedor_home_page) { documentation_pages(:comedor_home_page) }
-
-    before(:all) do
-      @user = User.create(super_admin: true)
-    end
-
-    after(:all) do
-      User.destroy_all
-    end
 
     describe 'GET /index' do
       it 'returns a list of worskpaces' do
