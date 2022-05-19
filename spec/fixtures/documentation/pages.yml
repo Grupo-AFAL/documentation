@@ -1,9 +1,17 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  title: MyString
-  description: MyString
+comedor_home_page:
+  title: Comedor Home Page
+  description: Comedor Home page description
+  workspace: comedor
 
-two:
-  title: MyString
-  description: MyString
+comedor_recipes:
+  title: My Recipes
+  description: Comedor recipes
+  workspace: comedor
+
+comedor_recipes_details:
+  title: My Recipes details
+  description: Comedor recipes
+  workspace: comedor
+  parent: comedor_recipes

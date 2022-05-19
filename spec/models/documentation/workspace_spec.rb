@@ -2,8 +2,13 @@
 
 require 'rails_helper'
 
-module Documentation
-  RSpec.describe Workspace, type: :model do
-    pending "add some examples to (or delete) #{__FILE__}"
+RSpec.describe Documentation::Workspace, type: :model do
+  context 'Creating workspace' do
+    it 'creates and links a home page' do
+      workspace = Documentation::Workspace.create(name: 'Prueba')
+
+      expect(workspace.home_page.title).to eql('Prueba Home page')
+      expect(workspace.home_page.workspace).to eql(workspace)
+    end
   end
 end

@@ -2,25 +2,40 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Images', type: :request do
-  describe 'GET /index' do
-    it 'returns http success' do
-      get '/page/images/index'
-      expect(response).to have_http_status(:success)
-    end
-  end
+module Documentation
+  RSpec.describe 'Images', type: :request do
+    include Engine.routes.url_helpers
 
-  describe 'GET /create' do
-    it 'returns http success' do
-      get '/page/images/create'
-      expect(response).to have_http_status(:success)
-    end
-  end
+    fixtures 'documentation/pages'
 
-  describe 'GET /destroy' do
-    it 'returns http success' do
-      get '/page/images/destroy'
-      expect(response).to have_http_status(:success)
+    let(:page) { documentation_pages(:comedor_home_page) }
+    let(:image_file) { fixture_file_upload('document.png', 'image/png') }
+
+    describe 'GET /index' do
+      it 'renders a list of images' do
+        get page_images_path(page)
+
+        expect(response).to have_http_status(:success)
+        expect(response.body).to include('Images')
+      end
+    end
+
+    describe 'GET /create' do
+      it 'creates a new image' do
+        post page_images_path(page), params: {
+          images: [image_file]
+        }
+        expect(response).to redirect_to(page_images_path(page))
+      end
+    end
+
+    describe 'GET /destroy' do
+      it 'destroys an image' do
+        page.images.attach(image_file)
+
+        delete page_image_path(page, page.images.first)
+        expect(response).to have_http_status(:success)
+      end
     end
   end
 end

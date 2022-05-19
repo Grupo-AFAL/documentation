@@ -28,9 +28,14 @@ gem 'debug', '>= 1.0.0'
 
 group :development, :test do
   gem 'data_migrate'
+  gem 'rspec-rails', '~> 5'
 end
 
 group :development do
   gem 'rubocop', '~> 1', require: false
   gem 'rubocop-rails', '~> 2'
+end
+
+group :test do
+  gem 'simplecov', require: false
 end

@@ -3,7 +3,16 @@
 /log/*.log
 /pkg/
 /tmp/
+
+/node_modules
+yarn-error.log
+yarn-debug.log*
+.yarn-integrity
+.env
+
+/coverage
+
 /spec/dummy/log/*.log
 /spec/dummy/storage/
 /spec/dummy/tmp/
-/node_modules
+/spec/dummy/public/

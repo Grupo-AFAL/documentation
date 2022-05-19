@@ -42,9 +42,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_05_13_194418) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "data_migrations", primary_key: "version", id: :string, force: :cascade do |t|
-  end
-
   create_table "documentation_pages", force: :cascade do |t|
     t.string "title"
     t.string "description"
