@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: e43a829e081517dbded1a905a2202cfc42da9867
+  revision: 2820ea3e90e6b8a1a735082221a7de115c7f32b3
   branch: main
   specs:
     bali_view_components (0.1.0)
