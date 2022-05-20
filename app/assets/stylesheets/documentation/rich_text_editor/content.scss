@@ -25,10 +25,32 @@
     list-style: disc outside;
     margin-left: 2em;
     margin-top: 1em;
+
+    ul {
+      list-style: circle outside;
+      margin-top: 0;
+
+      ul {
+        list-style: square outside;
+
+        ul {
+          list-style: disc outside;
+
+          ul {
+            list-style: circle outside;
+          }
+        }
+      }
+    }
   }
 
   li {
     display: list-item;
+    padding: 3px 2px;
+
+    p:not(:last-child) {
+      margin-bottom: 0;
+    }
   }
 
   ol {
