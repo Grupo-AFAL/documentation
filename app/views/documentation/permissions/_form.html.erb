@@ -1,0 +1,25 @@
+<%= form_with model: permission, url: workspace_permissions_path(@workspace),
+              id: "#{subject}_permission_form", class: 'permission_form', builder: FrontendHelpers::FormBuilder do |f| %>
+  <%= render Bali::Level::Component.new(class: 'is-align-items-start') do |c| %>
+    <%= c.level_left do |ll| %>
+      <%= ll.item do %>
+        <%= f.hidden_field :subject_type, value: subject %>
+
+        <div class="field">
+          <%= f.slim_select_field :subject_id, Documentation.collection(subject),
+            { include_blank: true, add_to_body: true },
+            select_class: 'is-fullwidth', control_class: 'mr-2' %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= c.level_right do |lr| %>
+      <%= lr.item do %>
+        <%= f.select_field :action, Documentation::Permission.actions.keys %>
+      <% end %>
+      <%= lr.item do %>
+        <%= f.submit 'Create', class: 'button is-primary' %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

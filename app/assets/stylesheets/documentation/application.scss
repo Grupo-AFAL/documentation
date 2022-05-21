@@ -67,7 +67,7 @@
 // @import 'sass/helpers/float';
 // @import 'sass/helpers/other';
 // @import 'sass/helpers/overflow';
-// @import 'sass/helpers/position';
+@import 'sass/helpers/position';
 @import 'sass/helpers/spacing';
 @import 'sass/helpers/typography';
 @import 'sass/helpers/visibility';
@@ -92,6 +92,7 @@
 @import 'rich_text_editor';
 @import 'page_menu';
 @import 'layout';
+@import 'permissions';
 
 // Bali Styles
 @import 'bali/dropdown/index';

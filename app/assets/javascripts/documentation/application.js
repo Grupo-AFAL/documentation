@@ -607,7 +607,7 @@
       var now2 = function() {
         return root.Date.now();
       };
-      function debounce3(func, wait, options) {
+      function debounce4(func, wait, options) {
         var lastArgs, lastThis, maxWait, result2, timerId, lastCallTime, lastInvokeTime = 0, leading = false, maxing = false, trailing = true;
         if (typeof func != "function") {
           throw new TypeError(FUNC_ERROR_TEXT);
@@ -696,7 +696,7 @@
           leading = "leading" in options ? !!options.leading : leading;
           trailing = "trailing" in options ? !!options.trailing : trailing;
         }
-        return debounce3(func, wait, {
+        return debounce4(func, wait, {
           "leading": leading,
           "maxWait": wait,
           "trailing": trailing
@@ -1355,6 +1355,139 @@
         var i, n;
       });
       slimselect_min_default = exports.SlimSelect;
+    }
+  });
+
+  // node_modules/lodash.debounce/index.js
+  var require_lodash2 = __commonJS({
+    "node_modules/lodash.debounce/index.js"(exports2, module2) {
+      var FUNC_ERROR_TEXT = "Expected a function";
+      var NAN = 0 / 0;
+      var symbolTag = "[object Symbol]";
+      var reTrim = /^\s+|\s+$/g;
+      var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+      var reIsBinary = /^0b[01]+$/i;
+      var reIsOctal = /^0o[0-7]+$/i;
+      var freeParseInt = parseInt;
+      var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
+      var freeSelf = typeof self == "object" && self && self.Object === Object && self;
+      var root = freeGlobal || freeSelf || Function("return this")();
+      var objectProto = Object.prototype;
+      var objectToString = objectProto.toString;
+      var nativeMax = Math.max;
+      var nativeMin = Math.min;
+      var now2 = function() {
+        return root.Date.now();
+      };
+      function debounce4(func, wait, options) {
+        var lastArgs, lastThis, maxWait, result2, timerId, lastCallTime, lastInvokeTime = 0, leading = false, maxing = false, trailing = true;
+        if (typeof func != "function") {
+          throw new TypeError(FUNC_ERROR_TEXT);
+        }
+        wait = toNumber(wait) || 0;
+        if (isObject2(options)) {
+          leading = !!options.leading;
+          maxing = "maxWait" in options;
+          maxWait = maxing ? nativeMax(toNumber(options.maxWait) || 0, wait) : maxWait;
+          trailing = "trailing" in options ? !!options.trailing : trailing;
+        }
+        function invokeFunc(time) {
+          var args = lastArgs, thisArg = lastThis;
+          lastArgs = lastThis = void 0;
+          lastInvokeTime = time;
+          result2 = func.apply(thisArg, args);
+          return result2;
+        }
+        function leadingEdge(time) {
+          lastInvokeTime = time;
+          timerId = setTimeout(timerExpired, wait);
+          return leading ? invokeFunc(time) : result2;
+        }
+        function remainingWait(time) {
+          var timeSinceLastCall = time - lastCallTime, timeSinceLastInvoke = time - lastInvokeTime, result3 = wait - timeSinceLastCall;
+          return maxing ? nativeMin(result3, maxWait - timeSinceLastInvoke) : result3;
+        }
+        function shouldInvoke(time) {
+          var timeSinceLastCall = time - lastCallTime, timeSinceLastInvoke = time - lastInvokeTime;
+          return lastCallTime === void 0 || timeSinceLastCall >= wait || timeSinceLastCall < 0 || maxing && timeSinceLastInvoke >= maxWait;
+        }
+        function timerExpired() {
+          var time = now2();
+          if (shouldInvoke(time)) {
+            return trailingEdge(time);
+          }
+          timerId = setTimeout(timerExpired, remainingWait(time));
+        }
+        function trailingEdge(time) {
+          timerId = void 0;
+          if (trailing && lastArgs) {
+            return invokeFunc(time);
+          }
+          lastArgs = lastThis = void 0;
+          return result2;
+        }
+        function cancel() {
+          if (timerId !== void 0) {
+            clearTimeout(timerId);
+          }
+          lastInvokeTime = 0;
+          lastArgs = lastCallTime = lastThis = timerId = void 0;
+        }
+        function flush2() {
+          return timerId === void 0 ? result2 : trailingEdge(now2());
+        }
+        function debounced() {
+          var time = now2(), isInvoking = shouldInvoke(time);
+          lastArgs = arguments;
+          lastThis = this;
+          lastCallTime = time;
+          if (isInvoking) {
+            if (timerId === void 0) {
+              return leadingEdge(lastCallTime);
+            }
+            if (maxing) {
+              timerId = setTimeout(timerExpired, wait);
+              return invokeFunc(lastCallTime);
+            }
+          }
+          if (timerId === void 0) {
+            timerId = setTimeout(timerExpired, wait);
+          }
+          return result2;
+        }
+        debounced.cancel = cancel;
+        debounced.flush = flush2;
+        return debounced;
+      }
+      function isObject2(value) {
+        var type = typeof value;
+        return !!value && (type == "object" || type == "function");
+      }
+      function isObjectLike(value) {
+        return !!value && typeof value == "object";
+      }
+      function isSymbol(value) {
+        return typeof value == "symbol" || isObjectLike(value) && objectToString.call(value) == symbolTag;
+      }
+      function toNumber(value) {
+        if (typeof value == "number") {
+          return value;
+        }
+        if (isSymbol(value)) {
+          return NAN;
+        }
+        if (isObject2(value)) {
+          var other = typeof value.valueOf == "function" ? value.valueOf() : value;
+          value = isObject2(other) ? other + "" : other;
+        }
+        if (typeof value != "string") {
+          return value === 0 ? value : +value;
+        }
+        value = value.replace(reTrim, "");
+        var isBinary = reIsBinary.test(value);
+        return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
+      }
+      module2.exports = debounce4;
     }
   });
 
@@ -11500,6 +11633,20 @@
     allowDeselectOption: Boolean
   });
   __publicField(SlimSelectController, "targets", ["select", "selectAllButton", "deselectAllButton"]);
+
+  // node_modules/frontend-helpers/javascript/src/controllers/submit-on-change-controller.js
+  var import_lodash = __toESM(require_lodash2());
+  var SubmitOnChangeController = class extends Controller {
+    connect() {
+      if (this.hasDelayValue && this.delayValue > 0) {
+        this.submit = (0, import_lodash.default)(this.submit, this.delayValue);
+      }
+    }
+    async submit() {
+      this.element.requestSubmit();
+    }
+  };
+  __publicField(SubmitOnChangeController, "values", { delay: Number });
 
   // node_modules/bali-view-components/app/components/bali/dropdown/index.js
   var DropdownController = class extends Controller {
@@ -25968,7 +26115,7 @@ img.ProseMirror-separator {
   }
 
   // app/javascript/documentation/controllers/rich_text_editor_controller.js
-  var import_lodash2 = __toESM(require_lodash());
+  var import_lodash3 = __toESM(require_lodash());
 
   // node_modules/@tiptap/extension-document/dist/tiptap-extension-document.esm.js
   var Document = Node4.create({
@@ -28280,7 +28427,7 @@ img.ProseMirror-separator {
   }
 
   // node_modules/tippy.js/node_modules/@popperjs/core/lib/utils/debounce.js
-  function debounce(fn2) {
+  function debounce2(fn2) {
     var pending;
     return function() {
       if (!pending) {
@@ -28519,7 +28666,7 @@ img.ProseMirror-separator {
             }
           }
         },
-        update: debounce(function() {
+        update: debounce2(function() {
           return new Promise(function(resolve14) {
             instance.forceUpdate();
             resolve14(state);
@@ -28603,7 +28750,7 @@ img.ProseMirror-separator {
   function invokeWithArgsOrReturn(value, args) {
     return typeof value === "function" ? value.apply(void 0, args) : value;
   }
-  function debounce2(fn2, ms) {
+  function debounce3(fn2, ms) {
     if (ms === 0) {
       return fn2;
     }
@@ -29081,7 +29228,7 @@ img.ProseMirror-separator {
     var currentTransitionEndListener;
     var onFirstUpdate;
     var listeners = [];
-    var debouncedOnMouseMove = debounce2(onMouseMove, props.interactiveDebounce);
+    var debouncedOnMouseMove = debounce3(onMouseMove, props.interactiveDebounce);
     var currentTarget;
     var id = idCounter++;
     var popperInstance = null;
@@ -29609,7 +29756,7 @@ img.ProseMirror-separator {
       addListeners();
       if (prevProps.interactiveDebounce !== nextProps.interactiveDebounce) {
         cleanupInteractiveMouseListeners();
-        debouncedOnMouseMove = debounce2(onMouseMove, nextProps.interactiveDebounce);
+        debouncedOnMouseMove = debounce3(onMouseMove, nextProps.interactiveDebounce);
       }
       if (prevProps.triggerTarget && !nextProps.triggerTarget) {
         normalizeToArray(prevProps.triggerTarget).forEach(function(node5) {
@@ -38448,7 +38595,7 @@ img.ProseMirror-separator {
   });
 
   // app/javascript/documentation/controllers/rich_text_editor/suggestions/popup_list_component.js
-  var import_lodash = __toESM(require_lodash());
+  var import_lodash2 = __toESM(require_lodash());
   var createRoot = ({ className } = {}) => {
     const div2 = document.createElement("div");
     div2.classList.add("dropdown-content", className);
@@ -38486,7 +38633,7 @@ img.ProseMirror-separator {
       this.items = items;
       this.command = command2;
     }
-    throttledUpdateActiveItem = (0, import_lodash.default)(this.updateActiveItem, 100);
+    throttledUpdateActiveItem = (0, import_lodash2.default)(this.updateActiveItem, 100);
     selectItem(index3) {
       const { url, title, command: command2 } = this.items[index3];
       this.command({ id: url, url, label: title, command: command2 });
@@ -41370,7 +41517,7 @@ img.ProseMirror-separator {
         return;
       this.outputTarget.value = editor.getHTML();
     };
-    throttledUpdate = (0, import_lodash2.default)(this.onUpdate, 1e3);
+    throttledUpdate = (0, import_lodash3.default)(this.onUpdate, 1e3);
     runCommand(name, attributes) {
       this.editor.chain().focus()[name](attributes).run();
     }
@@ -41416,6 +41563,7 @@ img.ProseMirror-separator {
   application.register("notification", NotificationController);
   application.register("rich-text-editor", RichTextEditorController);
   application.register("slim-select", SlimSelectController);
+  application.register("submit-on-change", SubmitOnChangeController);
   application.register("tabs", TabsController);
   application.register("tree-view-item", TreeViewItemController);
 })();

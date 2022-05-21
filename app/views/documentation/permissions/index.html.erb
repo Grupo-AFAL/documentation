@@ -1,15 +1,15 @@
-<table class="table is-fullwidth">
-  <% @permissions.group_by(&:subject_type).each do |subject_type, permissions| %>
-    <tr>
-      <th><%= subject_type %></th>
-      <th></th>
-    </tr>
+<% Documentation.permission_subjects.each do |subject| %>
+  <h4 class="title is-4"><%= subject.pluralize %></h4>
 
-    <% permissions.each do |permission| %>
-      <tr>
-        <td><%= permission.display_name %></td>
-        <td><%= permission.action %></td>
-      </tr>
+  <%= tag.div id: dom_id(@workspace, "subject_#{subject}") do %>
+    <% Array(@grouped_permissions[subject]).each do |permission| %>
+      <%= render permission %>
     <% end %>
   <% end %>
-</table>
+
+  <hr />
+
+  <%= render 'form', permission: @permission, subject: subject %>
+
+  <hr />
+<% end %>

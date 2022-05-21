@@ -3,7 +3,7 @@ Documentation::Engine.routes.draw do
 
   resources :workspaces do
     resources :pages
-    resources :permissions, only: %i[index]
+    resources :permissions, only: %i[index create update destroy]
     resources :page_transfers, only: %i[update]
   end
 
