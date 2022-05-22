@@ -27,7 +27,7 @@
             <%= icon_tag('ellipsis-h') %>
           <% end %>
 
-          <% if policy(Documentation::Permission).index? %>
+          <% if policy(workspace).permissions? %>
             <%= c.item(href: workspace_permissions_path(workspace), data: { action: 'modal#open' }) do %>
               Manage permissions
             <% end %>

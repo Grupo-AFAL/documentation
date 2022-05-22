@@ -17,5 +17,9 @@ module Documentation
     def show?
       true
     end
+
+    def permissions?
+      user.super_admin?
+    end
   end
 end
