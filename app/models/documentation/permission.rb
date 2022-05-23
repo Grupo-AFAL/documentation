@@ -7,6 +7,8 @@ module Documentation
 
     enum :action, read: 0, comment: 1, write: 2, full: 3
 
+    validates :subject_id, presence: true
+
     def can_edit?
       write? || full?
     end

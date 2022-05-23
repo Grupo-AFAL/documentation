@@ -1,0 +1,13 @@
+<% if @permission.valid? %>
+  <%= turbo_stream.append(
+      dom_id(@workspace, "subject_#{@permission.subject.class.name}"),
+      @permission) %>
+<% end %>
+
+<%= turbo_stream.replace(
+    "#{@subject_type}_permission_form",
+    partial: 'documentation/permissions/form',
+    locals: {
+      permission: @new_permission || @permission,
+      subject: @subject_type
+    }) %>

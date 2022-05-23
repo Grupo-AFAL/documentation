@@ -17,13 +17,21 @@
 <div class="columns is-multiline">
   <% @workspaces.each do |workspace| %>
     <div class="column is-one-quarter">
-      <div class="box is-fullheight">
-        <h1 class="title is-3">
+      <div class="box is-fullheight is-relative">
+        <h1 class="title is-3 pr-5">
           <%= link_to workspace.name, workspace_path(workspace) %>
         </h1>
 
-        <% if policy(Documentation::Permission).index? %>
-          <%= link_to 'Permissions', workspace_permissions_path(workspace), data: { action: 'modal#open' } %>
+        <%= render Bali::Dropdown::Component.new(class: 'is-right is-top-right') do |c| %>
+          <%= c.trigger do %>
+            <%= icon_tag('ellipsis-h') %>
+          <% end %>
+
+          <% if policy(workspace).permissions? %>
+            <%= c.item(href: workspace_permissions_path(workspace), data: { action: 'modal#open' }) do %>
+              Manage permissions
+            <% end %>
+          <% end %>
         <% end %>
       </div>
     </div>

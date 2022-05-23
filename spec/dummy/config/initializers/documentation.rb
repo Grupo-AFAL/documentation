@@ -2,6 +2,7 @@
 
 Documentation.config do |config|
   config.add_permission_subject('User',
-                                member: ->(subject, user) { subject == user },
-                                display_name: ->(subject) { subject.name })
+                                is_member: ->(subject, user) { subject == user },
+                                display_name: ->(subject) { subject.name },
+                                collection: -> { User.all.map { |u| [u.name, u.id] } })
 end

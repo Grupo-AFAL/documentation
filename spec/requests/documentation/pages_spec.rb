@@ -12,7 +12,6 @@ module Documentation
     let(:comedor) { documentation_workspaces(:comedor) }
     let(:comedor_recipes) { documentation_pages(:comedor_recipes) }
     let(:comedor_recipes_details) { documentation_pages(:comedor_recipes_details) }
-    let(:headers) { { 'ACCEPT' => 'application/json' } }
     let(:valid_attributes) do
       {
         title: 'Documenting stuff',
@@ -24,7 +23,7 @@ module Documentation
 
     describe 'GET /index' do
       it 'returns a JSON list of pages' do
-        get workspace_pages_url(comedor), headers: headers
+        get workspace_pages_url(comedor), headers: json_headers
         expect(response).to be_successful
 
         expect(json_body.size).to eql(3)
@@ -34,7 +33,7 @@ module Documentation
       end
 
       it 'returns a list of matching pages' do
-        get workspace_pages_url(comedor), params: { title: 'Recipes' }, headers: headers
+        get workspace_pages_url(comedor), params: { title: 'Recipes' }, headers: json_headers
 
         expect(json_body.size).to eql(2)
         expect(json_body[0]).to include('title' => 'My Recipes')
