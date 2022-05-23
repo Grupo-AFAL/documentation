@@ -17,10 +17,9 @@ module Documentation
 
     def create
       @permission = @workspace.permissions.build(permission_params)
-      
-      if @permission.save
-        @new_permission = @workspace.permissions.build
-      end
+
+      # Initialize a new permission to replace the permission form with a blank permission
+      @new_permission = @workspace.permissions.build if @permission.save
 
       @subject_type = permission_params[:subject_type]
     end

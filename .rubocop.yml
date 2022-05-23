@@ -74,6 +74,13 @@ Rails/HasAndBelongsToMany:
 Rails/I18nLocaleTexts:
   Enabled: false
 
+# Disabled because sometimes we need the validation on the foreign_key instead of the 
+# association to display errors correctly on the form
+# E.g. belongs_to :subject already has a validation, but it doesn't add the error to the form
+# unless you add a validation to subject_id.
+Rails/RedundantPresenceValidationOnBelongsTo:
+  Enabled: false
+
 Metrics/BlockLength:
   IgnoredMethods: ['describe', 'context', 'it', 'before', 'included', 'configure']
   Exclude:
