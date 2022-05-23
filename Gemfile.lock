@@ -8,6 +8,15 @@ GIT
       view_component (>= 2.0.0, < 3.0)
       view_component-contrib
 
+GIT
+  remote: https://github.com/Grupo-AFAL/frontend-helpers.git
+  revision: b0f0ea6801d4fbcea32fc8b70f7fb07f9c9e3f93
+  branch: main
+  specs:
+    frontend_helpers (0.6.0)
+      rails (> 6.1)
+      ransack
+
 PATH
   remote: .
   specs:
@@ -20,13 +29,6 @@ PATH
       turbo-rails (>= 1.0.1)
       view_component (>= 2.0.0, < 3.0)
       view_component-contrib
-
-PATH
-  remote: /Users/fede/code/grupoafal/frontend-helpers
-  specs:
-    frontend_helpers (0.5.29)
-      rails (> 6.1)
-      ransack
 
 GEM
   remote: https://rubygems.org/
