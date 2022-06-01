@@ -1,9 +1,9 @@
 <%= render Bali::Level::Component.new(id: dom_id(permission)) do |c| %>
-  <%= c.level_left do |ll| %>
+  <%= c.left do |ll| %>
     <%= ll.item { permission.display_name } %>
   <% end %>
 
-  <%= c.level_right do |lr| %>
+  <%= c.right do |lr| %>
     <%= lr.item do %>
       <%= auto_submit_select(
           record: permission,

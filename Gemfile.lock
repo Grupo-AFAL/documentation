@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: d9a8985a8495f8e395803d922220f6b399f7921c
-  branch: main
+  revision: 0b0a8b8c74941d511e38c91a5b5ae02bb7487e4c
+  branch: migrate-to-lookbook
   specs:
     bali_view_components (0.1.0)
       rails (>= 7.0.2.3)

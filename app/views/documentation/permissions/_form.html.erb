@@ -1,7 +1,7 @@
 <%= form_with model: permission, url: workspace_permissions_path(@workspace),
               id: "#{subject}_permission_form", class: 'permission_form', builder: FrontendHelpers::FormBuilder do |f| %>
   <%= render Bali::Level::Component.new(class: 'is-align-items-start') do |c| %>
-    <%= c.level_left do |ll| %>
+    <%= c.left do |ll| %>
       <%= ll.item do %>
         <%= f.hidden_field :subject_type, value: subject %>
 
@@ -13,7 +13,7 @@
       <% end %>
     <% end %>
 
-    <%= c.level_right do |lr| %>
+    <%= c.right do |lr| %>
       <%= lr.item do %>
         <%= f.select_field :action, Documentation::Permission.actions.keys %>
       <% end %>
