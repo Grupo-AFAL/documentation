@@ -15,7 +15,7 @@
 
     <hr class="my-4" />
 
-    <%= render Bali::TreeView::Component.new do |c| %>
+    <%= render Bali::TreeView::Component.new(current_path: request.path) do |c| %>
       <% pages.each do |page| %>
         <%= c.item(name: page.title, path: workspace_page_path(@workspace, page)) do |sub_item| %>
 

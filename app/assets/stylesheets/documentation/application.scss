@@ -47,17 +47,17 @@
 @import 'sass/form/tools';
 
 @import 'sass/components/breadcrumb';
-// @import 'sass/components/card';
-// @import 'sass/components/dropdown';
+@import 'sass/components/card';
+@import 'sass/components/dropdown';
 @import 'sass/components/level';
 // @import 'sass/components/media';
 // @import 'sass/components/menu';
 // @import 'sass/components/message';
-// @import 'sass/components/modal';
+@import 'sass/components/modal';
 // @import 'sass/components/navbar';
 // @import 'sass/components/pagination';
 // @import 'sass/components/panel';
-// @import 'sass/components/tabs';
+@import 'sass/components/tabs';
 
 @import 'sass/grid/columns';
 // @import 'sass/grid/tiles';
@@ -95,7 +95,8 @@
 @import 'permissions';
 
 // Bali Styles
-@import 'bali/dropdown/index';
+@import 'bali/card/index';
+@import 'bali/help_tip/index';
 @import 'bali/image_grid/index';
 @import 'bali/modal/index';
 @import 'bali/tabs/index';
