@@ -74,4 +74,21 @@ RSpec.describe Documentation::Page, type: :model do
       end
     end
   end
+
+  describe '#latest_updated_date' do
+    let(:date_time) { Time.zone.now }
+    let(:formatted_date_time) { date_time.strftime('%Y-%m-%d %I:%M%p') }
+
+    it 'returns the latest updated date' do
+      comedor_home_page.update!(updated_at: date_time)
+
+      expect(comedor_home_page.latest_updated_date).to eql(formatted_date_time)
+    end
+  end
+
+  describe '#title_with_ancestors' do
+    it 'returns the title with ancestors' do
+      expect(comedor_recipes_details.title_with_ancestors).to eql('My Recipes > My Recipes details')
+    end
+  end
 end

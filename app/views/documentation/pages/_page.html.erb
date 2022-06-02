@@ -4,6 +4,7 @@
     <p class="subtitle"><%= page.description %></p>
   </div>
 
+  <small>Fecha de última actualización: <%= page.latest_updated_date %></small>
   <hr/>
 
   <% if policy(page).edit? || policy(page).destroy? %>
