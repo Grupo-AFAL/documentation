@@ -20,4 +20,4 @@
 
 <%= render "form", page: @page %>
 
-<small>Fecha de última actualización: <%= @page.latest_update_date %></small>
+<small><%= t('activerecord.attributes.documentation/page.latest_update_date') %>: <%= l(page.updated_at, format: :date_twelve_hours) %></small>

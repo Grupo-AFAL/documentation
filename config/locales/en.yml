@@ -1,0 +1,10 @@
+en:
+  hello: 'hola'
+  activerecord:
+    attributes:
+      documentation/page:
+        title: Título
+        description: Descripción
+        content: Contenido
+    models:
+      documentation/page: Página

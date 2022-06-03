@@ -1,0 +1,11 @@
+es:
+  hello: 'hi'
+  activerecord:
+    attributes:
+      documentation/page:
+        title: Título
+        description: Descripción
+        content: Contenido
+        latest_update_date: Fecha de última actualización
+    models:
+      documentation/page: Página
