@@ -4,5 +4,4 @@ en:
     am: am
     pm: pm
     formats:
-      default: '%a, %d de %b de %Y a las %H:%M:%S %Z' # jue, 09 de sep de 2021 a las 12:37:25 PDT
       date_twelve_hours: '%Y-%m-%d %I:%M%p' # 2022-05-11 02:33PM
