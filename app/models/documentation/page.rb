@@ -38,5 +38,12 @@ module Documentation
     def previous_workspace
       Workspace.find(documentation_workspace_id_was)
     end
+
+    def title_with_ancestors
+      return title if parent.blank?
+
+      parents = ancestors.reverse.map(&:title).join(' > ')
+      "#{parents} > #{title}"
+    end
   end
 end

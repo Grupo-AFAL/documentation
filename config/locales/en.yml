@@ -1,0 +1,13 @@
+en:
+  activerecord:
+    attributes:
+      documentation/page:
+        title: Title
+        description: Description
+        content: Content
+    models:
+      documentation/page: Page
+  documentation:
+    page:
+      select_parent_page: Select parent page
+      latest_update_date: Last update date

@@ -74,4 +74,10 @@ RSpec.describe Documentation::Page, type: :model do
       end
     end
   end
+
+  describe '#title_with_ancestors' do
+    it 'returns the title with ancestors' do
+      expect(comedor_recipes_details.title_with_ancestors).to eql('My Recipes > My Recipes details')
+    end
+  end
 end

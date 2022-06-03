@@ -4,6 +4,8 @@
     <p class="subtitle"><%= page.description %></p>
   </div>
 
+  <small><%= t('documentation.page.latest_update_date') %>: <%= l(page.updated_at, format: :date_twelve_hours) %></small>
+
   <hr/>
 
   <% if policy(page).edit? || policy(page).destroy? %>

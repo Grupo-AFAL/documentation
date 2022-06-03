@@ -17,7 +17,7 @@ module Documentation
     def new
       @parent = @workspace.pages.find(params[:parent_id]) if params[:parent_id]
       @page = authorize @workspace.pages.build(parent_id: @parent&.id)
-      @pages = @workspace.pages
+      @pages = @workspace.pages.includes(:parent)
     end
 
     def edit

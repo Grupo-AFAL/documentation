@@ -19,3 +19,5 @@
 </div>
 
 <%= render "form", page: @page %>
+
+<small><%= t('documentation.page.latest_update_date') %>: <%= l(@page.updated_at, format: :date_twelve_hours) %></small>

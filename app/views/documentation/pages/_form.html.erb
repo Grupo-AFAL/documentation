@@ -2,7 +2,7 @@
   <%= render 'layouts/documentation/target_errors', target: page %>
 
   <% unless page.home_page? %>
-    <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title, p.id] }, include_blank: 'Select page parent', label: false %>
+    <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title, p.id] }, include_blank: t('documentation.page.select_parent_page'), label: false %>
   <% end %>
 
   <%= form.text_field_group :title, label: false, placeholder: 'Title', class: 'is-large' %>
