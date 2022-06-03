@@ -5,6 +5,9 @@ es:
         title: Título
         description: Descripción
         content: Contenido
-        latest_update_date: Fecha de última actualización
     models:
       documentation/page: Página
+  documentation:
+    page:
+      select_parent_page: Selecciona página principal
+      latest_update_date: Fecha de última actualización
