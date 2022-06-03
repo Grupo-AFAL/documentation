@@ -1,10 +1,10 @@
 en:
-  hello: 'hola'
   activerecord:
     attributes:
       documentation/page:
-        title: Título
-        description: Descripción
-        content: Contenido
+        title: Title
+        description: Description
+        content: Content
+        latest_update_date: Last update date
     models:
-      documentation/page: Página
+      documentation/page: Page

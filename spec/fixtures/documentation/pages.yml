@@ -9,6 +9,7 @@ comedor_recipes:
   title: My Recipes
   description: Comedor recipes
   workspace: comedor
+  updated_at: <%= Time.zone.now %>
 
 comedor_recipes_details:
   title: My Recipes details

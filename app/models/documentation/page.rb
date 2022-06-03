@@ -39,10 +39,6 @@ module Documentation
       Workspace.find(documentation_workspace_id_was)
     end
 
-    def latest_update_date
-      updated_at.strftime('%Y-%m-%d %I:%M%p')
-    end
-
     def title_with_ancestors
       return title if parent.blank?
 

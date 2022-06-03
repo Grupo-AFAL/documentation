@@ -1,5 +1,4 @@
 es:
-  hello: 'hi'
   activerecord:
     attributes:
       documentation/page:

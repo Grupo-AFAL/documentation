@@ -47,6 +47,8 @@ module Documentation
         expect(response).to be_successful
         expect(response.body).to include(comedor_recipes.title)
         expect(response.body).to include(comedor_recipes.description)
+        expect(response.body).to include(I18n.l(comedor_recipes.updated_at,
+                                                format: :date_twelve_hours))
       end
     end
 
