@@ -39,7 +39,7 @@ module Documentation
       Workspace.find(documentation_workspace_id_was)
     end
 
-    def latest_updated_date
+    def latest_update_date
       updated_at.strftime('%Y-%m-%d %I:%M%p')
     end
 
