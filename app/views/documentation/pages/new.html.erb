@@ -1,7 +1,7 @@
 <%= form_with(model: [@workspace, @page]) do |form| %>
   <%= render 'layouts/documentation/target_errors', target: @page %>
 
-  <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title_with_ancestors, p.id] }, include_blank: "#{t('documentation.page.select_parent_page')}", label: false, add_to_body: true %>
+  <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title_with_ancestors, p.id] }, include_blank: t('documentation.page.select_parent_page'), label: false, add_to_body: true %>
   <%= form.text_field_group :title, label: false, placeholder: 'Title', class: 'is-large' %>
   <%= form.text_field_group :description, label: false, placeholder: 'Description' %>
 
