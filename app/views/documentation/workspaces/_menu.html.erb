@@ -3,7 +3,7 @@
     <%= render Bali::Dropdown::Component.new(class: 'workspace-switch vh-centered') do |c| %>
       <%= c.trigger(class: 'has-text-weight-bold vh-centered') do %>
         <span><%= @workspace.name %></span>
-        <%= icon_tag('chevron-down') %>
+        <%= render Bali::Icon::Component.new('chevron-down') %>
       <% end %>
 
       <% @workspaces.each do |workspace| %>
@@ -43,7 +43,7 @@
       <%= link_to new_workspace_page_path(@workspace),
           class: 'button is-primary is-small vh-centered m-2',
           data: { action: 'modal#open' } do %>
-        <%= icon_tag('plus') %>
+        <%= render Bali::Icon::Component.new('plus') %>
         <span>New page</span>
       <% end %>
     <% end %>
@@ -52,7 +52,7 @@
 
     <div class="vh-centered">
       <%= link_to main_app.root_path, class: 'vh-centered' do %>
-        <%= icon_tag('arrow-left') %>
+        <%= render Bali::Icon::Component.new('arrow-left') %>
         <span>Back to main App</span>
       <% end %>
     </div>

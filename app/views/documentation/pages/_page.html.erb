@@ -17,7 +17,7 @@
 
         <%= render Bali::Dropdown::Component.new do |c| %>
           <%= c.trigger do %>
-            <%= icon_tag('arrow-right') %>
+            <%= render Bali::Icon::Component.new('arrow-right') %>
             <span>Transfer to another workspace</span>
           <% end %>
 
