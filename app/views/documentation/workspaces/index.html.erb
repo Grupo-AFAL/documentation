@@ -24,7 +24,7 @@
 
         <%= render Bali::Dropdown::Component.new(class: 'is-right is-top-right') do |c| %>
           <%= c.trigger do %>
-            <%= icon_tag('ellipsis-h') %>
+            <%= render Bali::Icon::Component.new('ellipsis-h') %>
           <% end %>
 
           <% if policy(workspace).permissions? %>
@@ -42,7 +42,8 @@
 
 <div>
   <%= link_to main_app.root_path, class: 'vh-centered inline' do %>
-    <%= icon_tag('arrow-left') %>
+
+    <%= render Bali::Icon::Component.new('arrow-left') %>
     <span>Back to main App</span>
   <% end %>
 </div>

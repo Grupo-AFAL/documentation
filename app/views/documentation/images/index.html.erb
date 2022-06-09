@@ -17,7 +17,7 @@
         <%= image_tag main_app.url_for(image.variant(:thumb)) %>
 
         <% img.footer(class: 'p-2') do %>
-          <%= link_to icon_tag('trash'), page_image_path(@page, image),
+          <%= link_to render(Bali::Icon::Component.new('trash')), page_image_path(@page, image),
               class: 'button is-danger is-small', 'data-turbo-method' => :delete, data: { confirm: 'Are you sure?' } %>
         <% end %>
       <% end %>

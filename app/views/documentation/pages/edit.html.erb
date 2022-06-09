@@ -4,7 +4,7 @@
   <div class="level-left">
     <nav class="breadcrumb" aria-label="breadcrumbs">
       <ul>
-        <li><%= link_with_icon "Cancel", 'arrow-back', workspace_page_path(@workspace, @page) %></li>
+        <li><%= link_with_icon "Cancel", 'chevron-left', workspace_page_path(@workspace, @page) %></li>
       </ul>
     </nav>
   </div>
@@ -12,7 +12,7 @@
   <div class="level-right">
     <%= link_to page_images_path(@page), class: 'button is-primary',
         data: { action: 'modal#open', 'wrapper-class': 'extra-wide' } do %>
-      <%= icon_tag('image') %>
+      <%= render Bali::Icon::Component.new('image') %>
       <span>Images</span>
     <% end %>
   </div>

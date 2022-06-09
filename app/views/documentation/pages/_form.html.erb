@@ -21,7 +21,7 @@
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'nodeSelect'}) do |c| %>
         <% c.trigger(class: 'toolbar-link', data: { action: 'rich-text-editor#openNodeSelect' }) do %>
           <span class="text" data-rich-text-editor-target="nodeSelectTrigger">Text</span>
-          <%= icon_tag('chevron-down', class: 'dropdown-icon') %>
+          <%= render Bali::Icon::Component.new('chevron-down', class: 'dropdown-icon') %>
         <% end %>
 
         <%= c.item(class: 'text', data: { action: 'rich-text-editor#setParagraph', 'rich-text-editor-target': 'text' }) { 'Text' } %>
@@ -36,7 +36,7 @@
 
       <%= render Bali::Dropdown::Component.new(close_on_click: false, data: { 'rich-text-editor-target': 'linkPanel' }) do |c| %>
         <% c.trigger(class: 'toolbar-link mark link', data: { action: 'rich-text-editor#openLinkPanel', 'rich-text-editor-target': 'link' }) do %>
-          <%= icon_tag('link') %>
+          <%= render Bali::Icon::Component.new('link') %>
         <% end %>
 
         <div class="link-panel">
@@ -66,7 +66,7 @@
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'imagePanel' }) do |c| %>
         <% c.trigger(class: 'toolbar-link', data: { action: 'rich-text-editor#toggleImagePanel' }) do %>
           <div class="is-flex is-align-items-center">
-            <%= icon_tag('image') %>
+            <%= render Bali::Icon::Component.new('image') %>
           </div>
         <% end %>
 
@@ -78,14 +78,14 @@
 
         <%= link_to page_images_path(@page), class: 'button is-primary is-small',
             data: { action: 'modal#open rich-text-editor#hideMenu', 'wrapper-class': 'extra-wide' } do %>
-          <%= icon_tag('image') %>
+          <%= render Bali::Icon::Component.new('image') %>
           <span>Upload Images</span>
         <% end %>
       <% end %>
 
       <%= render Bali::Dropdown::Component.new(data: { 'rich-text-editor-target': 'tablePanel' }) do |c| %>
         <% c.trigger(class: 'toolbar-link', data: { action: 'rich-text-editor#openTablePanel' }) do %>
-          <%= icon_tag('table') %>
+          <%= render Bali::Icon::Component.new('table') %>
         <% end %>
 
         <%= c.item(data: { action: 'rich-text-editor#insertTable' }) { 'Insert Table' } %>
@@ -98,16 +98,16 @@
       <% end %>
 
       <a class="toolbar-link mark bold" data-action="rich-text-editor#toggleBold" data-rich-text-editor-target="bold">
-        <%= icon_tag('bold') %>
+        <%= render Bali::Icon::Component.new('bold') %>
       </a>
       <a class="toolbar-link mark italic" data-action="rich-text-editor#toggleItalic" data-rich-text-editor-target="italic">
-        <%= icon_tag('italic') %>
+        <%= render Bali::Icon::Component.new('italic') %>
       </a>
       <a class="toolbar-link mark underline" data-action="rich-text-editor#toggleUnderline" data-rich-text-editor-target="underline">
-        <%= icon_tag('underline') %>
+        <%= render Bali::Icon::Component.new('underline') %>
       </a>
       <a class="toolbar-link mark strike" data-action="rich-text-editor#toggleStrike" data-rich-text-editor-target="strike">
-        <%= icon_tag('strikethrough') %>
+        <%= render Bali::Icon::Component.new('strikethrough') %>
       </a>
     </div>
 

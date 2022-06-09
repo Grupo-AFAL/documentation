@@ -13,7 +13,7 @@
     <% end %>
 
     <%= lr.item do %>
-      <%= link_to icon_tag('trash'), workspace_permission_path(@workspace, permission),
+      <%= link_to render(Bali::Icon::Component.new('trash')), workspace_permission_path(@workspace, permission),
         data: { 'turbo-method' => :delete }, class: 'has-text-danger' %>
     <% end %>
   <% end %>
