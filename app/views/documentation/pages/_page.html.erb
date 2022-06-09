@@ -11,7 +11,7 @@
   <% if policy(page).edit? || policy(page).destroy? %>
     <div>
       <% if policy(page).edit? %>
-        <%= link_with_icon "Edit", 'edit', edit_workspace_page_path(@workspace, page) %>
+        <%= link_to render(Bali::Icon::Component.new('edit')) + 'Edit', edit_workspace_page_path(@workspace, page) %>
 
         |
 
@@ -36,8 +36,8 @@
       <% if policy(page).destroy? %>
         |
 
-        <%= link_with_icon "Delete", 'trash', workspace_page_path(@workspace, page), class: 'has-text-danger',
-        data: { 'turbo-confirm' => '¿Estás seguro?', 'turbo-method' => :delete } %>
+        <%= link_to render(Bali::Icon::Component.new('trash')) + 'Delete', workspace_page_path(@workspace, page), class: 'has-text-danger',
+            data: { 'turbo-confirm' => '¿Estás seguro?', 'turbo-method' => :delete } %>
       <% end %>
     </div>
 
