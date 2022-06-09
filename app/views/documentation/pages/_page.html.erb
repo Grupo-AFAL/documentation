@@ -11,7 +11,7 @@
   <% if policy(page).edit? || policy(page).destroy? %>
     <div>
       <% if policy(page).edit? %>
-        <%= link_to render(Bali::Icon::Component.new('edit')) + 'Editar', edit_workspace_page_path(@workspace, page) %>
+        <%= link_to render(Bali::Icon::Component.new('edit')) + 'Edit', edit_workspace_page_path(@workspace, page) %>
 
         |
 
