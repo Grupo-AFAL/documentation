@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 1be17cf8128523de7082db450f132e9add41a560
+  revision: 3c112b12ea6d207a9529750b0e3acc3fd07c13ae
   branch: main
   specs:
     bali_view_components (0.1.0)
@@ -192,7 +192,7 @@ GEM
     rails-dom-testing (2.0.3)
       activesupport (>= 4.2.0)
       nokogiri (>= 1.6)
-    rails-html-sanitizer (1.4.2)
+    rails-html-sanitizer (1.4.3)
       loofah (~> 2.3)
     railties (7.0.3)
       actionpack (= 7.0.3)
@@ -278,7 +278,7 @@ GEM
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
-    view_component (2.56.2)
+    view_component (2.57.0)
       activesupport (>= 5.0.0, < 8.0)
       method_source (~> 1.0)
     view_component-contrib (0.1.1)
