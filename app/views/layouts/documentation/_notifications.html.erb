@@ -1,13 +1,11 @@
 <% if notice %>
-  <div data-controller="notification" data-notification-delay-value="3000" class="notification fixed is-success" data-turbo-cache="false">
-    <button data-action="notification#close" class="delete"></button>
+  <%= render Bali::Notification::Component.new(type: :success) do %>
     <%= notice %>
-  </div>
+  <% end %>
 <% end %>
 
 <% if alert %>
-  <div data-controller="notification" data-notification-delay-value="3000" class="notification fixed is-danger" data-turbo-cache="false">
-    <button data-action="notification#close" class="delete"></button>
+  <%= render Bali::Notification::Component.new(type: :danger) do %>
     <%= alert %>
-  </div>
+  <% end %>
 <% end %>
