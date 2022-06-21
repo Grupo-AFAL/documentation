@@ -3,7 +3,6 @@ import '@hotwired/turbo-rails'
 import { Application } from '@hotwired/stimulus'
 import {
   FileInputController,
-  NotificationController,
   SlimSelectController,
   SubmitOnChangeController
 } from 'frontend-helpers'
@@ -11,6 +10,7 @@ import {
 import {
   DropdownController,
   ModalController,
+  NotificationController,
   TabsController,
   TreeViewItemController
 } from 'bali-view-components'

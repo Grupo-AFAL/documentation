@@ -76,11 +76,6 @@
 @import 'sass/layout/section';
 // @import 'sass/layout/footer';
 
-// Frontend Helpers styles
-//
-@import 'fe_disappear_animations';
-@import 'fe_notification';
-
 // Plugins defined in js-frontend-helpers
 @import 'slim-select/dist/slimselect.min';
 @import 'fe_slim_select_customizations';
@@ -99,5 +94,6 @@
 @import 'bali/icon/index';
 @import 'bali/image_grid/index';
 @import 'bali/modal/index';
+@import 'bali/notification/index';
 @import 'bali/tabs/index';
 @import 'bali/tree_view/index';
