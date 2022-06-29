@@ -1,16 +1,14 @@
 import '@hotwired/turbo-rails'
 
 import { Application } from '@hotwired/stimulus'
-import {
-  FileInputController,
-  SlimSelectController,
-  SubmitOnChangeController
-} from 'frontend-helpers'
 
 import {
   DropdownController,
+  FileInputController,
   ModalController,
   NotificationController,
+  SlimSelectController,
+  SubmitOnChangeController,
   TabsController,
   TreeViewItemController
 } from 'bali-view-components'
