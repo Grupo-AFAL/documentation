@@ -1,10 +1,11 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: b60cc2589bcbfa48323032241903ecd39da9e179
+  revision: 725e27f664578e3d1a642995884c3c8c21b6414d
   branch: main
   specs:
-    bali_view_components (0.6.0)
+    bali_view_components (0.15.0)
       rails (>= 7.0.2.3)
+      ransack
       view_component (>= 2.0.0, < 3.0)
       view_component-contrib
 
@@ -173,8 +174,8 @@ GEM
       activesupport (>= 3.0.0)
     racc (1.6.0)
     rack (2.2.3.1)
-    rack-test (1.1.0)
-      rack (>= 1.0, < 3)
+    rack-test (2.0.2)
+      rack (>= 1.3)
     rails (7.0.3)
       actioncable (= 7.0.3)
       actionmailbox (= 7.0.3)
