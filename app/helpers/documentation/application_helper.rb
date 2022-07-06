@@ -3,5 +3,6 @@
 module Documentation
   module ApplicationHelper
     include Bali::FormHelper
+    include Bali::AutoSubmitSelectHelper
   end
 end

@@ -2,10 +2,10 @@
 
 module Documentation
   class ApplicationController < ActionController::Base
-    include FrontendHelpers::LayoutConcern
+    include Bali::LayoutConcern
     include Pundit::Authorization
 
-    default_form_builder FrontendHelpers::FormBuilder
+    default_form_builder Bali::FormBuilder
 
     # after_action :verify_authorized
     rescue_from Pundit::NotAuthorizedError, with: :not_authorized

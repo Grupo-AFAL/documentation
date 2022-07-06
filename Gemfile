@@ -16,7 +16,8 @@ gem 'sassc-rails'
 gem 'sprockets-rails'
 gem 'turbo-rails', '~> 1.0'
 
-gem 'bali_view_components', github: 'Grupo-AFAL/bali-view-components', branch: 'main'
+gem 'bali_view_components', github: 'Grupo-AFAL/bali-view-components',
+                            branch: 'upgrade-gems-fix-tests'
 # gem 'bali_view_components', path: ENV['BALI_VIEW_COMPONENTS_PATH']
 
 gem 'acts_as_tree'
