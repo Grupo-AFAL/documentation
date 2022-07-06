@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'bulma-rails', '~> 0.9.3'
   spec.add_dependency 'jbuilder'
   spec.add_dependency 'pundit', '~> 2.2'
-  spec.add_dependency 'rails', '>= 7.0.2.3'
+  spec.add_dependency 'rails', '>= 7.0.2'
   spec.add_dependency 'turbo-rails', '>= 1.0.1'
 
   spec.add_runtime_dependency 'view_component', ['>= 2.0.0', '< 3.0']

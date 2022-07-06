@@ -1,5 +1,5 @@
 <%= form_with model: permission, url: workspace_permissions_path(@workspace),
-              id: "#{subject}_permission_form", class: 'permission_form', builder: FrontendHelpers::FormBuilder do |f| %>
+              id: "#{subject}_permission_form", class: 'permission_form', builder: Bali::FormBuilder do |f| %>
   <%= render Bali::Level::Component.new(class: 'is-align-items-start') do |c| %>
     <%= c.left do |ll| %>
       <%= ll.item do %>

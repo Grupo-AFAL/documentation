@@ -2,6 +2,7 @@
 
 module Documentation
   module ApplicationHelper
-    include FrontendHelpers::Components
+    include Bali::FormHelper
+    include Bali::AutoSubmitSelectHelper
   end
 end
