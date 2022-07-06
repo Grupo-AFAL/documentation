@@ -76,9 +76,9 @@
 @import 'sass/layout/section';
 // @import 'sass/layout/footer';
 
-// Plugins defined in js-frontend-helpers
+// Third-party plugins used by bali
 @import 'slim-select/dist/slimselect.min';
-@import 'fe_slim_select_customizations';
+@import 'bali/slim_select_customizations';
 
 // Engine styles
 //
