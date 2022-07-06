@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: ee7d7f29402685e912f4004d6c53b16ae694053d
-  branch: upgrade-gems-fix-tests
+  revision: b470c53520b9b9756eb4811fc75c2fe1f1093515
+  branch: main
   specs:
     bali_view_components (0.25.2)
       rails (>= 7.0.2)
