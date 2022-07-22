@@ -11,3 +11,6 @@ en:
     page:
       select_parent_page: Select parent page
       latest_update_date: Last update date
+      files: Files
+      images: Images
+      documents: Documents

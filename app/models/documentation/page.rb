@@ -15,6 +15,8 @@ module Documentation
       attachable.variant :small_thumb, resize_to_fill: [84, 56]
     end
 
+    has_many_attached :documents
+
     before_update -> { halt(msg: "Workspace home page can't be transfered") }, if: :was_home_page?
     before_update -> { self.parent_id = nil }, if: :documentation_workspace_id_changed?
     before_destroy -> { halt(msg: "Workspace home page can't be deleted") }, if: :home_page?

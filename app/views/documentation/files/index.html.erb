@@ -1,0 +1,74 @@
+<%= render(Bali::Tabs::Component.new) do |c| %>
+  <%= turbo_frame_tag 'page_images' do %>
+    <% c.tab(title: "#{t('documentation.page.images')}", icon: 'image', active: true) do %>
+      <%= form_with(url: page_images_path(@page), class: 'is-flex is-flex-direction-row') do |f| %>
+        <%= f.file_field_group :images, :multiple => true, :required => 'required', 
+                             :accept => '.jpg, .jpeg, .png', 
+                             choose_file_text: 'Select image',
+                             non_selected_text: 'No image selected' %>
+        <%= f.submit "Save", class: 'button is-primary ml-4' %>
+      <% end %>
+
+      <hr />
+
+      <%= render Bali::ImageGrid::Component.new do |c| %>
+        <%= @images.each do |image| %>
+          <%= c.image(id: dom_id(image), image_ratio: 'is-3by2') do |img| %>
+            <%= image_tag main_app.url_for(image.variant(:thumb)) %>
+
+            <% img.footer(class: 'p-2') do %>
+              <%= link_to render(Bali::Icon::Component.new('trash')), page_image_path(@page, image),
+              class: 'button is-danger is-small', 'data-turbo-method' => :delete, data: { confirm: 'Are you sure?' } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+  <% end %>
+
+  <% c.tab(title: "#{t('documentation.page.documents')}", icon: 'file-signature') do %>
+    <%= turbo_frame_tag 'page_documents' do %>
+      <%= form_with(url: page_documents_path(@page), class: 'is-flex is-flex-direction-row') do |f| %>
+        <%= f.file_field_group :documents, :multiple => true, :required => 'required', 
+                               :accept => '.doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx', 
+                               choose_file_text: 'Select document',
+                               non_selected_text: 'No documents selected' %>
+        <%= f.submit "Save", class: 'button is-primary ml-4' %>
+      <% end %>
+
+      <hr />
+
+      <%= render(Bali::Table::Component.new) do |c| %>
+        <%= c.headers([
+          { name: 'Name' },
+          { name: 'Kind' },
+          { name: 'Uploaded at' },
+          { name: '' }
+        ]) %>
+        <% c.no_records_notification do %>
+          <%= render Bali::Icon::Component.new('alert-alt') %>
+          <p>So sorry, no records found!</p>
+        <% end %>
+
+        <% @documents.each do |document| %>
+          <%= c.row(id: dom_id(document)) do %>
+            <td>
+              <%= document.blob.filename %>
+            </td>
+            <td>
+              <%= document.blob.content_type %>
+            </td>
+            <td>
+              <%= document.created_at %>
+            </td>
+            <td>
+              <%= link_to render(Bali::Icon::Component.new('trash')), page_document_path(@page, document),
+              class: 'button is-danger is-small', 'data-turbo-method' => :delete, data: { confirm: 'Are you sure?' } %>
+            </td>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

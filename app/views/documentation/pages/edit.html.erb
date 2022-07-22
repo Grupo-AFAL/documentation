@@ -10,10 +10,10 @@
   </div>
 
   <div class="level-right">
-    <%= link_to page_images_path(@page), class: 'button is-primary',
+    <%= link_to page_files_path(@page), class: 'button is-primary',
         data: { action: 'modal#open', 'wrapper-class': 'extra-wide' } do %>
-      <%= render Bali::Icon::Component.new('image') %>
-      <span>Images</span>
+      <%= render Bali::Icon::Component.new('images') %>
+      <span><%= "#{t('documentation.page.files')}" %></span>
     <% end %>
   </div>
 </div>
