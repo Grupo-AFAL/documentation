@@ -6,6 +6,7 @@ module Documentation
     before_action :set_workspace
     before_action :set_root_pages, except: %i[index]
     before_action :set_page, only: %i[show edit update destroy]
+    before_action :set_documents, only: %i[show edit]
 
     def index
       @pages = @workspace.pages
@@ -79,6 +80,10 @@ module Documentation
 
     def set_root_pages
       @root_pages = @workspace.pages.roots.include_tree
+    end
+
+    def set_documents
+      @documents = @page.documents
     end
   end
 end

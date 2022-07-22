@@ -1,46 +1,13 @@
 <%= render(Bali::Tabs::Component.new) do |c| %>
   <% c.tab(title: 'Documents', icon: 'file-signature') do %>
     <%= turbo_frame_tag 'page_documents' do %>
-      <%= form_with(url: page_documents_path(@page), class: 'is-flex is-flex-direction-row') do |f| %>
-        <%= f.file_field_group :documents, :multiple => true, :required => 'required', 
-                               :accept => '.doc, .docx, .pdf, .xls, .xlsx, .ppt, .pptx', 
-                               choose_file_text: 'Select document',
-                               non_selected_text: 'No documents selected' %>
-        <%= f.submit "Save", class: 'button is-primary ml-4' %>
-      <% end %>
+
+      <%= render 'form', page: @page %>
 
       <hr />
 
-      <%= render(Bali::Table::Component.new) do |c| %>
-        <%= c.headers([
-          { name: 'Name' },
-          { name: 'Kind' },
-          { name: 'Uploaded at' },
-          { name: '' }
-        ]) %>
-        <% c.no_records_notification do %>
-          <%= render Bali::Icon::Component.new('alert-alt') %>
-          <p>So sorry, no records found!</p>
-        <% end %>
+      <%= render 'documentation/pages/documents', documents: @documents, page: @page %>
 
-        <% @documents.each do |document| %>
-          <%= c.row(id: dom_id(document)) do %>
-            <td>
-              <%= document.blob.filename %>
-            </td>
-            <td>
-              <%= document.blob.content_type %>
-            </td>
-            <td>
-              <%= document.created_at %>
-            </td>
-            <td>
-              <%= link_to render(Bali::Icon::Component.new('trash')), page_document_path(@page, document),
-              class: 'button is-danger is-small', 'data-turbo-method' => :delete, data: { confirm: 'Are you sure?' } %>
-            </td>
-          <% end %>
-        <% end %>
-      <% end %>
     <% end %>
   <% end %>
 <% end %>

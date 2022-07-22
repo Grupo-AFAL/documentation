@@ -1,0 +1,11 @@
+<%= render Bali::ImageGrid::Component.new do |c| %>
+  <%= images.each do |image| %>
+    <%= c.image(id: dom_id(image), image_ratio: 'is-3by2') do |img| %>
+      <%= image_tag main_app.url_for(image.variant(:thumb)) %>
+      <% img.footer(class: 'p-2') do %>
+        <%= link_to render(Bali::Icon::Component.new('trash')), page_image_path(page, image),
+              class: 'button is-danger is-small', 'data-turbo-method' => :delete, data: { confirm: 'Are you sure?' } %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

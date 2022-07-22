@@ -11,7 +11,7 @@ module Documentation
 
       render layout: false
     end
-    
+
     def create
       @page.documents.attach(params[:documents])
 

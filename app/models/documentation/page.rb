@@ -23,6 +23,9 @@ module Documentation
 
     validates :title, presence: true
 
+    ALLOWED_DOCUMENT_EXTENSIONS = %w[.pdf .doc .docx .xls .xlsx .ppt .pptx .odt .txt].freeze
+    ALLOWED_IMAGE_EXTENSIONS = %w[.jpg .jpeg .png .gif].freeze
+
     scope :include_tree, -> { includes(children: { children: [:children] }) }
 
     def self.search(query)
@@ -46,6 +49,16 @@ module Documentation
 
       parents = ancestors.reverse.map(&:title).join(' > ')
       "#{parents} > #{title}"
+    end
+
+    def file_extension(file)
+      file.blob.filename.to_s.split('.').last.upcase
+    end
+
+    def allowed_extensions(kind)
+      return ALLOWED_DOCUMENT_EXTENSIONS.join(',') if kind == :document
+
+      ALLOWED_IMAGE_EXTENSIONS.join(',')
     end
   end
 end

@@ -13,7 +13,5 @@ Documentation::Engine.routes.draw do
     resources :image_thumbnails, only: %i[index]
 
     resources :documents, only: %i[index create destroy]
-
-
   end
 end

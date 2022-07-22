@@ -1,0 +1,7 @@
+<%= form_with(url: page_documents_path(page), class: 'is-flex is-flex-direction-row') do |f| %>
+  <%= f.file_field_group :documents, :multiple => true, :required => 'required', 
+                               :accept => page.allowed_extensions(:document),
+                               choose_file_text: t('documentation.document.choose_file_text'),
+                               non_selected_text: t('documentation.document.non_selected_text') %>
+  <%= f.submit t('save'), class: 'button is-primary ml-4' %>
+<% end %>

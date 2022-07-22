@@ -1,0 +1,7 @@
+<%= form_with(url: page_images_path(page), class: 'is-flex is-flex-direction-row') do |f| %>
+  <%= f.file_field_group :images, :multiple => true, :required => 'required', 
+                             :accept => page.allowed_extensions(:image),
+                             choose_file_text: t('documentation.image.choose_file_text'),
+                             non_selected_text: t('documentation.image.non_selected_text') %>
+  <%= f.submit t('save'), class: 'button is-primary ml-4' %>
+<% end %>
