@@ -15,7 +15,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     services:
       postgres:
         image: postgres:11-alpine

@@ -10,7 +10,6 @@ jobs:
   rubocop:
     name: Rubocop
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
 
     steps:
       - uses: actions/checkout@v3
