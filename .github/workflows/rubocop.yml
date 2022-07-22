@@ -1,5 +1,10 @@
 name: Rubocop
-on: push
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [ opened, reopened, synchronize, ready_for_review ]
 
 jobs:
   rubocop:
