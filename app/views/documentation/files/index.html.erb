@@ -1,15 +1,15 @@
 <%= render(Bali::Tabs::Component.new) do |c| %>
   <% c.tab(title: "#{t('documentation.page.images')}", icon: 'image', active: true) do %>
     <%= turbo_frame_tag 'page_images' do %>
+
       <%= render 'documentation/images/form', page: @page %>
 
       <hr />
 
       <%= render 'documentation/images/grid', images: @images, page: @page %>
+
     <% end %>
-
   <% end %>
-
   <% c.tab(title: "#{t('documentation.page.documents')}", icon: 'file-signature') do %>
     <%= turbo_frame_tag 'page_documents' do %>
 

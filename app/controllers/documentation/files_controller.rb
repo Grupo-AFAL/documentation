@@ -3,6 +3,7 @@
 module Documentation
   class FilesController < ApplicationController
     before_action :set_page
+
     def index
       @images = @page.images
       @documents = @page.documents

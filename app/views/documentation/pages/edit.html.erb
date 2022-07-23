@@ -1,22 +1,26 @@
 <%= render 'documentation/workspaces/menu', pages: @root_pages %>
 
-<div class="level">
-  <div class="level-left">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><%= link_to render(Bali::Icon::Component.new('chevron-left')) + 'Cancel', workspace_page_path(@workspace, @page) %></li>
-      </ul>
-    </nav>
-  </div>
+<%= render (Bali::Level::Component.new) do |c| %>
+  <% c.left do |l| %>
+    <%= l.item do %>
+      <%= tag.nav class: 'breadcrumb', aria: { label: 'breadcrumbs' } do %>
+        <ul>
+          <li>
+            <%= link_to render(Bali::Icon::Component.new('chevron-left')) + t('cancel'), workspace_page_path(@workspace, @page) %>
+          </li>
+        </ul>
+      <% end %>
+    <% end %>
+  <% end %>
 
-  <div class="level-right">
+  <% c.right do |r| %>
     <%= link_to page_files_path(@page), class: 'button is-primary',
         data: { action: 'modal#open', 'wrapper-class': 'extra-wide' } do %>
       <%= render Bali::Icon::Component.new('images') %>
       <span><%= "#{t('documentation.page.files')}" %></span>
     <% end %>
-  </div>
-</div>
+  <% end %>
+<% end %>
 
 <%= render "form", page: @page %>
 

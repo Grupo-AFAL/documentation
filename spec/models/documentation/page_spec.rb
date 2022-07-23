@@ -91,4 +91,26 @@ RSpec.describe Documentation::Page, type: :model do
       expect(comedor_recipes.file_extension(doc)).to eql('PDF')
     end
   end
+
+  describe '#allowed_extensions' do
+    context 'when file is document' do
+      it 'returns the allowed extensions' do
+        expect(comedor_recipes.allowed_extensions(:document)).to include(
+          '.pdf',
+          '.doc',
+          '.docx',
+          '.xls',
+          '.xlsx',
+          '.ppt',
+          '.pptx'
+        )
+      end
+    end
+
+    context 'when the file is image' do
+      it 'returns the allowed extensions' do
+        expect(comedor_recipes.allowed_extensions).to include('jpg', 'jpeg', 'png', 'gif')
+      end
+    end
+  end
 end

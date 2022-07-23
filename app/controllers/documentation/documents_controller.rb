@@ -3,7 +3,6 @@
 module Documentation
   class DocumentsController < ApplicationController
     include ActionView::RecordIdentifier
-
     before_action :set_page
 
     def index

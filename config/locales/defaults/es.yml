@@ -5,3 +5,4 @@ es:
     formats:
       date_twelve_hours: '%Y-%m-%d %I:%M %p' # 2022-05-11 02:33PM
   save: Guardar
+  cancel: Cancelar

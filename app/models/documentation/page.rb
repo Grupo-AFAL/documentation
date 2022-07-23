@@ -55,7 +55,7 @@ module Documentation
       file.blob.filename.to_s.split('.').last.upcase
     end
 
-    def allowed_extensions(kind)
+    def allowed_extensions(kind = nil)
       return ALLOWED_DOCUMENT_EXTENSIONS.join(',') if kind == :document
 
       ALLOWED_IMAGE_EXTENSIONS.join(',')
