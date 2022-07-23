@@ -26,8 +26,10 @@
         <%= l(document.created_at, format: :date_twelve_hours) %>
       </td>
       <td>
-        <%= link_to render(Bali::Icon::Component.new('trash')), page_document_path(@page, document),
-              class: 'button is-danger is-small', 'data-turbo-method' => :delete, data: { confirm: 'Are you sure?' } %>
+        <%= render(Bali::DeleteLink::Component.new(
+            href: page_document_path(@page, document),
+            name: render(Bali::Icon::Component.new('trash')),
+            confirm: 'Are you sure')) %>
       </td>
     <% end %>
   <% end %>

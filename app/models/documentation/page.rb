@@ -57,8 +57,9 @@ module Documentation
 
     def allowed_extensions(kind = nil)
       return ALLOWED_DOCUMENT_EXTENSIONS.join(',') if kind == :document
+      return ALLOWED_IMAGE_EXTENSIONS.join(',') if kind == :image
 
-      ALLOWED_IMAGE_EXTENSIONS.join(',')
+      nil
     end
   end
 end
