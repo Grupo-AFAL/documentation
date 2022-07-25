@@ -11,3 +11,15 @@ es:
     page:
       select_parent_page: Selecciona página principal
       latest_update_date: Fecha de última actualización
+      files: Archivos
+      images: Imágenes
+      documents: Documentos
+    document:
+      name: Nombre
+      type: Tipo
+      uploaded_at: Fecha de creación
+      choose_file_text: Selecciona un documento
+      non_selected_text: Documentos no seleccionados
+    image:
+      choose_file_text: Selecciona una imagen
+      non_selected_text: Imágenes no seleccionadas

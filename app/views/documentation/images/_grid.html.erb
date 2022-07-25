@@ -1,0 +1,12 @@
+<%= render Bali::ImageGrid::Component.new do |c| %>
+  <%= images.each do |image| %>
+    <%= c.image(id: dom_id(image), image_ratio: 'is-3by2') do |img| %>
+      <%= image_tag main_app.url_for(image.variant(:thumb)) %>
+      <% img.footer(class: 'p-2') do %>
+        <%= render(Bali::DeleteLink::Component.new(
+            href: page_image_path(page, image),
+            name: render(Bali::Icon::Component.new('trash')))) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

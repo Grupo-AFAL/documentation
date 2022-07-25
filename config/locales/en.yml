@@ -11,3 +11,15 @@ en:
     page:
       select_parent_page: Select parent page
       latest_update_date: Last update date
+      files: Files
+      images: Images
+      documents: Documents
+    document:
+      name: Name
+      type: Type
+      uploaded_at: Uploaded at
+      choose_file_text: Choose documents
+      non_selected_text: No documents selected
+    image:
+      choose_file_text: Choose images
+      non_selected_text: No images selected

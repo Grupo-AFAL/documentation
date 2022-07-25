@@ -16,7 +16,7 @@ module Documentation
         get page_images_path(page)
 
         expect(response).to have_http_status(:success)
-        expect(response.body).to include('Images')
+        expect(response.body).to include('No images selected', 'Choose images')
       end
     end
 

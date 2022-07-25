@@ -1,0 +1,35 @@
+<%= render(Bali::Table::Component.new) do |c| %>
+  <%= c.headers([
+          { name: t('documentation.document.name') },
+          { name: t('documentation.document.type') },
+          { name: t('documentation.document.uploaded_at') },
+          { name: '' }
+        ]) %>
+  <% c.no_records_notification do %>
+    <%= render Bali::Icon::Component.new('alert-alt') %>
+    <p><%= t('no_records_found') %></p>
+  <% end %>
+
+  <% documents.each do |document| %>
+    <%= c.row(id: dom_id(document)) do %>
+      <td>
+        <%= render(Bali::Link::Component.new(name: document.blob.filename,
+                                            href: main_app.url_for(document),
+                                            icon_name: 'download',
+                                            type: :primary,
+                                            class: class_names('is-flex-grow-1 is-light is-radiusless'))) %>
+      </td>
+      <td>
+        <%= page.file_extension(document) %>
+      </td>
+      <td>
+        <%= l(document.created_at, format: :date_twelve_hours) %>
+      </td>
+      <td>
+        <%= render(Bali::DeleteLink::Component.new(
+            href: page_document_path(@page, document),
+            name: render(Bali::Icon::Component.new('trash')))) %>
+      </td>
+    <% end %>
+  <% end %>
+<% end %>

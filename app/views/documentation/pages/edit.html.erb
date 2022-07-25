@@ -1,22 +1,26 @@
 <%= render 'documentation/workspaces/menu', pages: @root_pages %>
 
-<div class="level">
-  <div class="level-left">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-      <ul>
-        <li><%= link_to render(Bali::Icon::Component.new('chevron-left')) + 'Cancel', workspace_page_path(@workspace, @page) %></li>
-      </ul>
-    </nav>
-  </div>
-
-  <div class="level-right">
-    <%= link_to page_images_path(@page), class: 'button is-primary',
-        data: { action: 'modal#open', 'wrapper-class': 'extra-wide' } do %>
-      <%= render Bali::Icon::Component.new('image') %>
-      <span>Images</span>
+<%= render (Bali::Level::Component.new) do |c| %>
+  <% c.left do |l| %>
+    <%= l.item do %>
+      <%= tag.nav class: 'breadcrumb', aria: { label: 'breadcrumbs' } do %>
+        <ul>
+          <li>
+            <%= link_to render(Bali::Icon::Component.new('chevron-left')) + t('cancel'), workspace_page_path(@workspace, @page) %>
+          </li>
+        </ul>
+      <% end %>
     <% end %>
-  </div>
-</div>
+  <% end %>
+
+  <% c.right do |r| %>
+    <%= link_to page_files_path(@page), class: 'button is-primary',
+        data: { action: 'modal#open', 'wrapper-class': 'extra-wide' } do %>
+      <%= render Bali::Icon::Component.new('images') %>
+      <span><%= "#{t('documentation.page.files')}" %></span>
+    <% end %>
+  <% end %>
+<% end %>
 
 <%= render "form", page: @page %>
 

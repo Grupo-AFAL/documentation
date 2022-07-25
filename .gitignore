@@ -16,3 +16,5 @@ yarn-debug.log*
 /spec/dummy/storage/
 /spec/dummy/tmp/
 /spec/dummy/public/
+
+.DS_Store

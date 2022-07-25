@@ -1,0 +1,5 @@
+<%= turbo_frame_tag 'page_documents' do %>
+  <%= render 'form', page: @page %>
+  <hr />
+  <%= render 'documentation/pages/documents', documents: @documents, page: @page %>
+<% end %>

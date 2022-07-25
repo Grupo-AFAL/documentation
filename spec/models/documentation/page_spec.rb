@@ -10,6 +10,7 @@ RSpec.describe Documentation::Page, type: :model do
   let(:comedor_home_page) { documentation_pages(:comedor_home_page) }
   let(:comedor_recipes) { documentation_pages(:comedor_recipes) }
   let(:comedor_recipes_details) { documentation_pages(:comedor_recipes_details) }
+  let(:document_file) { fixture_file_upload('file.pdf', 'application/pdf') }
 
   describe '#home_page?' do
     it 'returns true when its the homepage' do
@@ -78,6 +79,38 @@ RSpec.describe Documentation::Page, type: :model do
   describe '#title_with_ancestors' do
     it 'returns the title with ancestors' do
       expect(comedor_recipes_details.title_with_ancestors).to eql('My Recipes > My Recipes details')
+    end
+  end
+
+  describe '#file_extension' do
+    it 'returns the file extension' do
+      comedor_recipes_details.documents.attach(document_file)
+
+      doc = comedor_recipes_details.documents.first
+
+      expect(comedor_recipes.file_extension(doc)).to eql('PDF')
+    end
+  end
+
+  describe '#allowed_extensions' do
+    context 'when file is a document' do
+      it 'returns the allowed extensions' do
+        expect(comedor_recipes.allowed_extensions(:document)).to include(
+          '.pdf',
+          '.doc',
+          '.docx',
+          '.xls',
+          '.xlsx',
+          '.ppt',
+          '.pptx'
+        )
+      end
+    end
+
+    context 'when the file is an image' do
+      it 'returns the allowed extensions' do
+        expect(comedor_recipes.allowed_extensions).to include('jpg', 'jpeg', 'png', 'gif')
+      end
     end
   end
 end

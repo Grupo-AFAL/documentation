@@ -15,11 +15,16 @@ module Documentation
       attachable.variant :small_thumb, resize_to_fill: [84, 56]
     end
 
+    has_many_attached :documents
+
     before_update -> { halt(msg: "Workspace home page can't be transfered") }, if: :was_home_page?
     before_update -> { self.parent_id = nil }, if: :documentation_workspace_id_changed?
     before_destroy -> { halt(msg: "Workspace home page can't be deleted") }, if: :home_page?
 
     validates :title, presence: true
+
+    ALLOWED_DOCUMENT_EXTENSIONS = %w[.pdf .doc .docx .xls .xlsx .ppt .pptx .odt .txt].freeze
+    ALLOWED_IMAGE_EXTENSIONS = %w[.jpg .jpeg .png .gif].freeze
 
     scope :include_tree, -> { includes(children: { children: [:children] }) }
 
@@ -44,6 +49,21 @@ module Documentation
 
       parents = ancestors.reverse.map(&:title).join(' > ')
       "#{parents} > #{title}"
+    end
+
+    def file_extension(file)
+      file.blob.filename.to_s.split('.').last.upcase
+    end
+
+    def allowed_extensions(kind = nil)
+      case kind
+      when :document
+        ALLOWED_DOCUMENT_EXTENSIONS.join(',')
+      when :image
+        ALLOWED_IMAGE_EXTENSIONS.join(',')
+      else
+        "#{ALLOWED_DOCUMENT_EXTENSIONS.join(',')}, #{ALLOWED_IMAGE_EXTENSIONS.join(',')}"
+      end
     end
   end
 end
