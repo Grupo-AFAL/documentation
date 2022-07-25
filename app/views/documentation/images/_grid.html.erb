@@ -5,8 +5,7 @@
       <% img.footer(class: 'p-2') do %>
         <%= render(Bali::DeleteLink::Component.new(
             href: page_image_path(page, image),
-            name: render(Bali::Icon::Component.new('trash')),
-            confirm: 'Are you sure?')) %>
+            name: render(Bali::Icon::Component.new('trash')))) %>
       <% end %>
     <% end %>
   <% end %>

@@ -1,13 +1,9 @@
 <%= render(Bali::Tabs::Component.new) do |c| %>
   <% c.tab(title: 'Images', icon: 'image', active: true) do %>
     <%= turbo_frame_tag 'page_images' do %>
-      
       <%= render 'form', page: @page %>
-
       <hr />
-
       <%= render 'grid', images: @images, page: @page %>
-
     <% end %>
   <% end %>
 <% end %>

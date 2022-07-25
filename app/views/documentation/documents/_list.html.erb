@@ -7,7 +7,7 @@
         ]) %>
   <% c.no_records_notification do %>
     <%= render Bali::Icon::Component.new('alert-alt') %>
-    <p>So sorry, no records found!</p>
+    <p><%= t('no_records_found') %></p>
   <% end %>
 
   <% documents.each do |document| %>
@@ -28,8 +28,7 @@
       <td>
         <%= render(Bali::DeleteLink::Component.new(
             href: page_document_path(@page, document),
-            name: render(Bali::Icon::Component.new('trash')),
-            confirm: 'Are you sure?')) %>
+            name: render(Bali::Icon::Component.new('trash')))) %>
       </td>
     <% end %>
   <% end %>
