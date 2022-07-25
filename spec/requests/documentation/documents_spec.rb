@@ -16,7 +16,7 @@ module Documentation
         get page_documents_path(page)
 
         expect(response).to have_http_status(:success)
-        expect(response.body).to include('Documents')
+        expect(response.body).to include('Name', 'Type', 'Uploaded at')
       end
     end
 

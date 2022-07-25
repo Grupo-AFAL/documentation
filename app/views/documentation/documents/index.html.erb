@@ -1,9 +1,5 @@
-<%= render(Bali::Tabs::Component.new) do |c| %>
-  <% c.tab(title: 'Documents', icon: 'file-signature') do %>
-    <%= turbo_frame_tag 'page_documents' do %>
-      <%= render 'form', page: @page %>
-      <hr />
-      <%= render 'documentation/pages/documents', documents: @documents, page: @page %>
-    <% end %>
-  <% end %>
+<%= turbo_frame_tag 'page_documents' do %>
+  <%= render 'form', page: @page %>
+  <hr />
+  <%= render 'documentation/pages/documents', documents: @documents, page: @page %>
 <% end %>
