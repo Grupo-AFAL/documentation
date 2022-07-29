@@ -14,10 +14,10 @@
     <%= c.row(id: dom_id(document)) do %>
       <td>
         <%= render(Bali::Link::Component.new(name: document.blob.filename,
-                                            href: main_app.url_for(document),
-                                            icon_name: 'download',
-                                            type: :primary,
-                                            class: class_names('is-flex-grow-1 is-light is-radiusless'))) %>
+                                             href: main_app.url_for(document),
+                                             icon_name: 'download',
+                                             type: :primary,
+                                             class: class_names('is-flex-grow-1 is-light is-radiusless'))) %>
       </td>
       <td>
         <%= page.file_extension(document) %>
@@ -26,9 +26,10 @@
         <%= l(document.created_at, format: :date_twelve_hours) %>
       </td>
       <td>
-        <%= render(Bali::DeleteLink::Component.new(
-            href: page_document_path(@page, document),
-            name: render(Bali::Icon::Component.new('trash')))) %>
+        <% if policy(page).destroy? %>
+          <%= render(Bali::DeleteLink::Component.new(href: page_document_path(@page, document),
+                                                     name: render(Bali::Icon::Component.new('trash')))) %>
+        <% end %>
       </td>
     <% end %>
   <% end %>
