@@ -2,8 +2,11 @@
 
 <%= render @page %>
 
-<hr>
 
-<h2 class="title is-2"><%= t('documentation.page.documents') %></h2>
 
-<%= render 'documents', documents: @documents, page: @page %>
+<% if @documents.count.positive? %>
+  <hr>
+  <h2 class="title is-2"><%= t('documentation.page.documents') %></h2>
+
+  <%= render 'documents', documents: @documents, page: @page %>
+<% end %>
