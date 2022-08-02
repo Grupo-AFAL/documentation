@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: b470c53520b9b9756eb4811fc75c2fe1f1093515
+  revision: cb89b03a3abcc9793fa1ae8066fe471bd3a18ed0
   branch: main
   specs:
-    bali_view_components (0.25.2)
+    bali_view_components (0.33.0)
       rails (>= 7.0.2)
       ransack
       view_component (>= 2.0.0, < 3.0)
