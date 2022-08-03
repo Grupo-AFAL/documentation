@@ -14,7 +14,7 @@ describe Documentation::PagePolicy do
   let(:page) { documentation_pages(:comedor_home_page) }
 
   describe '#show?' do
-    it 'returns true' do
+    it 'returns true for all users' do
       expect(described_class.new(read_user, page).show?).to be_truthy
       expect(described_class.new(write_user, page).show?).to be_truthy
       expect(described_class.new(full_user, page).show?).to be_truthy
