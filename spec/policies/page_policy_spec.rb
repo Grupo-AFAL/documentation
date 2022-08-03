@@ -13,75 +13,71 @@ describe Documentation::PagePolicy do
 
   let(:page) { documentation_pages(:comedor_home_page) }
 
-  describe '#show?' do
-    it 'returns true for all users' do
-      expect(described_class.new(read_user, page).show?).to be_truthy
-      expect(described_class.new(write_user, page).show?).to be_truthy
-      expect(described_class.new(full_user, page).show?).to be_truthy
+  permissions :show? do
+    it 'grants access to all users' do
+      expect(described_class).to permit(read_user, write_user, full_user, non_member_user)
     end
   end
 
-  describe '#create?' do
-    it 'returns true for super admin access users' do
-      expect(described_class.new(super_admin, page).create?).to be_truthy
+  permissions :create? do
+    it 'grants access to super admins' do
+      expect(described_class).to permit(super_admin, page)
     end
 
-    it 'returns false for read, write or full access users' do
-      expect(described_class.new(full_user, page).create?).to be_falsey
-      expect(described_class.new(write_user, page).create?).to be_falsey
-      expect(described_class.new(read_user, page).create?).to be_falsey
-    end
-
-    it 'returns false for non-members' do
-      expect(described_class.new(non_member_user, page).create?).to be_falsey
+    it 'denies access to non-super admins' do
+      expect(described_class).not_to permit(read_user, page)
+      expect(described_class).not_to permit(write_user, page)
+      expect(described_class).not_to permit(full_user, page)
+      expect(described_class).not_to permit(non_member_user, page)
     end
   end
 
-  describe '#update?' do
-    it 'returns true for write or full access users' do
-      expect(described_class.new(full_user, page).update?).to be_truthy
-      expect(described_class.new(write_user, page).update?).to be_truthy
+  permissions :update? do
+    it 'grants access to super admins, write users and full permissions user' do
+      expect(described_class).to permit(super_admin, page)
+      expect(described_class).to permit(write_user, page)
+      expect(described_class).to permit(full_user, page)
     end
 
-    it 'returns false for read, write or non-full access users' do
-      expect(described_class.new(read_user, page).update?).to be_falsey
-      expect(described_class.new(non_member_user, page).update?).to be_falsey
-    end
-  end
-
-  describe '#destroy?' do
-    it 'returns true for full access users' do
-      expect(described_class.new(full_user, page).destroy?).to be_truthy
-    end
-
-    it 'returns false for read, write or non member access users' do
-      expect(described_class.new(write_user, page).destroy?).to be_falsey
-      expect(described_class.new(read_user, page).destroy?).to be_falsey
-      expect(described_class.new(non_member_user, page).destroy?).to be_falsey
+    it 'denies access to non-super admins' do
+      expect(described_class).not_to permit(read_user, page)
+      expect(described_class).not_to permit(non_member_user, page)
     end
   end
 
-  describe '#can_destroy_documents?' do
-    it 'returns true for write or full access users' do
-      expect(described_class.new(full_user, page).can_destroy_documents?).to be_truthy
-      expect(described_class.new(write_user, page).can_destroy_documents?).to be_truthy
+  permissions :destroy? do
+    it 'grants access to full permissions users' do
+      expect(described_class).to permit(full_user, page)
     end
 
-    it 'returns false for read or non member access users' do
-      expect(described_class.new(read_user, page).can_destroy_documents?).to be_falsey
-      expect(described_class.new(non_member_user, page).can_destroy_documents?).to be_falsey
+    it 'denies access to non-super admins' do
+      expect(described_class).not_to permit(read_user, page)
+      expect(described_class).not_to permit(write_user, page)
+      expect(described_class).not_to permit(non_member_user, page)
     end
   end
 
-  describe '#can_destroy_images?' do
-    it 'returns true for write or full access users' do
-      expect(described_class.new(full_user, page).can_destroy_images?).to be_truthy
-      expect(described_class.new(write_user, page).can_destroy_images?).to be_truthy
+  permissions :can_destroy_documents? do
+    it 'grants access to write or full permissions users' do
+      expect(described_class).to permit(full_user, page)
+      expect(described_class).to permit(write_user, page)
     end
 
-    it 'returns false for read or non member access users' do
-      expect(described_class.new(read_user, page).can_destroy_images?).to be_falsey
-      expect(described_class.new(non_member_user, page).can_destroy_images?).to be_falsey
+    it 'denies access to non-super admins' do
+      expect(described_class).not_to permit(read_user, page)
+      expect(described_class).not_to permit(non_member_user, page)
+    end
+  end
+
+  permissions :can_destroy_images? do
+    it 'grants access to write or full permissions users' do
+      expect(described_class).to permit(full_user, page)
+      expect(described_class).to permit(write_user, page)
+    end
+
+    it 'denies access to non-super admins' do
+      expect(described_class).not_to permit(read_user, page)
+      expect(described_class).not_to permit(non_member_user, page)
     end
   end
 end
