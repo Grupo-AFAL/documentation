@@ -1,8 +1,8 @@
 <%= render(Bali::Table::Component.new) do |c| %>
   <%= c.headers([
-          { name: t('documentation.document.name') },
-          { name: t('documentation.document.type') },
-          { name: t('documentation.document.uploaded_at') },
+          { name: t('documentation.file.name') },
+          { name: t('documentation.file.type') },
+          { name: t('documentation.file.uploaded_at') },
           { name: '' }
         ]) %>
   <% c.no_records_notification do %>
@@ -10,24 +10,24 @@
     <p><%= t('no_records_found') %></p>
   <% end %>
 
-  <% documents.each do |document| %>
-    <%= c.row(id: dom_id(document)) do %>
+  <% files.each do |file| %>
+    <%= c.row(id: dom_id(file)) do %>
       <td>
-        <%= render(Bali::Link::Component.new(name: document.blob.filename,
-                                             href: main_app.url_for(document),
+        <%= render(Bali::Link::Component.new(name: file.blob.filename,
+                                             href: main_app.url_for(file),
                                              icon_name: 'download',
                                              type: :primary,
                                              class: class_names('is-flex-grow-1 is-light is-radiusless'))) %>
       </td>
       <td>
-        <%= page.file_extension(document) %>
+        <%= page.file_extension(file) %>
       </td>
       <td>
-        <%= l(document.created_at, format: :date_twelve_hours) %>
+        <%= l(file.created_at, format: :date_twelve_hours) %>
       </td>
       <td>
-        <% if policy(page).can_destroy_documents? %>
-          <%= render(Bali::DeleteLink::Component.new(href: page_document_path(@page, document),
+        <% if policy(page).can_destroy_files? %>
+          <%= render(Bali::DeleteLink::Component.new(href: page_file_path(@page, file),
                                                      name: render(Bali::Icon::Component.new('trash')))) %>
         <% end %>
       </td>

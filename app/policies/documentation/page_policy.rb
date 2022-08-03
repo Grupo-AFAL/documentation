@@ -20,7 +20,7 @@ module Documentation
       permission?(:can_destroy?)
     end
 
-    def can_destroy_documents?
+    def can_destroy_files?
       permission?(:can_edit?)
     end
 

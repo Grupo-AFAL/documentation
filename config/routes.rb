@@ -8,9 +8,9 @@ Documentation::Engine.routes.draw do
   end
 
   resources :pages, only: %i[] do
-    resources :documents, only: %i[index create destroy]
+    resources :files, only: %i[index create destroy]
     resources :images, only: %i[index create destroy]
     resources :image_thumbnails, only: %i[index]
-    resources :files, only: %i[index]
+    resources :attachments, only: %i[index]
   end
 end

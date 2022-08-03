@@ -2,11 +2,9 @@
 
 <%= render @page %>
 
-
-
-<% if @documents.count.positive? %>
+<% if @files.count.positive? %>
   <hr>
-  <h2 class="title is-2"><%= t('documentation.page.documents') %></h2>
+  <h2 class="title is-2"><%= t('documentation.page.files') %></h2>
 
-  <%= render 'documents', documents: @documents, page: @page %>
+  <%= render 'files', files: @files, page: @page %>
 <% end %>
