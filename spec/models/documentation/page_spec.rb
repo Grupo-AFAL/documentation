@@ -10,7 +10,7 @@ RSpec.describe Documentation::Page, type: :model do
   let(:comedor_home_page) { documentation_pages(:comedor_home_page) }
   let(:comedor_recipes) { documentation_pages(:comedor_recipes) }
   let(:comedor_recipes_details) { documentation_pages(:comedor_recipes_details) }
-  let(:document_file) { fixture_file_upload('file.pdf', 'application/pdf') }
+  let(:file) { fixture_file_upload('file.pdf', 'application/pdf') }
 
   describe '#home_page?' do
     it 'returns true when its the homepage' do
@@ -84,9 +84,9 @@ RSpec.describe Documentation::Page, type: :model do
 
   describe '#file_extension' do
     it 'returns the file extension' do
-      comedor_recipes_details.documents.attach(document_file)
+      comedor_recipes_details.files.attach(file)
 
-      doc = comedor_recipes_details.documents.first
+      doc = comedor_recipes_details.files.first
 
       expect(comedor_recipes.file_extension(doc)).to eql('PDF')
     end

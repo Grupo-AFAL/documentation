@@ -57,7 +57,7 @@ describe Documentation::PagePolicy do
     end
   end
 
-  permissions :can_destroy_documents? do
+  permissions :can_destroy_files? do
     it 'grants access to write or full permissions users' do
       expect(described_class).to permit(full_user, page)
       expect(described_class).to permit(write_user, page)

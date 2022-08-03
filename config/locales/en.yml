@@ -13,8 +13,8 @@ en:
       latest_update_date: Last update date
       attachments: Attachments
       images: Images
-      files: files
-    document:
+      files: Files
+    file:
       name: Name
       type: Type
       uploaded_at: Uploaded at
