@@ -1,3 +1,19 @@
 super_admin:
   super_admin: true
   name: Super Admin
+  
+read_user:
+  super_admin: false
+  name: Read permission user
+
+write_user:
+  super_admin: false
+  name: Write permission user
+
+full_user:
+  super_admin: false
+  name: Full permission user
+
+non_member_user:
+  super_admin: false
+  name: No member user

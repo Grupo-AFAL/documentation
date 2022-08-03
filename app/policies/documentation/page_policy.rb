@@ -36,12 +36,6 @@ module Documentation
       end
     end
 
-    # def destroy_permission?
-    #   workspace_permissions.any? do |permission|
-    #     permission.member?(user) && permission.can_destroy?
-    #   end
-    # end
-
     def workspace_permissions
       @workspace_permissions ||= workspace.permissions.includes(:subject)
     end

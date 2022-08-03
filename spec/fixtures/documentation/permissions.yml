@@ -4,3 +4,23 @@ user_comedor:
   subject: super_admin (User)
   object: comedor (Documentation::Workspace)
   action: full
+
+read_access_user:
+  subject: read_user (User)
+  object: comedor (Documentation::Workspace)
+  action: read
+
+write_access_user:
+  subject: write_user (User)
+  object: comedor (Documentation::Workspace)
+  action: write
+
+full_access_user:
+  subject: full_user (User)
+  object: comedor (Documentation::Workspace)
+  action: full
+
+non_member_user:
+  subject: non_member_user (User)
+  object: guarderia (Documentation::Workspace)
+  action: read
