@@ -26,7 +26,7 @@
         <%= l(document.created_at, format: :date_twelve_hours) %>
       </td>
       <td>
-        <% if policy(page).destroy? %>
+        <% if policy(page).can_destroy_documents? %>
           <%= render(Bali::DeleteLink::Component.new(href: page_document_path(@page, document),
                                                      name: render(Bali::Icon::Component.new('trash')))) %>
         <% end %>
