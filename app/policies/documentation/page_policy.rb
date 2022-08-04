@@ -13,18 +13,28 @@ module Documentation
     end
 
     def update?
-      workspace_permissions.any? do |permission|
-        permission.member?(user) && permission.can_edit?
-      end
+      permission?(:can_edit?)
     end
 
     def destroy?
-      workspace_permissions.any? do |permission|
-        permission.member?(user) && permission.can_destroy?
-      end
+      permission?(:can_destroy?)
+    end
+
+    def can_destroy_files?
+      permission?(:can_edit?)
+    end
+
+    def can_destroy_images?
+      permission?(:can_edit?)
     end
 
     private
+
+    def permission?(action)
+      workspace_permissions.any? do |permission|
+        permission.member?(user) && permission.send(action)
+      end
+    end
 
     def workspace_permissions
       @workspace_permissions ||= workspace.permissions.includes(:subject)

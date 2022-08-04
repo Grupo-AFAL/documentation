@@ -14,10 +14,10 @@
   <% end %>
 
   <% c.right do |r| %>
-    <%= link_to page_files_path(@page), class: 'button is-primary',
+    <%= link_to page_attachments_path(@page), class: 'button is-primary',
         data: { action: 'modal#open', 'wrapper-class': 'extra-wide' } do %>
       <%= render Bali::Icon::Component.new('images') %>
-      <span><%= "#{t('documentation.page.files')}" %></span>
+      <span><%= "#{t('documentation.page.attachments')}" %></span>
     <% end %>
   <% end %>
 <% end %>
