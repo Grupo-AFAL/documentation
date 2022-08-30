@@ -9,10 +9,10 @@ gemspec
 gem 'pg'
 
 gem 'bulma-rails', '~> 0.9.3'
+gem 'dartsass-rails'
 gem 'image_processing', '>= 1.2'
 gem 'jbuilder'
 gem 'jsbundling-rails'
-gem 'sassc-rails'
 gem 'sprockets-rails'
 gem 'turbo-rails', '~> 1.0'
 

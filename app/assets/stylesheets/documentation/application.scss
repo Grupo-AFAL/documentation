@@ -76,10 +76,6 @@
 @import 'sass/layout/section';
 // @import 'sass/layout/footer';
 
-// Third-party plugins used by bali
-@import 'slim-select/dist/slimselect.min';
-@import 'bali/slim_select_customizations';
-
 // Engine styles
 //
 @import 'general';
@@ -97,3 +93,6 @@
 @import 'bali/tabs/index';
 @import 'bali/tooltip/index';
 @import 'bali/tree_view/index';
+
+// Form helper styles
+@import 'bali/slim_select';
