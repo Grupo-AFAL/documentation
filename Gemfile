@@ -12,7 +12,7 @@ gem 'bulma-rails', '~> 0.9.3'
 gem 'image_processing', '>= 1.2'
 gem 'jbuilder'
 gem 'jsbundling-rails'
-gem 'sassc-rails'
+gem 'dartsass-rails'
 gem 'sprockets-rails'
 gem 'turbo-rails', '~> 1.0'
 
