@@ -18,4 +18,6 @@ yarn-debug.log*
 /spec/dummy/tmp/
 /spec/dummy/public/
 
+/vendor
+
 .DS_Store
