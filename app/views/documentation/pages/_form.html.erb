@@ -12,7 +12,8 @@
       html_content: page.content, editable: true, placeholder: "Type '/' for commands",
       images_url: page_image_thumbnails_path(@page),
       output_input_name: 'page[content]', class: 'mb-4',
-      data: { 'turbo-cache': false }) %>
+      data: { 'turbo-cache': false },
+      page_hyperlink_options: @pages.map { |page| { title: page.title, id: page.id, url: workspace_page_url(@workspace, page)} } ) %>
 
   <%= form.submit_actions 'Guardar', class: 'button is-primary', cancel_path: workspace_page_path(@workspace, page) %>
 <% end %>

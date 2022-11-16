@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 456f87c76e8505bd11899043b995140f565173c8
-  branch: main
+  revision: a12f912b5d59b640ba99d6cbca0169678e117250
+  branch: add-page-hyperlinks-to-rich-editor
   specs:
-    bali_view_components (0.54.2)
+    bali_view_components (0.55.0)
       rails (>= 7.0.2)
       ransack
       view_component (>= 2.0.0, < 3.0)
