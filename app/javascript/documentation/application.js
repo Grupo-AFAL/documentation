@@ -7,13 +7,12 @@ import {
   FileInputController,
   ModalController,
   NotificationController,
+  RichTextEditorController,
   SlimSelectController,
   SubmitOnChangeController,
   TabsController,
   TreeViewItemController
 } from 'bali-view-components'
-
-import RichTextEditorController from './controllers/rich_text_editor_controller'
 
 const application = Application.start()
 

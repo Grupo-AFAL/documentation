@@ -44,12 +44,7 @@
     <hr/>
   <% end %>
 
-  <div
-    data-turbo-cache="false"
-    class="rich-text-editor-component input mb-4 rich-editor-content"
-    data-controller="rich-text-editor"
-    data-rich-text-editor-content-value='<%= page.content %>'
-    data-rich-text-editor-editable-value='false'
-  >
-  </div>
+  <%= render Bali::RichTextEditor::Component.new(
+      html_content: page.content, editable: false, class: 'mb-4', data: { 'turbo-cache': false }) %>
+
 </div>
