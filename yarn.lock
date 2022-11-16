@@ -310,8 +310,8 @@
   integrity sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==
 
 "bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git":
-  version "0.54.3"
-  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#da006184fe5dddcdeb9a1925c908413709376587"
+  version "0.55.0"
+  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#75b03e398afd96855944c9c99955a16847da978c"
   dependencies:
     "@glidejs/glide" "^3.6.0"
     "@hotwired/stimulus" "^3.1.0"
