@@ -14,8 +14,6 @@ import {
   TreeViewItemController
 } from 'bali-view-components'
 
-// import RichTextEditorController from './controllers/rich_text_editor_controller'
-
 const application = Application.start()
 
 application.register('dropdown', DropdownController)
