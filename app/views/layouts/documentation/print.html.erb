@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Documentation</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "documentation/application", media: "all" %>
+    <%= javascript_include_tag "documentation/application", "data-turbo-track": "reload", defer: true %>
+  </head>
+
+  <body>
+    <div>
+      <section>
+        <div class="container" data-controller="print">
+          <div class="columns">
+            <div class="column is-full">
+              <%= yield %>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

@@ -12,6 +12,8 @@ module Documentation
       @workspaces = Workspace.all
       @home_page = @workspace.home_page
       @root_pages = @workspace.pages.roots.include_tree
+
+      render layout: 'documentation/print' if params[:print]
     end
 
     def new

@@ -1,17 +1,19 @@
 <div id="<%= dom_id page %>">
-  <div class="mb-6">
-    <h1 class="title is-1"><%= page.title %></h1>
+  <div class="mb-2">
+    <h1 class="title page-title is-1"><%= page.title %></h1>
     <p class="subtitle"><%= page.description %></p>
   </div>
 
-  <small><%= t('documentation.page.latest_update_date') %>: <%= l(page.updated_at, format: :date_twelve_hours) %></small>
-
-  <hr/>
+  <hr class="is-hidden-print mt-1" />
 
   <% if policy(page).edit? || policy(page).destroy? %>
-    <div>
+    <div class="is-hidden-print">
       <% if policy(page).edit? %>
         <%= link_to render(Bali::Icon::Component.new('edit')) + 'Edit', edit_workspace_page_path(@workspace, page) %>
+
+        |
+
+        <%= link_to render(Bali::Icon::Component.new('print')) + 'Print', workspace_page_path(@workspace, page, print: true), target: '_blank' %>
 
         |
 
@@ -47,4 +49,12 @@
   <%= render Bali::RichTextEditor::Component.new(
       html_content: page.content, editable: false, class: 'mb-4', data: { 'turbo-cache': false }) %>
 
+</div>
+
+<div class="is-hidden-print">
+  <hr />
+
+  <small>
+    <%= t('documentation.page.latest_update_date') %>: <%= l(page.updated_at, format: :date_twelve_hours) %>
+  </small>
 </div>

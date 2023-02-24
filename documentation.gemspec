@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'view_component', ['>= 2.0.0', '< 3.0']
   spec.add_runtime_dependency 'view_component-contrib'
 
-  spec.add_development_dependency 'puma', '~> 5.6'
-  spec.add_development_dependency 'rspec-rails', '~> 5.0.0'
+  spec.add_development_dependency 'puma', '~> 6.1'
+  spec.add_development_dependency 'rspec-rails', '~> 6.0'
   spec.metadata['rubygems_mfa_required'] = 'true'
 end

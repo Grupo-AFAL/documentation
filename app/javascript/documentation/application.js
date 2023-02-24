@@ -7,6 +7,7 @@ import {
   FileInputController,
   ModalController,
   NotificationController,
+  PrintController,
   RichTextEditorController,
   SlimSelectController,
   SubmitOnChangeController,
@@ -20,6 +21,7 @@ application.register('dropdown', DropdownController)
 application.register('file-input', FileInputController)
 application.register('modal', ModalController)
 application.register('notification', NotificationController)
+application.register('print', PrintController)
 application.register('rich-text-editor', RichTextEditorController)
 application.register('slim-select', SlimSelectController)
 application.register('submit-on-change', SubmitOnChangeController)

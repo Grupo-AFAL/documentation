@@ -1,0 +1,17 @@
+@media only print {
+  body {
+    -webkit-print-color-adjust: exact;
+  }
+
+  .page-break {
+    page-break-after: always;
+  }
+
+  .title.is-1.page-title {
+    font-size: $size-3;
+  }
+
+  .is-hidden-print {
+    display: none;
+  }
+}
