@@ -25,7 +25,9 @@ module Dummy
     # config.eager_load_paths << Rails.root.join("extras")
 
     # ViewComponents
+    # rubocop:disable Rails/FilePath
     config.autoload_paths << Rails.root.parent.parent.join('app', 'components')
     config.view_component.preview_paths << Rails.root.parent.parent.join('app', 'components')
+    # rubocop:enable Rails/FilePath
   end
 end
