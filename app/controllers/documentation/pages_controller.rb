@@ -13,7 +13,9 @@ module Documentation
       @pages = @pages.merge(Page.search(params[:title])) if params[:title]
     end
 
-    def show; end
+    def show
+      render layout: 'documentation/print' if params[:print]
+    end
 
     def new
       @parent = @workspace.pages.find(params[:parent_id]) if params[:parent_id]

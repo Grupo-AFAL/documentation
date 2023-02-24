@@ -3,7 +3,7 @@
     "@hotwired/stimulus": "^3.1.0",
     "@hotwired/turbo-rails": "^7.1.3",
     "bali-view-components": "https://github.com/Grupo-AFAL/bali-view-components.git",
-    "esbuild": "^0.14.28"
+    "esbuild": "^0.17.0"
   },
   "scripts": {
     "build": "esbuild app/javascript/documentation/application.js --bundle --loader:.png=dataurl --sourcemap --outdir=app/assets/javascripts/documentation"

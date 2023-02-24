@@ -82,7 +82,7 @@ Rails/RedundantPresenceValidationOnBelongsTo:
   Enabled: false
 
 Metrics/BlockLength:
-  IgnoredMethods: ['describe', 'context', 'it', 'before', 'included', 'configure']
+  AllowedMethods: ['describe', 'context', 'it', 'before', 'included', 'configure']
   Exclude:
     - spec/*
     - lib/tasks/*

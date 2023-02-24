@@ -8,8 +8,8 @@
     <%= stylesheet_link_tag "documentation/application", media: "all" %>
     <%= javascript_include_tag "documentation/application", "data-turbo-track": "reload", defer: true %>
   </head>
-  <body data-controller="modal">
 
+  <body data-controller="modal">
     <%= yield :menu %>
 
     <section class="section app-frame <%= yield :app_frame_class %>">

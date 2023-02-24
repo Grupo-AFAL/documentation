@@ -10,7 +10,7 @@ en:
   documentation:
     page:
       select_parent_page: Select parent page
-      latest_update_date: Last update date
+      latest_update_date: Last updated
       attachments: Attachments
       images: Images
       files: Files
