@@ -1,45 +1,35 @@
 <%= content_for :menu do %>
   <div class="page-menu">
     <%= render Bali::Dropdown::Component.new(class: 'workspace-switch vh-centered') do |c| %>
-      <%= c.trigger(class: 'has-text-weight-bold vh-centered') do %>
+      <%= c.with_trigger(class: 'has-text-weight-bold vh-centered') do %>
         <span><%= @workspace.name %></span>
         <%= render Bali::Icon::Component.new('chevron-down') %>
       <% end %>
-
       <% @workspaces.each do |workspace| %>
-        <%= c.item(href: workspace_path(workspace)) { workspace.name } %>
+        <%= c.with_item(href: workspace_path(workspace)) { workspace.name } %>
       <% end %>
-
-      <%= c.item(href: workspaces_path) { 'All Workspaces' } %>
+      <%= c.with_item(href: workspaces_path) { 'All Workspaces' } %>
     <% end %>
-
     <hr class="my-4" />
-
     <%= render Bali::TreeView::Component.new(current_path: request.path) do |c| %>
       <% pages.each do |page| %>
-        <%= c.item(name: page.title, path: workspace_page_path(@workspace, page)) do |sub_item| %>
-
+        <%= c.with_item(name: page.title, path: workspace_page_path(@workspace, page)) do |sub_item| %>
           <% page.children.each do |child| %>
-            <%= sub_item.item(name: child.title, path: workspace_page_path(@workspace, child)) do |sub_sub_item| %>
-
+            <%= sub_item.with_item(name: child.title, path: workspace_page_path(@workspace, child)) do |sub_sub_item| %>
               <%= child.children.each do |grand_child| %>
-                <%= sub_sub_item.item(name: grand_child.title, path: workspace_page_path(@workspace, grand_child)) do |sub_sub_sub_item| %>
-
+                <%= sub_sub_item.with_item(name: grand_child.title, path: workspace_page_path(@workspace, grand_child)) do |sub_sub_sub_item| %>
                   <%= grand_child.children.each do |great_grand_child| %>
-                    <%= sub_sub_sub_item.item(name: great_grand_child.title, path: workspace_page_path(@workspace, great_grand_child)) %>
+                    <%= sub_sub_sub_item.iwith_tem(name: great_grand_child.title, path: workspace_page_path(@workspace, great_grand_child)) %>
                   <% end %>
                 <% end %>
               <% end %>
             <% end %>
           <% end %>
         <% end %>
-
       <% end %>
     <% end %>
-
     <% if policy(Documentation::Page).new? %>
       <hr class="my-4" />
-
       <%= link_to new_workspace_page_path(@workspace),
           class: 'button is-primary is-small vh-centered m-2',
           data: { action: 'modal#open' } do %>
@@ -47,9 +37,7 @@
         <span>New page</span>
       <% end %>
     <% end %>
-
     <hr class="my-4" />
-
     <div class="vh-centered">
       <%= link_to main_app.root_path, class: 'vh-centered' do %>
         <%= render Bali::Icon::Component.new('arrow-left') %>

@@ -1,10 +1,9 @@
 <%= form_with model: permission, url: workspace_permissions_path(@workspace),
               id: "#{subject}_permission_form", class: 'permission_form', builder: Bali::FormBuilder do |f| %>
   <%= render Bali::Level::Component.new(class: 'is-align-items-start') do |c| %>
-    <%= c.left do |ll| %>
-      <%= ll.item do %>
+    <%= c.with_left do |ll| %>
+      <%= ll.with_item do %>
         <%= f.hidden_field :subject_type, value: subject %>
-
         <div class="field">
           <%= f.slim_select_field :subject_id, Documentation.collection(subject),
             { include_blank: true, add_to_body: true },
@@ -12,12 +11,11 @@
         </div>
       <% end %>
     <% end %>
-
-    <%= c.right do |lr| %>
-      <%= lr.item do %>
+    <%= c.with_right do |lr| %>
+      <%= lr.with_item do %>
         <%= f.select_field :action, Documentation::Permission.actions.keys %>
       <% end %>
-      <%= lr.item do %>
+      <%= lr.with_item do %>
         <%= f.submit 'Create', class: 'button is-primary' %>
       <% end %>
     <% end %>
