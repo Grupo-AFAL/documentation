@@ -13,11 +13,12 @@ gem 'dartsass-rails'
 gem 'image_processing', '>= 1.2'
 gem 'jbuilder'
 gem 'jsbundling-rails'
-gem 'sprockets-rails'
 gem 'simple_command'
+gem 'sprockets-rails'
 gem 'turbo-rails', '~> 1.0'
 
-gem 'bali_view_components', github: 'Grupo-AFAL/bali-view-components', branch: 'update-gems-and-npm-packages'
+gem 'bali_view_components', github: 'Grupo-AFAL/bali-view-components',
+                            branch: 'update-gems-and-npm-packages'
 # gem 'bali_view_components', path: ENV['BALI_VIEW_COMPONENTS_PATH']
 
 gem 'acts_as_tree'
