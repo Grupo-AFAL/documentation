@@ -1,12 +1,12 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 4e0d6f437a07ce0f34d8bb13cabe0b6237edff61
-  branch: main
+  revision: 5d1176eabd3b2e2fb06fdf2e7799eb6a61b8491c
+  branch: update-gems-and-npm-packages
   specs:
-    bali_view_components (0.58.2)
+    bali_view_components (0.73.0)
       rails (>= 7.0.2)
       ransack
-      view_component (>= 2.0.0, < 3.0)
+      view_component (>= 2.0.0, < 4.0)
       view_component-contrib
 
 PATH
@@ -139,6 +139,7 @@ GEM
     method_source (1.0.0)
     mini_magick (4.12.0)
     mini_mime (1.1.2)
+    mini_portile2 (2.8.5)
     minitest (5.17.0)
     net-imap (0.3.4)
       date
@@ -150,11 +151,8 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.8)
-    nokogiri (1.14.2-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.14.2-x86_64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.14.2-x86_64-linux)
+    nokogiri (1.14.2)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     parallel (1.22.1)
     parser (3.2.1.0)
@@ -196,7 +194,7 @@ GEM
       zeitwerk (~> 2.5)
     rainbow (3.1.1)
     rake (13.0.6)
-    ransack (4.0.0)
+    ransack (4.1.1)
       activerecord (>= 6.1.5)
       activesupport (>= 6.1.5)
       i18n
@@ -243,6 +241,7 @@ GEM
       ffi (~> 1.12)
     sassc (2.4.0)
       ffi (~> 1.9)
+    simple_command (1.0.1)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -278,11 +277,7 @@ GEM
     zeitwerk (2.6.7)
 
 PLATFORMS
-  arm64-darwin-20
-  arm64-darwin-21
-  x86_64-darwin-20
-  x86_64-darwin-21
-  x86_64-linux
+  ruby
 
 DEPENDENCIES
   acts_as_tree
@@ -300,6 +295,7 @@ DEPENDENCIES
   rspec-rails (~> 6)
   rubocop (~> 1)
   rubocop-rails (~> 2)
+  simple_command
   simplecov
   sprockets-rails
   turbo-rails (~> 1.0)
