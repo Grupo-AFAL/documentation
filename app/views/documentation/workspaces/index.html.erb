@@ -1,19 +1,15 @@
 <%= content_for :app_frame_class, 'without-menu' %>
-
 <div class="level">
   <div class="level-left">
     <h1 class="title is-1">Workspaces</h1>
   </div>
-
   <div class="level-right">
     <% if policy(Documentation::Workspace).new? %>
       <%= link_to "New Workspace", new_workspace_path, class: 'button is-primary', data: { action: 'modal#open' } %>
     <% end %>
   </div>
 </div>
-
 <hr class="mb-6" />
-
 <div class="columns is-multiline">
   <% @workspaces.each do |workspace| %>
     <div class="column is-one-quarter">
@@ -21,14 +17,12 @@
         <h1 class="title is-3 pr-5">
           <%= link_to workspace.name, workspace_path(workspace) %>
         </h1>
-
         <%= render Bali::Dropdown::Component.new(class: 'is-right is-top-right') do |c| %>
-          <%= c.trigger do %>
+          <%= c.with_trigger do %>
             <%= render Bali::Icon::Component.new('ellipsis-h') %>
           <% end %>
-
           <% if policy(workspace).permissions? %>
-            <%= c.item(href: workspace_permissions_path(workspace), data: { action: 'modal#open' }) do %>
+            <%= c.with_item(href: workspace_permissions_path(workspace), data: { action: 'modal#open' }) do %>
               Manage permissions
             <% end %>
           <% end %>
@@ -37,12 +31,9 @@
     </div>
   <% end %>
 </div>
-
 <hr class="mb-6" />
-
 <div>
   <%= link_to main_app.root_path, class: 'vh-centered inline' do %>
-
     <%= render Bali::Icon::Component.new('arrow-left') %>
     <span>Back to main App</span>
   <% end %>

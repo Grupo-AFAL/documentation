@@ -18,13 +18,13 @@
         |
 
         <%= render Bali::Dropdown::Component.new do |c| %>
-          <%= c.trigger do %>
+          <%= c.with_trigger do %>
             <%= render Bali::Icon::Component.new('arrow-right') %>
             <span>Transfer to another workspace</span>
           <% end %>
 
           <% (@workspaces - [@workspace]).each do |workspace| %>
-            <%= c.item(
+            <%= c.with_item(
                 href: workspace_page_transfer_path(
                   @workspace, page, { page: { documentation_workspace_id: workspace.id } }
                 ),

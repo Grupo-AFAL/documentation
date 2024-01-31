@@ -1,17 +1,16 @@
 <%= render(Bali::Table::Component.new) do |c| %>
-  <%= c.headers([
+  <%= c.with_headers([
           { name: t('documentation.file.name') },
           { name: t('documentation.file.type') },
           { name: t('documentation.file.uploaded_at') },
           { name: '' }
         ]) %>
-  <% c.no_records_notification do %>
+  <% c.with_no_records_notification do %>
     <%= render Bali::Icon::Component.new('alert-alt') %>
     <p><%= t('no_records_found') %></p>
   <% end %>
-
   <% files.each do |file| %>
-    <%= c.row(id: dom_id(file)) do %>
+    <%= c.with_row(id: dom_id(file)) do %>
       <td>
         <%= render(Bali::Link::Component.new(name: file.blob.filename,
                                              href: main_app.url_for(file),

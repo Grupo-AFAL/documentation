@@ -13,6 +13,7 @@ gem 'dartsass-rails'
 gem 'image_processing', '>= 1.2'
 gem 'jbuilder'
 gem 'jsbundling-rails'
+gem 'simple_command'
 gem 'sprockets-rails'
 gem 'turbo-rails', '~> 1.0'
 
@@ -30,8 +31,8 @@ group :development, :test do
 end
 
 group :development do
-  gem 'rubocop', '~> 1', require: false
-  gem 'rubocop-rails', '~> 2'
+  gem 'rubocop', require: false
+  gem 'rubocop-rails'
 end
 
 group :test do

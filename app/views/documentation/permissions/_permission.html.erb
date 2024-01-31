@@ -1,18 +1,16 @@
 <%= render Bali::Level::Component.new(id: dom_id(permission)) do |c| %>
-  <%= c.left do |ll| %>
-    <%= ll.item { permission.display_name } %>
+  <%= c.with_left do |ll| %>
+    <%= ll.with_item { permission.display_name } %>
   <% end %>
-
-  <%= c.right do |lr| %>
-    <%= lr.item do %>
+  <%= c.with_right do |lr| %>
+    <%= lr.with_item do %>
       <%= auto_submit_select(
           record: permission,
           attribute: :action,
           choices: Documentation::Permission.actions.keys,
           url: workspace_permission_path(@workspace, permission)) %>
     <% end %>
-
-    <%= lr.item do %>
+    <%= lr.with_item do %>
       <%= link_to render(Bali::Icon::Component.new('trash')), workspace_permission_path(@workspace, permission),
         data: { 'turbo-method' => :delete }, class: 'has-text-danger' %>
     <% end %>

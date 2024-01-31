@@ -1,6 +1,6 @@
 <%= render Bali::ImageGrid::Component.new do |c| %>
   <% images.each do |image| %>
-    <%= c.image do %>
+    <%= c.with_image do %>
       <%= image_tag main_app.url_for(image.variant(:small_thumb)),
           data: { action: 'click->rich-text-editor#addImage', 'source-url': main_app.url_for(image) } %>
     <% end %>

@@ -5,7 +5,6 @@
   var __getOwnPropNames = Object.getOwnPropertyNames;
   var __getProtoOf = Object.getPrototypeOf;
   var __hasOwnProp = Object.prototype.hasOwnProperty;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __esm = (fn2, res) => function __init() {
     return fn2 && (res = (0, fn2[__getOwnPropNames(fn2)[0]])(fn2 = 0)), res;
   };
@@ -32,10 +31,6 @@
     isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
     mod
   ));
-  var __publicField = (obj, key, value) => {
-    __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-    return value;
-  };
 
   // node_modules/@rails/actioncable/src/adapters.js
   var adapters_default;
@@ -2629,7 +2624,7 @@
 
   // node_modules/lodash.throttle/index.js
   var require_lodash = __commonJS({
-    "node_modules/lodash.throttle/index.js"(exports2, module2) {
+    "node_modules/lodash.throttle/index.js"(exports, module) {
       var FUNC_ERROR_TEXT2 = "Expected a function";
       var NAN2 = 0 / 0;
       var symbolTag2 = "[object Symbol]";
@@ -2771,7 +2766,7 @@
         var isBinary = reIsBinary2.test(value);
         return isBinary || reIsOctal2.test(value) ? freeParseInt2(value.slice(2), isBinary ? 2 : 8) : reIsBadHex2.test(value) ? NAN2 : +value;
       }
-      module2.exports = throttle7;
+      module.exports = throttle7;
     }
   });
 
@@ -2894,7 +2889,7 @@
     for (const [name, value] of entries) {
       if (value instanceof window.File)
         continue;
-      if (searchParams.has(name)) {
+      if (searchParams.has(name) && !name.includes("[]")) {
         searchParams.delete(name);
         searchParams.set(name, value);
       } else {
@@ -2933,7 +2928,8 @@
           if (response.unauthenticated && response.authenticationURL) {
             return Promise.reject(window.location.href = response.authenticationURL);
           }
-          if (response.ok && response.isTurboStream) {
+          const responseStatusIsTurboStreamable = response.ok || response.unprocessableEntity;
+          if (responseStatusIsTurboStreamable && response.isTurboStream) {
             await response.renderTurboStream();
           }
           return response;
@@ -2943,27 +2939,37 @@
           headers[key] = value;
           this.options.headers = headers;
         }
+        sameHostname() {
+          if (!this.originalUrl.startsWith("http:")) {
+            return true;
+          }
+          try {
+            return new URL(this.originalUrl).hostname === window.location.hostname;
+          } catch (_) {
+            return true;
+          }
+        }
         get fetchOptions() {
           return {
             method: this.method.toUpperCase(),
             headers: this.headers,
             body: this.formattedBody,
             signal: this.signal,
-            credentials: "same-origin",
+            credentials: this.credentials,
             redirect: this.redirect
           };
         }
         get headers() {
+          const baseHeaders = {
+            "X-Requested-With": "XMLHttpRequest",
+            "Content-Type": this.contentType,
+            Accept: this.accept
+          };
+          if (this.sameHostname()) {
+            baseHeaders["X-CSRF-Token"] = this.csrfToken;
+          }
           return compact(
-            Object.assign(
-              {
-                "X-Requested-With": "XMLHttpRequest",
-                "X-CSRF-Token": this.csrfToken,
-                "Content-Type": this.contentType,
-                Accept: this.accept
-              },
-              this.additionalHeaders
-            )
+            Object.assign(baseHeaders, this.additionalHeaders)
           );
         }
         get csrfToken() {
@@ -3020,6 +3026,9 @@
         }
         get redirect() {
           return this.options.redirect || "follow";
+        }
+        get credentials() {
+          return this.options.credentials || "same-origin";
         }
         get additionalHeaders() {
           return this.options.headers || {};
@@ -3088,11 +3097,11 @@
     };
   }
   function removeProperties(obj, keys2) {
-    var clone3 = Object.assign({}, obj);
+    var clone4 = Object.assign({}, obj);
     keys2.forEach(function(key) {
-      delete clone3[key];
+      delete clone4[key];
     });
-    return clone3;
+    return clone4;
   }
   function splitBySpaces(value) {
     return value.split(/\s+/).filter(Boolean);
@@ -4343,6 +4352,51 @@
     }
   });
 
+  // node_modules/fast-deep-equal/index.js
+  var require_fast_deep_equal = __commonJS({
+    "node_modules/fast-deep-equal/index.js"(exports, module) {
+      "use strict";
+      module.exports = function equal2(a, b) {
+        if (a === b)
+          return true;
+        if (a && b && typeof a == "object" && typeof b == "object") {
+          if (a.constructor !== b.constructor)
+            return false;
+          var length, i, keys2;
+          if (Array.isArray(a)) {
+            length = a.length;
+            if (length != b.length)
+              return false;
+            for (i = length; i-- !== 0; )
+              if (!equal2(a[i], b[i]))
+                return false;
+            return true;
+          }
+          if (a.constructor === RegExp)
+            return a.source === b.source && a.flags === b.flags;
+          if (a.valueOf !== Object.prototype.valueOf)
+            return a.valueOf() === b.valueOf();
+          if (a.toString !== Object.prototype.toString)
+            return a.toString() === b.toString();
+          keys2 = Object.keys(a);
+          length = keys2.length;
+          if (length !== Object.keys(b).length)
+            return false;
+          for (i = length; i-- !== 0; )
+            if (!Object.prototype.hasOwnProperty.call(b, keys2[i]))
+              return false;
+          for (i = length; i-- !== 0; ) {
+            var key = keys2[i];
+            if (!equal2(a[key], b[key]))
+              return false;
+          }
+          return true;
+        }
+        return a !== a && b !== b;
+      };
+    }
+  });
+
   // node_modules/orderedmap/dist/index.js
   function OrderedMap(content) {
     this.content = content;
@@ -5016,7 +5070,7 @@
   var init_dist2 = __esm({
     "node_modules/prosemirror-model/dist/index.js"() {
       init_dist();
-      Fragment = class {
+      Fragment = class _Fragment {
         /**
         @internal
         */
@@ -5090,7 +5144,7 @@
           }
           for (; i < other.content.length; i++)
             content.push(other.content[i]);
-          return new Fragment(content, this.size + other.size);
+          return new _Fragment(content, this.size + other.size);
         }
         /**
         Cut out the sub-fragment between the two given positions.
@@ -5114,17 +5168,17 @@
               }
               pos = end2;
             }
-          return new Fragment(result, size);
+          return new _Fragment(result, size);
         }
         /**
         @internal
         */
         cutByIndex(from3, to2) {
           if (from3 == to2)
-            return Fragment.empty;
+            return _Fragment.empty;
           if (from3 == 0 && to2 == this.content.length)
             return this;
-          return new Fragment(this.content.slice(from3, to2));
+          return new _Fragment(this.content.slice(from3, to2));
         }
         /**
         Create a new fragment in which the node at the given index is
@@ -5137,21 +5191,21 @@
           let copy2 = this.content.slice();
           let size = this.size + node.nodeSize - current.nodeSize;
           copy2[index3] = node;
-          return new Fragment(copy2, size);
+          return new _Fragment(copy2, size);
         }
         /**
         Create a new fragment by prepending the given node to this
         fragment.
         */
         addToStart(node) {
-          return new Fragment([node].concat(this.content), this.size + node.nodeSize);
+          return new _Fragment([node].concat(this.content), this.size + node.nodeSize);
         }
         /**
         Create a new fragment by appending the given node to this
         fragment.
         */
         addToEnd(node) {
-          return new Fragment(this.content.concat(node), this.size + node.nodeSize);
+          return new _Fragment(this.content.concat(node), this.size + node.nodeSize);
         }
         /**
         Compare this fragment to another one.
@@ -5270,10 +5324,10 @@
         */
         static fromJSON(schema, value) {
           if (!value)
-            return Fragment.empty;
+            return _Fragment.empty;
           if (!Array.isArray(value))
             throw new RangeError("Invalid input for Fragment.fromJSON");
-          return new Fragment(value.map(schema.nodeFromJSON));
+          return new _Fragment(value.map(schema.nodeFromJSON));
         }
         /**
         Build a fragment from an array of nodes. Ensures that adjacent
@@ -5281,7 +5335,7 @@
         */
         static fromArray(array) {
           if (!array.length)
-            return Fragment.empty;
+            return _Fragment.empty;
           let joined, size = 0;
           for (let i = 0; i < array.length; i++) {
             let node = array[i];
@@ -5294,7 +5348,7 @@
               joined.push(node);
             }
           }
-          return new Fragment(joined || array, size);
+          return new _Fragment(joined || array, size);
         }
         /**
         Create a fragment from something that can be interpreted as a
@@ -5304,19 +5358,19 @@
         */
         static from(nodes) {
           if (!nodes)
-            return Fragment.empty;
-          if (nodes instanceof Fragment)
+            return _Fragment.empty;
+          if (nodes instanceof _Fragment)
             return nodes;
           if (Array.isArray(nodes))
             return this.fromArray(nodes);
           if (nodes.attrs)
-            return new Fragment([nodes], nodes.nodeSize);
+            return new _Fragment([nodes], nodes.nodeSize);
           throw new RangeError("Can not convert " + nodes + " to a Fragment" + (nodes.nodesBetween ? " (looks like multiple versions of prosemirror-model were loaded)" : ""));
         }
       };
       Fragment.empty = new Fragment([], 0);
       found = { index: 0, offset: 0 };
-      Mark = class {
+      Mark = class _Mark {
         /**
         @internal
         */
@@ -5426,8 +5480,8 @@
         */
         static setFrom(marks) {
           if (!marks || Array.isArray(marks) && marks.length == 0)
-            return Mark.none;
-          if (marks instanceof Mark)
+            return _Mark.none;
+          if (marks instanceof _Mark)
             return [marks];
           let copy2 = marks.slice();
           copy2.sort((a, b) => a.type.rank - b.type.rank);
@@ -5437,7 +5491,7 @@
       Mark.none = [];
       ReplaceError = class extends Error {
       };
-      Slice = class {
+      Slice = class _Slice {
         /**
         Create a slice. When specifying a non-zero open depth, you must
         make sure that there are nodes of at least that depth at the
@@ -5466,13 +5520,13 @@
         */
         insertAt(pos, fragment) {
           let content = insertInto(this.content, pos + this.openStart, fragment);
-          return content && new Slice(content, this.openStart, this.openEnd);
+          return content && new _Slice(content, this.openStart, this.openEnd);
         }
         /**
         @internal
         */
         removeBetween(from3, to2) {
-          return new Slice(removeRange(this.content, from3 + this.openStart, to2 + this.openStart), this.openStart, this.openEnd);
+          return new _Slice(removeRange(this.content, from3 + this.openStart, to2 + this.openStart), this.openStart, this.openEnd);
         }
         /**
         Tests whether this slice is equal to another slice.
@@ -5504,11 +5558,11 @@
         */
         static fromJSON(schema, json2) {
           if (!json2)
-            return Slice.empty;
+            return _Slice.empty;
           let openStart = json2.openStart || 0, openEnd = json2.openEnd || 0;
           if (typeof openStart != "number" || typeof openEnd != "number")
             throw new RangeError("Invalid input for Slice.fromJSON");
-          return new Slice(Fragment.fromJSON(schema, json2.content), openStart, openEnd);
+          return new _Slice(Fragment.fromJSON(schema, json2.content), openStart, openEnd);
         }
         /**
         Create a slice from a fragment by taking the maximum possible
@@ -5520,11 +5574,11 @@
             openStart++;
           for (let n = fragment.lastChild; n && !n.isLeaf && (openIsolating || !n.type.spec.isolating); n = n.lastChild)
             openEnd++;
-          return new Slice(fragment, openStart, openEnd);
+          return new _Slice(fragment, openStart, openEnd);
         }
       };
       Slice.empty = new Slice(Fragment.empty, 0, 0);
-      ResolvedPos = class {
+      ResolvedPos = class _ResolvedPos {
         /**
         @internal
         */
@@ -5777,7 +5831,7 @@
             parentOffset = rem - 1;
             start3 += offset2 + 1;
           }
-          return new ResolvedPos(pos, path, parentOffset);
+          return new _ResolvedPos(pos, path, parentOffset);
         }
         /**
         @internal
@@ -5788,7 +5842,7 @@
             if (cached.pos == pos && cached.doc == doc3)
               return cached;
           }
-          let result = resolveCache[resolveCachePos] = ResolvedPos.resolve(doc3, pos);
+          let result = resolveCache[resolveCachePos] = _ResolvedPos.resolve(doc3, pos);
           resolveCachePos = (resolveCachePos + 1) % resolveCacheSize;
           return result;
         }
@@ -5839,7 +5893,7 @@
         }
       };
       emptyAttrs = /* @__PURE__ */ Object.create(null);
-      Node2 = class {
+      Node2 = class _Node {
         /**
         @internal
         */
@@ -5962,14 +6016,14 @@
         copy(content = null) {
           if (content == this.content)
             return this;
-          return new Node2(this.type, this.attrs, content, this.marks);
+          return new _Node(this.type, this.attrs, content, this.marks);
         }
         /**
         Create a copy of this node, with the given set of marks instead
         of the node's own marks.
         */
         mark(marks) {
-          return marks == this.marks ? this : new Node2(this.type, this.attrs, this.content, marks);
+          return marks == this.marks ? this : new _Node(this.type, this.attrs, this.content, marks);
         }
         /**
         Create a copy of this node with only the content between the
@@ -6228,7 +6282,7 @@
         }
       };
       Node2.prototype.text = void 0;
-      TextNode = class extends Node2 {
+      TextNode = class _TextNode extends Node2 {
         /**
         @internal
         */
@@ -6253,12 +6307,12 @@
           return this.text.length;
         }
         mark(marks) {
-          return marks == this.marks ? this : new TextNode(this.type, this.attrs, this.text, marks);
+          return marks == this.marks ? this : new _TextNode(this.type, this.attrs, this.text, marks);
         }
         withText(text2) {
           if (text2 == this.text)
             return this;
-          return new TextNode(this.type, this.attrs, text2, this.marks);
+          return new _TextNode(this.type, this.attrs, text2, this.marks);
         }
         cut(from3 = 0, to2 = this.text.length) {
           if (from3 == 0 && to2 == this.text.length)
@@ -6274,7 +6328,7 @@
           return base2;
         }
       };
-      ContentMatch = class {
+      ContentMatch = class _ContentMatch {
         /**
         @internal
         */
@@ -6289,7 +6343,7 @@
         static parse(string, nodeTypes) {
           let stream = new TokenStream(string, nodeTypes);
           if (stream.next == null)
-            return ContentMatch.empty;
+            return _ContentMatch.empty;
           let expr = parseExpr(stream);
           if (stream.next)
             stream.err("Unexpected trailing text");
@@ -6468,7 +6522,7 @@
           throw new SyntaxError(str + " (in content expression '" + this.string + "')");
         }
       };
-      NodeType = class {
+      NodeType = class _NodeType {
         /**
         @internal
         */
@@ -6649,7 +6703,7 @@
         */
         static compile(nodes, schema) {
           let result = /* @__PURE__ */ Object.create(null);
-          nodes.forEach((name, spec) => result[name] = new NodeType(name, schema, spec));
+          nodes.forEach((name, spec) => result[name] = new _NodeType(name, schema, spec));
           let topType = schema.spec.topNode || "doc";
           if (!result[topType])
             throw new RangeError("Schema is missing its top node type ('" + topType + "')");
@@ -6669,7 +6723,7 @@
           return !this.hasDefault;
         }
       };
-      MarkType = class {
+      MarkType = class _MarkType {
         /**
         @internal
         */
@@ -6698,7 +6752,7 @@
         */
         static compile(marks, schema) {
           let result = /* @__PURE__ */ Object.create(null), rank = 0;
-          marks.forEach((name, spec) => result[name] = new MarkType(name, rank++, schema, spec));
+          marks.forEach((name, spec) => result[name] = new _MarkType(name, rank++, schema, spec));
           return result;
         }
         /**
@@ -6813,7 +6867,7 @@
           return found2;
         }
       };
-      DOMParser2 = class {
+      DOMParser2 = class _DOMParser {
         /**
         Create a parser that targets the given schema, using the given
         parsing rules.
@@ -6934,7 +6988,7 @@
         [priority](https://prosemirror.net/docs/ref/#model.ParseRule.priority).
         */
         static fromSchema(schema) {
-          return schema.cached.domParser || (schema.cached.domParser = new DOMParser2(schema, DOMParser2.schemaRules(schema)));
+          return schema.cached.domParser || (schema.cached.domParser = new _DOMParser(schema, _DOMParser.schemaRules(schema)));
         }
       };
       blockTags = {
@@ -7450,7 +7504,7 @@
           }
         }
       };
-      DOMSerializer = class {
+      DOMSerializer = class _DOMSerializer {
         /**
         Create a serializer. `nodes` should map node names to functions
         that take a node and return a description of the corresponding
@@ -7508,7 +7562,7 @@
         @internal
         */
         serializeNodeInner(node, options) {
-          let { dom, contentDOM } = DOMSerializer.renderSpec(doc(options), this.nodes[node.type.name](node));
+          let { dom, contentDOM } = _DOMSerializer.renderSpec(doc(options), this.nodes[node.type.name](node));
           if (contentDOM) {
             if (node.isLeaf)
               throw new RangeError("Content hole not allowed in a leaf node spec");
@@ -7539,7 +7593,7 @@
         */
         serializeMark(mark, inline, options = {}) {
           let toDOM = this.marks[mark.type.name];
-          return toDOM && DOMSerializer.renderSpec(doc(options), toDOM(mark, inline));
+          return toDOM && _DOMSerializer.renderSpec(doc(options), toDOM(mark, inline));
         }
         /**
         Render an [output spec](https://prosemirror.net/docs/ref/#model.DOMOutputSpec) to a DOM node. If
@@ -7579,7 +7633,7 @@
                 throw new RangeError("Content hole must be the only child of its parent node");
               return { dom, contentDOM: dom };
             } else {
-              let { dom: inner, contentDOM: innerContent } = DOMSerializer.renderSpec(doc3, child, xmlNS);
+              let { dom: inner, contentDOM: innerContent } = _DOMSerializer.renderSpec(doc3, child, xmlNS);
               dom.appendChild(inner);
               if (innerContent) {
                 if (contentDOM)
@@ -7595,7 +7649,7 @@
         properties in a schema's node and mark specs.
         */
         static fromSchema(schema) {
-          return schema.cached.domSerializer || (schema.cached.domSerializer = new DOMSerializer(this.nodesFromSchema(schema), this.marksFromSchema(schema)));
+          return schema.cached.domSerializer || (schema.cached.domSerializer = new _DOMSerializer(this.nodesFromSchema(schema), this.marksFromSchema(schema)));
         }
         /**
         Gather the serializers in a schema's node specs into an object.
@@ -8183,7 +8237,7 @@
           return (this.delInfo & DEL_ACROSS) > 0;
         }
       };
-      StepMap = class {
+      StepMap = class _StepMap {
         /**
         Create a position map. The modifications to the document are
         represented as an array of numbers, in which each group of three
@@ -8192,8 +8246,8 @@
         constructor(ranges, inverted = false) {
           this.ranges = ranges;
           this.inverted = inverted;
-          if (!ranges.length && StepMap.empty)
-            return StepMap.empty;
+          if (!ranges.length && _StepMap.empty)
+            return _StepMap.empty;
         }
         /**
         @internal
@@ -8271,7 +8325,7 @@
         map positions in the post-step document to the pre-step document.
         */
         invert() {
-          return new StepMap(this.ranges, !this.inverted);
+          return new _StepMap(this.ranges, !this.inverted);
         }
         /**
         @internal
@@ -8285,11 +8339,11 @@
         sub-document to a larger document, or vice-versa.
         */
         static offset(n) {
-          return n == 0 ? StepMap.empty : new StepMap(n < 0 ? [0, -n, 0] : [0, 0, n]);
+          return n == 0 ? _StepMap.empty : new _StepMap(n < 0 ? [0, -n, 0] : [0, 0, n]);
         }
       };
       StepMap.empty = new StepMap([]);
-      Mapping = class {
+      Mapping = class _Mapping {
         /**
         Create a new mapping with the given position maps.
         */
@@ -8303,13 +8357,13 @@
         Create a mapping that maps only through a part of this one.
         */
         slice(from3 = 0, to2 = this.maps.length) {
-          return new Mapping(this.maps, this.mirror, from3, to2);
+          return new _Mapping(this.maps, this.mirror, from3, to2);
         }
         /**
         @internal
         */
         copy() {
-          return new Mapping(this.maps.slice(), this.mirror && this.mirror.slice(), this.from, this.to);
+          return new _Mapping(this.maps.slice(), this.mirror && this.mirror.slice(), this.from, this.to);
         }
         /**
         Add a step map to the end of this mapping. If `mirrors` is
@@ -8364,7 +8418,7 @@
         Create an inverted version of this mapping.
         */
         invert() {
-          let inverse = new Mapping();
+          let inverse = new _Mapping();
           inverse.appendMappingInverted(this);
           return inverse;
         }
@@ -8450,7 +8504,7 @@
           return stepClass;
         }
       };
-      StepResult = class {
+      StepResult = class _StepResult {
         /**
         @internal
         */
@@ -8462,13 +8516,13 @@
         Create a successful step result.
         */
         static ok(doc3) {
-          return new StepResult(doc3, null);
+          return new _StepResult(doc3, null);
         }
         /**
         Create a failed step result.
         */
         static fail(message) {
-          return new StepResult(null, message);
+          return new _StepResult(null, message);
         }
         /**
         Call [`Node.replace`](https://prosemirror.net/docs/ref/#model.Node.replace) with the given
@@ -8477,15 +8531,15 @@
         */
         static fromReplace(doc3, from3, to2, slice2) {
           try {
-            return StepResult.ok(doc3.replace(from3, to2, slice2));
+            return _StepResult.ok(doc3.replace(from3, to2, slice2));
           } catch (e) {
             if (e instanceof ReplaceError)
-              return StepResult.fail(e.message);
+              return _StepResult.fail(e.message);
             throw e;
           }
         }
       };
-      AddMarkStep = class extends Step {
+      AddMarkStep = class _AddMarkStep extends Step {
         /**
         Create a mark step.
         */
@@ -8512,11 +8566,11 @@
           let from3 = mapping.mapResult(this.from, 1), to2 = mapping.mapResult(this.to, -1);
           if (from3.deleted && to2.deleted || from3.pos >= to2.pos)
             return null;
-          return new AddMarkStep(from3.pos, to2.pos, this.mark);
+          return new _AddMarkStep(from3.pos, to2.pos, this.mark);
         }
         merge(other) {
-          if (other instanceof AddMarkStep && other.mark.eq(this.mark) && this.from <= other.to && this.to >= other.from)
-            return new AddMarkStep(Math.min(this.from, other.from), Math.max(this.to, other.to), this.mark);
+          if (other instanceof _AddMarkStep && other.mark.eq(this.mark) && this.from <= other.to && this.to >= other.from)
+            return new _AddMarkStep(Math.min(this.from, other.from), Math.max(this.to, other.to), this.mark);
           return null;
         }
         toJSON() {
@@ -8533,11 +8587,11 @@
         static fromJSON(schema, json2) {
           if (typeof json2.from != "number" || typeof json2.to != "number")
             throw new RangeError("Invalid input for AddMarkStep.fromJSON");
-          return new AddMarkStep(json2.from, json2.to, schema.markFromJSON(json2.mark));
+          return new _AddMarkStep(json2.from, json2.to, schema.markFromJSON(json2.mark));
         }
       };
       Step.jsonID("addMark", AddMarkStep);
-      RemoveMarkStep = class extends Step {
+      RemoveMarkStep = class _RemoveMarkStep extends Step {
         /**
         Create a mark-removing step.
         */
@@ -8561,11 +8615,11 @@
           let from3 = mapping.mapResult(this.from, 1), to2 = mapping.mapResult(this.to, -1);
           if (from3.deleted && to2.deleted || from3.pos >= to2.pos)
             return null;
-          return new RemoveMarkStep(from3.pos, to2.pos, this.mark);
+          return new _RemoveMarkStep(from3.pos, to2.pos, this.mark);
         }
         merge(other) {
-          if (other instanceof RemoveMarkStep && other.mark.eq(this.mark) && this.from <= other.to && this.to >= other.from)
-            return new RemoveMarkStep(Math.min(this.from, other.from), Math.max(this.to, other.to), this.mark);
+          if (other instanceof _RemoveMarkStep && other.mark.eq(this.mark) && this.from <= other.to && this.to >= other.from)
+            return new _RemoveMarkStep(Math.min(this.from, other.from), Math.max(this.to, other.to), this.mark);
           return null;
         }
         toJSON() {
@@ -8582,11 +8636,11 @@
         static fromJSON(schema, json2) {
           if (typeof json2.from != "number" || typeof json2.to != "number")
             throw new RangeError("Invalid input for RemoveMarkStep.fromJSON");
-          return new RemoveMarkStep(json2.from, json2.to, schema.markFromJSON(json2.mark));
+          return new _RemoveMarkStep(json2.from, json2.to, schema.markFromJSON(json2.mark));
         }
       };
       Step.jsonID("removeMark", RemoveMarkStep);
-      AddNodeMarkStep = class extends Step {
+      AddNodeMarkStep = class _AddNodeMarkStep extends Step {
         /**
         Create a node mark step.
         */
@@ -8609,15 +8663,15 @@
             if (newSet.length == node.marks.length) {
               for (let i = 0; i < node.marks.length; i++)
                 if (!node.marks[i].isInSet(newSet))
-                  return new AddNodeMarkStep(this.pos, node.marks[i]);
-              return new AddNodeMarkStep(this.pos, this.mark);
+                  return new _AddNodeMarkStep(this.pos, node.marks[i]);
+              return new _AddNodeMarkStep(this.pos, this.mark);
             }
           }
           return new RemoveNodeMarkStep(this.pos, this.mark);
         }
         map(mapping) {
           let pos = mapping.mapResult(this.pos, 1);
-          return pos.deletedAfter ? null : new AddNodeMarkStep(pos.pos, this.mark);
+          return pos.deletedAfter ? null : new _AddNodeMarkStep(pos.pos, this.mark);
         }
         toJSON() {
           return { stepType: "addNodeMark", pos: this.pos, mark: this.mark.toJSON() };
@@ -8628,11 +8682,11 @@
         static fromJSON(schema, json2) {
           if (typeof json2.pos != "number")
             throw new RangeError("Invalid input for AddNodeMarkStep.fromJSON");
-          return new AddNodeMarkStep(json2.pos, schema.markFromJSON(json2.mark));
+          return new _AddNodeMarkStep(json2.pos, schema.markFromJSON(json2.mark));
         }
       };
       Step.jsonID("addNodeMark", AddNodeMarkStep);
-      RemoveNodeMarkStep = class extends Step {
+      RemoveNodeMarkStep = class _RemoveNodeMarkStep extends Step {
         /**
         Create a mark-removing step.
         */
@@ -8656,7 +8710,7 @@
         }
         map(mapping) {
           let pos = mapping.mapResult(this.pos, 1);
-          return pos.deletedAfter ? null : new RemoveNodeMarkStep(pos.pos, this.mark);
+          return pos.deletedAfter ? null : new _RemoveNodeMarkStep(pos.pos, this.mark);
         }
         toJSON() {
           return { stepType: "removeNodeMark", pos: this.pos, mark: this.mark.toJSON() };
@@ -8667,11 +8721,11 @@
         static fromJSON(schema, json2) {
           if (typeof json2.pos != "number")
             throw new RangeError("Invalid input for RemoveNodeMarkStep.fromJSON");
-          return new RemoveNodeMarkStep(json2.pos, schema.markFromJSON(json2.mark));
+          return new _RemoveNodeMarkStep(json2.pos, schema.markFromJSON(json2.mark));
         }
       };
       Step.jsonID("removeNodeMark", RemoveNodeMarkStep);
-      ReplaceStep = class extends Step {
+      ReplaceStep = class _ReplaceStep extends Step {
         /**
         The given `slice` should fit the 'gap' between `from` and
         `to`—the depths must line up, and the surrounding nodes must be
@@ -8697,23 +8751,23 @@
           return new StepMap([this.from, this.to - this.from, this.slice.size]);
         }
         invert(doc3) {
-          return new ReplaceStep(this.from, this.from + this.slice.size, doc3.slice(this.from, this.to));
+          return new _ReplaceStep(this.from, this.from + this.slice.size, doc3.slice(this.from, this.to));
         }
         map(mapping) {
           let from3 = mapping.mapResult(this.from, 1), to2 = mapping.mapResult(this.to, -1);
           if (from3.deletedAcross && to2.deletedAcross)
             return null;
-          return new ReplaceStep(from3.pos, Math.max(from3.pos, to2.pos), this.slice);
+          return new _ReplaceStep(from3.pos, Math.max(from3.pos, to2.pos), this.slice);
         }
         merge(other) {
-          if (!(other instanceof ReplaceStep) || other.structure || this.structure)
+          if (!(other instanceof _ReplaceStep) || other.structure || this.structure)
             return null;
           if (this.from + this.slice.size == other.from && !this.slice.openEnd && !other.slice.openStart) {
             let slice2 = this.slice.size + other.slice.size == 0 ? Slice.empty : new Slice(this.slice.content.append(other.slice.content), this.slice.openStart, other.slice.openEnd);
-            return new ReplaceStep(this.from, this.to + (other.to - other.from), slice2, this.structure);
+            return new _ReplaceStep(this.from, this.to + (other.to - other.from), slice2, this.structure);
           } else if (other.to == this.from && !this.slice.openStart && !other.slice.openEnd) {
             let slice2 = this.slice.size + other.slice.size == 0 ? Slice.empty : new Slice(other.slice.content.append(this.slice.content), other.slice.openStart, this.slice.openEnd);
-            return new ReplaceStep(other.from, this.to, slice2, this.structure);
+            return new _ReplaceStep(other.from, this.to, slice2, this.structure);
           } else {
             return null;
           }
@@ -8732,11 +8786,11 @@
         static fromJSON(schema, json2) {
           if (typeof json2.from != "number" || typeof json2.to != "number")
             throw new RangeError("Invalid input for ReplaceStep.fromJSON");
-          return new ReplaceStep(json2.from, json2.to, Slice.fromJSON(schema, json2.slice), !!json2.structure);
+          return new _ReplaceStep(json2.from, json2.to, Slice.fromJSON(schema, json2.slice), !!json2.structure);
         }
       };
       Step.jsonID("replace", ReplaceStep);
-      ReplaceAroundStep = class extends Step {
+      ReplaceAroundStep = class _ReplaceAroundStep extends Step {
         /**
         Create a replace-around step with the given range and gap.
         `insert` should be the point in the slice into which the content
@@ -8776,14 +8830,14 @@
         }
         invert(doc3) {
           let gap = this.gapTo - this.gapFrom;
-          return new ReplaceAroundStep(this.from, this.from + this.slice.size + gap, this.from + this.insert, this.from + this.insert + gap, doc3.slice(this.from, this.to).removeBetween(this.gapFrom - this.from, this.gapTo - this.from), this.gapFrom - this.from, this.structure);
+          return new _ReplaceAroundStep(this.from, this.from + this.slice.size + gap, this.from + this.insert, this.from + this.insert + gap, doc3.slice(this.from, this.to).removeBetween(this.gapFrom - this.from, this.gapTo - this.from), this.gapFrom - this.from, this.structure);
         }
         map(mapping) {
           let from3 = mapping.mapResult(this.from, 1), to2 = mapping.mapResult(this.to, -1);
           let gapFrom = mapping.map(this.gapFrom, -1), gapTo = mapping.map(this.gapTo, 1);
           if (from3.deletedAcross && to2.deletedAcross || gapFrom < from3.pos || gapTo > to2.pos)
             return null;
-          return new ReplaceAroundStep(from3.pos, to2.pos, gapFrom, gapTo, this.slice, this.insert, this.structure);
+          return new _ReplaceAroundStep(from3.pos, to2.pos, gapFrom, gapTo, this.slice, this.insert, this.structure);
         }
         toJSON() {
           let json2 = {
@@ -8806,7 +8860,7 @@
         static fromJSON(schema, json2) {
           if (typeof json2.from != "number" || typeof json2.to != "number" || typeof json2.gapFrom != "number" || typeof json2.gapTo != "number" || typeof json2.insert != "number")
             throw new RangeError("Invalid input for ReplaceAroundStep.fromJSON");
-          return new ReplaceAroundStep(json2.from, json2.to, json2.gapFrom, json2.gapTo, Slice.fromJSON(schema, json2.slice), json2.insert, !!json2.structure);
+          return new _ReplaceAroundStep(json2.from, json2.to, json2.gapFrom, json2.gapTo, Slice.fromJSON(schema, json2.slice), json2.insert, !!json2.structure);
         }
       };
       Step.jsonID("replaceAround", ReplaceAroundStep);
@@ -9009,7 +9063,7 @@
             this.placed = addToFragment(this.placed, this.frontier.length, add2);
         }
       };
-      AttrStep = class extends Step {
+      AttrStep = class _AttrStep extends Step {
         /**
         Construct an attribute step.
         */
@@ -9034,11 +9088,11 @@
           return StepMap.empty;
         }
         invert(doc3) {
-          return new AttrStep(this.pos, this.attr, doc3.nodeAt(this.pos).attrs[this.attr]);
+          return new _AttrStep(this.pos, this.attr, doc3.nodeAt(this.pos).attrs[this.attr]);
         }
         map(mapping) {
           let pos = mapping.mapResult(this.pos, 1);
-          return pos.deletedAfter ? null : new AttrStep(pos.pos, this.attr, this.value);
+          return pos.deletedAfter ? null : new _AttrStep(pos.pos, this.attr, this.value);
         }
         toJSON() {
           return { stepType: "attr", pos: this.pos, attr: this.attr, value: this.value };
@@ -9046,7 +9100,7 @@
         static fromJSON(schema, json2) {
           if (typeof json2.pos != "number" || typeof json2.attr != "string")
             throw new RangeError("Invalid input for AttrStep.fromJSON");
-          return new AttrStep(json2.pos, json2.attr, json2.value);
+          return new _AttrStep(json2.pos, json2.attr, json2.value);
         }
       };
       Step.jsonID("attr", AttrStep);
@@ -9553,7 +9607,7 @@
         }
       };
       warnedAboutTextSelection = false;
-      TextSelection = class extends Selection {
+      TextSelection = class _TextSelection extends Selection {
         /**
         Construct a text selection between the given points.
         */
@@ -9574,7 +9628,7 @@
           if (!$head.parent.inlineContent)
             return Selection.near($head);
           let $anchor = doc3.resolve(mapping.map(this.anchor));
-          return new TextSelection($anchor.parent.inlineContent ? $anchor : $head, $head);
+          return new _TextSelection($anchor.parent.inlineContent ? $anchor : $head, $head);
         }
         replace(tr, content = Slice.empty) {
           super.replace(tr, content);
@@ -9585,7 +9639,7 @@
           }
         }
         eq(other) {
-          return other instanceof TextSelection && other.anchor == this.anchor && other.head == this.head;
+          return other instanceof _TextSelection && other.anchor == this.anchor && other.head == this.head;
         }
         getBookmark() {
           return new TextBookmark(this.anchor, this.head);
@@ -9599,7 +9653,7 @@
         static fromJSON(doc3, json2) {
           if (typeof json2.anchor != "number" || typeof json2.head != "number")
             throw new RangeError("Invalid input for TextSelection.fromJSON");
-          return new TextSelection(doc3.resolve(json2.anchor), doc3.resolve(json2.head));
+          return new _TextSelection(doc3.resolve(json2.anchor), doc3.resolve(json2.head));
         }
         /**
         Create a text selection from non-resolved positions.
@@ -9636,23 +9690,23 @@
                 $anchor = $head;
             }
           }
-          return new TextSelection($anchor, $head);
+          return new _TextSelection($anchor, $head);
         }
       };
       Selection.jsonID("text", TextSelection);
-      TextBookmark = class {
+      TextBookmark = class _TextBookmark {
         constructor(anchor, head) {
           this.anchor = anchor;
           this.head = head;
         }
         map(mapping) {
-          return new TextBookmark(mapping.map(this.anchor), mapping.map(this.head));
+          return new _TextBookmark(mapping.map(this.anchor), mapping.map(this.head));
         }
         resolve(doc3) {
           return TextSelection.between(doc3.resolve(this.anchor), doc3.resolve(this.head));
         }
       };
-      NodeSelection = class extends Selection {
+      NodeSelection = class _NodeSelection extends Selection {
         /**
         Create a node selection. Does not verify the validity of its
         argument.
@@ -9668,13 +9722,13 @@
           let $pos = doc3.resolve(pos);
           if (deleted)
             return Selection.near($pos);
-          return new NodeSelection($pos);
+          return new _NodeSelection($pos);
         }
         content() {
           return new Slice(Fragment.from(this.node), 0, 0);
         }
         eq(other) {
-          return other instanceof NodeSelection && other.anchor == this.anchor;
+          return other instanceof _NodeSelection && other.anchor == this.anchor;
         }
         toJSON() {
           return { type: "node", anchor: this.anchor };
@@ -9688,13 +9742,13 @@
         static fromJSON(doc3, json2) {
           if (typeof json2.anchor != "number")
             throw new RangeError("Invalid input for NodeSelection.fromJSON");
-          return new NodeSelection(doc3.resolve(json2.anchor));
+          return new _NodeSelection(doc3.resolve(json2.anchor));
         }
         /**
         Create a node selection from non-resolved positions.
         */
         static create(doc3, from3) {
-          return new NodeSelection(doc3.resolve(from3));
+          return new _NodeSelection(doc3.resolve(from3));
         }
         /**
         Determines whether the given node may be selected as a node
@@ -9706,13 +9760,13 @@
       };
       NodeSelection.prototype.visible = false;
       Selection.jsonID("node", NodeSelection);
-      NodeBookmark = class {
+      NodeBookmark = class _NodeBookmark {
         constructor(anchor) {
           this.anchor = anchor;
         }
         map(mapping) {
           let { deleted, pos } = mapping.mapResult(this.anchor);
-          return deleted ? new TextBookmark(pos, pos) : new NodeBookmark(pos);
+          return deleted ? new TextBookmark(pos, pos) : new _NodeBookmark(pos);
         }
         resolve(doc3) {
           let $pos = doc3.resolve(this.anchor), node = $pos.nodeAfter;
@@ -9721,7 +9775,7 @@
           return Selection.near($pos);
         }
       };
-      AllSelection = class extends Selection {
+      AllSelection = class _AllSelection extends Selection {
         /**
         Create an all-selection over the given document.
         */
@@ -9745,13 +9799,13 @@
         @internal
         */
         static fromJSON(doc3) {
-          return new AllSelection(doc3);
+          return new _AllSelection(doc3);
         }
         map(doc3) {
-          return new AllSelection(doc3);
+          return new _AllSelection(doc3);
         }
         eq(other) {
-          return other instanceof AllSelection;
+          return other instanceof _AllSelection;
         }
         getBookmark() {
           return AllBookmark;
@@ -10014,7 +10068,7 @@
             });
         }
       };
-      EditorState = class {
+      EditorState = class _EditorState {
         /**
         @internal
         */
@@ -10094,7 +10148,7 @@
         applyInner(tr) {
           if (!tr.before.eq(this.doc))
             throw new RangeError("Applying a mismatched transaction");
-          let newInstance = new EditorState(this.config), fields = this.config.fields;
+          let newInstance = new _EditorState(this.config), fields = this.config.fields;
           for (let i = 0; i < fields.length; i++) {
             let field = fields[i];
             newInstance[field.name] = field.apply(tr, this[field.name], this, newInstance);
@@ -10112,7 +10166,7 @@
         */
         static create(config) {
           let $config = new Configuration(config.doc ? config.doc.type.schema : config.schema, config.plugins);
-          let instance = new EditorState($config);
+          let instance = new _EditorState($config);
           for (let i = 0; i < $config.fields.length; i++)
             instance[$config.fields[i].name] = $config.fields[i].init(config, instance);
           return instance;
@@ -10127,7 +10181,7 @@
         */
         reconfigure(config) {
           let $config = new Configuration(this.schema, config.plugins);
-          let fields = $config.fields, instance = new EditorState($config);
+          let fields = $config.fields, instance = new _EditorState($config);
           for (let i = 0; i < fields.length; i++) {
             let name = fields[i].name;
             instance[name] = this.hasOwnProperty(name) ? this[name] : fields[i].init(config, instance);
@@ -10168,7 +10222,7 @@
           if (!config.schema)
             throw new RangeError("Required config field 'schema' missing");
           let $config = new Configuration(config.schema, config.plugins);
-          let instance = new EditorState($config);
+          let instance = new _EditorState($config);
           $config.fields.forEach((field) => {
             if (field.name == "doc") {
               instance.doc = Node2.fromJSON(config.schema, json2.doc);
@@ -12961,7 +13015,7 @@
           return mut.type === "characterData" && mut.target.nodeValue == mut.oldValue;
         }
       };
-      MarkViewDesc = class extends ViewDesc {
+      MarkViewDesc = class _MarkViewDesc extends ViewDesc {
         constructor(parent, mark, dom, contentDOM) {
           super(parent, [], dom, contentDOM);
           this.mark = mark;
@@ -12971,7 +13025,7 @@
           let spec = custom && custom(mark, view, inline);
           if (!spec || !spec.dom)
             spec = DOMSerializer.renderSpec(document, mark.type.spec.toDOM(mark, inline));
-          return new MarkViewDesc(parent, mark, spec.dom, spec.contentDOM || spec.dom);
+          return new _MarkViewDesc(parent, mark, spec.dom, spec.contentDOM || spec.dom);
         }
         parseRule() {
           if (this.dirty & NODE_DIRTY || this.mark.type.spec.reparseInView)
@@ -12993,7 +13047,7 @@
           }
         }
         slice(from3, to2, view) {
-          let copy2 = MarkViewDesc.create(this.parent, this.mark, true, view);
+          let copy2 = _MarkViewDesc.create(this.parent, this.mark, true, view);
           let nodes = this.children, size = this.size;
           if (to2 < size)
             nodes = replaceNodes(nodes, to2, size, view);
@@ -13005,7 +13059,7 @@
           return copy2;
         }
       };
-      NodeViewDesc = class extends ViewDesc {
+      NodeViewDesc = class _NodeViewDesc extends ViewDesc {
         constructor(parent, node, outerDeco, innerDeco, dom, contentDOM, nodeDOM, view, pos) {
           super(parent, [], dom, contentDOM);
           this.node = node;
@@ -13054,7 +13108,7 @@
           else if (node.isText)
             return new TextViewDesc(parent, node, outerDeco, innerDeco, dom, nodeDOM, view);
           else
-            return new NodeViewDesc(parent, node, outerDeco, innerDeco, dom, contentDOM || null, nodeDOM, view, pos + 1);
+            return new _NodeViewDesc(parent, node, outerDeco, innerDeco, dom, contentDOM || null, nodeDOM, view, pos + 1);
         }
         parseRule() {
           if (this.node.type.spec.reparseInView)
@@ -13210,7 +13264,7 @@
           return this.node.isAtom;
         }
       };
-      TextViewDesc = class extends NodeViewDesc {
+      TextViewDesc = class _TextViewDesc extends NodeViewDesc {
         constructor(parent, node, outerDeco, innerDeco, dom, nodeDOM, view) {
           super(parent, node, outerDeco, innerDeco, dom, null, nodeDOM, view, 0);
         }
@@ -13253,7 +13307,7 @@
         }
         slice(from3, to2, view) {
           let node = this.node.cut(from3, to2), dom = document.createTextNode(node.text);
-          return new TextViewDesc(this.parent, node, this.outerDeco, this.innerDeco, dom, dom, view);
+          return new _TextViewDesc(this.parent, node, this.outerDeco, this.innerDeco, dom, dom, view);
         }
         markDirty(from3, to2) {
           super.markDirty(from3, to2);
@@ -13940,7 +13994,7 @@
       };
       for (let prop in editHandlers)
         handlers[prop] = editHandlers[prop];
-      WidgetType = class {
+      WidgetType = class _WidgetType {
         constructor(toDOM, spec) {
           this.toDOM = toDOM;
           this.spec = spec || noSpec;
@@ -13954,14 +14008,14 @@
           return true;
         }
         eq(other) {
-          return this == other || other instanceof WidgetType && (this.spec.key && this.spec.key == other.spec.key || this.toDOM == other.toDOM && compareObjs(this.spec, other.spec));
+          return this == other || other instanceof _WidgetType && (this.spec.key && this.spec.key == other.spec.key || this.toDOM == other.toDOM && compareObjs(this.spec, other.spec));
         }
         destroy(node) {
           if (this.spec.destroy)
             this.spec.destroy(node);
         }
       };
-      InlineType = class {
+      InlineType = class _InlineType {
         constructor(attrs, spec) {
           this.attrs = attrs;
           this.spec = spec || noSpec;
@@ -13975,15 +14029,15 @@
           return span.from < span.to;
         }
         eq(other) {
-          return this == other || other instanceof InlineType && compareObjs(this.attrs, other.attrs) && compareObjs(this.spec, other.spec);
+          return this == other || other instanceof _InlineType && compareObjs(this.attrs, other.attrs) && compareObjs(this.spec, other.spec);
         }
         static is(span) {
-          return span.type instanceof InlineType;
+          return span.type instanceof _InlineType;
         }
         destroy() {
         }
       };
-      NodeType2 = class {
+      NodeType2 = class _NodeType {
         constructor(attrs, spec) {
           this.attrs = attrs;
           this.spec = spec || noSpec;
@@ -14002,12 +14056,12 @@
           return offset2 == span.from && !(child = node.child(index3)).isText && offset2 + child.nodeSize == span.to;
         }
         eq(other) {
-          return this == other || other instanceof NodeType2 && compareObjs(this.attrs, other.attrs) && compareObjs(this.spec, other.spec);
+          return this == other || other instanceof _NodeType && compareObjs(this.attrs, other.attrs) && compareObjs(this.spec, other.spec);
         }
         destroy() {
         }
       };
-      Decoration = class {
+      Decoration = class _Decoration {
         /**
         @internal
         */
@@ -14020,7 +14074,7 @@
         @internal
         */
         copy(from3, to2) {
-          return new Decoration(from3, to2, this.type);
+          return new _Decoration(from3, to2, this.type);
         }
         /**
         @internal
@@ -14043,14 +14097,14 @@
         widget's current document position.
         */
         static widget(pos, toDOM, spec) {
-          return new Decoration(pos, pos, new WidgetType(toDOM, spec));
+          return new _Decoration(pos, pos, new WidgetType(toDOM, spec));
         }
         /**
         Creates an inline decoration, which adds the given attributes to
         each inline node between `from` and `to`.
         */
         static inline(from3, to2, attrs, spec) {
-          return new Decoration(from3, to2, new InlineType(attrs, spec));
+          return new _Decoration(from3, to2, new InlineType(attrs, spec));
         }
         /**
         Creates a node decoration. `from` and `to` should point precisely
@@ -14058,7 +14112,7 @@
         node, will receive the given attributes.
         */
         static node(from3, to2, attrs, spec) {
-          return new Decoration(from3, to2, new NodeType2(attrs, spec));
+          return new _Decoration(from3, to2, new NodeType2(attrs, spec));
         }
         /**
         The spec provided when creating this decoration. Can be useful
@@ -14076,7 +14130,7 @@
       };
       none = [];
       noSpec = {};
-      DecorationSet = class {
+      DecorationSet = class _DecorationSet {
         /**
         @internal
         */
@@ -14141,7 +14195,7 @@
           if (this.children.length)
             return mapChildren(this.children, newLocal || [], mapping, node, offset2, oldOffset, options);
           else
-            return newLocal ? new DecorationSet(newLocal.sort(byPos), none) : empty;
+            return newLocal ? new _DecorationSet(newLocal.sort(byPos), none) : empty;
         }
         /**
         Add the given array of decorations to the ones in the set,
@@ -14152,7 +14206,7 @@
           if (!decorations.length)
             return this;
           if (this == empty)
-            return DecorationSet.create(doc3, decorations);
+            return _DecorationSet.create(doc3, decorations);
           return this.addInner(doc3, decorations, 0);
         }
         addInner(doc3, decorations, offset2) {
@@ -14175,7 +14229,7 @@
           for (let i = 0; i < local.length; i++)
             if (!local[i].type.valid(doc3, local[i]))
               local.splice(i--, 1);
-          return new DecorationSet(local.length ? this.local.concat(local).sort(byPos) : this.local, children || this.children);
+          return new _DecorationSet(local.length ? this.local.concat(local).sort(byPos) : this.local, children || this.children);
         }
         /**
         Create a new set that contains the decorations in this set, minus
@@ -14223,7 +14277,7 @@
           }
           if (children == this.children && local == this.local)
             return this;
-          return local.length || children.length ? new DecorationSet(local, children) : empty;
+          return local.length || children.length ? new _DecorationSet(local, children) : empty;
         }
         /**
         @internal
@@ -14232,7 +14286,7 @@
           if (this == empty)
             return this;
           if (node.isLeaf)
-            return DecorationSet.empty;
+            return _DecorationSet.empty;
           let child, local;
           for (let i = 0; i < this.children.length; i += 3)
             if (this.children[i] >= offset2) {
@@ -14250,7 +14304,7 @@
             }
           }
           if (local) {
-            let localSet = new DecorationSet(local.sort(byPos), none);
+            let localSet = new _DecorationSet(local.sort(byPos), none);
             return child ? new DecorationGroup([localSet, child]) : localSet;
           }
           return child || empty;
@@ -14261,7 +14315,7 @@
         eq(other) {
           if (this == other)
             return true;
-          if (!(other instanceof DecorationSet) || this.local.length != other.local.length || this.children.length != other.children.length)
+          if (!(other instanceof _DecorationSet) || this.local.length != other.local.length || this.children.length != other.children.length)
             return false;
           for (let i = 0; i < this.local.length; i++)
             if (!this.local[i].eq(other.local[i]))
@@ -14296,13 +14350,13 @@
       DecorationSet.empty = new DecorationSet([], []);
       DecorationSet.removeOverlap = removeOverlap;
       empty = DecorationSet.empty;
-      DecorationGroup = class {
+      DecorationGroup = class _DecorationGroup {
         constructor(members) {
           this.members = members;
         }
         map(mapping, doc3) {
           const mappedDecos = this.members.map((member) => member.map(mapping, doc3, noSpec));
-          return DecorationGroup.from(mappedDecos);
+          return _DecorationGroup.from(mappedDecos);
         }
         forChild(offset2, child) {
           if (child.isLeaf)
@@ -14312,15 +14366,15 @@
             let result = this.members[i].forChild(offset2, child);
             if (result == empty)
               continue;
-            if (result instanceof DecorationGroup)
+            if (result instanceof _DecorationGroup)
               found2 = found2.concat(result.members);
             else
               found2.push(result);
           }
-          return DecorationGroup.from(found2);
+          return _DecorationGroup.from(found2);
         }
         eq(other) {
-          if (!(other instanceof DecorationGroup) || other.members.length != this.members.length)
+          if (!(other instanceof _DecorationGroup) || other.members.length != this.members.length)
             return false;
           for (let i = 0; i < this.members.length; i++)
             if (!this.members[i].eq(other.members[i]))
@@ -14355,7 +14409,7 @@
             case 1:
               return members[0];
             default:
-              return new DecorationGroup(members.every((m) => m instanceof DecorationSet) ? members : members.reduce((r, m) => r.concat(m instanceof DecorationSet ? m : m.members), []));
+              return new _DecorationGroup(members.every((m) => m instanceof DecorationSet) ? members : members.reduce((r, m) => r.concat(m instanceof DecorationSet ? m : m.members), []));
           }
         }
       };
@@ -16969,12 +17023,12 @@
     });
   }
   function getChangedRanges(transform) {
-    const { mapping, steps } = transform;
+    const { mapping, steps: steps2 } = transform;
     const changes = [];
     mapping.maps.forEach((stepMap, index3) => {
       const ranges = [];
       if (!stepMap.ranges.length) {
-        const { from: from3, to: to2 } = steps[index3];
+        const { from: from3, to: to2 } = steps2[index3];
         if (from3 === void 0 || to2 === void 0) {
           return;
         }
@@ -17650,11 +17704,11 @@
           return result;
         });
       };
-      ExtensionManager = class {
+      ExtensionManager = class _ExtensionManager {
         constructor(extensions2, editor) {
           this.splittableMarks = [];
           this.editor = editor;
-          this.extensions = ExtensionManager.resolve(extensions2);
+          this.extensions = _ExtensionManager.resolve(extensions2);
           this.schema = getSchemaByResolvedExtensions(this.extensions);
           this.extensions.forEach((extension) => {
             var _a;
@@ -17707,7 +17761,7 @@
           });
         }
         static resolve(extensions2) {
-          const resolvedExtensions = ExtensionManager.sort(ExtensionManager.flatten(extensions2));
+          const resolvedExtensions = _ExtensionManager.sort(_ExtensionManager.flatten(extensions2));
           const duplicatedNames = findDuplicates(resolvedExtensions.map((extension) => extension.name));
           if (duplicatedNames.length) {
             console.warn(`[tiptap warn]: Duplicate extension names found: [${duplicatedNames.map((item) => `'${item}'`).join(", ")}]. This can lead to issues.`);
@@ -17763,7 +17817,7 @@
         }
         get plugins() {
           const { editor } = this;
-          const extensions2 = ExtensionManager.sort([...this.extensions].reverse());
+          const extensions2 = _ExtensionManager.sort([...this.extensions].reverse());
           const inputRules = [];
           const pasteRules = [];
           const allPlugins2 = extensions2.map((extension) => {
@@ -17849,7 +17903,7 @@
           }));
         }
       };
-      Extension = class {
+      Extension = class _Extension {
         constructor(config = {}) {
           this.type = "extension";
           this.name = "extension";
@@ -17879,7 +17933,7 @@
           })) || {};
         }
         static create(config = {}) {
-          return new Extension(config);
+          return new _Extension(config);
         }
         configure(options = {}) {
           const extension = this.extend();
@@ -17891,7 +17945,7 @@
           return extension;
         }
         extend(extendedConfig = {}) {
-          const extension = new Extension(extendedConfig);
+          const extension = new _Extension(extendedConfig);
           extension.parent = this;
           this.child = extension;
           extension.name = extendedConfig.name ? extendedConfig.name : extension.parent.name;
@@ -19309,7 +19363,7 @@ img.ProseMirror-separator {
           return !((_a = this.view) === null || _a === void 0 ? void 0 : _a.docView);
         }
       };
-      Mark2 = class {
+      Mark2 = class _Mark {
         constructor(config = {}) {
           this.type = "mark";
           this.name = "mark";
@@ -19339,7 +19393,7 @@ img.ProseMirror-separator {
           })) || {};
         }
         static create(config = {}) {
-          return new Mark2(config);
+          return new _Mark(config);
         }
         configure(options = {}) {
           const extension = this.extend();
@@ -19351,7 +19405,7 @@ img.ProseMirror-separator {
           return extension;
         }
         extend(extendedConfig = {}) {
-          const extension = new Mark2(extendedConfig);
+          const extension = new _Mark(extendedConfig);
           extension.parent = this;
           this.child = extension;
           extension.name = extendedConfig.name ? extendedConfig.name : extension.parent.name;
@@ -19388,7 +19442,7 @@ img.ProseMirror-separator {
           return false;
         }
       };
-      Node3 = class {
+      Node3 = class _Node {
         constructor(config = {}) {
           this.type = "node";
           this.name = "node";
@@ -19418,7 +19472,7 @@ img.ProseMirror-separator {
           })) || {};
         }
         static create(config = {}) {
-          return new Node3(config);
+          return new _Node(config);
         }
         configure(options = {}) {
           const extension = this.extend();
@@ -19430,7 +19484,7 @@ img.ProseMirror-separator {
           return extension;
         }
         extend(extendedConfig = {}) {
-          const extension = new Node3(extendedConfig);
+          const extension = new _Node(extendedConfig);
           extension.parent = this;
           this.child = extension;
           extension.name = extendedConfig.name ? extendedConfig.name : extension.parent.name;
@@ -19912,7 +19966,7 @@ img.ProseMirror-separator {
       init_dist4();
       init_dist2();
       init_dist6();
-      GapCursor = class extends Selection {
+      GapCursor = class _GapCursor extends Selection {
         /**
         Create a gap cursor.
         */
@@ -19921,13 +19975,13 @@ img.ProseMirror-separator {
         }
         map(doc3, mapping) {
           let $pos = doc3.resolve(mapping.map(this.head));
-          return GapCursor.valid($pos) ? new GapCursor($pos) : Selection.near($pos);
+          return _GapCursor.valid($pos) ? new _GapCursor($pos) : Selection.near($pos);
         }
         content() {
           return Slice.empty;
         }
         eq(other) {
-          return other instanceof GapCursor && other.head == this.head;
+          return other instanceof _GapCursor && other.head == this.head;
         }
         toJSON() {
           return { type: "gapcursor", pos: this.head };
@@ -19938,7 +19992,7 @@ img.ProseMirror-separator {
         static fromJSON(doc3, json2) {
           if (typeof json2.pos != "number")
             throw new RangeError("Invalid input for GapCursor.fromJSON");
-          return new GapCursor(doc3.resolve(json2.pos));
+          return new _GapCursor(doc3.resolve(json2.pos));
         }
         /**
         @internal
@@ -19965,7 +20019,7 @@ img.ProseMirror-separator {
         static findGapCursorFrom($pos, dir, mustMove = false) {
           search:
             for (; ; ) {
-              if (!mustMove && GapCursor.valid($pos))
+              if (!mustMove && _GapCursor.valid($pos))
                 return $pos;
               let pos = $pos.pos, next = null;
               for (let d = $pos.depth; ; d--) {
@@ -19978,7 +20032,7 @@ img.ProseMirror-separator {
                 }
                 pos += dir;
                 let $cur = $pos.doc.resolve(pos);
-                if (GapCursor.valid($cur))
+                if (_GapCursor.valid($cur))
                   return $cur;
               }
               for (; ; ) {
@@ -19994,7 +20048,7 @@ img.ProseMirror-separator {
                 next = inside;
                 pos += dir;
                 let $cur = $pos.doc.resolve(pos);
-                if (GapCursor.valid($cur))
+                if (_GapCursor.valid($cur))
                   return $cur;
               }
               return null;
@@ -20004,12 +20058,12 @@ img.ProseMirror-separator {
       GapCursor.prototype.visible = false;
       GapCursor.findFrom = GapCursor.findGapCursorFrom;
       Selection.jsonID("gapcursor", GapCursor);
-      GapBookmark = class {
+      GapBookmark = class _GapBookmark {
         constructor(pos) {
           this.pos = pos;
         }
         map(mapping) {
-          return new GapBookmark(mapping.map(this.pos));
+          return new _GapBookmark(mapping.map(this.pos));
         }
         resolve(doc3) {
           let $pos = doc3.resolve(this.pos);
@@ -20387,7 +20441,7 @@ img.ProseMirror-separator {
       init_dist3();
       init_dist4();
       max_empty_items = 500;
-      Branch = class {
+      Branch = class _Branch {
         constructor(items, eventCount) {
           this.items = items;
           this.eventCount = eventCount;
@@ -20438,7 +20492,7 @@ img.ProseMirror-separator {
             }
             if (item.selection) {
               selection = remap ? item.selection.map(remap.slice(mapFrom)) : item.selection;
-              remaining = new Branch(this.items.slice(0, end2).append(addBefore.reverse().concat(addAfter)), this.eventCount - 1);
+              remaining = new _Branch(this.items.slice(0, end2).append(addBefore.reverse().concat(addAfter)), this.eventCount - 1);
               return false;
             }
           }, this.items.length, 0);
@@ -20471,7 +20525,7 @@ img.ProseMirror-separator {
             oldItems = cutOffEvents(oldItems, overflow);
             eventCount -= overflow;
           }
-          return new Branch(oldItems.append(newItems), eventCount);
+          return new _Branch(oldItems.append(newItems), eventCount);
         }
         remapping(from3, to2) {
           let maps = new Mapping();
@@ -20484,7 +20538,7 @@ img.ProseMirror-separator {
         addMaps(array) {
           if (this.eventCount == 0)
             return this;
-          return new Branch(this.items.append(array.map((map4) => new Item(map4))), this.eventCount);
+          return new _Branch(this.items.append(array.map((map4) => new Item(map4))), this.eventCount);
         }
         // When the collab module receives remote changes, the history has
         // to know about those, so that it can adjust the steps that were
@@ -20522,7 +20576,7 @@ img.ProseMirror-separator {
           for (let i = rebasedCount; i < newUntil; i++)
             newMaps.push(new Item(mapping.maps[i]));
           let items = this.items.slice(0, start3).append(newMaps).append(rebasedItems);
-          let branch = new Branch(items, eventCount);
+          let branch = new _Branch(items, eventCount);
           if (branch.emptyItemCount() > max_empty_items)
             branch = branch.compress(this.items.length - rebasedItems.length);
           return branch;
@@ -20568,11 +20622,11 @@ img.ProseMirror-separator {
               mapFrom--;
             }
           }, this.items.length, 0);
-          return new Branch(index_es_default.from(items.reverse()), events);
+          return new _Branch(index_es_default.from(items.reverse()), events);
         }
       };
       Branch.empty = new Branch(index_es_default.empty, 0);
-      Item = class {
+      Item = class _Item {
         constructor(map4, step, selection, mirrorOffset) {
           this.map = map4;
           this.step = step;
@@ -20583,7 +20637,7 @@ img.ProseMirror-separator {
           if (this.step && other.step && !other.selection) {
             let step = other.step.merge(this.step);
             if (step)
-              return new Item(step.getMap().invert(), step, this.selection);
+              return new _Item(step.getMap().invert(), step, this.selection);
           }
         }
       };
@@ -26887,7 +26941,7 @@ img.ProseMirror-separator {
         Object.assign(result, opts);
         return result;
       };
-      TokenTree = class {
+      TokenTree = class _TokenTree {
         constructor() {
           this.rootNode = newNode();
           this.stack = [this.rootNode];
@@ -26954,7 +27008,7 @@ img.ProseMirror-separator {
             node.children = [node.children.join("")];
           } else {
             node.children.forEach((child) => {
-              TokenTree._collapse(child);
+              _TokenTree._collapse(child);
             });
           }
         }
@@ -28316,8 +28370,7 @@ img.ProseMirror-separator {
 
   // node_modules/highlight.js/lib/core.js
   var require_core = __commonJS({
-    "node_modules/highlight.js/lib/core.js"(exports2, module2) {
-      var deepFreezeEs62 = { exports: {} };
+    "node_modules/highlight.js/lib/core.js"(exports, module) {
       function deepFreeze2(obj) {
         if (obj instanceof Map) {
           obj.clear = obj.delete = obj.set = function() {
@@ -28329,16 +28382,15 @@ img.ProseMirror-separator {
           };
         }
         Object.freeze(obj);
-        Object.getOwnPropertyNames(obj).forEach(function(name) {
-          var prop = obj[name];
-          if (typeof prop == "object" && !Object.isFrozen(prop)) {
+        Object.getOwnPropertyNames(obj).forEach((name) => {
+          const prop = obj[name];
+          const type = typeof prop;
+          if ((type === "object" || type === "function") && !Object.isFrozen(prop)) {
             deepFreeze2(prop);
           }
         });
         return obj;
       }
-      deepFreezeEs62.exports = deepFreeze2;
-      deepFreezeEs62.exports.default = deepFreeze2;
       var Response3 = class {
         /**
          * @param {CompiledMode} mode
@@ -28373,9 +28425,12 @@ img.ProseMirror-separator {
       }
       var SPAN_CLOSE2 = "</span>";
       var emitsWrappingTags2 = (node) => {
-        return !!node.scope || node.sublanguage && node.language;
+        return !!node.scope;
       };
       var scopeToCSSClass2 = (name, { prefix }) => {
+        if (name.startsWith("language:")) {
+          return name.replace("language:", "language-");
+        }
         if (name.includes(".")) {
           const pieces = name.split(".");
           return [
@@ -28411,12 +28466,10 @@ img.ProseMirror-separator {
         openNode(node) {
           if (!emitsWrappingTags2(node))
             return;
-          let className = "";
-          if (node.sublanguage) {
-            className = `language-${node.language}`;
-          } else {
-            className = scopeToCSSClass2(node.scope, { prefix: this.classPrefix });
-          }
+          const className = scopeToCSSClass2(
+            node.scope,
+            { prefix: this.classPrefix }
+          );
           this.span(className);
         }
         /**
@@ -28448,7 +28501,7 @@ img.ProseMirror-separator {
         Object.assign(result, opts);
         return result;
       };
-      var TokenTree2 = class {
+      var TokenTree2 = class _TokenTree {
         constructor() {
           this.rootNode = newNode2();
           this.stack = [this.rootNode];
@@ -28515,7 +28568,7 @@ img.ProseMirror-separator {
             node.children = [node.children.join("")];
           } else {
             node.children.forEach((child) => {
-              TokenTree2._collapse(child);
+              _TokenTree._collapse(child);
             });
           }
         }
@@ -28530,18 +28583,6 @@ img.ProseMirror-separator {
         }
         /**
          * @param {string} text
-         * @param {string} scope
-         */
-        addKeyword(text2, scope) {
-          if (text2 === "") {
-            return;
-          }
-          this.openNode(scope);
-          this.addText(text2);
-          this.closeNode();
-        }
-        /**
-         * @param {string} text
          */
         addText(text2) {
           if (text2 === "") {
@@ -28549,14 +28590,21 @@ img.ProseMirror-separator {
           }
           this.add(text2);
         }
+        /** @param {string} scope */
+        startScope(scope) {
+          this.openNode(scope);
+        }
+        endScope() {
+          this.closeNode();
+        }
         /**
          * @param {Emitter & {root: DataNode}} emitter
          * @param {string} name
          */
-        addSublanguage(emitter, name) {
+        __addSublanguage(emitter, name) {
           const node = emitter.root;
-          node.sublanguage = true;
-          node.language = name;
+          if (name)
+            node.scope = `language:${name}`;
           this.add(node);
         }
         toHTML() {
@@ -28564,6 +28612,7 @@ img.ProseMirror-separator {
           return renderer.value();
         }
         finalize() {
+          this.closeAllNodes();
           return true;
         }
       };
@@ -29251,7 +29300,7 @@ img.ProseMirror-separator {
         }
         return mode;
       }
-      var version4 = "11.7.0";
+      var version4 = "11.8.0";
       var HTMLInjectionError2 = class extends Error {
         constructor(reason, html) {
           super(reason);
@@ -29354,7 +29403,7 @@ img.ProseMirror-separator {
                   buf += match[0];
                 } else {
                   const cssClass = language.classNameAliases[kind] || kind;
-                  emitter.addKeyword(match[0], cssClass);
+                  emitKeyword(match[0], cssClass);
                 }
               } else {
                 buf += match[0];
@@ -29383,7 +29432,7 @@ img.ProseMirror-separator {
             if (top2.relevance > 0) {
               relevance += result2.relevance;
             }
-            emitter.addSublanguage(result2._emitter, result2.language);
+            emitter.__addSublanguage(result2._emitter, result2.language);
           }
           function processBuffer() {
             if (top2.subLanguage != null) {
@@ -29392,6 +29441,13 @@ img.ProseMirror-separator {
               processKeywords();
             }
             modeBuffer = "";
+          }
+          function emitKeyword(keyword, scope) {
+            if (keyword === "")
+              return;
+            emitter.startScope(scope);
+            emitter.addText(keyword);
+            emitter.endScope();
           }
           function emitMultiClass(scope, match) {
             let i = 1;
@@ -29404,7 +29460,7 @@ img.ProseMirror-separator {
               const klass = language.classNameAliases[scope[i]] || scope[i];
               const text2 = match[i];
               if (klass) {
-                emitter.addKeyword(text2, klass);
+                emitKeyword(text2, klass);
               } else {
                 modeBuffer = text2;
                 processKeywords();
@@ -29419,7 +29475,7 @@ img.ProseMirror-separator {
             }
             if (mode.beginScope) {
               if (mode.beginScope._wrap) {
-                emitter.addKeyword(modeBuffer, language.classNameAliases[mode.beginScope._wrap] || mode.beginScope._wrap);
+                emitKeyword(modeBuffer, language.classNameAliases[mode.beginScope._wrap] || mode.beginScope._wrap);
                 modeBuffer = "";
               } else if (mode.beginScope._multi) {
                 emitMultiClass(mode.beginScope, match);
@@ -29494,7 +29550,7 @@ img.ProseMirror-separator {
             const origin = top2;
             if (top2.endScope && top2.endScope._wrap) {
               processBuffer();
-              emitter.addKeyword(lexeme, top2.endScope._wrap);
+              emitKeyword(lexeme, top2.endScope._wrap);
             } else if (top2.endScope && top2.endScope._multi) {
               processBuffer();
               emitMultiClass(top2.endScope, match);
@@ -29590,24 +29646,27 @@ img.ProseMirror-separator {
           let iterations = 0;
           let resumeScanAtSamePosition = false;
           try {
-            top2.matcher.considerAll();
-            for (; ; ) {
-              iterations++;
-              if (resumeScanAtSamePosition) {
-                resumeScanAtSamePosition = false;
-              } else {
-                top2.matcher.considerAll();
+            if (!language.__emitTokens) {
+              top2.matcher.considerAll();
+              for (; ; ) {
+                iterations++;
+                if (resumeScanAtSamePosition) {
+                  resumeScanAtSamePosition = false;
+                } else {
+                  top2.matcher.considerAll();
+                }
+                top2.matcher.lastIndex = index3;
+                const match = top2.matcher.exec(codeToHighlight);
+                if (!match)
+                  break;
+                const beforeMatch = codeToHighlight.substring(index3, match.index);
+                const processedCount = processLexeme(beforeMatch, match);
+                index3 = match.index + processedCount;
               }
-              top2.matcher.lastIndex = index3;
-              const match = top2.matcher.exec(codeToHighlight);
-              if (!match)
-                break;
-              const beforeMatch = codeToHighlight.substring(index3, match.index);
-              const processedCount = processLexeme(beforeMatch, match);
-              index3 = match.index + processedCount;
+              processLexeme(codeToHighlight.substring(index3));
+            } else {
+              language.__emitTokens(codeToHighlight, emitter);
             }
-            processLexeme(codeToHighlight.substring(index3));
-            emitter.closeAllNodes();
             emitter.finalize();
             result = emitter.toHTML();
             return {
@@ -29827,6 +29886,12 @@ img.ProseMirror-separator {
           upgradePluginAPI(plugin);
           plugins3.push(plugin);
         }
+        function removePlugin(plugin) {
+          const index3 = plugins3.indexOf(plugin);
+          if (index3 !== -1) {
+            plugins3.splice(index3, 1);
+          }
+        }
         function fire(event, args) {
           const cb = event;
           plugins3.forEach(function(plugin) {
@@ -29857,7 +29922,8 @@ img.ProseMirror-separator {
           registerAliases,
           autoDetection,
           inherit: inherit2,
-          addPlugin
+          addPlugin,
+          removePlugin
         });
         hljs.debugMode = function() {
           SAFE_MODE = false;
@@ -29875,14 +29941,15 @@ img.ProseMirror-separator {
         };
         for (const key in MODES4) {
           if (typeof MODES4[key] === "object") {
-            deepFreezeEs62.exports(MODES4[key]);
+            deepFreeze2(MODES4[key]);
           }
         }
         Object.assign(hljs, MODES4);
         return hljs;
       };
       var highlight3 = HLJS2({});
-      module2.exports = highlight3;
+      highlight3.newInstance = () => HLJS2({});
+      module.exports = highlight3;
       highlight3.HighlightJS = highlight3;
       highlight3.default = highlight3;
     }
@@ -29899,11 +29966,11 @@ img.ProseMirror-separator {
 
   // node_modules/format/format.js
   var require_format = __commonJS({
-    "node_modules/format/format.js"(exports2, module2) {
+    "node_modules/format/format.js"(exports, module) {
       (function() {
         var namespace;
-        if (typeof module2 !== "undefined") {
-          namespace = module2.exports = format2;
+        if (typeof module !== "undefined") {
+          namespace = module.exports = format2;
         } else {
           namespace = function() {
             return this || (1, eval)("this");
@@ -30139,19 +30206,22 @@ img.ProseMirror-separator {
           }
         }
         /**
-         * @param {string} value
-         * @param {string} name
+         *
+         * @param {unknown} rawName
          */
-        addKeyword(value, name) {
-          this.openNode(name);
-          this.addText(value);
+        startScope(rawName) {
+          this.openNode(String(rawName));
+        }
+        /**
+         */
+        endScope() {
           this.closeNode();
         }
         /**
          * @param {HastEmitter} other
          * @param {string} name
          */
-        addSublanguage(other, name) {
+        __addSublanguage(other, name) {
           const current = this.stack[this.stack.length - 1];
           const results = other.root.children;
           if (name) {
@@ -30184,10 +30254,6 @@ img.ProseMirror-separator {
          */
         closeNode() {
           this.stack.pop();
-        }
-        /**
-         */
-        closeAllNodes() {
         }
         /**
          */
@@ -31062,6 +31128,19 @@ img.ProseMirror-separator {
         subLanguage: "css"
       }
     };
+    const GRAPHQL_TEMPLATE = {
+      begin: "gql`",
+      end: "",
+      starts: {
+        end: "`",
+        returnEnd: false,
+        contains: [
+          hljs.BACKSLASH_ESCAPE,
+          SUBST
+        ],
+        subLanguage: "graphql"
+      }
+    };
     const TEMPLATE_STRING = {
       className: "string",
       begin: "`",
@@ -31123,6 +31202,7 @@ img.ProseMirror-separator {
       hljs.QUOTE_STRING_MODE,
       HTML_TEMPLATE,
       CSS_TEMPLATE,
+      GRAPHQL_TEMPLATE,
       TEMPLATE_STRING,
       // Skip numbers when they are part of a variable name
       { match: /\$\d+/ },
@@ -31324,7 +31404,7 @@ img.ProseMirror-separator {
       ]
     };
     return {
-      name: "Javascript",
+      name: "JavaScript",
       aliases: ["js", "jsx", "mjs", "cjs"],
       keywords: KEYWORDS$1,
       // this will be extended by TypeScript
@@ -31341,6 +31421,7 @@ img.ProseMirror-separator {
         hljs.QUOTE_STRING_MODE,
         HTML_TEMPLATE,
         CSS_TEMPLATE,
+        GRAPHQL_TEMPLATE,
         TEMPLATE_STRING,
         COMMENT2,
         // Skip numbers when they are part of a variable name
@@ -31620,6 +31701,7 @@ img.ProseMirror-separator {
         "window",
         "document",
         "localStorage",
+        "sessionStorage",
         "module",
         "global"
         // Node.js
@@ -33384,7 +33466,7 @@ img.ProseMirror-separator {
     });
     const VARIABLE = {
       className: "variable",
-      begin: /@[a-z0-9]+/
+      begin: /@[a-z0-9][a-z0-9_]*/
     };
     const OPERATOR = {
       className: "operator",
@@ -34106,633 +34188,1831 @@ img.ProseMirror-separator {
     }
   });
 
-  // node_modules/slim-select/dist/slimselect.min.mjs
-  var slimselect_min_exports = {};
-  __export(slimselect_min_exports, {
-    default: () => slimselect_min_default
-  });
-  var exports, slimselect_min_default;
-  var init_slimselect_min = __esm({
-    "node_modules/slim-select/dist/slimselect.min.mjs"() {
-      exports = {};
-      !function(e, t) {
-        "object" == typeof exports && "object" == typeof module ? module.exports = t() : "function" == typeof define && define.amd ? define([], t) : "object" == typeof exports ? exports.SlimSelect = t() : e.SlimSelect = t();
-      }(window, function() {
-        return n = {}, s.m = i = [function(e, t, i2) {
-          "use strict";
-          function n2(e2, t2) {
-            t2 = t2 || { bubbles: false, cancelable: false, detail: void 0 };
-            var i3 = document.createEvent("CustomEvent");
-            return i3.initCustomEvent(e2, t2.bubbles, t2.cancelable, t2.detail), i3;
+  // node_modules/slim-select/dist/slimselect.js
+  var require_slimselect = __commonJS({
+    "node_modules/slim-select/dist/slimselect.js"(exports, module) {
+      (function(global2, factory) {
+        typeof exports === "object" && typeof module !== "undefined" ? module.exports = factory() : typeof define === "function" && define.amd ? define(factory) : (global2 = typeof globalThis !== "undefined" ? globalThis : global2 || self, global2.SlimSelect = factory());
+      })(exports, function() {
+        "use strict";
+        function generateID() {
+          return Math.random().toString(36).substring(2, 10);
+        }
+        function hasClassInTree(element, className) {
+          function hasClass(e, c) {
+            if (c && e && e.classList && e.classList.contains(c)) {
+              return e;
+            }
+            if (c && e && e.dataset && e.dataset.id && e.dataset.id === className) {
+              return e;
+            }
+            return null;
           }
-          t.__esModule = true, t.kebabCase = t.highlight = t.isValueInArrayOfObjects = t.debounce = t.putContent = t.ensureElementInView = t.hasClassInTree = void 0, t.hasClassInTree = function(e2, t2) {
-            function n3(e3, t3) {
-              return t3 && e3 && e3.classList && e3.classList.contains(t3) ? e3 : null;
-            }
-            return n3(e2, t2) || function e3(t3, i3) {
-              return t3 && t3 !== document ? n3(t3, i3) ? t3 : e3(t3.parentNode, i3) : null;
-            }(e2, t2);
-          }, t.ensureElementInView = function(e2, t2) {
-            var i3 = e2.scrollTop + e2.offsetTop, n3 = i3 + e2.clientHeight, s2 = t2.offsetTop, t2 = s2 + t2.clientHeight;
-            s2 < i3 ? e2.scrollTop -= i3 - s2 : n3 < t2 && (e2.scrollTop += t2 - n3);
-          }, t.putContent = function(e2, t2, i3) {
-            var n3 = e2.offsetHeight, s2 = e2.getBoundingClientRect(), e2 = i3 ? s2.top : s2.top - n3, n3 = i3 ? s2.bottom : s2.bottom + n3;
-            return e2 <= 0 ? "below" : n3 >= window.innerHeight ? "above" : i3 ? t2 : "below";
-          }, t.debounce = function(s2, a, o) {
-            var l;
-            return void 0 === a && (a = 100), void 0 === o && (o = false), function() {
-              for (var e2 = [], t2 = 0; t2 < arguments.length; t2++)
-                e2[t2] = arguments[t2];
-              var i3 = self, n3 = o && !l;
-              clearTimeout(l), l = setTimeout(function() {
-                l = null, o || s2.apply(i3, e2);
-              }, a), n3 && s2.apply(i3, e2);
-            };
-          }, t.isValueInArrayOfObjects = function(e2, t2, i3) {
-            if (!Array.isArray(e2))
-              return e2[t2] === i3;
-            for (var n3 = 0, s2 = e2; n3 < s2.length; n3++) {
-              var a = s2[n3];
-              if (a && a[t2] && a[t2] === i3)
-                return true;
-            }
-            return false;
-          }, t.highlight = function(e2, t2, i3) {
-            var n3 = e2, s2 = new RegExp("(" + t2.trim() + ")(?![^<]*>[^<>]*</)", "i");
-            if (!e2.match(s2))
-              return e2;
-            var a = e2.match(s2).index, t2 = a + e2.match(s2)[0].toString().length, t2 = e2.substring(a, t2);
-            return n3 = n3.replace(s2, '<mark class="'.concat(i3, '">').concat(t2, "</mark>"));
-          }, t.kebabCase = function(e2) {
-            var t2 = e2.replace(/[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g, function(e3) {
-              return "-" + e3.toLowerCase();
-            });
-            return e2[0] === e2[0].toUpperCase() ? t2.substring(1) : t2;
-          }, "function" != typeof (t = window).CustomEvent && (n2.prototype = t.Event.prototype, t.CustomEvent = n2);
-        }, function(e, t, i2) {
-          "use strict";
-          t.__esModule = true, t.validateOption = t.validateData = t.Data = void 0;
-          var n2 = (s2.prototype.newOption = function(e2) {
-            return { id: e2.id || String(Math.floor(1e8 * Math.random())), value: e2.value || "", text: e2.text || "", innerHTML: e2.innerHTML || "", selected: e2.selected || false, display: void 0 === e2.display || e2.display, disabled: e2.disabled || false, placeholder: e2.placeholder || false, class: e2.class || void 0, data: e2.data || {}, mandatory: e2.mandatory || false };
-          }, s2.prototype.add = function(e2) {
-            this.data.push({ id: String(Math.floor(1e8 * Math.random())), value: e2.value, text: e2.text, innerHTML: "", selected: false, display: true, disabled: false, placeholder: false, class: void 0, mandatory: e2.mandatory, data: {} });
-          }, s2.prototype.parseSelectData = function() {
-            this.data = [];
-            for (var e2 = 0, t2 = this.main.select.element.childNodes; e2 < t2.length; e2++) {
-              var i3 = t2[e2];
-              if ("OPTGROUP" === i3.nodeName) {
-                for (var n3 = { label: i3.label, options: [] }, s3 = 0, a = i3.childNodes; s3 < a.length; s3++) {
-                  var o, l = a[s3];
-                  "OPTION" === l.nodeName && (o = this.pullOptionData(l), n3.options.push(o), o.placeholder && "" !== o.text.trim() && (this.main.config.placeholderText = o.text));
-                }
-                this.data.push(n3);
-              } else
-                "OPTION" === i3.nodeName && (o = this.pullOptionData(i3), this.data.push(o), o.placeholder && "" !== o.text.trim() && (this.main.config.placeholderText = o.text));
-            }
-          }, s2.prototype.pullOptionData = function(e2) {
-            return { id: !!e2.dataset && e2.dataset.id || String(Math.floor(1e8 * Math.random())), value: e2.value, text: e2.text, innerHTML: e2.innerHTML, selected: e2.selected, disabled: e2.disabled, placeholder: "true" === e2.dataset.placeholder, class: e2.className, style: e2.style.cssText, data: e2.dataset, mandatory: !!e2.dataset && "true" === e2.dataset.mandatory };
-          }, s2.prototype.setSelectedFromSelect = function() {
-            if (this.main.config.isMultiple) {
-              for (var e2 = [], t2 = 0, i3 = this.main.select.element.options; t2 < i3.length; t2++) {
-                var n3 = i3[t2];
-                !n3.selected || (n3 = this.getObjectFromData(n3.value, "value")) && n3.id && e2.push(n3.id);
-              }
-              this.setSelected(e2, "id");
+          function parentByClass(e, c) {
+            if (!e || e === document) {
+              return null;
+            } else if (hasClass(e, c)) {
+              return e;
             } else {
-              var s3 = this.main.select.element;
-              -1 !== s3.selectedIndex && (s3 = s3.options[s3.selectedIndex].value, this.setSelected(s3, "value"));
+              return parentByClass(e.parentNode, c);
             }
-          }, s2.prototype.setSelected = function(e2, t2) {
-            void 0 === t2 && (t2 = "id");
-            for (var i3 = 0, n3 = this.data; i3 < n3.length; i3++) {
-              var s3 = n3[i3];
-              if (s3.hasOwnProperty("label")) {
-                if (s3.hasOwnProperty("options")) {
-                  var a = s3.options;
-                  if (a)
-                    for (var o = 0, l = a; o < l.length; o++) {
-                      var r2 = l[o];
-                      r2.placeholder || (r2.selected = this.shouldBeSelected(r2, e2, t2));
-                    }
-                }
-              } else
-                s3.selected = this.shouldBeSelected(s3, e2, t2);
-            }
-          }, s2.prototype.shouldBeSelected = function(e2, t2, i3) {
-            if (void 0 === i3 && (i3 = "id"), Array.isArray(t2))
-              for (var n3 = 0, s3 = t2; n3 < s3.length; n3++) {
-                var a = s3[n3];
-                if (i3 in e2 && String(e2[i3]) === String(a))
-                  return true;
+          }
+          return hasClass(element, className) || parentByClass(element, className);
+        }
+        function debounce6(func, wait = 50, immediate = false) {
+          let timeout;
+          return function(...args) {
+            const context = self;
+            const later = () => {
+              timeout = null;
+              if (!immediate) {
+                func.apply(context, args);
               }
-            else if (i3 in e2 && String(e2[i3]) === String(t2))
-              return true;
-            return false;
-          }, s2.prototype.getSelected = function() {
-            for (var e2 = { text: "", placeholder: this.main.config.placeholderText }, t2 = [], i3 = 0, n3 = this.data; i3 < n3.length; i3++) {
-              var s3 = n3[i3];
-              if (s3.hasOwnProperty("label")) {
-                if (s3.hasOwnProperty("options")) {
-                  var a = s3.options;
-                  if (a)
-                    for (var o = 0, l = a; o < l.length; o++) {
-                      var r2 = l[o];
-                      r2.selected && (this.main.config.isMultiple ? t2.push(r2) : e2 = r2);
-                    }
-                }
-              } else
-                s3.selected && (this.main.config.isMultiple ? t2.push(s3) : e2 = s3);
+            };
+            const callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) {
+              func.apply(context, args);
             }
-            return this.main.config.isMultiple ? t2 : e2;
-          }, s2.prototype.addToSelected = function(e2, t2) {
-            if (void 0 === t2 && (t2 = "id"), this.main.config.isMultiple) {
-              var i3 = [], n3 = this.getSelected();
-              if (Array.isArray(n3))
-                for (var s3 = 0, a = n3; s3 < a.length; s3++) {
-                  var o = a[s3];
-                  i3.push(o[t2]);
-                }
-              i3.push(e2), this.setSelected(i3, t2);
-            }
-          }, s2.prototype.removeFromSelected = function(e2, t2) {
-            if (void 0 === t2 && (t2 = "id"), this.main.config.isMultiple) {
-              for (var i3 = [], n3 = 0, s3 = this.getSelected(); n3 < s3.length; n3++) {
-                var a = s3[n3];
-                String(a[t2]) !== String(e2) && i3.push(a[t2]);
+          };
+        }
+        function isEqual(a, b) {
+          return JSON.stringify(a) === JSON.stringify(b);
+        }
+        function kebabCase(str) {
+          const result = str.replace(/[A-Z\u00C0-\u00D6\u00D8-\u00DE]/g, (match) => "-" + match.toLowerCase());
+          return str[0] === str[0].toUpperCase() ? result.substring(1) : result;
+        }
+        class Optgroup {
+          constructor(optgroup) {
+            this.id = !optgroup.id || optgroup.id === "" ? generateID() : optgroup.id;
+            this.label = optgroup.label || "";
+            this.selectAll = optgroup.selectAll === void 0 ? false : optgroup.selectAll;
+            this.selectAllText = optgroup.selectAllText || "Select All";
+            this.closable = optgroup.closable || "off";
+            this.options = [];
+            if (optgroup.options) {
+              for (const o of optgroup.options) {
+                this.options.push(new Option(o));
               }
-              this.setSelected(i3, t2);
             }
-          }, s2.prototype.onDataChange = function() {
-            this.main.onChange && this.isOnChangeEnabled && this.main.onChange(JSON.parse(JSON.stringify(this.getSelected())));
-          }, s2.prototype.getObjectFromData = function(e2, t2) {
-            void 0 === t2 && (t2 = "id");
-            for (var i3 = 0, n3 = this.data; i3 < n3.length; i3++) {
-              var s3 = n3[i3];
-              if (t2 in s3 && String(s3[t2]) === String(e2))
-                return s3;
-              if (s3.hasOwnProperty("options")) {
-                if (s3.options)
-                  for (var a = 0, o = s3.options; a < o.length; a++) {
-                    var l = o[a];
-                    if (String(l[t2]) === String(e2))
-                      return l;
+          }
+        }
+        class Option {
+          constructor(option2) {
+            this.id = !option2.id || option2.id === "" ? generateID() : option2.id;
+            this.value = option2.value === void 0 ? option2.text : option2.value;
+            this.text = option2.text || "";
+            this.html = option2.html || "";
+            this.selected = option2.selected !== void 0 ? option2.selected : false;
+            this.display = option2.display !== void 0 ? option2.display : true;
+            this.disabled = option2.disabled !== void 0 ? option2.disabled : false;
+            this.mandatory = option2.mandatory !== void 0 ? option2.mandatory : false;
+            this.placeholder = option2.placeholder !== void 0 ? option2.placeholder : false;
+            this.class = option2.class || "";
+            this.style = option2.style || "";
+            this.data = option2.data || {};
+          }
+        }
+        class Store {
+          constructor(type, data) {
+            this.selectType = "single";
+            this.data = [];
+            this.selectType = type;
+            this.setData(data);
+          }
+          validateDataArray(data) {
+            if (!Array.isArray(data)) {
+              return new Error("Data must be an array");
+            }
+            for (let dataObj of data) {
+              if (dataObj instanceof Optgroup || "label" in dataObj) {
+                if (!("label" in dataObj)) {
+                  return new Error("Optgroup must have a label");
+                }
+                if ("options" in dataObj && dataObj.options) {
+                  for (let option2 of dataObj.options) {
+                    return this.validateOption(option2);
                   }
+                }
+              } else if (dataObj instanceof Option || "text" in dataObj) {
+                return this.validateOption(dataObj);
+              } else {
+                return new Error("Data object must be a valid optgroup or option");
               }
             }
             return null;
-          }, s2.prototype.search = function(n3) {
-            var s3, e2;
-            "" !== (this.searchValue = n3).trim() ? (s3 = this.main.config.searchFilter, e2 = this.data.slice(0), n3 = n3.trim(), e2 = e2.map(function(e3) {
-              if (e3.hasOwnProperty("options")) {
-                var t2 = e3, i3 = [];
-                if (0 !== (i3 = t2.options ? t2.options.filter(function(e4) {
-                  return s3(e4, n3);
-                }) : i3).length) {
-                  t2 = Object.assign({}, t2);
-                  return t2.options = i3, t2;
+          }
+          validateOption(option2) {
+            if (!("text" in option2)) {
+              return new Error("Option must have a text");
+            }
+            return null;
+          }
+          partialToFullData(data) {
+            let dataFinal = [];
+            data.forEach((dataObj) => {
+              if (dataObj instanceof Optgroup || "label" in dataObj) {
+                let optOptions = [];
+                if ("options" in dataObj && dataObj.options) {
+                  dataObj.options.forEach((option2) => {
+                    optOptions.push(new Option(option2));
+                  });
+                }
+                if (optOptions.length > 0) {
+                  dataFinal.push(new Optgroup(dataObj));
                 }
               }
-              if (e3.hasOwnProperty("text") && s3(e3, n3))
-                return e3;
-              return null;
-            }), this.filtered = e2.filter(function(e3) {
-              return e3;
-            })) : this.filtered = null;
-          }, s2);
-          function s2(e2) {
-            this.contentOpen = false, this.contentPosition = "below", this.isOnChangeEnabled = true, this.main = e2.main, this.searchValue = "", this.data = [], this.filtered = null, this.parseSelectData(), this.setSelectedFromSelect();
-          }
-          function r(e2) {
-            return void 0 !== e2.text || (console.error("Data object option must have at least have a text value. Check object: " + JSON.stringify(e2)), false);
-          }
-          t.Data = n2, t.validateData = function(e2) {
-            if (!e2)
-              return console.error("Data must be an array of objects"), false;
-            for (var t2 = 0, i3 = 0, n3 = e2; i3 < n3.length; i3++) {
-              var s3 = n3[i3];
-              if (s3.hasOwnProperty("label")) {
-                if (s3.hasOwnProperty("options")) {
-                  var a = s3.options;
-                  if (a)
-                    for (var o = 0, l = a; o < l.length; o++)
-                      r(l[o]) || t2++;
-                }
-              } else
-                r(s3) || t2++;
-            }
-            return 0 === t2;
-          }, t.validateOption = r;
-        }, function(e, t, i2) {
-          "use strict";
-          t.__esModule = true;
-          var n2 = i2(3), s2 = i2(4), a = i2(5), r = i2(1), o = i2(0), i2 = (l.prototype.validate = function(e2) {
-            e2 = "string" == typeof e2.select ? document.querySelector(e2.select) : e2.select;
-            if (!e2)
-              throw new Error("Could not find select element");
-            if ("SELECT" !== e2.tagName)
-              throw new Error("Element isnt of type select");
-            return e2;
-          }, l.prototype.selected = function() {
-            if (this.config.isMultiple) {
-              for (var e2 = [], t2 = 0, i3 = s3 = this.data.getSelected(); t2 < i3.length; t2++) {
-                var n3 = i3[t2];
-                e2.push(n3.value);
+              if (dataObj instanceof Option || "text" in dataObj) {
+                dataFinal.push(new Option(dataObj));
               }
-              return e2;
-            }
-            var s3;
-            return (s3 = this.data.getSelected()) ? s3.value : "";
-          }, l.prototype.set = function(e2, t2, i3, n3) {
-            void 0 === t2 && (t2 = "value"), void 0 === i3 && (i3 = true), void 0 === n3 && (n3 = true), this.config.isMultiple && !Array.isArray(e2) ? this.data.addToSelected(e2, t2) : this.data.setSelected(e2, t2), this.select.setValue(), this.data.onDataChange(), this.render(), (i3 = this.config.hideSelectedOption && this.config.isMultiple && this.data.getSelected().length === this.data.data.length ? true : i3) && this.close();
-          }, l.prototype.setSelected = function(e2, t2, i3, n3) {
-            this.set(e2, t2 = void 0 === t2 ? "value" : t2, i3 = void 0 === i3 ? true : i3, n3 = void 0 === n3 ? true : n3);
-          }, l.prototype.setData = function(e2) {
-            if ((0, r.validateData)(e2)) {
-              for (var t2 = JSON.parse(JSON.stringify(e2)), i3 = this.data.getSelected(), n3 = 0; n3 < t2.length; n3++)
-                t2[n3].value || t2[n3].placeholder || (t2[n3].value = t2[n3].text);
-              if (this.config.isAjax && i3)
-                if (this.config.isMultiple)
-                  for (var s3 = 0, a2 = i3.reverse(); s3 < a2.length; s3++) {
-                    var o2 = a2[s3];
-                    t2.unshift(o2);
-                  }
-                else {
-                  t2.unshift(i3);
-                  for (n3 = 0; n3 < t2.length; n3++)
-                    t2[n3].placeholder || t2[n3].value !== i3.value || t2[n3].text !== i3.text || t2.splice(n3, 1);
-                  for (var l2 = false, n3 = 0; n3 < t2.length; n3++)
-                    t2[n3].placeholder && (l2 = true);
-                  l2 || t2.unshift({ text: "", placeholder: true });
-                }
-              this.select.create(t2), this.data.parseSelectData(), this.data.setSelectedFromSelect();
-            } else
-              console.error("Validation problem on: #" + this.select.element.id);
-          }, l.prototype.addData = function(e2) {
-            (0, r.validateData)([e2]) ? (this.data.add(this.data.newOption(e2)), this.select.create(this.data.data), this.data.parseSelectData(), this.data.setSelectedFromSelect(), this.render()) : console.error("Validation problem on: #" + this.select.element.id);
-          }, l.prototype.open = function() {
-            var e2, t2 = this;
-            this.config.isEnabled && (this.data.contentOpen || this.config.hideSelectedOption && this.config.isMultiple && this.data.getSelected().length === this.data.data.length || (this.beforeOpen && this.beforeOpen(), this.config.isMultiple && this.slim.multiSelected ? this.slim.multiSelected.plus.classList.add("ss-cross") : this.slim.singleSelected && (this.slim.singleSelected.arrowIcon.arrow.classList.remove("arrow-down"), this.slim.singleSelected.arrowIcon.arrow.classList.add("arrow-up")), this.slim[this.config.isMultiple ? "multiSelected" : "singleSelected"].container.classList.add("above" === this.data.contentPosition ? this.config.openAbove : this.config.openBelow), this.config.addToBody && (e2 = this.slim.container.getBoundingClientRect(), this.slim.content.style.top = e2.top + e2.height + window.scrollY + "px", this.slim.content.style.left = e2.left + window.scrollX + "px", this.slim.content.style.width = e2.width + "px"), this.slim.content.classList.add(this.config.open), "up" === this.config.showContent.toLowerCase() || "down" !== this.config.showContent.toLowerCase() && "above" === (0, o.putContent)(this.slim.content, this.data.contentPosition, this.data.contentOpen) ? this.moveContentAbove() : this.moveContentBelow(), this.config.isMultiple || (e2 = this.data.getSelected()) && (e2 = e2.id, (e2 = this.slim.list.querySelector('[data-id="' + e2 + '"]')) && (0, o.ensureElementInView)(this.slim.list, e2)), setTimeout(function() {
-              t2.data.contentOpen = true, t2.config.searchFocus && t2.slim.search.input.focus(), t2.afterOpen && t2.afterOpen();
-            }, this.config.timeoutDelay)));
-          }, l.prototype.close = function() {
-            var e2 = this;
-            this.data.contentOpen && (this.beforeClose && this.beforeClose(), this.config.isMultiple && this.slim.multiSelected ? (this.slim.multiSelected.container.classList.remove(this.config.openAbove), this.slim.multiSelected.container.classList.remove(this.config.openBelow), this.slim.multiSelected.plus.classList.remove("ss-cross")) : this.slim.singleSelected && (this.slim.singleSelected.container.classList.remove(this.config.openAbove), this.slim.singleSelected.container.classList.remove(this.config.openBelow), this.slim.singleSelected.arrowIcon.arrow.classList.add("arrow-down"), this.slim.singleSelected.arrowIcon.arrow.classList.remove("arrow-up")), this.slim.content.classList.remove(this.config.open), this.data.contentOpen = false, this.search(""), setTimeout(function() {
-              e2.slim.content.removeAttribute("style"), e2.data.contentPosition = "below", e2.config.isMultiple && e2.slim.multiSelected ? (e2.slim.multiSelected.container.classList.remove(e2.config.openAbove), e2.slim.multiSelected.container.classList.remove(e2.config.openBelow)) : e2.slim.singleSelected && (e2.slim.singleSelected.container.classList.remove(e2.config.openAbove), e2.slim.singleSelected.container.classList.remove(e2.config.openBelow)), e2.slim.search.input.blur(), e2.afterClose && e2.afterClose();
-            }, this.config.timeoutDelay));
-          }, l.prototype.moveContentAbove = function() {
-            var e2 = 0;
-            this.config.isMultiple && this.slim.multiSelected ? e2 = this.slim.multiSelected.container.offsetHeight : this.slim.singleSelected && (e2 = this.slim.singleSelected.container.offsetHeight);
-            var t2 = e2 + this.slim.content.offsetHeight - 1;
-            this.slim.content.style.margin = "-" + t2 + "px 0 0 0", this.slim.content.style.height = t2 - e2 + 1 + "px", this.slim.content.style.transformOrigin = "center bottom", this.data.contentPosition = "above", this.config.isMultiple && this.slim.multiSelected ? (this.slim.multiSelected.container.classList.remove(this.config.openBelow), this.slim.multiSelected.container.classList.add(this.config.openAbove)) : this.slim.singleSelected && (this.slim.singleSelected.container.classList.remove(this.config.openBelow), this.slim.singleSelected.container.classList.add(this.config.openAbove));
-          }, l.prototype.moveContentBelow = function() {
-            this.data.contentPosition = "below", this.config.isMultiple && this.slim.multiSelected ? (this.slim.multiSelected.container.classList.remove(this.config.openAbove), this.slim.multiSelected.container.classList.add(this.config.openBelow)) : this.slim.singleSelected && (this.slim.singleSelected.container.classList.remove(this.config.openAbove), this.slim.singleSelected.container.classList.add(this.config.openBelow));
-          }, l.prototype.enable = function() {
-            this.config.isEnabled = true, this.config.isMultiple && this.slim.multiSelected ? this.slim.multiSelected.container.classList.remove(this.config.disabled) : this.slim.singleSelected && this.slim.singleSelected.container.classList.remove(this.config.disabled), this.select.triggerMutationObserver = false, this.select.element.disabled = false, this.slim.search.input.disabled = false, this.select.triggerMutationObserver = true;
-          }, l.prototype.disable = function() {
-            this.config.isEnabled = false, this.config.isMultiple && this.slim.multiSelected ? this.slim.multiSelected.container.classList.add(this.config.disabled) : this.slim.singleSelected && this.slim.singleSelected.container.classList.add(this.config.disabled), this.select.triggerMutationObserver = false, this.select.element.disabled = true, this.slim.search.input.disabled = true, this.select.triggerMutationObserver = true;
-          }, l.prototype.search = function(t2) {
-            var i3;
-            this.data.searchValue !== t2 && (this.slim.search.input.value = t2, this.config.isAjax ? ((i3 = this).config.isSearching = true, this.render(), this.ajax && this.ajax(t2, function(e2) {
-              i3.config.isSearching = false, Array.isArray(e2) ? (e2.unshift({ text: "", placeholder: true }), i3.setData(e2), i3.data.search(t2), i3.render()) : "string" == typeof e2 ? i3.slim.options(e2) : i3.render();
-            })) : (this.data.search(t2), this.render()));
-          }, l.prototype.setSearchText = function(e2) {
-            this.config.searchText = e2;
-          }, l.prototype.render = function() {
-            this.config.isMultiple ? this.slim.values() : (this.slim.placeholder(), this.slim.deselect()), this.slim.options();
-          }, l.prototype.destroy = function(e2) {
-            var t2 = (e2 = void 0 === e2 ? null : e2) ? document.querySelector("." + e2 + ".ss-main") : this.slim.container, i3 = e2 ? document.querySelector("[data-ssid=".concat(e2, "]")) : this.select.element;
-            t2 && i3 && (document.removeEventListener("click", this.documentClick), "auto" === this.config.showContent && window.removeEventListener("scroll", this.windowScroll, false), i3.style.display = "", delete i3.dataset.ssid, i3.slim = null, t2.parentElement && t2.parentElement.removeChild(t2), !this.config.addToBody || (e2 = e2 ? document.querySelector("." + e2 + ".ss-content") : this.slim.content) && document.body.removeChild(e2));
-          }, l);
-          function l(e2) {
-            var t2 = this;
-            this.ajax = null, this.addable = null, this.beforeOnChange = null, this.onChange = null, this.beforeOpen = null, this.afterOpen = null, this.beforeClose = null, this.afterClose = null, this.windowScroll = (0, o.debounce)(function(e3) {
-              t2.data.contentOpen && ("above" === (0, o.putContent)(t2.slim.content, t2.data.contentPosition, t2.data.contentOpen) ? t2.moveContentAbove() : t2.moveContentBelow());
-            }), this.documentClick = function(e3) {
-              e3.target && !(0, o.hasClassInTree)(e3.target, t2.config.id) && t2.close();
-            };
-            var i3 = this.validate(e2);
-            i3.dataset.ssid && this.destroy(i3.dataset.ssid), e2.ajax && (this.ajax = e2.ajax), e2.addable && (this.addable = e2.addable), this.config = new n2.Config({ select: i3, isAjax: !!e2.ajax, showSearch: e2.showSearch, searchPlaceholder: e2.searchPlaceholder, searchText: e2.searchText, searchingText: e2.searchingText, searchFocus: e2.searchFocus, searchHighlight: e2.searchHighlight, searchFilter: e2.searchFilter, closeOnSelect: e2.closeOnSelect, showContent: e2.showContent, placeholderText: e2.placeholder, allowDeselect: e2.allowDeselect, allowDeselectOption: e2.allowDeselectOption, hideSelectedOption: e2.hideSelectedOption, deselectLabel: e2.deselectLabel, isEnabled: e2.isEnabled, valuesUseText: e2.valuesUseText, showOptionTooltips: e2.showOptionTooltips, selectByGroup: e2.selectByGroup, limit: e2.limit, timeoutDelay: e2.timeoutDelay, addToBody: e2.addToBody }), this.select = new s2.Select({ select: i3, main: this }), this.data = new r.Data({ main: this }), this.slim = new a.Slim({ main: this }), this.select.element.parentNode && this.select.element.parentNode.insertBefore(this.slim.container, this.select.element.nextSibling), e2.data ? this.setData(e2.data) : this.render(), document.addEventListener("click", this.documentClick), "auto" === this.config.showContent && window.addEventListener("scroll", this.windowScroll, false), e2.beforeOnChange && (this.beforeOnChange = e2.beforeOnChange), e2.onChange && (this.onChange = e2.onChange), e2.beforeOpen && (this.beforeOpen = e2.beforeOpen), e2.afterOpen && (this.afterOpen = e2.afterOpen), e2.beforeClose && (this.beforeClose = e2.beforeClose), e2.afterClose && (this.afterClose = e2.afterClose), this.config.isEnabled || this.disable();
-          }
-          t.default = i2;
-        }, function(e, t, i2) {
-          "use strict";
-          t.__esModule = true, t.Config = void 0;
-          var n2 = (s2.prototype.searchFilter = function(e2, t2) {
-            return -1 !== e2.text.toLowerCase().indexOf(t2.toLowerCase());
-          }, s2);
-          function s2(e2) {
-            this.id = "", this.isMultiple = false, this.isAjax = false, this.isSearching = false, this.showSearch = true, this.searchFocus = true, this.searchHighlight = false, this.closeOnSelect = true, this.showContent = "auto", this.searchPlaceholder = "Search", this.searchText = "No Results", this.searchingText = "Searching...", this.placeholderText = "Select Value", this.allowDeselect = false, this.allowDeselectOption = false, this.hideSelectedOption = false, this.deselectLabel = "x", this.isEnabled = true, this.valuesUseText = false, this.showOptionTooltips = false, this.selectByGroup = false, this.limit = 0, this.timeoutDelay = 200, this.addToBody = false, this.main = "ss-main", this.singleSelected = "ss-single-selected", this.arrow = "ss-arrow", this.multiSelected = "ss-multi-selected", this.add = "ss-add", this.plus = "ss-plus", this.values = "ss-values", this.value = "ss-value", this.valueText = "ss-value-text", this.valueDelete = "ss-value-delete", this.content = "ss-content", this.open = "ss-open", this.openAbove = "ss-open-above", this.openBelow = "ss-open-below", this.search = "ss-search", this.searchHighlighter = "ss-search-highlight", this.addable = "ss-addable", this.list = "ss-list", this.optgroup = "ss-optgroup", this.optgroupLabel = "ss-optgroup-label", this.optgroupLabelSelectable = "ss-optgroup-label-selectable", this.option = "ss-option", this.optionSelected = "ss-option-selected", this.highlighted = "ss-highlighted", this.disabled = "ss-disabled", this.hide = "ss-hide", this.id = "ss-" + Math.floor(1e5 * Math.random()), this.style = e2.select.style.cssText, this.class = e2.select.className.split(" "), this.isMultiple = e2.select.multiple, this.isAjax = e2.isAjax, this.showSearch = false !== e2.showSearch, this.searchFocus = false !== e2.searchFocus, this.searchHighlight = true === e2.searchHighlight, this.closeOnSelect = false !== e2.closeOnSelect, e2.showContent && (this.showContent = e2.showContent), this.isEnabled = false !== e2.isEnabled, e2.searchPlaceholder && (this.searchPlaceholder = e2.searchPlaceholder), e2.searchText && (this.searchText = e2.searchText), e2.searchingText && (this.searchingText = e2.searchingText), e2.placeholderText && (this.placeholderText = e2.placeholderText), this.allowDeselect = true === e2.allowDeselect, this.allowDeselectOption = true === e2.allowDeselectOption, this.hideSelectedOption = true === e2.hideSelectedOption, e2.deselectLabel && (this.deselectLabel = e2.deselectLabel), e2.valuesUseText && (this.valuesUseText = e2.valuesUseText), e2.showOptionTooltips && (this.showOptionTooltips = e2.showOptionTooltips), e2.selectByGroup && (this.selectByGroup = e2.selectByGroup), e2.limit && (this.limit = e2.limit), e2.searchFilter && (this.searchFilter = e2.searchFilter), null != e2.timeoutDelay && (this.timeoutDelay = e2.timeoutDelay), this.addToBody = true === e2.addToBody;
-          }
-          t.Config = n2;
-        }, function(e, t, i2) {
-          "use strict";
-          t.__esModule = true, t.Select = void 0;
-          var n2 = i2(0), i2 = (s2.prototype.setValue = function() {
-            if (this.main.data.getSelected()) {
-              if (this.main.config.isMultiple)
-                for (var e2 = this.main.data.getSelected(), t2 = 0, i3 = this.element.options; t2 < i3.length; t2++) {
-                  var n3 = i3[t2];
-                  n3.selected = false;
-                  for (var s3 = 0, a = e2; s3 < a.length; s3++)
-                    a[s3].value === n3.value && (n3.selected = true);
-                }
-              else {
-                e2 = this.main.data.getSelected();
-                this.element.value = e2 ? e2.value : "";
-              }
-              this.main.data.isOnChangeEnabled = false, this.element.dispatchEvent(new CustomEvent("change", { bubbles: true })), this.main.data.isOnChangeEnabled = true;
-            }
-          }, s2.prototype.addAttributes = function() {
-            this.element.tabIndex = -1, this.element.style.display = "none", this.element.dataset.ssid = this.main.config.id, this.element.setAttribute("aria-hidden", "true");
-          }, s2.prototype.addEventListeners = function() {
-            var t2 = this;
-            this.element.addEventListener("change", function(e2) {
-              t2.main.data.setSelectedFromSelect(), t2.main.render();
             });
-          }, s2.prototype.addMutationObserver = function() {
-            var t2 = this;
-            this.main.config.isAjax || (this.mutationObserver = new MutationObserver(function(e2) {
-              t2.triggerMutationObserver && (t2.main.data.parseSelectData(), t2.main.data.setSelectedFromSelect(), t2.main.render(), e2.forEach(function(e3) {
-                "class" === e3.attributeName && t2.main.slim.updateContainerDivClass(t2.main.slim.container);
-              }));
-            }), this.observeMutationObserver());
-          }, s2.prototype.observeMutationObserver = function() {
-            this.mutationObserver && this.mutationObserver.observe(this.element, { attributes: true, childList: true, characterData: true });
-          }, s2.prototype.disconnectMutationObserver = function() {
-            this.mutationObserver && this.mutationObserver.disconnect();
-          }, s2.prototype.create = function(e2) {
-            this.element.innerHTML = "";
-            for (var t2 = 0, i3 = e2; t2 < i3.length; t2++) {
-              var n3 = i3[t2];
-              if (n3.hasOwnProperty("options")) {
-                var s3 = n3, a = document.createElement("optgroup");
-                if (a.label = s3.label, s3.options)
-                  for (var o = 0, l = s3.options; o < l.length; o++) {
-                    var r = l[o];
-                    a.appendChild(this.createOption(r));
-                  }
-                this.element.appendChild(a);
-              } else
-                this.element.appendChild(this.createOption(n3));
-            }
-          }, s2.prototype.createOption = function(t2) {
-            var i3 = document.createElement("option");
-            return i3.value = "" !== t2.value ? t2.value : t2.text, i3.innerHTML = t2.innerHTML || t2.text, t2.selected && (i3.selected = t2.selected), false === t2.display && (i3.style.display = "none"), t2.disabled && (i3.disabled = true), t2.placeholder && i3.setAttribute("data-placeholder", "true"), t2.mandatory && i3.setAttribute("data-mandatory", "true"), t2.class && t2.class.split(" ").forEach(function(e2) {
-              i3.classList.add(e2);
-            }), t2.data && "object" == typeof t2.data && Object.keys(t2.data).forEach(function(e2) {
-              i3.setAttribute("data-" + (0, n2.kebabCase)(e2), t2.data[e2]);
-            }), i3;
-          }, s2);
-          function s2(e2) {
-            this.triggerMutationObserver = true, this.element = e2.select, this.main = e2.main, this.element.disabled && (this.main.config.isEnabled = false), this.addAttributes(), this.addEventListeners(), this.mutationObserver = null, this.addMutationObserver(), this.element.slim = e2.main;
+            return dataFinal;
           }
-          t.Select = i2;
-        }, function(e, t, i2) {
-          "use strict";
-          t.__esModule = true, t.Slim = void 0;
-          var n2 = i2(0), o = i2(1), i2 = (s2.prototype.containerDiv = function() {
-            var e2 = document.createElement("div");
-            return e2.style.cssText = this.main.config.style, this.updateContainerDivClass(e2), e2;
-          }, s2.prototype.updateContainerDivClass = function(e2) {
-            this.main.config.class = this.main.select.element.className.split(" "), e2.className = "", e2.classList.add(this.main.config.id), e2.classList.add(this.main.config.main);
-            for (var t2 = 0, i3 = this.main.config.class; t2 < i3.length; t2++) {
-              var n3 = i3[t2];
-              "" !== n3.trim() && e2.classList.add(n3);
+          setData(data) {
+            this.data = this.partialToFullData(data);
+            if (this.selectType === "single") {
+              this.setSelectedBy("value", this.getSelected());
             }
-          }, s2.prototype.singleSelectedDiv = function() {
-            var t2 = this, e2 = document.createElement("div");
-            e2.classList.add(this.main.config.singleSelected);
-            var i3 = document.createElement("span");
-            i3.classList.add("placeholder"), e2.appendChild(i3);
-            var n3 = document.createElement("span");
-            n3.innerHTML = this.main.config.deselectLabel, n3.classList.add("ss-deselect"), n3.onclick = function(e3) {
-              e3.stopPropagation(), t2.main.config.isEnabled && t2.main.set("");
-            }, e2.appendChild(n3);
-            var s3 = document.createElement("span");
-            s3.classList.add(this.main.config.arrow);
-            var a = document.createElement("span");
-            return a.classList.add("arrow-down"), s3.appendChild(a), e2.appendChild(s3), e2.onclick = function() {
-              t2.main.config.isEnabled && (t2.main.data.contentOpen ? t2.main.close() : t2.main.open());
-            }, { container: e2, placeholder: i3, deselect: n3, arrowIcon: { container: s3, arrow: a } };
-          }, s2.prototype.placeholder = function() {
-            var e2, t2 = this.main.data.getSelected();
-            null === t2 || t2 && t2.placeholder ? ((e2 = document.createElement("span")).classList.add(this.main.config.disabled), e2.innerHTML = this.main.config.placeholderText, this.singleSelected && (this.singleSelected.placeholder.innerHTML = e2.outerHTML)) : (e2 = "", t2 && (e2 = t2.innerHTML && true !== this.main.config.valuesUseText ? t2.innerHTML : t2.text), this.singleSelected && (this.singleSelected.placeholder.innerHTML = t2 ? e2 : ""));
-          }, s2.prototype.deselect = function() {
-            this.singleSelected && (!this.main.config.allowDeselect || "" === this.main.selected() ? this.singleSelected.deselect.classList.add("ss-hide") : this.singleSelected.deselect.classList.remove("ss-hide"));
-          }, s2.prototype.multiSelectedDiv = function() {
-            var t2 = this, e2 = document.createElement("div");
-            e2.classList.add(this.main.config.multiSelected);
-            var i3 = document.createElement("div");
-            i3.classList.add(this.main.config.values), e2.appendChild(i3);
-            var n3 = document.createElement("div");
-            n3.classList.add(this.main.config.add);
-            var s3 = document.createElement("span");
-            return s3.classList.add(this.main.config.plus), s3.onclick = function(e3) {
-              t2.main.data.contentOpen && (t2.main.close(), e3.stopPropagation());
-            }, n3.appendChild(s3), e2.appendChild(n3), e2.onclick = function(e3) {
-              t2.main.config.isEnabled && (e3.target.classList.contains(t2.main.config.valueDelete) || (t2.main.data.contentOpen ? t2.main.close() : t2.main.open()));
-            }, { container: e2, values: i3, add: n3, plus: s3 };
-          }, s2.prototype.values = function() {
-            if (this.multiSelected) {
-              for (var e2 = this.multiSelected.values.childNodes, t2 = this.main.data.getSelected(), i3 = [], n3 = 0, s3 = e2; n3 < s3.length; n3++) {
-                for (var a = s3[n3], o2 = true, l = 0, r = t2; l < r.length; l++) {
-                  var c = r[l];
-                  String(c.id) === String(a.dataset.id) && (o2 = false);
+          }
+          getData() {
+            return this.filter(null, true);
+          }
+          getDataOptions() {
+            return this.filter(null, false);
+          }
+          addOption(option2) {
+            this.setData(this.getData().concat(new Option(option2)));
+          }
+          setSelectedBy(selectedType, selectedValues) {
+            let firstOption = null;
+            let hasSelected = false;
+            for (let dataObj of this.data) {
+              if (dataObj instanceof Optgroup) {
+                for (let option2 of dataObj.options) {
+                  if (!firstOption) {
+                    firstOption = option2;
+                  }
+                  option2.selected = hasSelected ? false : selectedValues.includes(option2[selectedType]);
+                  if (option2.selected && this.selectType === "single") {
+                    hasSelected = true;
+                  }
                 }
-                o2 && i3.push(a);
               }
-              for (var d = 0, h = i3; d < h.length; d++) {
-                var u = h[d];
-                u.classList.add("ss-out"), this.multiSelected.values.removeChild(u);
-              }
-              for (var p, e2 = this.multiSelected.values.childNodes, c = 0; c < t2.length; c++) {
-                o2 = false;
-                for (var m = 0, f = e2; m < f.length; m++) {
-                  a = f[m];
-                  String(t2[c].id) === String(a.dataset.id) && (o2 = true);
+              if (dataObj instanceof Option) {
+                if (!firstOption) {
+                  firstOption = dataObj;
                 }
-                o2 || (0 !== e2.length && HTMLElement.prototype.insertAdjacentElement ? 0 === c ? this.multiSelected.values.insertBefore(this.valueDiv(t2[c]), e2[c]) : e2[c - 1].insertAdjacentElement("afterend", this.valueDiv(t2[c])) : this.multiSelected.values.appendChild(this.valueDiv(t2[c])));
+                dataObj.selected = hasSelected ? false : selectedValues.includes(dataObj[selectedType]);
+                if (dataObj.selected && this.selectType === "single") {
+                  hasSelected = true;
+                }
               }
-              0 === t2.length && ((p = document.createElement("span")).classList.add(this.main.config.disabled), p.innerHTML = this.main.config.placeholderText, this.multiSelected.values.innerHTML = p.outerHTML);
             }
-          }, s2.prototype.valueDiv = function(s3) {
-            var a = this, e2 = document.createElement("div");
-            e2.classList.add(this.main.config.value), e2.dataset.id = s3.id;
-            var t2 = document.createElement("span");
-            return t2.classList.add(this.main.config.valueText), t2.innerHTML = s3.innerHTML && true !== this.main.config.valuesUseText ? s3.innerHTML : s3.text, e2.appendChild(t2), s3.mandatory || ((t2 = document.createElement("span")).classList.add(this.main.config.valueDelete), t2.innerHTML = this.main.config.deselectLabel, t2.onclick = function(e3) {
-              e3.preventDefault(), e3.stopPropagation();
-              var t3 = false;
-              if (a.main.beforeOnChange || (t3 = true), a.main.beforeOnChange) {
-                for (var e3 = a.main.data.getSelected(), i3 = JSON.parse(JSON.stringify(e3)), n3 = 0; n3 < i3.length; n3++)
-                  i3[n3].id === s3.id && i3.splice(n3, 1);
-                false !== a.main.beforeOnChange(i3) && (t3 = true);
+            if (this.selectType === "single" && firstOption && !hasSelected) {
+              firstOption.selected = true;
+            }
+          }
+          getSelected() {
+            let selectedOptions = this.getSelectedOptions();
+            let selectedValues = [];
+            selectedOptions.forEach((option2) => {
+              selectedValues.push(option2.value);
+            });
+            return selectedValues;
+          }
+          getSelectedOptions() {
+            return this.filter((opt) => {
+              return opt.selected;
+            }, false);
+          }
+          getSelectedIDs() {
+            let selectedOptions = this.getSelectedOptions();
+            let selectedIDs = [];
+            selectedOptions.forEach((op) => {
+              selectedIDs.push(op.id);
+            });
+            return selectedIDs;
+          }
+          getOptgroupByID(id) {
+            for (let dataObj of this.data) {
+              if (dataObj instanceof Optgroup && dataObj.id === id) {
+                return dataObj;
               }
-              t3 && (a.main.data.removeFromSelected(s3.id, "id"), a.main.render(), a.main.select.setValue(), a.main.data.onDataChange());
-            }, e2.appendChild(t2)), e2;
-          }, s2.prototype.contentDiv = function() {
-            var e2 = document.createElement("div");
-            return e2.classList.add(this.main.config.content), e2;
-          }, s2.prototype.searchDiv = function() {
-            var n3 = this, e2 = document.createElement("div"), s3 = document.createElement("input"), a = document.createElement("div");
-            e2.classList.add(this.main.config.search);
-            var t2 = { container: e2, input: s3 };
-            return this.main.config.showSearch || (e2.classList.add(this.main.config.hide), s3.readOnly = true), s3.type = "search", s3.placeholder = this.main.config.searchPlaceholder, s3.tabIndex = 0, s3.setAttribute("aria-label", this.main.config.searchPlaceholder), s3.setAttribute("autocapitalize", "off"), s3.setAttribute("autocomplete", "off"), s3.setAttribute("autocorrect", "off"), s3.onclick = function(e3) {
-              setTimeout(function() {
-                "" === e3.target.value && n3.main.search("");
-              }, 10);
-            }, s3.onkeydown = function(e3) {
-              "ArrowUp" === e3.key ? (n3.main.open(), n3.highlightUp(), e3.preventDefault()) : "ArrowDown" === e3.key ? (n3.main.open(), n3.highlightDown(), e3.preventDefault()) : "Tab" === e3.key ? n3.main.data.contentOpen ? n3.main.close() : setTimeout(function() {
-                n3.main.close();
-              }, n3.main.config.timeoutDelay) : "Enter" === e3.key && e3.preventDefault();
-            }, s3.onkeyup = function(e3) {
-              var t3 = e3.target;
-              if ("Enter" === e3.key) {
-                if (n3.main.addable && e3.ctrlKey)
-                  return a.click(), e3.preventDefault(), void e3.stopPropagation();
-                var i3 = n3.list.querySelector("." + n3.main.config.highlighted);
-                i3 && i3.click();
-              } else
-                "ArrowUp" === e3.key || "ArrowDown" === e3.key || ("Escape" === e3.key ? n3.main.close() : n3.main.config.showSearch && n3.main.data.contentOpen ? n3.main.search(t3.value) : s3.value = "");
-              e3.preventDefault(), e3.stopPropagation();
-            }, s3.onfocus = function() {
-              n3.main.open();
-            }, e2.appendChild(s3), this.main.addable && (a.classList.add(this.main.config.addable), a.innerHTML = "+", a.onclick = function(e3) {
-              var t3;
-              n3.main.addable && (e3.preventDefault(), e3.stopPropagation(), "" !== (e3 = n3.search.input.value).trim() ? (e3 = n3.main.addable(e3), t3 = "", e3 && ("object" == typeof e3 ? (0, o.validateOption)(e3) && (n3.main.addData(e3), t3 = e3.value || e3.text) : (n3.main.addData(n3.main.data.newOption({ text: e3, value: e3 })), t3 = e3), n3.main.search(""), setTimeout(function() {
-                n3.main.set(t3, "value", false, false);
-              }, 100), n3.main.config.closeOnSelect && setTimeout(function() {
-                n3.main.close();
-              }, 100))) : n3.search.input.focus());
-            }, e2.appendChild(a), t2.addable = a), t2;
-          }, s2.prototype.highlightUp = function() {
-            var e2 = this.list.querySelector("." + this.main.config.highlighted), t2 = null;
-            if (e2)
-              for (t2 = e2.previousSibling; null !== t2 && t2.classList.contains(this.main.config.disabled); )
-                t2 = t2.previousSibling;
-            else
-              var i3 = this.list.querySelectorAll("." + this.main.config.option + ":not(." + this.main.config.disabled + ")"), t2 = i3[i3.length - 1];
-            null !== (t2 = t2 && t2.classList.contains(this.main.config.optgroupLabel) ? null : t2) || (i3 = e2.parentNode).classList.contains(this.main.config.optgroup) && (!i3.previousSibling || (i3 = i3.previousSibling.querySelectorAll("." + this.main.config.option + ":not(." + this.main.config.disabled + ")")).length && (t2 = i3[i3.length - 1])), t2 && (e2 && e2.classList.remove(this.main.config.highlighted), t2.classList.add(this.main.config.highlighted), (0, n2.ensureElementInView)(this.list, t2));
-          }, s2.prototype.highlightDown = function() {
-            var e2, t2 = this.list.querySelector("." + this.main.config.highlighted), i3 = null;
-            if (t2)
-              for (i3 = t2.nextSibling; null !== i3 && i3.classList.contains(this.main.config.disabled); )
-                i3 = i3.nextSibling;
-            else
-              i3 = this.list.querySelector("." + this.main.config.option + ":not(." + this.main.config.disabled + ")");
-            null !== i3 || null === t2 || (e2 = t2.parentNode).classList.contains(this.main.config.optgroup) && e2.nextSibling && (i3 = e2.nextSibling.querySelector("." + this.main.config.option + ":not(." + this.main.config.disabled + ")")), i3 && (t2 && t2.classList.remove(this.main.config.highlighted), i3.classList.add(this.main.config.highlighted), (0, n2.ensureElementInView)(this.list, i3));
-          }, s2.prototype.listDiv = function() {
-            var e2 = document.createElement("div");
-            return e2.classList.add(this.main.config.list), e2.setAttribute("role", "listbox"), e2;
-          }, s2.prototype.options = function(e2) {
-            void 0 === e2 && (e2 = "");
-            var t2 = this.main.data.filtered || this.main.data.data;
-            if ((this.list.innerHTML = "") !== e2)
-              return (i3 = document.createElement("div")).classList.add(this.main.config.option), i3.classList.add(this.main.config.disabled), i3.innerHTML = e2, void this.list.appendChild(i3);
-            if (this.main.config.isAjax && this.main.config.isSearching)
-              return (i3 = document.createElement("div")).classList.add(this.main.config.option), i3.classList.add(this.main.config.disabled), i3.innerHTML = this.main.config.searchingText, void this.list.appendChild(i3);
-            if (0 === t2.length) {
-              var i3 = document.createElement("div");
-              return i3.classList.add(this.main.config.option), i3.classList.add(this.main.config.disabled), i3.innerHTML = this.main.config.searchText, void this.list.appendChild(i3);
             }
-            for (var r = this, n3 = 0, s3 = t2; n3 < s3.length; n3++)
-              !function(e3) {
-                if (e3.hasOwnProperty("label")) {
-                  var t3 = e3, s4 = document.createElement("div");
-                  s4.classList.add(r.main.config.optgroup);
-                  var i4 = document.createElement("div");
-                  i4.classList.add(r.main.config.optgroupLabel), r.main.config.selectByGroup && r.main.config.isMultiple && i4.classList.add(r.main.config.optgroupLabelSelectable), i4.innerHTML = t3.label, s4.appendChild(i4);
-                  t3 = t3.options;
-                  if (t3) {
-                    for (var a, n4 = 0, o2 = t3; n4 < o2.length; n4++) {
-                      var l = o2[n4];
-                      s4.appendChild(r.option(l));
+            return null;
+          }
+          getOptionByID(id) {
+            let options = this.filter((opt) => {
+              return opt.id === id;
+            }, false);
+            return options.length ? options[0] : null;
+          }
+          getSelectType() {
+            return this.selectType;
+          }
+          getFirstOption() {
+            let option2 = null;
+            for (let dataObj of this.data) {
+              if (dataObj instanceof Optgroup) {
+                option2 = dataObj.options[0];
+              } else if (dataObj instanceof Option) {
+                option2 = dataObj;
+              }
+              if (option2) {
+                break;
+              }
+            }
+            return option2;
+          }
+          search(search, searchFilter) {
+            search = search.trim();
+            if (search === "") {
+              return this.getData();
+            }
+            return this.filter((opt) => {
+              return searchFilter(opt, search);
+            }, true);
+          }
+          filter(filter, includeOptgroup) {
+            const dataSearch = [];
+            this.data.forEach((dataObj) => {
+              if (dataObj instanceof Optgroup) {
+                let optOptions = [];
+                dataObj.options.forEach((option2) => {
+                  if (!filter || filter(option2)) {
+                    if (!includeOptgroup) {
+                      dataSearch.push(new Option(option2));
+                    } else {
+                      optOptions.push(new Option(option2));
                     }
-                    r.main.config.selectByGroup && r.main.config.isMultiple && (a = r, i4.addEventListener("click", function(e4) {
-                      e4.preventDefault(), e4.stopPropagation();
-                      for (var t4 = 0, i5 = s4.children; t4 < i5.length; t4++) {
-                        var n5 = i5[t4];
-                        -1 !== n5.className.indexOf(a.main.config.option) && n5.click();
-                      }
-                    }));
                   }
-                  r.list.appendChild(s4);
-                } else
-                  r.list.appendChild(r.option(e3));
-              }(s3[n3]);
-          }, s2.prototype.option = function(o2) {
-            if (o2.placeholder) {
-              var e2 = document.createElement("div");
-              return e2.classList.add(this.main.config.option), e2.classList.add(this.main.config.hide), e2;
-            }
-            var t2 = document.createElement("div");
-            t2.classList.add(this.main.config.option), t2.setAttribute("role", "option"), o2.class && o2.class.split(" ").forEach(function(e3) {
-              t2.classList.add(e3);
-            }), o2.style && (t2.style.cssText = o2.style);
-            var l = this.main.data.getSelected();
-            t2.dataset.id = o2.id, this.main.config.searchHighlight && this.main.slim && o2.innerHTML && "" !== this.main.slim.search.input.value.trim() ? t2.innerHTML = (0, n2.highlight)(o2.innerHTML, this.main.slim.search.input.value, this.main.config.searchHighlighter) : o2.innerHTML && (t2.innerHTML = o2.innerHTML), this.main.config.showOptionTooltips && t2.textContent && t2.setAttribute("title", t2.textContent);
-            var r = this;
-            t2.addEventListener("click", function(e3) {
-              e3.preventDefault(), e3.stopPropagation();
-              var t3 = this.dataset.id;
-              if (true === o2.selected && r.main.config.allowDeselectOption) {
-                var i3 = false;
-                if (r.main.beforeOnChange && r.main.config.isMultiple || (i3 = true), r.main.beforeOnChange && r.main.config.isMultiple) {
-                  for (var n3 = r.main.data.getSelected(), s3 = JSON.parse(JSON.stringify(n3)), a = 0; a < s3.length; a++)
-                    s3[a].id === t3 && s3.splice(a, 1);
-                  false !== r.main.beforeOnChange(s3) && (i3 = true);
+                });
+                if (optOptions.length > 0) {
+                  let optgroup = new Optgroup(dataObj);
+                  optgroup.options = optOptions;
+                  dataSearch.push(optgroup);
                 }
-                i3 && (r.main.config.isMultiple ? (r.main.data.removeFromSelected(t3, "id"), r.main.render(), r.main.select.setValue(), r.main.data.onDataChange()) : r.main.set(""));
-              } else
-                o2.disabled || o2.selected || r.main.config.limit && Array.isArray(l) && r.main.config.limit <= l.length || (r.main.beforeOnChange ? (n3 = void 0, (i3 = JSON.parse(JSON.stringify(r.main.data.getObjectFromData(t3)))).selected = true, r.main.config.isMultiple ? (n3 = JSON.parse(JSON.stringify(l))).push(i3) : n3 = JSON.parse(JSON.stringify(i3)), false !== r.main.beforeOnChange(n3) && r.main.set(t3, "id", r.main.config.closeOnSelect)) : r.main.set(t3, "id", r.main.config.closeOnSelect));
+              }
+              if (dataObj instanceof Option) {
+                if (!filter || filter(dataObj)) {
+                  dataSearch.push(new Option(dataObj));
+                }
+              }
             });
-            e2 = l && (0, n2.isValueInArrayOfObjects)(l, "id", o2.id);
-            return (o2.disabled || e2) && (t2.onclick = null, r.main.config.allowDeselectOption || t2.classList.add(this.main.config.disabled), r.main.config.hideSelectedOption && t2.classList.add(this.main.config.hide)), e2 ? t2.classList.add(this.main.config.optionSelected) : t2.classList.remove(this.main.config.optionSelected), t2;
-          }, s2);
-          function s2(e2) {
-            this.main = e2.main, this.container = this.containerDiv(), this.content = this.contentDiv(), this.search = this.searchDiv(), this.list = this.listDiv(), this.options(), this.singleSelected = null, this.multiSelected = null, this.main.config.isMultiple ? (this.multiSelected = this.multiSelectedDiv(), this.multiSelected && this.container.appendChild(this.multiSelected.container)) : (this.singleSelected = this.singleSelectedDiv(), this.container.appendChild(this.singleSelected.container)), this.main.config.addToBody ? (this.content.classList.add(this.main.config.id), document.body.appendChild(this.content)) : this.container.appendChild(this.content), this.content.appendChild(this.search.container), this.content.appendChild(this.list);
+            return dataSearch;
           }
-          t.Slim = i2;
-        }], s.c = n, s.d = function(e, t, i2) {
-          s.o(e, t) || Object.defineProperty(e, t, { enumerable: true, get: i2 });
-        }, s.r = function(e) {
-          "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, { value: "Module" }), Object.defineProperty(e, "__esModule", { value: true });
-        }, s.t = function(t, e) {
-          if (1 & e && (t = s(t)), 8 & e)
-            return t;
-          if (4 & e && "object" == typeof t && t && t.__esModule)
-            return t;
-          var i2 = /* @__PURE__ */ Object.create(null);
-          if (s.r(i2), Object.defineProperty(i2, "default", { enumerable: true, value: t }), 2 & e && "string" != typeof t)
-            for (var n2 in t)
-              s.d(i2, n2, function(e2) {
-                return t[e2];
-              }.bind(null, n2));
-          return i2;
-        }, s.n = function(e) {
-          var t = e && e.__esModule ? function() {
-            return e.default;
-          } : function() {
-            return e;
-          };
-          return s.d(t, "a", t), t;
-        }, s.o = function(e, t) {
-          return Object.prototype.hasOwnProperty.call(e, t);
-        }, s.p = "", s(s.s = 2).default;
-        function s(e) {
-          if (n[e])
-            return n[e].exports;
-          var t = n[e] = { i: e, l: false, exports: {} };
-          return i[e].call(t.exports, t, t.exports, s), t.l = true, t.exports;
         }
-        var i, n;
+        class Render {
+          constructor(settings, store, callbacks) {
+            this.classes = {
+              main: "ss-main",
+              placeholder: "ss-placeholder",
+              values: "ss-values",
+              single: "ss-single",
+              max: "ss-max",
+              value: "ss-value",
+              valueText: "ss-value-text",
+              valueDelete: "ss-value-delete",
+              valueOut: "ss-value-out",
+              deselect: "ss-deselect",
+              deselectPath: "M10,10 L90,90 M10,90 L90,10",
+              arrow: "ss-arrow",
+              arrowClose: "M10,30 L50,70 L90,30",
+              arrowOpen: "M10,70 L50,30 L90,70",
+              content: "ss-content",
+              openAbove: "ss-open-above",
+              openBelow: "ss-open-below",
+              search: "ss-search",
+              searchHighlighter: "ss-search-highlight",
+              searching: "ss-searching",
+              addable: "ss-addable",
+              addablePath: "M50,10 L50,90 M10,50 L90,50",
+              list: "ss-list",
+              optgroup: "ss-optgroup",
+              optgroupLabel: "ss-optgroup-label",
+              optgroupLabelText: "ss-optgroup-label-text",
+              optgroupActions: "ss-optgroup-actions",
+              optgroupSelectAll: "ss-selectall",
+              optgroupSelectAllBox: "M60,10 L10,10 L10,90 L90,90 L90,50",
+              optgroupSelectAllCheck: "M30,45 L50,70 L90,10",
+              optgroupClosable: "ss-closable",
+              option: "ss-option",
+              optionDelete: "M10,10 L90,90 M10,90 L90,10",
+              highlighted: "ss-highlighted",
+              open: "ss-open",
+              close: "ss-close",
+              selected: "ss-selected",
+              error: "ss-error",
+              disabled: "ss-disabled",
+              hide: "ss-hide"
+            };
+            this.store = store;
+            this.settings = settings;
+            this.callbacks = callbacks;
+            this.main = this.mainDiv();
+            this.content = this.contentDiv();
+            this.updateClassStyles();
+            this.updateAriaAttributes();
+            this.settings.contentLocation.appendChild(this.content.main);
+          }
+          enable() {
+            this.main.main.classList.remove(this.classes.disabled);
+            this.content.search.input.disabled = false;
+          }
+          disable() {
+            this.main.main.classList.add(this.classes.disabled);
+            this.content.search.input.disabled = true;
+          }
+          open() {
+            this.main.arrow.path.setAttribute("d", this.classes.arrowOpen);
+            this.main.main.classList.add(this.settings.openPosition === "up" ? this.classes.openAbove : this.classes.openBelow);
+            this.main.main.setAttribute("aria-expanded", "true");
+            this.moveContent();
+            const selectedOptions = this.store.getSelectedOptions();
+            if (selectedOptions.length) {
+              const selectedId = selectedOptions[selectedOptions.length - 1].id;
+              const selectedOption = this.content.list.querySelector('[data-id="' + selectedId + '"]');
+              if (selectedOption) {
+                this.ensureElementInView(this.content.list, selectedOption);
+              }
+            }
+          }
+          close() {
+            this.main.main.classList.remove(this.classes.openAbove);
+            this.main.main.classList.remove(this.classes.openBelow);
+            this.main.main.setAttribute("aria-expanded", "false");
+            this.content.main.classList.remove(this.classes.openAbove);
+            this.content.main.classList.remove(this.classes.openBelow);
+            this.main.arrow.path.setAttribute("d", this.classes.arrowClose);
+          }
+          updateClassStyles() {
+            this.main.main.className = "";
+            this.main.main.removeAttribute("style");
+            this.content.main.className = "";
+            this.content.main.removeAttribute("style");
+            this.main.main.classList.add(this.classes.main);
+            this.content.main.classList.add(this.classes.content);
+            if (this.settings.style !== "") {
+              this.main.main.style.cssText = this.settings.style;
+              this.content.main.style.cssText = this.settings.style;
+            }
+            if (this.settings.class.length) {
+              for (const c of this.settings.class) {
+                if (c.trim() !== "") {
+                  this.main.main.classList.add(c.trim());
+                  this.content.main.classList.add(c.trim());
+                }
+              }
+            }
+            if (this.settings.contentPosition === "relative") {
+              this.content.main.classList.add("ss-" + this.settings.contentPosition);
+            }
+          }
+          updateAriaAttributes() {
+            this.main.main.role = "combobox";
+            this.main.main.setAttribute("aria-haspopup", "listbox");
+            this.main.main.setAttribute("aria-controls", this.content.main.id);
+            this.main.main.setAttribute("aria-expanded", "false");
+            this.content.main.setAttribute("role", "listbox");
+          }
+          mainDiv() {
+            var _a;
+            const main2 = document.createElement("div");
+            main2.dataset.id = this.settings.id;
+            main2.setAttribute("aria-label", this.settings.ariaLabel);
+            main2.tabIndex = 0;
+            main2.onkeydown = (e) => {
+              switch (e.key) {
+                case "ArrowUp":
+                case "ArrowDown":
+                  this.callbacks.open();
+                  e.key === "ArrowDown" ? this.highlight("down") : this.highlight("up");
+                  return false;
+                case "Tab":
+                  this.callbacks.close();
+                  return true;
+                case "Enter":
+                case " ":
+                  this.callbacks.open();
+                  const highlighted = this.content.list.querySelector("." + this.classes.highlighted);
+                  if (highlighted) {
+                    highlighted.click();
+                  }
+                  return false;
+                case "Escape":
+                  this.callbacks.close();
+                  return false;
+              }
+              return false;
+            };
+            main2.onclick = (e) => {
+              if (this.settings.disabled) {
+                return;
+              }
+              this.settings.isOpen ? this.callbacks.close() : this.callbacks.open();
+            };
+            const values = document.createElement("div");
+            values.classList.add(this.classes.values);
+            main2.appendChild(values);
+            const deselect = document.createElement("div");
+            deselect.classList.add(this.classes.deselect);
+            const selectedOptions = (_a = this.store) === null || _a === void 0 ? void 0 : _a.getSelectedOptions();
+            if (!this.settings.allowDeselect || this.settings.isMultiple && selectedOptions && selectedOptions.length <= 0) {
+              deselect.classList.add(this.classes.hide);
+            } else {
+              deselect.classList.remove(this.classes.hide);
+            }
+            deselect.onclick = (e) => {
+              e.stopPropagation();
+              if (this.settings.disabled) {
+                return;
+              }
+              let shouldDelete = true;
+              const before = this.store.getSelectedOptions();
+              const after = [];
+              if (this.callbacks.beforeChange) {
+                shouldDelete = this.callbacks.beforeChange(after, before) === true;
+              }
+              if (shouldDelete) {
+                if (this.settings.isMultiple) {
+                  this.callbacks.setSelected([], false);
+                  this.updateDeselectAll();
+                } else {
+                  const firstOption = this.store.getFirstOption();
+                  const value = firstOption ? firstOption.value : "";
+                  this.callbacks.setSelected(value, false);
+                }
+                if (this.settings.closeOnSelect) {
+                  this.callbacks.close();
+                }
+                if (this.callbacks.afterChange) {
+                  this.callbacks.afterChange(this.store.getSelectedOptions());
+                }
+              }
+            };
+            const deselectSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            deselectSvg.setAttribute("viewBox", "0 0 100 100");
+            const deselectPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            deselectPath.setAttribute("d", this.classes.deselectPath);
+            deselectSvg.appendChild(deselectPath);
+            deselect.appendChild(deselectSvg);
+            main2.appendChild(deselect);
+            const arrow4 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            arrow4.classList.add(this.classes.arrow);
+            arrow4.setAttribute("viewBox", "0 0 100 100");
+            const arrowPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            arrowPath.setAttribute("d", this.classes.arrowClose);
+            if (this.settings.alwaysOpen) {
+              arrow4.classList.add(this.classes.hide);
+            }
+            arrow4.appendChild(arrowPath);
+            main2.appendChild(arrow4);
+            return {
+              main: main2,
+              values,
+              deselect: {
+                main: deselect,
+                svg: deselectSvg,
+                path: deselectPath
+              },
+              arrow: {
+                main: arrow4,
+                path: arrowPath
+              }
+            };
+          }
+          mainFocus(eventType) {
+            if (eventType !== "click") {
+              this.main.main.focus({ preventScroll: true });
+            }
+          }
+          placeholder() {
+            const placeholderOption = this.store.filter((o) => o.placeholder, false);
+            let placeholderText = this.settings.placeholderText;
+            if (placeholderOption.length) {
+              if (placeholderOption[0].html !== "") {
+                placeholderText = placeholderOption[0].html;
+              } else if (placeholderOption[0].text !== "") {
+                placeholderText = placeholderOption[0].text;
+              }
+            }
+            const placeholder = document.createElement("div");
+            placeholder.classList.add(this.classes.placeholder);
+            placeholder.innerHTML = placeholderText;
+            return placeholder;
+          }
+          renderValues() {
+            if (!this.settings.isMultiple) {
+              this.renderSingleValue();
+              return;
+            }
+            this.renderMultipleValues();
+            this.updateDeselectAll();
+          }
+          renderSingleValue() {
+            const selected = this.store.filter((o) => {
+              return o.selected && !o.placeholder;
+            }, false);
+            const selectedSingle = selected.length > 0 ? selected[0] : null;
+            if (!selectedSingle) {
+              this.main.values.innerHTML = this.placeholder().outerHTML;
+            } else {
+              const singleValue = document.createElement("div");
+              singleValue.classList.add(this.classes.single);
+              if (selectedSingle.html) {
+                singleValue.innerHTML = selectedSingle.html;
+              } else {
+                singleValue.innerText = selectedSingle.text;
+              }
+              this.main.values.innerHTML = singleValue.outerHTML;
+            }
+            if (!this.settings.allowDeselect || !selected.length) {
+              this.main.deselect.main.classList.add(this.classes.hide);
+            } else {
+              this.main.deselect.main.classList.remove(this.classes.hide);
+            }
+          }
+          renderMultipleValues() {
+            let currentNodes = this.main.values.childNodes;
+            let selectedOptions = this.store.filter((opt) => {
+              return opt.selected && opt.display;
+            }, false);
+            if (selectedOptions.length === 0) {
+              this.main.values.innerHTML = this.placeholder().outerHTML;
+              return;
+            } else {
+              const placeholder = this.main.values.querySelector("." + this.classes.placeholder);
+              if (placeholder) {
+                placeholder.remove();
+              }
+            }
+            if (selectedOptions.length > this.settings.maxValuesShown) {
+              const singleValue = document.createElement("div");
+              singleValue.classList.add(this.classes.max);
+              singleValue.textContent = this.settings.maxValuesMessage.replace("{number}", selectedOptions.length.toString());
+              this.main.values.innerHTML = singleValue.outerHTML;
+              return;
+            } else {
+              const maxValuesMessage = this.main.values.querySelector("." + this.classes.max);
+              if (maxValuesMessage) {
+                maxValuesMessage.remove();
+              }
+            }
+            let removeNodes = [];
+            for (let i = 0; i < currentNodes.length; i++) {
+              const node = currentNodes[i];
+              const id = node.getAttribute("data-id");
+              if (id) {
+                const found2 = selectedOptions.filter((opt) => {
+                  return opt.id === id;
+                }, false);
+                if (!found2.length) {
+                  removeNodes.push(node);
+                }
+              }
+            }
+            for (const n of removeNodes) {
+              n.classList.add(this.classes.valueOut);
+              setTimeout(() => {
+                if (this.main.values.hasChildNodes() && this.main.values.contains(n)) {
+                  this.main.values.removeChild(n);
+                }
+              }, 100);
+            }
+            currentNodes = this.main.values.childNodes;
+            for (let d = 0; d < selectedOptions.length; d++) {
+              let shouldAdd = true;
+              for (let i = 0; i < currentNodes.length; i++) {
+                if (selectedOptions[d].id === String(currentNodes[i].dataset.id)) {
+                  shouldAdd = false;
+                }
+              }
+              if (shouldAdd) {
+                if (this.settings.keepOrder) {
+                  this.main.values.appendChild(this.multipleValue(selectedOptions[d]));
+                } else {
+                  if (currentNodes.length === 0) {
+                    this.main.values.appendChild(this.multipleValue(selectedOptions[d]));
+                  } else if (d === 0) {
+                    this.main.values.insertBefore(this.multipleValue(selectedOptions[d]), currentNodes[d]);
+                  } else {
+                    currentNodes[d - 1].insertAdjacentElement("afterend", this.multipleValue(selectedOptions[d]));
+                  }
+                }
+              }
+            }
+          }
+          multipleValue(option2) {
+            const value = document.createElement("div");
+            value.classList.add(this.classes.value);
+            value.dataset.id = option2.id;
+            const text2 = document.createElement("div");
+            text2.classList.add(this.classes.valueText);
+            text2.innerText = option2.text;
+            value.appendChild(text2);
+            if (!option2.mandatory) {
+              const deleteDiv = document.createElement("div");
+              deleteDiv.classList.add(this.classes.valueDelete);
+              deleteDiv.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (this.settings.disabled) {
+                  return;
+                }
+                let shouldDelete = true;
+                const before = this.store.getSelectedOptions();
+                const after = before.filter((o) => {
+                  return o.selected && o.id !== option2.id;
+                }, true);
+                if (this.settings.minSelected && after.length < this.settings.minSelected) {
+                  return;
+                }
+                if (this.callbacks.beforeChange) {
+                  shouldDelete = this.callbacks.beforeChange(after, before) === true;
+                }
+                if (shouldDelete) {
+                  let selectedValues = [];
+                  for (const o of after) {
+                    if (o instanceof Optgroup) {
+                      for (const c of o.options) {
+                        selectedValues.push(c.value);
+                      }
+                    }
+                    if (o instanceof Option) {
+                      selectedValues.push(o.value);
+                    }
+                  }
+                  this.callbacks.setSelected(selectedValues, false);
+                  if (this.settings.closeOnSelect) {
+                    this.callbacks.close();
+                  }
+                  if (this.callbacks.afterChange) {
+                    this.callbacks.afterChange(after);
+                  }
+                  this.updateDeselectAll();
+                }
+              };
+              const deleteSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+              deleteSvg.setAttribute("viewBox", "0 0 100 100");
+              const deletePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              deletePath.setAttribute("d", this.classes.optionDelete);
+              deleteSvg.appendChild(deletePath);
+              deleteDiv.appendChild(deleteSvg);
+              value.appendChild(deleteDiv);
+            }
+            return value;
+          }
+          contentDiv() {
+            const main2 = document.createElement("div");
+            main2.dataset.id = this.settings.id;
+            const search = this.searchDiv();
+            main2.appendChild(search.main);
+            const list = this.listDiv();
+            main2.appendChild(list);
+            return {
+              main: main2,
+              search,
+              list
+            };
+          }
+          moveContent() {
+            if (this.settings.contentPosition === "relative") {
+              this.moveContentBelow();
+              return;
+            }
+            if (this.settings.openPosition === "down") {
+              this.moveContentBelow();
+              return;
+            } else if (this.settings.openPosition === "up") {
+              this.moveContentAbove();
+              return;
+            }
+            if (this.putContent() === "up") {
+              this.moveContentAbove();
+            } else {
+              this.moveContentBelow();
+            }
+          }
+          searchDiv() {
+            const main2 = document.createElement("div");
+            const input = document.createElement("input");
+            const addable = document.createElement("div");
+            main2.classList.add(this.classes.search);
+            const searchReturn = {
+              main: main2,
+              input
+            };
+            if (!this.settings.showSearch) {
+              main2.classList.add(this.classes.hide);
+              input.readOnly = true;
+            }
+            input.type = "search";
+            input.placeholder = this.settings.searchPlaceholder;
+            input.tabIndex = -1;
+            input.setAttribute("aria-label", this.settings.searchPlaceholder);
+            input.setAttribute("autocapitalize", "off");
+            input.setAttribute("autocomplete", "off");
+            input.setAttribute("autocorrect", "off");
+            input.oninput = debounce6((e) => {
+              this.callbacks.search(e.target.value);
+            }, 100);
+            input.onkeydown = (e) => {
+              switch (e.key) {
+                case "ArrowUp":
+                case "ArrowDown":
+                  e.key === "ArrowDown" ? this.highlight("down") : this.highlight("up");
+                  return false;
+                case "Tab":
+                  this.callbacks.close();
+                  return true;
+                case "Escape":
+                  this.callbacks.close();
+                  return false;
+                case "Enter":
+                case " ":
+                  if (this.callbacks.addable && e.ctrlKey) {
+                    addable.click();
+                    return false;
+                  } else {
+                    const highlighted = this.content.list.querySelector("." + this.classes.highlighted);
+                    if (highlighted) {
+                      highlighted.click();
+                      return false;
+                    }
+                  }
+                  return true;
+              }
+              return true;
+            };
+            main2.appendChild(input);
+            if (this.callbacks.addable) {
+              addable.classList.add(this.classes.addable);
+              const plus = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+              plus.setAttribute("viewBox", "0 0 100 100");
+              const plusPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+              plusPath.setAttribute("d", this.classes.addablePath);
+              plus.appendChild(plusPath);
+              addable.appendChild(plus);
+              addable.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!this.callbacks.addable) {
+                  return;
+                }
+                const inputValue = this.content.search.input.value.trim();
+                if (inputValue === "") {
+                  this.content.search.input.focus();
+                  return;
+                }
+                const runFinish = (oo) => {
+                  let newOption = new Option(oo);
+                  this.callbacks.addOption(newOption);
+                  if (this.settings.isMultiple) {
+                    let values = this.store.getSelected();
+                    values.push(newOption.value);
+                    this.callbacks.setSelected(values, true);
+                  } else {
+                    this.callbacks.setSelected([newOption.value], true);
+                  }
+                  this.callbacks.search("");
+                  if (this.settings.closeOnSelect) {
+                    setTimeout(() => {
+                      this.callbacks.close();
+                    }, 100);
+                  }
+                };
+                const addableValue = this.callbacks.addable(inputValue);
+                if (addableValue === false || addableValue === void 0 || addableValue === null) {
+                  return;
+                }
+                if (addableValue instanceof Promise) {
+                  addableValue.then((value) => {
+                    if (typeof value === "string") {
+                      runFinish({
+                        text: value,
+                        value
+                      });
+                    } else {
+                      runFinish(value);
+                    }
+                  });
+                } else if (typeof addableValue === "string") {
+                  runFinish({
+                    text: addableValue,
+                    value: addableValue
+                  });
+                } else {
+                  runFinish(addableValue);
+                }
+                return;
+              };
+              main2.appendChild(addable);
+              searchReturn.addable = {
+                main: addable,
+                svg: plus,
+                path: plusPath
+              };
+            }
+            return searchReturn;
+          }
+          searchFocus() {
+            this.content.search.input.focus();
+          }
+          getOptions(notPlaceholder = false, notDisabled = false, notHidden = false) {
+            let query = "." + this.classes.option;
+            if (notPlaceholder) {
+              query += ":not(." + this.classes.placeholder + ")";
+            }
+            if (notDisabled) {
+              query += ":not(." + this.classes.disabled + ")";
+            }
+            if (notHidden) {
+              query += ":not(." + this.classes.hide + ")";
+            }
+            return Array.from(this.content.list.querySelectorAll(query));
+          }
+          highlight(dir) {
+            const options = this.getOptions(true, true, true);
+            if (options.length === 0) {
+              return;
+            }
+            if (options.length === 1) {
+              if (!options[0].classList.contains(this.classes.highlighted)) {
+                options[0].classList.add(this.classes.highlighted);
+                return;
+              }
+            }
+            let highlighted = false;
+            for (const o of options) {
+              if (o.classList.contains(this.classes.highlighted)) {
+                highlighted = true;
+              }
+            }
+            if (!highlighted) {
+              for (const o of options) {
+                if (o.classList.contains(this.classes.selected)) {
+                  o.classList.add(this.classes.highlighted);
+                  break;
+                }
+              }
+            }
+            for (let i = 0; i < options.length; i++) {
+              if (options[i].classList.contains(this.classes.highlighted)) {
+                const prevOption = options[i];
+                prevOption.classList.remove(this.classes.highlighted);
+                const prevParent = prevOption.parentElement;
+                if (prevParent && prevParent.classList.contains(this.classes.open)) {
+                  const optgroupLabel = prevParent.querySelector("." + this.classes.optgroupLabel);
+                  if (optgroupLabel) {
+                    optgroupLabel.click();
+                  }
+                }
+                let selectOption = options[dir === "down" ? i + 1 < options.length ? i + 1 : 0 : i - 1 >= 0 ? i - 1 : options.length - 1];
+                selectOption.classList.add(this.classes.highlighted);
+                this.ensureElementInView(this.content.list, selectOption);
+                const selectParent = selectOption.parentElement;
+                if (selectParent && selectParent.classList.contains(this.classes.close)) {
+                  const optgroupLabel = selectParent.querySelector("." + this.classes.optgroupLabel);
+                  if (optgroupLabel) {
+                    optgroupLabel.click();
+                  }
+                }
+                return;
+              }
+            }
+            options[dir === "down" ? 0 : options.length - 1].classList.add(this.classes.highlighted);
+            this.ensureElementInView(this.content.list, options[dir === "down" ? 0 : options.length - 1]);
+          }
+          listDiv() {
+            const options = document.createElement("div");
+            options.classList.add(this.classes.list);
+            return options;
+          }
+          renderError(error3) {
+            this.content.list.innerHTML = "";
+            const errorDiv = document.createElement("div");
+            errorDiv.classList.add(this.classes.error);
+            errorDiv.textContent = error3;
+            this.content.list.appendChild(errorDiv);
+          }
+          renderSearching() {
+            this.content.list.innerHTML = "";
+            const searchingDiv = document.createElement("div");
+            searchingDiv.classList.add(this.classes.searching);
+            searchingDiv.textContent = this.settings.searchingText;
+            this.content.list.appendChild(searchingDiv);
+          }
+          renderOptions(data) {
+            this.content.list.innerHTML = "";
+            if (data.length === 0) {
+              const noResults = document.createElement("div");
+              noResults.classList.add(this.classes.search);
+              noResults.innerHTML = this.settings.searchText;
+              this.content.list.appendChild(noResults);
+              return;
+            }
+            for (const d of data) {
+              if (d instanceof Optgroup) {
+                const optgroupEl = document.createElement("div");
+                optgroupEl.classList.add(this.classes.optgroup);
+                const optgroupLabel = document.createElement("div");
+                optgroupLabel.classList.add(this.classes.optgroupLabel);
+                optgroupEl.appendChild(optgroupLabel);
+                const optgroupLabelText = document.createElement("div");
+                optgroupLabelText.classList.add(this.classes.optgroupLabelText);
+                optgroupLabelText.textContent = d.label;
+                optgroupLabel.appendChild(optgroupLabelText);
+                const optgroupActions = document.createElement("div");
+                optgroupActions.classList.add(this.classes.optgroupActions);
+                optgroupLabel.appendChild(optgroupActions);
+                if (this.settings.isMultiple && d.selectAll) {
+                  const selectAll3 = document.createElement("div");
+                  selectAll3.classList.add(this.classes.optgroupSelectAll);
+                  let allSelected = true;
+                  for (const o of d.options) {
+                    if (!o.selected) {
+                      allSelected = false;
+                      break;
+                    }
+                  }
+                  if (allSelected) {
+                    selectAll3.classList.add(this.classes.selected);
+                  }
+                  const selectAllText = document.createElement("span");
+                  selectAllText.textContent = d.selectAllText;
+                  selectAll3.appendChild(selectAllText);
+                  const selectAllSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                  selectAllSvg.setAttribute("viewBox", "0 0 100 100");
+                  selectAll3.appendChild(selectAllSvg);
+                  const selectAllBox = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                  selectAllBox.setAttribute("d", this.classes.optgroupSelectAllBox);
+                  selectAllSvg.appendChild(selectAllBox);
+                  const selectAllCheck = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                  selectAllCheck.setAttribute("d", this.classes.optgroupSelectAllCheck);
+                  selectAllSvg.appendChild(selectAllCheck);
+                  selectAll3.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const currentSelected = this.store.getSelected();
+                    if (allSelected) {
+                      const newSelected = currentSelected.filter((s) => {
+                        for (const o of d.options) {
+                          if (s === o.value) {
+                            return false;
+                          }
+                        }
+                        return true;
+                      });
+                      this.callbacks.setSelected(newSelected, true);
+                      return;
+                    } else {
+                      const newSelected = currentSelected.concat(d.options.map((o) => o.value));
+                      for (const o of d.options) {
+                        if (!this.store.getOptionByID(o.id)) {
+                          this.callbacks.addOption(o);
+                        }
+                      }
+                      this.callbacks.setSelected(newSelected, true);
+                      return;
+                    }
+                  });
+                  optgroupActions.appendChild(selectAll3);
+                }
+                if (d.closable !== "off") {
+                  const optgroupClosable = document.createElement("div");
+                  optgroupClosable.classList.add(this.classes.optgroupClosable);
+                  const optgroupClosableSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                  optgroupClosableSvg.setAttribute("viewBox", "0 0 100 100");
+                  optgroupClosableSvg.classList.add(this.classes.arrow);
+                  optgroupClosable.appendChild(optgroupClosableSvg);
+                  const optgroupClosableArrow = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                  optgroupClosableSvg.appendChild(optgroupClosableArrow);
+                  if (d.options.some((o) => o.selected) || this.content.search.input.value.trim() !== "") {
+                    optgroupClosable.classList.add(this.classes.open);
+                    optgroupClosableArrow.setAttribute("d", this.classes.arrowOpen);
+                  } else if (d.closable === "open") {
+                    optgroupEl.classList.add(this.classes.open);
+                    optgroupClosableArrow.setAttribute("d", this.classes.arrowOpen);
+                  } else if (d.closable === "close") {
+                    optgroupEl.classList.add(this.classes.close);
+                    optgroupClosableArrow.setAttribute("d", this.classes.arrowClose);
+                  }
+                  optgroupLabel.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (optgroupEl.classList.contains(this.classes.close)) {
+                      optgroupEl.classList.remove(this.classes.close);
+                      optgroupEl.classList.add(this.classes.open);
+                      optgroupClosableArrow.setAttribute("d", this.classes.arrowOpen);
+                    } else {
+                      optgroupEl.classList.remove(this.classes.open);
+                      optgroupEl.classList.add(this.classes.close);
+                      optgroupClosableArrow.setAttribute("d", this.classes.arrowClose);
+                    }
+                  });
+                  optgroupActions.appendChild(optgroupClosable);
+                }
+                optgroupEl.appendChild(optgroupLabel);
+                for (const o of d.options) {
+                  optgroupEl.appendChild(this.option(o));
+                }
+                this.content.list.appendChild(optgroupEl);
+              }
+              if (d instanceof Option) {
+                this.content.list.appendChild(this.option(d));
+              }
+            }
+          }
+          option(option2) {
+            if (option2.placeholder) {
+              const placeholder = document.createElement("div");
+              placeholder.classList.add(this.classes.option);
+              placeholder.classList.add(this.classes.hide);
+              return placeholder;
+            }
+            const optionEl = document.createElement("div");
+            optionEl.dataset.id = option2.id;
+            optionEl.id = option2.id;
+            optionEl.classList.add(this.classes.option);
+            optionEl.setAttribute("role", "option");
+            if (option2.class) {
+              option2.class.split(" ").forEach((dataClass) => {
+                optionEl.classList.add(dataClass);
+              });
+            }
+            if (option2.style) {
+              optionEl.style.cssText = option2.style;
+            }
+            if (this.settings.searchHighlight && this.content.search.input.value.trim() !== "") {
+              optionEl.innerHTML = this.highlightText(option2.html !== "" ? option2.html : option2.text, this.content.search.input.value, this.classes.searchHighlighter);
+            } else if (option2.html !== "") {
+              optionEl.innerHTML = option2.html;
+            } else {
+              optionEl.textContent = option2.text;
+            }
+            if (this.settings.showOptionTooltips && optionEl.textContent) {
+              optionEl.setAttribute("title", optionEl.textContent);
+            }
+            if (!option2.display) {
+              optionEl.classList.add(this.classes.hide);
+            }
+            if (option2.disabled) {
+              optionEl.classList.add(this.classes.disabled);
+            }
+            if (option2.selected && this.settings.hideSelected) {
+              optionEl.classList.add(this.classes.hide);
+            }
+            if (option2.selected) {
+              optionEl.classList.add(this.classes.selected);
+              optionEl.setAttribute("aria-selected", "true");
+              this.main.main.setAttribute("aria-activedescendant", optionEl.id);
+            } else {
+              optionEl.classList.remove(this.classes.selected);
+              optionEl.setAttribute("aria-selected", "false");
+            }
+            optionEl.addEventListener("click", (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const selectedOptions = this.store.getSelected();
+              const element = e.currentTarget;
+              const elementID = String(element.dataset.id);
+              if (option2.disabled || option2.selected && !this.settings.allowDeselect) {
+                return;
+              }
+              if (this.settings.isMultiple && this.settings.maxSelected <= selectedOptions.length && !option2.selected || this.settings.isMultiple && this.settings.minSelected >= selectedOptions.length && option2.selected) {
+                return;
+              }
+              let shouldUpdate = false;
+              const before = this.store.getSelectedOptions();
+              let after = [];
+              if (this.settings.isMultiple) {
+                if (option2.selected) {
+                  after = before.filter((o) => o.id !== elementID);
+                } else {
+                  after = before.concat(option2);
+                }
+              }
+              if (!this.settings.isMultiple) {
+                if (option2.selected) {
+                  after = [];
+                } else {
+                  after = [option2];
+                }
+              }
+              if (!this.callbacks.beforeChange) {
+                shouldUpdate = true;
+              }
+              if (this.callbacks.beforeChange) {
+                if (this.callbacks.beforeChange(after, before) === false) {
+                  shouldUpdate = false;
+                } else {
+                  shouldUpdate = true;
+                }
+              }
+              if (shouldUpdate) {
+                if (!this.store.getOptionByID(elementID)) {
+                  this.callbacks.addOption(option2);
+                }
+                this.callbacks.setSelected(after.map((o) => o.value), false);
+                if (this.settings.closeOnSelect) {
+                  this.callbacks.close();
+                }
+                if (this.callbacks.afterChange) {
+                  this.callbacks.afterChange(after);
+                }
+              }
+            });
+            return optionEl;
+          }
+          destroy() {
+            this.main.main.remove();
+            this.content.main.remove();
+          }
+          highlightText(str, search, className) {
+            let completedString = str;
+            const regex = new RegExp("(" + search.trim() + ")(?![^<]*>[^<>]*</)", "i");
+            if (!str.match(regex)) {
+              return str;
+            }
+            const matchStartPosition = str.match(regex).index;
+            const matchEndPosition = matchStartPosition + str.match(regex)[0].toString().length;
+            const originalTextFoundByRegex = str.substring(matchStartPosition, matchEndPosition);
+            completedString = completedString.replace(regex, `<mark class="${className}">${originalTextFoundByRegex}</mark>`);
+            return completedString;
+          }
+          moveContentAbove() {
+            const mainHeight = this.main.main.offsetHeight;
+            const contentHeight = this.content.main.offsetHeight;
+            this.main.main.classList.remove(this.classes.openBelow);
+            this.main.main.classList.add(this.classes.openAbove);
+            this.content.main.classList.remove(this.classes.openBelow);
+            this.content.main.classList.add(this.classes.openAbove);
+            const containerRect = this.main.main.getBoundingClientRect();
+            this.content.main.style.margin = "-" + (mainHeight + contentHeight - 1) + "px 0px 0px 0px";
+            this.content.main.style.top = containerRect.top + containerRect.height + window.scrollY + "px";
+            this.content.main.style.left = containerRect.left + window.scrollX + "px";
+            this.content.main.style.width = containerRect.width + "px";
+          }
+          moveContentBelow() {
+            this.main.main.classList.remove(this.classes.openAbove);
+            this.main.main.classList.add(this.classes.openBelow);
+            this.content.main.classList.remove(this.classes.openAbove);
+            this.content.main.classList.add(this.classes.openBelow);
+            const containerRect = this.main.main.getBoundingClientRect();
+            this.content.main.style.margin = "-1px 0px 0px 0px";
+            if (this.settings.contentPosition !== "relative") {
+              this.content.main.style.top = containerRect.top + containerRect.height + window.scrollY + "px";
+              this.content.main.style.left = containerRect.left + window.scrollX + "px";
+              this.content.main.style.width = containerRect.width + "px";
+            }
+          }
+          ensureElementInView(container, element) {
+            const cTop = container.scrollTop + container.offsetTop;
+            const cBottom = cTop + container.clientHeight;
+            const eTop = element.offsetTop;
+            const eBottom = eTop + element.clientHeight;
+            if (eTop < cTop) {
+              container.scrollTop -= cTop - eTop;
+            } else if (eBottom > cBottom) {
+              container.scrollTop += eBottom - cBottom;
+            }
+          }
+          putContent() {
+            const mainHeight = this.main.main.offsetHeight;
+            const mainRect = this.main.main.getBoundingClientRect();
+            const contentHeight = this.content.main.offsetHeight;
+            const spaceBelow = window.innerHeight - (mainRect.top + mainHeight);
+            if (spaceBelow <= contentHeight) {
+              if (mainRect.top > contentHeight) {
+                return "up";
+              } else {
+                return "down";
+              }
+            }
+            return "down";
+          }
+          updateDeselectAll() {
+            if (!this.store || !this.settings) {
+              return;
+            }
+            const selected = this.store.getSelectedOptions();
+            const hasSelectedItems = selected && selected.length > 0;
+            const isMultiple = this.settings.isMultiple;
+            const allowDeselect = this.settings.allowDeselect;
+            const deselectButton = this.main.deselect.main;
+            const hideClass = this.classes.hide;
+            if (allowDeselect && !(isMultiple && !hasSelectedItems)) {
+              deselectButton.classList.remove(hideClass);
+            } else {
+              deselectButton.classList.add(hideClass);
+            }
+          }
+        }
+        class Select {
+          constructor(select) {
+            this.listen = false;
+            this.observer = null;
+            this.select = select;
+            this.valueChange = this.valueChange.bind(this);
+            this.select.addEventListener("change", this.valueChange, {
+              passive: true
+            });
+            this.observer = new MutationObserver(this.observeCall.bind(this));
+            this.changeListen(true);
+          }
+          enable() {
+            this.select.disabled = false;
+          }
+          disable() {
+            this.select.disabled = true;
+          }
+          hideUI() {
+            this.select.tabIndex = -1;
+            this.select.style.display = "none";
+            this.select.setAttribute("aria-hidden", "true");
+          }
+          showUI() {
+            this.select.removeAttribute("tabindex");
+            this.select.style.display = "";
+            this.select.removeAttribute("aria-hidden");
+          }
+          changeListen(listen) {
+            this.listen = listen;
+            if (listen) {
+              if (this.observer) {
+                this.observer.observe(this.select, {
+                  subtree: true,
+                  childList: true,
+                  attributes: true
+                });
+              }
+            }
+            if (!listen) {
+              if (this.observer) {
+                this.observer.disconnect();
+              }
+            }
+          }
+          valueChange(ev) {
+            if (this.listen && this.onValueChange) {
+              this.onValueChange(this.getSelectedValues());
+            }
+            return true;
+          }
+          observeCall(mutations) {
+            if (!this.listen) {
+              return;
+            }
+            let classChanged = false;
+            let disabledChanged = false;
+            let optgroupOptionChanged = false;
+            for (const m of mutations) {
+              if (m.target === this.select) {
+                if (m.attributeName === "disabled") {
+                  disabledChanged = true;
+                }
+                if (m.attributeName === "class") {
+                  classChanged = true;
+                }
+              }
+              if (m.target.nodeName === "OPTGROUP" || m.target.nodeName === "OPTION") {
+                optgroupOptionChanged = true;
+              }
+            }
+            if (classChanged && this.onClassChange) {
+              this.onClassChange(this.select.className.split(" "));
+            }
+            if (disabledChanged && this.onDisabledChange) {
+              this.changeListen(false);
+              this.onDisabledChange(this.select.disabled);
+              this.changeListen(true);
+            }
+            if (optgroupOptionChanged && this.onOptionsChange) {
+              this.changeListen(false);
+              this.onOptionsChange(this.getData());
+              this.changeListen(true);
+            }
+          }
+          getData() {
+            let data = [];
+            const nodes = this.select.childNodes;
+            for (const n of nodes) {
+              if (n.nodeName === "OPTGROUP") {
+                data.push(this.getDataFromOptgroup(n));
+              }
+              if (n.nodeName === "OPTION") {
+                data.push(this.getDataFromOption(n));
+              }
+            }
+            return data;
+          }
+          getDataFromOptgroup(optgroup) {
+            let data = {
+              id: optgroup.id,
+              label: optgroup.label,
+              selectAll: optgroup.dataset ? optgroup.dataset.selectall === "true" : false,
+              selectAllText: optgroup.dataset ? optgroup.dataset.selectalltext : "Select all",
+              closable: optgroup.dataset ? optgroup.dataset.closable : "off",
+              options: []
+            };
+            const options = optgroup.childNodes;
+            for (const o of options) {
+              if (o.nodeName === "OPTION") {
+                data.options.push(this.getDataFromOption(o));
+              }
+            }
+            return data;
+          }
+          getDataFromOption(option2) {
+            return {
+              id: option2.id,
+              value: option2.value,
+              text: option2.text,
+              html: option2.dataset && option2.dataset.html ? option2.dataset.html : "",
+              selected: option2.selected,
+              display: option2.style.display === "none" ? false : true,
+              disabled: option2.disabled,
+              mandatory: option2.dataset ? option2.dataset.mandatory === "true" : false,
+              placeholder: option2.dataset.placeholder === "true",
+              class: option2.className,
+              style: option2.style.cssText,
+              data: option2.dataset
+            };
+          }
+          getSelectedValues() {
+            let values = [];
+            const options = this.select.childNodes;
+            for (const o of options) {
+              if (o.nodeName === "OPTGROUP") {
+                const optgroupOptions = o.childNodes;
+                for (const oo of optgroupOptions) {
+                  if (oo.nodeName === "OPTION") {
+                    const option2 = oo;
+                    if (option2.selected) {
+                      values.push(option2.value);
+                    }
+                  }
+                }
+              }
+              if (o.nodeName === "OPTION") {
+                const option2 = o;
+                if (option2.selected) {
+                  values.push(option2.value);
+                }
+              }
+            }
+            return values;
+          }
+          setSelected(value) {
+            this.changeListen(false);
+            const options = this.select.childNodes;
+            for (const o of options) {
+              if (o.nodeName === "OPTGROUP") {
+                const optgroup = o;
+                const optgroupOptions = optgroup.childNodes;
+                for (const oo of optgroupOptions) {
+                  if (oo.nodeName === "OPTION") {
+                    const option2 = oo;
+                    option2.selected = value.includes(option2.value);
+                  }
+                }
+              }
+              if (o.nodeName === "OPTION") {
+                const option2 = o;
+                option2.selected = value.includes(option2.value);
+              }
+            }
+            this.changeListen(true);
+          }
+          updateSelect(id, style2, classes) {
+            this.changeListen(false);
+            if (id) {
+              this.select.dataset.id = id;
+            }
+            if (style2) {
+              this.select.style.cssText = style2;
+            }
+            if (classes) {
+              this.select.className = "";
+              classes.forEach((c) => {
+                if (c.trim() !== "") {
+                  this.select.classList.add(c.trim());
+                }
+              });
+            }
+            this.changeListen(true);
+          }
+          updateOptions(data) {
+            this.changeListen(false);
+            this.select.innerHTML = "";
+            for (const d of data) {
+              if (d instanceof Optgroup) {
+                this.select.appendChild(this.createOptgroup(d));
+              }
+              if (d instanceof Option) {
+                this.select.appendChild(this.createOption(d));
+              }
+            }
+            this.select.dispatchEvent(new Event("change"));
+            this.changeListen(true);
+          }
+          createOptgroup(optgroup) {
+            const optgroupEl = document.createElement("optgroup");
+            optgroupEl.id = optgroup.id;
+            optgroupEl.label = optgroup.label;
+            if (optgroup.selectAll) {
+              optgroupEl.dataset.selectAll = "true";
+            }
+            if (optgroup.closable !== "off") {
+              optgroupEl.dataset.closable = optgroup.closable;
+            }
+            if (optgroup.options) {
+              for (const o of optgroup.options) {
+                optgroupEl.appendChild(this.createOption(o));
+              }
+            }
+            return optgroupEl;
+          }
+          createOption(info) {
+            const optionEl = document.createElement("option");
+            optionEl.id = info.id;
+            optionEl.value = info.value;
+            optionEl.innerHTML = info.text;
+            if (info.html !== "") {
+              optionEl.setAttribute("data-html", info.html);
+            }
+            if (info.selected) {
+              optionEl.selected = info.selected;
+            }
+            if (info.disabled) {
+              optionEl.disabled = true;
+            }
+            if (info.display === false) {
+              optionEl.style.display = "none";
+            }
+            if (info.placeholder) {
+              optionEl.setAttribute("data-placeholder", "true");
+            }
+            if (info.mandatory) {
+              optionEl.setAttribute("data-mandatory", "true");
+            }
+            if (info.class) {
+              info.class.split(" ").forEach((optionClass) => {
+                optionEl.classList.add(optionClass);
+              });
+            }
+            if (info.data && typeof info.data === "object") {
+              Object.keys(info.data).forEach((key) => {
+                optionEl.setAttribute("data-" + kebabCase(key), info.data[key]);
+              });
+            }
+            return optionEl;
+          }
+          destroy() {
+            this.changeListen(false);
+            this.select.removeEventListener("change", this.valueChange);
+            if (this.observer) {
+              this.observer.disconnect();
+              this.observer = null;
+            }
+            delete this.select.dataset.id;
+            this.showUI();
+          }
+        }
+        class Settings {
+          constructor(settings) {
+            this.id = "";
+            this.style = "";
+            this.class = [];
+            this.isMultiple = false;
+            this.isOpen = false;
+            this.isFullOpen = false;
+            this.intervalMove = null;
+            if (!settings) {
+              settings = {};
+            }
+            this.id = "ss-" + generateID();
+            this.style = settings.style || "";
+            this.class = settings.class || [];
+            this.disabled = settings.disabled !== void 0 ? settings.disabled : false;
+            this.alwaysOpen = settings.alwaysOpen !== void 0 ? settings.alwaysOpen : false;
+            this.showSearch = settings.showSearch !== void 0 ? settings.showSearch : true;
+            this.ariaLabel = settings.ariaLabel || "Combobox";
+            this.searchPlaceholder = settings.searchPlaceholder || "Search";
+            this.searchText = settings.searchText || "No Results";
+            this.searchingText = settings.searchingText || "Searching...";
+            this.searchHighlight = settings.searchHighlight !== void 0 ? settings.searchHighlight : false;
+            this.closeOnSelect = settings.closeOnSelect !== void 0 ? settings.closeOnSelect : true;
+            this.contentLocation = settings.contentLocation || document.body;
+            this.contentPosition = settings.contentPosition || "absolute";
+            this.openPosition = settings.openPosition || "auto";
+            this.placeholderText = settings.placeholderText !== void 0 ? settings.placeholderText : "Select Value";
+            this.allowDeselect = settings.allowDeselect !== void 0 ? settings.allowDeselect : false;
+            this.hideSelected = settings.hideSelected !== void 0 ? settings.hideSelected : false;
+            this.keepOrder = settings.keepOrder !== void 0 ? settings.keepOrder : false;
+            this.showOptionTooltips = settings.showOptionTooltips !== void 0 ? settings.showOptionTooltips : false;
+            this.minSelected = settings.minSelected || 0;
+            this.maxSelected = settings.maxSelected || 1e3;
+            this.timeoutDelay = settings.timeoutDelay || 200;
+            this.maxValuesShown = settings.maxValuesShown || 20;
+            this.maxValuesMessage = settings.maxValuesMessage || "{number} selected";
+          }
+        }
+        class SlimSelect {
+          constructor(config) {
+            var _a;
+            this.events = {
+              search: void 0,
+              searchFilter: (opt, search) => {
+                return opt.text.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+              },
+              addable: void 0,
+              beforeChange: void 0,
+              afterChange: void 0,
+              beforeOpen: void 0,
+              afterOpen: void 0,
+              beforeClose: void 0,
+              afterClose: void 0
+            };
+            this.windowResize = debounce6(() => {
+              if (!this.settings.isOpen && !this.settings.isFullOpen) {
+                return;
+              }
+              this.render.moveContent();
+            });
+            this.windowScroll = debounce6(() => {
+              if (!this.settings.isOpen && !this.settings.isFullOpen) {
+                return;
+              }
+              this.render.moveContent();
+            });
+            this.documentClick = (e) => {
+              if (!this.settings.isOpen) {
+                return;
+              }
+              if (e.target && !hasClassInTree(e.target, this.settings.id)) {
+                this.close(e.type);
+              }
+            };
+            this.windowVisibilityChange = () => {
+              if (document.hidden) {
+                this.close();
+              }
+            };
+            this.selectEl = typeof config.select === "string" ? document.querySelector(config.select) : config.select;
+            if (!this.selectEl) {
+              if (config.events && config.events.error) {
+                config.events.error(new Error("Could not find select element"));
+              }
+              return;
+            }
+            if (this.selectEl.tagName !== "SELECT") {
+              if (config.events && config.events.error) {
+                config.events.error(new Error("Element isnt of type select"));
+              }
+              return;
+            }
+            if (this.selectEl.dataset.ssid) {
+              this.destroy();
+            }
+            this.settings = new Settings(config.settings);
+            const debounceEvents = ["afterChange", "beforeOpen", "afterOpen", "beforeClose", "afterClose"];
+            for (const key in config.events) {
+              if (!config.events.hasOwnProperty(key)) {
+                continue;
+              }
+              if (debounceEvents.indexOf(key) !== -1) {
+                this.events[key] = debounce6(config.events[key], 100);
+              } else {
+                this.events[key] = config.events[key];
+              }
+            }
+            this.settings.disabled = ((_a = config.settings) === null || _a === void 0 ? void 0 : _a.disabled) ? config.settings.disabled : this.selectEl.disabled;
+            this.settings.isMultiple = this.selectEl.multiple;
+            this.settings.style = this.selectEl.style.cssText;
+            this.settings.class = this.selectEl.className.split(" ");
+            this.select = new Select(this.selectEl);
+            this.select.updateSelect(this.settings.id, this.settings.style, this.settings.class);
+            this.select.hideUI();
+            this.select.onValueChange = (values) => {
+              this.setSelected(values);
+            };
+            this.select.onClassChange = (classes) => {
+              this.settings.class = classes;
+              this.render.updateClassStyles();
+            };
+            this.select.onDisabledChange = (disabled) => {
+              if (disabled) {
+                this.disable();
+              } else {
+                this.enable();
+              }
+            };
+            this.select.onOptionsChange = (data) => {
+              this.setData(data);
+            };
+            this.store = new Store(this.settings.isMultiple ? "multiple" : "single", config.data ? config.data : this.select.getData());
+            if (config.data) {
+              this.select.updateOptions(this.store.getData());
+            }
+            const renderCallbacks = {
+              open: this.open.bind(this),
+              close: this.close.bind(this),
+              addable: this.events.addable ? this.events.addable : void 0,
+              setSelected: this.setSelected.bind(this),
+              addOption: this.addOption.bind(this),
+              search: this.search.bind(this),
+              beforeChange: this.events.beforeChange,
+              afterChange: this.events.afterChange
+            };
+            this.render = new Render(this.settings, this.store, renderCallbacks);
+            this.render.renderValues();
+            this.render.renderOptions(this.store.getData());
+            const selectAriaLabel = this.selectEl.getAttribute("aria-label");
+            const selectAriaLabelledBy = this.selectEl.getAttribute("aria-labelledby");
+            if (selectAriaLabel) {
+              this.render.main.main.setAttribute("aria-label", selectAriaLabel);
+            } else if (selectAriaLabelledBy) {
+              this.render.main.main.setAttribute("aria-labelledby", selectAriaLabelledBy);
+            }
+            if (this.selectEl.parentNode) {
+              this.selectEl.parentNode.insertBefore(this.render.main.main, this.selectEl.nextSibling);
+            }
+            window.addEventListener("resize", this.windowResize, false);
+            if (this.settings.openPosition === "auto") {
+              window.addEventListener("scroll", this.windowScroll, false);
+            }
+            document.addEventListener("visibilitychange", this.windowVisibilityChange);
+            if (this.settings.disabled) {
+              this.disable();
+            }
+            if (this.settings.alwaysOpen) {
+              this.open();
+            }
+            this.selectEl.slim = this;
+          }
+          enable() {
+            this.settings.disabled = false;
+            this.select.enable();
+            this.render.enable();
+          }
+          disable() {
+            this.settings.disabled = true;
+            this.select.disable();
+            this.render.disable();
+          }
+          getData() {
+            return this.store.getData();
+          }
+          setData(data) {
+            const selected = this.store.getSelected();
+            const err = this.store.validateDataArray(data);
+            if (err) {
+              if (this.events.error) {
+                this.events.error(err);
+              }
+              return;
+            }
+            this.store.setData(data);
+            const dataClean = this.store.getData();
+            this.select.updateOptions(dataClean);
+            this.render.renderValues();
+            this.render.renderOptions(dataClean);
+            if (this.events.afterChange && !isEqual(selected, this.store.getSelected())) {
+              this.events.afterChange(this.store.getSelectedOptions());
+            }
+          }
+          getSelected() {
+            return this.store.getSelected();
+          }
+          setSelected(value, runAfterChange = true) {
+            const selected = this.store.getSelected();
+            this.store.setSelectedBy("value", Array.isArray(value) ? value : [value]);
+            const data = this.store.getData();
+            this.select.updateOptions(data);
+            this.render.renderValues();
+            if (this.render.content.search.input.value !== "") {
+              this.search(this.render.content.search.input.value);
+            } else {
+              this.render.renderOptions(data);
+            }
+            if (runAfterChange && this.events.afterChange && !isEqual(selected, this.store.getSelected())) {
+              this.events.afterChange(this.store.getSelectedOptions());
+            }
+          }
+          addOption(option2) {
+            const selected = this.store.getSelected();
+            if (!this.store.getDataOptions().some((o) => {
+              var _a;
+              return o.value === ((_a = option2.value) !== null && _a !== void 0 ? _a : option2.text);
+            })) {
+              this.store.addOption(option2);
+            }
+            const data = this.store.getData();
+            this.select.updateOptions(data);
+            this.render.renderValues();
+            this.render.renderOptions(data);
+            if (this.events.afterChange && !isEqual(selected, this.store.getSelected())) {
+              this.events.afterChange(this.store.getSelectedOptions());
+            }
+          }
+          open() {
+            if (this.settings.disabled || this.settings.isOpen) {
+              return;
+            }
+            if (this.events.beforeOpen) {
+              this.events.beforeOpen();
+            }
+            this.render.open();
+            if (this.settings.showSearch) {
+              this.render.searchFocus();
+            }
+            this.settings.isOpen = true;
+            setTimeout(() => {
+              if (this.events.afterOpen) {
+                this.events.afterOpen();
+              }
+              if (this.settings.isOpen) {
+                this.settings.isFullOpen = true;
+              }
+              document.addEventListener("click", this.documentClick);
+            }, this.settings.timeoutDelay);
+            if (this.settings.contentPosition === "absolute") {
+              if (this.settings.intervalMove) {
+                clearInterval(this.settings.intervalMove);
+              }
+              this.settings.intervalMove = setInterval(this.render.moveContent.bind(this.render), 500);
+            }
+          }
+          close(eventType = null) {
+            if (!this.settings.isOpen || this.settings.alwaysOpen) {
+              return;
+            }
+            if (this.events.beforeClose) {
+              this.events.beforeClose();
+            }
+            this.render.close();
+            if (this.render.content.search.input.value !== "") {
+              this.search("");
+            }
+            this.render.mainFocus(eventType);
+            this.settings.isOpen = false;
+            this.settings.isFullOpen = false;
+            setTimeout(() => {
+              if (this.events.afterClose) {
+                this.events.afterClose();
+              }
+              document.removeEventListener("click", this.documentClick);
+            }, this.settings.timeoutDelay);
+            if (this.settings.intervalMove) {
+              clearInterval(this.settings.intervalMove);
+            }
+          }
+          search(value) {
+            if (this.render.content.search.input.value !== value) {
+              this.render.content.search.input.value = value;
+            }
+            if (!this.events.search) {
+              this.render.renderOptions(value === "" ? this.store.getData() : this.store.search(value, this.events.searchFilter));
+              return;
+            }
+            this.render.renderSearching();
+            const searchResp = this.events.search(value, this.store.getSelectedOptions());
+            if (searchResp instanceof Promise) {
+              searchResp.then((data) => {
+                this.render.renderOptions(this.store.partialToFullData(data));
+              }).catch((err) => {
+                this.render.renderError(typeof err === "string" ? err : err.message);
+              });
+              return;
+            } else if (Array.isArray(searchResp)) {
+              this.render.renderOptions(this.store.partialToFullData(searchResp));
+            } else {
+              this.render.renderError("Search event must return a promise or an array of data");
+            }
+          }
+          destroy() {
+            document.removeEventListener("click", this.documentClick);
+            window.removeEventListener("resize", this.windowResize, false);
+            if (this.settings.openPosition === "auto") {
+              window.removeEventListener("scroll", this.windowScroll, false);
+            }
+            document.removeEventListener("visibilitychange", this.windowVisibilityChange);
+            this.store.setData([]);
+            this.render.destroy();
+            this.select.destroy();
+          }
+        }
+        return SlimSelect;
       });
-      slimselect_min_default = exports.SlimSelect;
     }
   });
 
   // node_modules/lodash.debounce/index.js
   var require_lodash2 = __commonJS({
-    "node_modules/lodash.debounce/index.js"(exports2, module2) {
+    "node_modules/lodash.debounce/index.js"(exports, module) {
       var FUNC_ERROR_TEXT2 = "Expected a function";
       var NAN2 = 0 / 0;
       var symbolTag2 = "[object Symbol]";
@@ -34859,7 +36139,7 @@ img.ProseMirror-separator {
         var isBinary = reIsBinary2.test(value);
         return isBinary || reIsOctal2.test(value) ? freeParseInt2(value.slice(2), isBinary ? 2 : 8) : reIsBadHex2.test(value) ? NAN2 : +value;
       }
-      module2.exports = debounce6;
+      module.exports = debounce6;
     }
   });
 
@@ -34919,13 +36199,11 @@ img.ProseMirror-separator {
   (function() {
     if ("submitter" in Event.prototype)
       return;
-    let prototype;
+    let prototype = window.Event.prototype;
     if ("SubmitEvent" in window && /Apple Computer/.test(navigator.vendor)) {
       prototype = window.SubmitEvent.prototype;
     } else if ("SubmitEvent" in window) {
       return;
-    } else {
-      prototype = window.Event.prototype;
     }
     addEventListener("click", clickCaptured, true);
     Object.defineProperty(prototype, "submitter", {
@@ -34941,14 +36219,14 @@ img.ProseMirror-separator {
     FrameLoadingStyle2["eager"] = "eager";
     FrameLoadingStyle2["lazy"] = "lazy";
   })(FrameLoadingStyle || (FrameLoadingStyle = {}));
-  var FrameElement = class extends HTMLElement {
+  var FrameElement = class _FrameElement extends HTMLElement {
+    static get observedAttributes() {
+      return ["disabled", "complete", "loading", "src"];
+    }
     constructor() {
       super();
       this.loaded = Promise.resolve();
-      this.delegate = new FrameElement.delegateConstructor(this);
-    }
-    static get observedAttributes() {
-      return ["disabled", "complete", "loading", "src"];
+      this.delegate = new _FrameElement.delegateConstructor(this);
     }
     connectedCallback() {
       this.delegate.connect();
@@ -35365,7 +36643,7 @@ img.ProseMirror-separator {
         credentials: "same-origin",
         headers: this.headers,
         redirect: "follow",
-        body: this.isIdempotent ? null : this.body,
+        body: this.isSafe ? null : this.body,
         signal: this.abortSignal,
         referrer: (_a = this.delegate.referrer) === null || _a === void 0 ? void 0 : _a.href
       };
@@ -35375,8 +36653,8 @@ img.ProseMirror-separator {
         Accept: "text/html, application/xhtml+xml"
       };
     }
-    get isIdempotent() {
-      return this.method == FetchMethod.get;
+    get isSafe() {
+      return this.method === FetchMethod.get;
     }
     get abortSignal() {
       return this.abortController.signal;
@@ -35434,15 +36712,15 @@ img.ProseMirror-separator {
     }
   };
   var StreamMessage = class {
-    constructor(fragment) {
-      this.fragment = importStreamElements(fragment);
-    }
     static wrap(message) {
       if (typeof message == "string") {
         return new this(createDocumentFragment(message));
       } else {
         return message;
       }
+    }
+    constructor(fragment) {
+      this.fragment = importStreamElements(fragment);
     }
   };
   StreamMessage.contentType = "text/vnd.turbo-stream.html";
@@ -35481,7 +36759,10 @@ img.ProseMirror-separator {
         return FormEnctype.urlEncoded;
     }
   }
-  var FormSubmission = class {
+  var FormSubmission = class _FormSubmission {
+    static confirmMethod(message, _element, _submitter) {
+      return Promise.resolve(confirm(message));
+    }
     constructor(delegate, formElement, submitter, mustRedirect = false) {
       this.state = FormSubmissionState.initialized;
       this.delegate = delegate;
@@ -35494,9 +36775,6 @@ img.ProseMirror-separator {
       }
       this.fetchRequest = new FetchRequest(this, this.method, this.location, this.body, this.formElement);
       this.mustRedirect = mustRedirect;
-    }
-    static confirmMethod(message, _element, _submitter) {
-      return Promise.resolve(confirm(message));
     }
     get method() {
       var _a;
@@ -35523,8 +36801,8 @@ img.ProseMirror-separator {
       var _a;
       return formEnctypeFromString(((_a = this.submitter) === null || _a === void 0 ? void 0 : _a.getAttribute("formenctype")) || this.formElement.enctype);
     }
-    get isIdempotent() {
-      return this.fetchRequest.isIdempotent;
+    get isSafe() {
+      return this.fetchRequest.isSafe;
     }
     get stringFormData() {
       return [...this.formData].reduce((entries, [name, value]) => {
@@ -35535,7 +36813,7 @@ img.ProseMirror-separator {
       const { initialized, requesting } = FormSubmissionState;
       const confirmationMessage = getAttribute("data-turbo-confirm", this.submitter, this.formElement);
       if (typeof confirmationMessage === "string") {
-        const answer = await FormSubmission.confirmMethod(confirmationMessage, this.formElement, this.submitter);
+        const answer = await _FormSubmission.confirmMethod(confirmationMessage, this.formElement, this.submitter);
         if (!answer) {
           return;
         }
@@ -35554,7 +36832,7 @@ img.ProseMirror-separator {
       }
     }
     prepareRequest(request) {
-      if (!request.isIdempotent) {
+      if (!request.isSafe) {
         const token = getCookieValue(getMetaContent("csrf-param")) || getMetaContent("csrf-token");
         if (token) {
           request.headers["X-CSRF-Token"] = token;
@@ -35568,6 +36846,7 @@ img.ProseMirror-separator {
       var _a;
       this.state = FormSubmissionState.waiting;
       (_a = this.submitter) === null || _a === void 0 ? void 0 : _a.setAttribute("disabled", "");
+      this.setSubmitsWith();
       dispatch("turbo:submit-start", {
         target: this.formElement,
         detail: { formSubmission: this }
@@ -35601,17 +36880,44 @@ img.ProseMirror-separator {
       var _a;
       this.state = FormSubmissionState.stopped;
       (_a = this.submitter) === null || _a === void 0 ? void 0 : _a.removeAttribute("disabled");
+      this.resetSubmitterText();
       dispatch("turbo:submit-end", {
         target: this.formElement,
         detail: Object.assign({ formSubmission: this }, this.result)
       });
       this.delegate.formSubmissionFinished(this);
     }
+    setSubmitsWith() {
+      if (!this.submitter || !this.submitsWith)
+        return;
+      if (this.submitter.matches("button")) {
+        this.originalSubmitText = this.submitter.innerHTML;
+        this.submitter.innerHTML = this.submitsWith;
+      } else if (this.submitter.matches("input")) {
+        const input = this.submitter;
+        this.originalSubmitText = input.value;
+        input.value = this.submitsWith;
+      }
+    }
+    resetSubmitterText() {
+      if (!this.submitter || !this.originalSubmitText)
+        return;
+      if (this.submitter.matches("button")) {
+        this.submitter.innerHTML = this.originalSubmitText;
+      } else if (this.submitter.matches("input")) {
+        const input = this.submitter;
+        input.value = this.originalSubmitText;
+      }
+    }
     requestMustRedirect(request) {
-      return !request.isIdempotent && this.mustRedirect;
+      return !request.isSafe && this.mustRedirect;
     }
     requestAcceptsTurboStreamResponse(request) {
-      return !request.isIdempotent || hasAttribute("data-turbo-stream", this.submitter, this.formElement);
+      return !request.isSafe || hasAttribute("data-turbo-stream", this.submitter, this.formElement);
+    }
+    get submitsWith() {
+      var _a;
+      return (_a = this.submitter) === null || _a === void 0 ? void 0 : _a.getAttribute("data-turbo-submits-with");
     }
   };
   function buildFormData(formElement, submitter) {
@@ -35840,8 +37146,8 @@ img.ProseMirror-separator {
     }
   };
   var FrameView = class extends View {
-    invalidate() {
-      this.element.innerHTML = "";
+    missing() {
+      this.element.innerHTML = `<strong class="turbo-frame-error">Content missing</strong>`;
     }
     get snapshot() {
       return new Snapshot(this.element);
@@ -35989,15 +37295,15 @@ img.ProseMirror-separator {
     }
   };
   var Bardo = class {
-    constructor(delegate, permanentElementMap) {
-      this.delegate = delegate;
-      this.permanentElementMap = permanentElementMap;
-    }
     static async preservingPermanentElements(delegate, permanentElementMap, callback2) {
       const bardo = new this(delegate, permanentElementMap);
       bardo.enter();
       await callback2();
       bardo.leave();
+    }
+    constructor(delegate, permanentElementMap) {
+      this.delegate = delegate;
+      this.permanentElementMap = permanentElementMap;
     }
     enter() {
       for (const id in this.permanentElementMap) {
@@ -36019,8 +37325,8 @@ img.ProseMirror-separator {
       permanentElement.replaceWith(placeholder);
     }
     replaceCurrentPermanentElementWithClone(permanentElement) {
-      const clone3 = permanentElement.cloneNode(true);
-      permanentElement.replaceWith(clone3);
+      const clone4 = permanentElement.cloneNode(true);
+      permanentElement.replaceWith(clone4);
     }
     replacePlaceholderWithPermanentElement(permanentElement) {
       const placeholder = this.getPlaceholderById(permanentElement.id);
@@ -36103,10 +37409,6 @@ img.ProseMirror-separator {
     return element && typeof element.focus == "function";
   }
   var FrameRenderer = class extends Renderer {
-    constructor(delegate, currentSnapshot, newSnapshot, renderElement, isPreview, willRender = true) {
-      super(currentSnapshot, newSnapshot, renderElement, isPreview, willRender);
-      this.delegate = delegate;
-    }
     static renderElement(currentElement, newElement) {
       var _a;
       const destinationRange = document.createRange();
@@ -36118,6 +37420,10 @@ img.ProseMirror-separator {
         sourceRange.selectNodeContents(frameElement);
         currentElement.appendChild(sourceRange.extractContents());
       }
+    }
+    constructor(delegate, currentSnapshot, newSnapshot, renderElement, isPreview, willRender = true) {
+      super(currentSnapshot, newSnapshot, renderElement, isPreview, willRender);
+      this.delegate = delegate;
     }
     get shouldRender() {
       return true;
@@ -36173,19 +37479,7 @@ img.ProseMirror-separator {
       return defaultValue;
     }
   }
-  var ProgressBar = class {
-    constructor() {
-      this.hiding = false;
-      this.value = 0;
-      this.visible = false;
-      this.trickle = () => {
-        this.setValue(this.value + Math.random() / 100);
-      };
-      this.stylesheetElement = this.createStylesheetElement();
-      this.progressElement = this.createProgressElement();
-      this.installStylesheetElement();
-      this.setValue(0);
-    }
+  var ProgressBar = class _ProgressBar {
     static get defaultCSS() {
       return unindent`
       .turbo-progress-bar {
@@ -36197,11 +37491,23 @@ img.ProseMirror-separator {
         background: #0076ff;
         z-index: 2147483647;
         transition:
-          width ${ProgressBar.animationDuration}ms ease-out,
-          opacity ${ProgressBar.animationDuration / 2}ms ${ProgressBar.animationDuration / 2}ms ease-in;
+          width ${_ProgressBar.animationDuration}ms ease-out,
+          opacity ${_ProgressBar.animationDuration / 2}ms ${_ProgressBar.animationDuration / 2}ms ease-in;
         transform: translate3d(0, 0, 0);
       }
     `;
+    }
+    constructor() {
+      this.hiding = false;
+      this.value = 0;
+      this.visible = false;
+      this.trickle = () => {
+        this.setValue(this.value + Math.random() / 100);
+      };
+      this.stylesheetElement = this.createStylesheetElement();
+      this.progressElement = this.createProgressElement();
+      this.installStylesheetElement();
+      this.setValue(0);
     }
     show() {
       if (!this.visible) {
@@ -36236,7 +37542,7 @@ img.ProseMirror-separator {
     }
     fadeProgressElement(callback2) {
       this.progressElement.style.opacity = "0";
-      setTimeout(callback2, ProgressBar.animationDuration * 1.5);
+      setTimeout(callback2, _ProgressBar.animationDuration * 1.5);
     }
     uninstallProgressElement() {
       if (this.progressElement.parentNode) {
@@ -36245,7 +37551,7 @@ img.ProseMirror-separator {
     }
     startTrickling() {
       if (!this.trickleInterval) {
-        this.trickleInterval = window.setInterval(this.trickle, ProgressBar.animationDuration);
+        this.trickleInterval = window.setInterval(this.trickle, _ProgressBar.animationDuration);
       }
     }
     stopTrickling() {
@@ -36260,7 +37566,7 @@ img.ProseMirror-separator {
     createStylesheetElement() {
       const element = document.createElement("style");
       element.type = "text/css";
-      element.textContent = ProgressBar.defaultCSS;
+      element.textContent = _ProgressBar.defaultCSS;
       if (this.cspNonce) {
         element.nonce = this.cspNonce;
       }
@@ -36356,11 +37662,7 @@ img.ProseMirror-separator {
     }
     return element;
   }
-  var PageSnapshot = class extends Snapshot {
-    constructor(element, headSnapshot) {
-      super(element);
-      this.headSnapshot = headSnapshot;
-    }
+  var PageSnapshot = class _PageSnapshot extends Snapshot {
     static fromHTMLString(html = "") {
       return this.fromDocument(parseHTMLDocument(html));
     }
@@ -36370,21 +37672,25 @@ img.ProseMirror-separator {
     static fromDocument({ head, body }) {
       return new this(body, new HeadSnapshot(head));
     }
+    constructor(element, headSnapshot) {
+      super(element);
+      this.headSnapshot = headSnapshot;
+    }
     clone() {
       const clonedElement = this.element.cloneNode(true);
       const selectElements = this.element.querySelectorAll("select");
       const clonedSelectElements = clonedElement.querySelectorAll("select");
       for (const [index3, source2] of selectElements.entries()) {
-        const clone3 = clonedSelectElements[index3];
-        for (const option2 of clone3.selectedOptions)
+        const clone4 = clonedSelectElements[index3];
+        for (const option2 of clone4.selectedOptions)
           option2.selected = false;
         for (const option2 of source2.selectedOptions)
-          clone3.options[option2.index].selected = true;
+          clone4.options[option2.index].selected = true;
       }
       for (const clonedPasswordInput of clonedElement.querySelectorAll('input[type="password"]')) {
         clonedPasswordInput.value = "";
       }
-      return new PageSnapshot(clonedElement, this.headSnapshot);
+      return new _PageSnapshot(clonedElement, this.headSnapshot);
     }
     get headElement() {
       return this.headSnapshot.element;
@@ -36861,10 +38167,11 @@ img.ProseMirror-separator {
   };
   var CacheObserver = class {
     constructor() {
+      this.selector = "[data-turbo-temporary]";
+      this.deprecatedSelector = "[data-turbo-cache=false]";
       this.started = false;
-      this.removeStaleElements = (_event) => {
-        const staleElements = [...document.querySelectorAll('[data-turbo-cache="false"]')];
-        for (const element of staleElements) {
+      this.removeTemporaryElements = (_event) => {
+        for (const element of this.temporaryElements) {
           element.remove();
         }
       };
@@ -36872,14 +38179,24 @@ img.ProseMirror-separator {
     start() {
       if (!this.started) {
         this.started = true;
-        addEventListener("turbo:before-cache", this.removeStaleElements, false);
+        addEventListener("turbo:before-cache", this.removeTemporaryElements, false);
       }
     }
     stop() {
       if (this.started) {
         this.started = false;
-        removeEventListener("turbo:before-cache", this.removeStaleElements, false);
+        removeEventListener("turbo:before-cache", this.removeTemporaryElements, false);
       }
+    }
+    get temporaryElements() {
+      return [...document.querySelectorAll(this.selector), ...this.temporaryElementsWithDeprecation];
+    }
+    get temporaryElementsWithDeprecation() {
+      const elements2 = document.querySelectorAll(this.deprecatedSelector);
+      if (elements2.length) {
+        console.warn(`The ${this.deprecatedSelector} selector is deprecated and will be removed in a future version. Use ${this.selector} instead.`);
+      }
+      return [...elements2];
     }
   };
   var FrameRedirector = class {
@@ -37070,7 +38387,7 @@ img.ProseMirror-separator {
       if (formSubmission == this.formSubmission) {
         const responseHTML = await fetchResponse.responseHTML;
         if (responseHTML) {
-          const shouldCacheSnapshot = formSubmission.method == FetchMethod.get;
+          const shouldCacheSnapshot = formSubmission.isSafe;
           if (!shouldCacheSnapshot) {
             this.view.clearSnapshotCache();
           }
@@ -38005,6 +39322,8 @@ img.ProseMirror-separator {
     setFormMode,
     StreamActions
   });
+  var TurboFrameMissingError = class extends Error {
+  };
   var FrameController = class {
     constructor(element) {
       this.fetchResponseLoaded = (_fetchResponse) => {
@@ -38105,27 +39424,14 @@ img.ProseMirror-separator {
       try {
         const html = await fetchResponse.responseHTML;
         if (html) {
-          const { body } = parseHTMLDocument(html);
-          const newFrameElement = await this.extractForeignFrameElement(body);
-          if (newFrameElement) {
-            const snapshot = new Snapshot(newFrameElement);
-            const renderer = new FrameRenderer(this, this.view.snapshot, snapshot, FrameRenderer.renderElement, false, false);
-            if (this.view.renderPromise)
-              await this.view.renderPromise;
-            this.changeHistory();
-            await this.view.render(renderer);
-            this.complete = true;
-            session.frameRendered(fetchResponse, this.element);
-            session.frameLoaded(this.element);
-            this.fetchResponseLoaded(fetchResponse);
-          } else if (this.willHandleFrameMissingFromResponse(fetchResponse)) {
-            console.warn(`A matching frame for #${this.element.id} was missing from the response, transforming into full-page Visit.`);
-            this.visitResponse(fetchResponse.response);
+          const document2 = parseHTMLDocument(html);
+          const pageSnapshot = PageSnapshot.fromDocument(document2);
+          if (pageSnapshot.isVisitable) {
+            await this.loadFrameResponse(fetchResponse, document2);
+          } else {
+            await this.handleUnvisitableFrameResponse(fetchResponse);
           }
         }
-      } catch (error3) {
-        console.error(error3);
-        this.view.invalidate();
       } finally {
         this.fetchResponseLoaded = () => {
         };
@@ -38179,7 +39485,6 @@ img.ProseMirror-separator {
       this.resolveVisitPromise();
     }
     async requestFailedWithResponse(request, response) {
-      console.error(response);
       await this.loadResponse(response);
       this.resolveVisitPromise();
     }
@@ -38197,9 +39502,13 @@ img.ProseMirror-separator {
       const frame = this.findFrameElement(formSubmission.formElement, formSubmission.submitter);
       frame.delegate.proposeVisitIfNavigatedWithAction(frame, formSubmission.formElement, formSubmission.submitter);
       frame.delegate.loadResponse(response);
+      if (!formSubmission.isSafe) {
+        session.clearCache();
+      }
     }
     formSubmissionFailedWithResponse(formSubmission, fetchResponse) {
       this.element.delegate.loadResponse(fetchResponse);
+      session.clearCache();
     }
     formSubmissionErrored(formSubmission, error3) {
       console.error(error3);
@@ -38228,6 +39537,23 @@ img.ProseMirror-separator {
     }
     willRenderFrame(currentElement, _newElement) {
       this.previousFrameElement = currentElement.cloneNode(true);
+    }
+    async loadFrameResponse(fetchResponse, document2) {
+      const newFrameElement = await this.extractForeignFrameElement(document2.body);
+      if (newFrameElement) {
+        const snapshot = new Snapshot(newFrameElement);
+        const renderer = new FrameRenderer(this, this.view.snapshot, snapshot, FrameRenderer.renderElement, false, false);
+        if (this.view.renderPromise)
+          await this.view.renderPromise;
+        this.changeHistory();
+        await this.view.render(renderer);
+        this.complete = true;
+        session.frameRendered(fetchResponse, this.element);
+        session.frameLoaded(this.element);
+        this.fetchResponseLoaded(fetchResponse);
+      } else if (this.willHandleFrameMissingFromResponse(fetchResponse)) {
+        this.handleFrameMissingFromResponse(fetchResponse);
+      }
     }
     async visit(url) {
       var _a;
@@ -38282,6 +39608,10 @@ img.ProseMirror-separator {
         session.history.update(method, expandURL(this.element.src || ""), this.restorationIdentifier);
       }
     }
+    async handleUnvisitableFrameResponse(fetchResponse) {
+      console.warn(`The response (${fetchResponse.statusCode}) from <turbo-frame id="${this.element.id}"> is performing a full page visit due to turbo-visit-control.`);
+      await this.visitResponse(fetchResponse.response);
+    }
     willHandleFrameMissingFromResponse(fetchResponse) {
       this.element.setAttribute("complete", "");
       const response = fetchResponse.response;
@@ -38298,6 +39628,14 @@ img.ProseMirror-separator {
         cancelable: true
       });
       return !event.defaultPrevented;
+    }
+    handleFrameMissingFromResponse(fetchResponse) {
+      this.view.missing();
+      this.throwFrameMissingError(fetchResponse);
+    }
+    throwFrameMissingError(fetchResponse) {
+      const message = `The response (${fetchResponse.statusCode}) did not contain the expected <turbo-frame id="${this.element.id}"> and will be ignored. To perform a full page visit instead, set turbo-visit-control to reload.`;
+      throw new TurboFrameMissingError(message);
     }
     async visitResponse(response) {
       const wrapped = new FetchResponse(response);
@@ -38436,7 +39774,7 @@ img.ProseMirror-separator {
       }
     }
   }
-  var StreamElement = class extends HTMLElement {
+  var StreamElement = class _StreamElement extends HTMLElement {
     static async renderElement(newElement) {
       await newElement.performAction();
     }
@@ -38526,7 +39864,7 @@ img.ProseMirror-separator {
       return new CustomEvent("turbo:before-stream-render", {
         bubbles: true,
         cancelable: true,
-        detail: { newStream: this, render: StreamElement.renderElement }
+        detail: { newStream: this, render: _StreamElement.renderElement }
       });
     }
     get targetElementsById() {
@@ -38640,7 +39978,11 @@ img.ProseMirror-separator {
   var TurboCableStreamSourceElement = class extends HTMLElement {
     async connectedCallback() {
       connectStreamSource(this);
-      this.subscription = await subscribeTo(this.channel, { received: this.dispatchMessageEvent.bind(this) });
+      this.subscription = await subscribeTo(this.channel, {
+        received: this.dispatchMessageEvent.bind(this),
+        connected: this.subscriptionConnected.bind(this),
+        disconnected: this.subscriptionDisconnected.bind(this)
+      });
     }
     disconnectedCallback() {
       disconnectStreamSource(this);
@@ -38650,6 +39992,12 @@ img.ProseMirror-separator {
     dispatchMessageEvent(data) {
       const event = new MessageEvent("message", { data });
       return this.dispatchEvent(event);
+    }
+    subscriptionConnected() {
+      this.setAttribute("connected", "");
+    }
+    subscriptionDisconnected() {
+      this.removeAttribute("connected");
     }
     get channel() {
       const channel = this.getAttribute("channel");
@@ -38866,23 +40214,23 @@ img.ProseMirror-separator {
       }
     }
   };
-  var descriptorPattern = /^(?:(.+?)(?:\.(.+?))?(?:@(window|document))?->)?(.+?)(?:#([^:]+?))(?::(.+))?$/;
+  var descriptorPattern = /^(?:(?:([^.]+?)\+)?(.+?)(?:\.(.+?))?(?:@(window|document))?->)?(.+?)(?:#([^:]+?))(?::(.+))?$/;
   function parseActionDescriptorString(descriptorString) {
     const source2 = descriptorString.trim();
     const matches3 = source2.match(descriptorPattern) || [];
-    let eventName = matches3[1];
-    let keyFilter = matches3[2];
+    let eventName = matches3[2];
+    let keyFilter = matches3[3];
     if (keyFilter && !["keydown", "keyup", "keypress"].includes(eventName)) {
       eventName += `.${keyFilter}`;
       keyFilter = "";
     }
     return {
-      eventTarget: parseEventTarget(matches3[3]),
+      eventTarget: parseEventTarget(matches3[4]),
       eventName,
-      eventOptions: matches3[6] ? parseEventOptions(matches3[6]) : {},
-      identifier: matches3[4],
-      methodName: matches3[5],
-      keyFilter
+      eventOptions: matches3[7] ? parseEventOptions(matches3[7]) : {},
+      identifier: matches3[5],
+      methodName: matches3[6],
+      keyFilter: matches3[1] || keyFilter
     };
   }
   function parseEventTarget(eventTargetName) {
@@ -38917,6 +40265,13 @@ img.ProseMirror-separator {
   function tokenize(value) {
     return value.match(/[^\s]+/g) || [];
   }
+  function isSomething(object) {
+    return object !== null && object !== void 0;
+  }
+  function hasProperty(object, property) {
+    return Object.prototype.hasOwnProperty.call(object, property);
+  }
+  var allModifiers = ["meta", "ctrl", "alt", "shift"];
   var Action = class {
     constructor(element, index3, descriptor, schema) {
       this.element = element;
@@ -38937,24 +40292,32 @@ img.ProseMirror-separator {
       const eventTarget = this.eventTargetName ? `@${this.eventTargetName}` : "";
       return `${this.eventName}${eventFilter}${eventTarget}->${this.identifier}#${this.methodName}`;
     }
-    isFilterTarget(event) {
+    shouldIgnoreKeyboardEvent(event) {
       if (!this.keyFilter) {
         return false;
       }
-      const filteres = this.keyFilter.split("+");
-      const modifiers2 = ["meta", "ctrl", "alt", "shift"];
-      const [meta, ctrl, alt, shift2] = modifiers2.map((modifier) => filteres.includes(modifier));
-      if (event.metaKey !== meta || event.ctrlKey !== ctrl || event.altKey !== alt || event.shiftKey !== shift2) {
+      const filters = this.keyFilter.split("+");
+      if (this.keyFilterDissatisfied(event, filters)) {
         return true;
       }
-      const standardFilter = filteres.filter((key) => !modifiers2.includes(key))[0];
+      const standardFilter = filters.filter((key) => !allModifiers.includes(key))[0];
       if (!standardFilter) {
         return false;
       }
-      if (!Object.prototype.hasOwnProperty.call(this.keyMappings, standardFilter)) {
+      if (!hasProperty(this.keyMappings, standardFilter)) {
         error(`contains unknown key filter: ${this.keyFilter}`);
       }
       return this.keyMappings[standardFilter].toLowerCase() !== event.key.toLowerCase();
+    }
+    shouldIgnoreMouseEvent(event) {
+      if (!this.keyFilter) {
+        return false;
+      }
+      const filters = [this.keyFilter];
+      if (this.keyFilterDissatisfied(event, filters)) {
+        return true;
+      }
+      return false;
     }
     get params() {
       const params = {};
@@ -38973,6 +40336,10 @@ img.ProseMirror-separator {
     }
     get keyMappings() {
       return this.schema.keyMappings;
+    }
+    keyFilterDissatisfied(event, filters) {
+      const [meta, ctrl, alt, shift2] = allModifiers.map((modifier) => filters.includes(modifier));
+      return event.metaKey !== meta || event.ctrlKey !== ctrl || event.altKey !== alt || event.shiftKey !== shift2;
     }
   };
   var defaultEventNames = {
@@ -39018,8 +40385,9 @@ img.ProseMirror-separator {
       return this.context.identifier;
     }
     handleEvent(event) {
-      if (this.willBeInvokedByEvent(event) && this.applyEventModifiers(event)) {
-        this.invokeWithEvent(event);
+      const actionEvent = this.prepareActionEvent(event);
+      if (this.willBeInvokedByEvent(event) && this.applyEventModifiers(actionEvent)) {
+        this.invokeWithEvent(actionEvent);
       }
     }
     get eventName() {
@@ -39035,23 +40403,25 @@ img.ProseMirror-separator {
     applyEventModifiers(event) {
       const { element } = this.action;
       const { actionDescriptorFilters } = this.context.application;
+      const { controller } = this.context;
       let passes = true;
       for (const [name, value] of Object.entries(this.eventOptions)) {
         if (name in actionDescriptorFilters) {
           const filter = actionDescriptorFilters[name];
-          passes = passes && filter({ name, value, event, element });
+          passes = passes && filter({ name, value, event, element, controller });
         } else {
           continue;
         }
       }
       return passes;
     }
+    prepareActionEvent(event) {
+      return Object.assign(event, { params: this.action.params });
+    }
     invokeWithEvent(event) {
       const { target, currentTarget } = event;
       try {
-        const { params } = this.action;
-        const actionEvent = Object.assign(event, { params });
-        this.method.call(this.controller, actionEvent);
+        this.method.call(this.controller, event);
         this.context.logDebugActivity(this.methodName, { event, target, currentTarget, action: this.methodName });
       } catch (error3) {
         const { identifier, controller, element, index: index3 } = this;
@@ -39061,7 +40431,10 @@ img.ProseMirror-separator {
     }
     willBeInvokedByEvent(event) {
       const eventTarget = event.target;
-      if (event instanceof KeyboardEvent && this.action.isFilterTarget(event)) {
+      if (event instanceof KeyboardEvent && this.action.shouldIgnoreKeyboardEvent(event)) {
+        return false;
+      }
+      if (event instanceof MouseEvent && this.action.shouldIgnoreMouseEvent(event)) {
         return false;
       }
       if (this.element === eventTarget) {
@@ -39147,8 +40520,7 @@ img.ProseMirror-separator {
         this.processAddedNodes(mutation.addedNodes);
       }
     }
-    processAttributeChange(node, attributeName) {
-      const element = node;
+    processAttributeChange(element, attributeName) {
       if (this.elements.has(element)) {
         if (this.delegate.elementAttributeChanged && this.matchElement(element)) {
           this.delegate.elementAttributeChanged(element, attributeName);
@@ -39330,8 +40702,8 @@ img.ProseMirror-separator {
     }
   };
   var SelectorObserver = class {
-    constructor(element, selector, delegate, details = {}) {
-      this.selector = selector;
+    constructor(element, selector, delegate, details) {
+      this._selector = selector;
       this.details = details;
       this.elementObserver = new ElementObserver(element, this);
       this.delegate = delegate;
@@ -39339,6 +40711,13 @@ img.ProseMirror-separator {
     }
     get started() {
       return this.elementObserver.started;
+    }
+    get selector() {
+      return this._selector;
+    }
+    set selector(selector) {
+      this._selector = selector;
+      this.refresh();
     }
     start() {
       this.elementObserver.start();
@@ -39356,39 +40735,58 @@ img.ProseMirror-separator {
       return this.elementObserver.element;
     }
     matchElement(element) {
-      const matches3 = element.matches(this.selector);
-      if (this.delegate.selectorMatchElement) {
-        return matches3 && this.delegate.selectorMatchElement(element, this.details);
+      const { selector } = this;
+      if (selector) {
+        const matches3 = element.matches(selector);
+        if (this.delegate.selectorMatchElement) {
+          return matches3 && this.delegate.selectorMatchElement(element, this.details);
+        }
+        return matches3;
+      } else {
+        return false;
       }
-      return matches3;
     }
     matchElementsInTree(tree) {
-      const match = this.matchElement(tree) ? [tree] : [];
-      const matches3 = Array.from(tree.querySelectorAll(this.selector)).filter((match2) => this.matchElement(match2));
-      return match.concat(matches3);
+      const { selector } = this;
+      if (selector) {
+        const match = this.matchElement(tree) ? [tree] : [];
+        const matches3 = Array.from(tree.querySelectorAll(selector)).filter((match2) => this.matchElement(match2));
+        return match.concat(matches3);
+      } else {
+        return [];
+      }
     }
     elementMatched(element) {
-      this.selectorMatched(element);
+      const { selector } = this;
+      if (selector) {
+        this.selectorMatched(element, selector);
+      }
     }
     elementUnmatched(element) {
-      this.selectorUnmatched(element);
+      const selectors = this.matchesByElement.getKeysForValue(element);
+      for (const selector of selectors) {
+        this.selectorUnmatched(element, selector);
+      }
     }
     elementAttributeChanged(element, _attributeName) {
-      const matches3 = this.matchElement(element);
-      const matchedBefore = this.matchesByElement.has(this.selector, element);
-      if (!matches3 && matchedBefore) {
-        this.selectorUnmatched(element);
+      const { selector } = this;
+      if (selector) {
+        const matches3 = this.matchElement(element);
+        const matchedBefore = this.matchesByElement.has(selector, element);
+        if (matches3 && !matchedBefore) {
+          this.selectorMatched(element, selector);
+        } else if (!matches3 && matchedBefore) {
+          this.selectorUnmatched(element, selector);
+        }
       }
     }
-    selectorMatched(element) {
-      if (this.delegate.selectorMatched) {
-        this.delegate.selectorMatched(element, this.selector, this.details);
-        this.matchesByElement.add(this.selector, element);
-      }
+    selectorMatched(element, selector) {
+      this.delegate.selectorMatched(element, selector, this.details);
+      this.matchesByElement.add(selector, element);
     }
-    selectorUnmatched(element) {
-      this.delegate.selectorUnmatched(element, this.selector, this.details);
-      this.matchesByElement.delete(this.selector, element);
+    selectorUnmatched(element, selector) {
+      this.delegate.selectorUnmatched(element, selector, this.details);
+      this.matchesByElement.delete(selector, element);
     }
   };
   var StringMapObserver = class {
@@ -39868,34 +41266,47 @@ img.ProseMirror-separator {
   }
   var OutletObserver = class {
     constructor(context, delegate) {
+      this.started = false;
       this.context = context;
       this.delegate = delegate;
       this.outletsByName = new Multimap();
       this.outletElementsByName = new Multimap();
       this.selectorObserverMap = /* @__PURE__ */ new Map();
+      this.attributeObserverMap = /* @__PURE__ */ new Map();
     }
     start() {
-      if (this.selectorObserverMap.size === 0) {
+      if (!this.started) {
         this.outletDefinitions.forEach((outletName) => {
-          const selector = this.selector(outletName);
-          const details = { outletName };
-          if (selector) {
-            this.selectorObserverMap.set(outletName, new SelectorObserver(document.body, selector, this, details));
-          }
+          this.setupSelectorObserverForOutlet(outletName);
+          this.setupAttributeObserverForOutlet(outletName);
         });
-        this.selectorObserverMap.forEach((observer) => observer.start());
-      }
-      this.dependentContexts.forEach((context) => context.refresh());
-    }
-    stop() {
-      if (this.selectorObserverMap.size > 0) {
-        this.disconnectAllOutlets();
-        this.selectorObserverMap.forEach((observer) => observer.stop());
-        this.selectorObserverMap.clear();
+        this.started = true;
+        this.dependentContexts.forEach((context) => context.refresh());
       }
     }
     refresh() {
       this.selectorObserverMap.forEach((observer) => observer.refresh());
+      this.attributeObserverMap.forEach((observer) => observer.refresh());
+    }
+    stop() {
+      if (this.started) {
+        this.started = false;
+        this.disconnectAllOutlets();
+        this.stopSelectorObservers();
+        this.stopAttributeObservers();
+      }
+    }
+    stopSelectorObservers() {
+      if (this.selectorObserverMap.size > 0) {
+        this.selectorObserverMap.forEach((observer) => observer.stop());
+        this.selectorObserverMap.clear();
+      }
+    }
+    stopAttributeObservers() {
+      if (this.attributeObserverMap.size > 0) {
+        this.attributeObserverMap.forEach((observer) => observer.stop());
+        this.attributeObserverMap.clear();
+      }
     }
     selectorMatched(element, _selector, { outletName }) {
       const outlet = this.getOutlet(element, outletName);
@@ -39910,7 +41321,32 @@ img.ProseMirror-separator {
       }
     }
     selectorMatchElement(element, { outletName }) {
-      return this.hasOutlet(element, outletName) && element.matches(`[${this.context.application.schema.controllerAttribute}~=${outletName}]`);
+      const selector = this.selector(outletName);
+      const hasOutlet = this.hasOutlet(element, outletName);
+      const hasOutletController = element.matches(`[${this.schema.controllerAttribute}~=${outletName}]`);
+      if (selector) {
+        return hasOutlet && hasOutletController && element.matches(selector);
+      } else {
+        return false;
+      }
+    }
+    elementMatchedAttribute(_element, attributeName) {
+      const outletName = this.getOutletNameFromOutletAttributeName(attributeName);
+      if (outletName) {
+        this.updateSelectorObserverForOutlet(outletName);
+      }
+    }
+    elementAttributeValueChanged(_element, attributeName) {
+      const outletName = this.getOutletNameFromOutletAttributeName(attributeName);
+      if (outletName) {
+        this.updateSelectorObserverForOutlet(outletName);
+      }
+    }
+    elementUnmatchedAttribute(_element, attributeName) {
+      const outletName = this.getOutletNameFromOutletAttributeName(attributeName);
+      if (outletName) {
+        this.updateSelectorObserverForOutlet(outletName);
+      }
     }
     connectOutlet(outlet, element, outletName) {
       var _a;
@@ -39937,15 +41373,39 @@ img.ProseMirror-separator {
         }
       }
     }
+    updateSelectorObserverForOutlet(outletName) {
+      const observer = this.selectorObserverMap.get(outletName);
+      if (observer) {
+        observer.selector = this.selector(outletName);
+      }
+    }
+    setupSelectorObserverForOutlet(outletName) {
+      const selector = this.selector(outletName);
+      const selectorObserver = new SelectorObserver(document.body, selector, this, { outletName });
+      this.selectorObserverMap.set(outletName, selectorObserver);
+      selectorObserver.start();
+    }
+    setupAttributeObserverForOutlet(outletName) {
+      const attributeName = this.attributeNameForOutletName(outletName);
+      const attributeObserver = new AttributeObserver(this.scope.element, attributeName, this);
+      this.attributeObserverMap.set(outletName, attributeObserver);
+      attributeObserver.start();
+    }
     selector(outletName) {
       return this.scope.outlets.getSelectorForOutletName(outletName);
     }
+    attributeNameForOutletName(outletName) {
+      return this.scope.schema.outletAttributeForScope(this.identifier, outletName);
+    }
+    getOutletNameFromOutletAttributeName(attributeName) {
+      return this.outletDefinitions.find((outletName) => this.attributeNameForOutletName(outletName) === attributeName);
+    }
     get outletDependencies() {
       const dependencies = new Multimap();
-      this.router.modules.forEach((module2) => {
-        const constructor = module2.definition.controllerConstructor;
+      this.router.modules.forEach((module) => {
+        const constructor = module.definition.controllerConstructor;
         const outlets = readInheritableStaticArrayValues(constructor, "outlets");
-        outlets.forEach((outlet) => dependencies.add(outlet, module2.identifier));
+        outlets.forEach((outlet) => dependencies.add(outlet, module.identifier));
       });
       return dependencies;
     }
@@ -39971,6 +41431,9 @@ img.ProseMirror-separator {
     get scope() {
       return this.context.scope;
     }
+    get schema() {
+      return this.context.schema;
+    }
     get identifier() {
       return this.context.identifier;
     }
@@ -39982,15 +41445,15 @@ img.ProseMirror-separator {
     }
   };
   var Context = class {
-    constructor(module2, scope) {
+    constructor(module, scope) {
       this.logDebugActivity = (functionName, detail = {}) => {
         const { identifier, controller, element } = this;
         detail = Object.assign({ identifier, controller, element }, detail);
         this.application.logDebugActivity(this.identifier, functionName, detail);
       };
-      this.module = module2;
+      this.module = module;
       this.scope = scope;
-      this.controller = new module2.controllerConstructor(this);
+      this.controller = new module.controllerConstructor(this);
       this.bindingObserver = new BindingObserver(this, this.dispatcher);
       this.valueObserver = new ValueObserver(this, this.controller);
       this.targetObserver = new TargetObserver(this, this);
@@ -40382,7 +41845,7 @@ img.ProseMirror-separator {
       return element.matches(selector) && controllerAttribute.split(" ").includes(outletName);
     }
   };
-  var Scope = class {
+  var Scope = class _Scope {
     constructor(schema, element, identifier, logger) {
       this.targets = new TargetSet(this);
       this.classes = new ClassMap(this);
@@ -40415,7 +41878,7 @@ img.ProseMirror-separator {
       return this.element === document.documentElement;
     }
     get documentScope() {
-      return this.isDocumentScope ? this : new Scope(this.schema, document.documentElement, this.identifier, this.guide.logger);
+      return this.isDocumentScope ? this : new _Scope(this.schema, document.documentElement, this.identifier, this.guide.logger);
     }
   };
   var ScopeObserver = class {
@@ -40438,6 +41901,9 @@ img.ProseMirror-separator {
     }
     parseValueForToken(token) {
       const { element, content: identifier } = token;
+      return this.parseValueForElementAndIdentifier(element, identifier);
+    }
+    parseValueForElementAndIdentifier(element, identifier) {
       const scopesByIdentifier = this.fetchScopesByIdentifierForElement(element);
       let scope = scopesByIdentifier.get(identifier);
       if (!scope) {
@@ -40494,7 +41960,7 @@ img.ProseMirror-separator {
       return Array.from(this.modulesByIdentifier.values());
     }
     get contexts() {
-      return this.modules.reduce((contexts, module2) => contexts.concat(module2.contexts), []);
+      return this.modules.reduce((contexts, module) => contexts.concat(module.contexts), []);
     }
     start() {
       this.scopeObserver.start();
@@ -40504,23 +41970,31 @@ img.ProseMirror-separator {
     }
     loadDefinition(definition) {
       this.unloadIdentifier(definition.identifier);
-      const module2 = new Module(this.application, definition);
-      this.connectModule(module2);
+      const module = new Module(this.application, definition);
+      this.connectModule(module);
       const afterLoad = definition.controllerConstructor.afterLoad;
       if (afterLoad) {
-        afterLoad(definition.identifier, this.application);
+        afterLoad.call(definition.controllerConstructor, definition.identifier, this.application);
       }
     }
     unloadIdentifier(identifier) {
-      const module2 = this.modulesByIdentifier.get(identifier);
-      if (module2) {
-        this.disconnectModule(module2);
+      const module = this.modulesByIdentifier.get(identifier);
+      if (module) {
+        this.disconnectModule(module);
       }
     }
     getContextForElementAndIdentifier(element, identifier) {
-      const module2 = this.modulesByIdentifier.get(identifier);
-      if (module2) {
-        return module2.contexts.find((context) => context.element == element);
+      const module = this.modulesByIdentifier.get(identifier);
+      if (module) {
+        return module.contexts.find((context) => context.element == element);
+      }
+    }
+    proposeToConnectScopeForElementAndIdentifier(element, identifier) {
+      const scope = this.scopeObserver.parseValueForElementAndIdentifier(element, identifier);
+      if (scope) {
+        this.scopeObserver.elementMatchedValue(scope.element, scope);
+      } else {
+        console.error(`Couldn't find or create scope for identifier: "${identifier}" and element:`, element);
       }
     }
     handleError(error3, message, detail) {
@@ -40531,27 +42005,27 @@ img.ProseMirror-separator {
     }
     scopeConnected(scope) {
       this.scopesByIdentifier.add(scope.identifier, scope);
-      const module2 = this.modulesByIdentifier.get(scope.identifier);
-      if (module2) {
-        module2.connectContextForScope(scope);
+      const module = this.modulesByIdentifier.get(scope.identifier);
+      if (module) {
+        module.connectContextForScope(scope);
       }
     }
     scopeDisconnected(scope) {
       this.scopesByIdentifier.delete(scope.identifier, scope);
-      const module2 = this.modulesByIdentifier.get(scope.identifier);
-      if (module2) {
-        module2.disconnectContextForScope(scope);
+      const module = this.modulesByIdentifier.get(scope.identifier);
+      if (module) {
+        module.disconnectContextForScope(scope);
       }
     }
-    connectModule(module2) {
-      this.modulesByIdentifier.set(module2.identifier, module2);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
-      scopes.forEach((scope) => module2.connectContextForScope(scope));
+    connectModule(module) {
+      this.modulesByIdentifier.set(module.identifier, module);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
+      scopes.forEach((scope) => module.connectContextForScope(scope));
     }
-    disconnectModule(module2) {
-      this.modulesByIdentifier.delete(module2.identifier);
-      const scopes = this.scopesByIdentifier.getValuesForKey(module2.identifier);
-      scopes.forEach((scope) => module2.disconnectContextForScope(scope));
+    disconnectModule(module) {
+      this.modulesByIdentifier.delete(module.identifier);
+      const scopes = this.scopesByIdentifier.getValuesForKey(module.identifier);
+      scopes.forEach((scope) => module.disconnectContextForScope(scope));
     }
   };
   var defaultSchema = {
@@ -40560,7 +42034,7 @@ img.ProseMirror-separator {
     targetAttribute: "data-target",
     targetAttributeForScope: (identifier) => `data-${identifier}-target`,
     outletAttributeForScope: (identifier, outlet) => `data-${identifier}-${outlet}-outlet`,
-    keyMappings: Object.assign(Object.assign({ enter: "Enter", tab: "Tab", esc: "Escape", space: " ", up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", home: "Home", end: "End" }, objectFromEntries("abcdefghijklmnopqrstuvwxyz".split("").map((c) => [c, c]))), objectFromEntries("0123456789".split("").map((n) => [n, n])))
+    keyMappings: Object.assign(Object.assign({ enter: "Enter", tab: "Tab", esc: "Escape", space: " ", up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", home: "Home", end: "End", page_up: "PageUp", page_down: "PageDown" }, objectFromEntries("abcdefghijklmnopqrstuvwxyz".split("").map((c) => [c, c]))), objectFromEntries("0123456789".split("").map((n) => [n, n])))
   };
   function objectFromEntries(array) {
     return array.reduce((memo, [k, v]) => Object.assign(Object.assign({}, memo), { [k]: v }), {});
@@ -40685,34 +42159,43 @@ img.ProseMirror-separator {
       return Object.assign(properties, propertiesForOutletDefinition(outletDefinition));
     }, {});
   }
+  function getOutletController(controller, element, identifier) {
+    return controller.application.getControllerForElementAndIdentifier(element, identifier);
+  }
+  function getControllerAndEnsureConnectedScope(controller, element, outletName) {
+    let outletController = getOutletController(controller, element, outletName);
+    if (outletController)
+      return outletController;
+    controller.application.router.proposeToConnectScopeForElementAndIdentifier(element, outletName);
+    outletController = getOutletController(controller, element, outletName);
+    if (outletController)
+      return outletController;
+  }
   function propertiesForOutletDefinition(name) {
     const camelizedName = namespaceCamelize(name);
     return {
       [`${camelizedName}Outlet`]: {
         get() {
-          const outlet = this.outlets.find(name);
-          if (outlet) {
-            const outletController = this.application.getControllerForElementAndIdentifier(outlet, name);
-            if (outletController) {
+          const outletElement = this.outlets.find(name);
+          const selector = this.outlets.getSelectorForOutletName(name);
+          if (outletElement) {
+            const outletController = getControllerAndEnsureConnectedScope(this, outletElement, name);
+            if (outletController)
               return outletController;
-            } else {
-              throw new Error(`Missing "data-controller=${name}" attribute on outlet element for "${this.identifier}" controller`);
-            }
+            throw new Error(`The provided outlet element is missing an outlet controller "${name}" instance for host controller "${this.identifier}"`);
           }
-          throw new Error(`Missing outlet element "${name}" for "${this.identifier}" controller`);
+          throw new Error(`Missing outlet element "${name}" for host controller "${this.identifier}". Stimulus couldn't find a matching outlet element using selector "${selector}".`);
         }
       },
       [`${camelizedName}Outlets`]: {
         get() {
           const outlets = this.outlets.findAll(name);
           if (outlets.length > 0) {
-            return outlets.map((outlet) => {
-              const controller = this.application.getControllerForElementAndIdentifier(outlet, name);
-              if (controller) {
-                return controller;
-              } else {
-                console.warn(`The provided outlet element is missing the outlet controller "${name}" for "${this.identifier}"`, outlet);
-              }
+            return outlets.map((outletElement) => {
+              const outletController = getControllerAndEnsureConnectedScope(this, outletElement, name);
+              if (outletController)
+                return outletController;
+              console.warn(`The provided outlet element is missing an outlet controller "${name}" instance for host controller "${this.identifier}"`, outletElement);
             }).filter((controller) => controller);
           }
           return [];
@@ -40720,11 +42203,12 @@ img.ProseMirror-separator {
       },
       [`${camelizedName}OutletElement`]: {
         get() {
-          const outlet = this.outlets.find(name);
-          if (outlet) {
-            return outlet;
+          const outletElement = this.outlets.find(name);
+          const selector = this.outlets.getSelectorForOutletName(name);
+          if (outletElement) {
+            return outletElement;
           } else {
-            throw new Error(`Missing outlet element "${name}" for "${this.identifier}" controller`);
+            throw new Error(`Missing outlet element "${name}" for host controller "${this.identifier}". Stimulus couldn't find a matching outlet element using selector "${selector}".`);
           }
         }
       },
@@ -40851,51 +42335,67 @@ img.ProseMirror-separator {
       return "object";
   }
   function parseValueTypeObject(payload) {
-    const typeFromObject = parseValueTypeConstant(payload.typeObject.type);
-    if (!typeFromObject)
-      return;
-    const defaultValueType = parseValueTypeDefault(payload.typeObject.default);
-    if (typeFromObject !== defaultValueType) {
-      const propertyPath = payload.controller ? `${payload.controller}.${payload.token}` : payload.token;
-      throw new Error(`The specified default value for the Stimulus Value "${propertyPath}" must match the defined type "${typeFromObject}". The provided default value of "${payload.typeObject.default}" is of type "${defaultValueType}".`);
+    const { controller, token, typeObject } = payload;
+    const hasType = isSomething(typeObject.type);
+    const hasDefault = isSomething(typeObject.default);
+    const fullObject = hasType && hasDefault;
+    const onlyType = hasType && !hasDefault;
+    const onlyDefault = !hasType && hasDefault;
+    const typeFromObject = parseValueTypeConstant(typeObject.type);
+    const typeFromDefaultValue = parseValueTypeDefault(payload.typeObject.default);
+    if (onlyType)
+      return typeFromObject;
+    if (onlyDefault)
+      return typeFromDefaultValue;
+    if (typeFromObject !== typeFromDefaultValue) {
+      const propertyPath = controller ? `${controller}.${token}` : token;
+      throw new Error(`The specified default value for the Stimulus Value "${propertyPath}" must match the defined type "${typeFromObject}". The provided default value of "${typeObject.default}" is of type "${typeFromDefaultValue}".`);
     }
-    return typeFromObject;
+    if (fullObject)
+      return typeFromObject;
   }
   function parseValueTypeDefinition(payload) {
-    const typeFromObject = parseValueTypeObject({
-      controller: payload.controller,
-      token: payload.token,
-      typeObject: payload.typeDefinition
-    });
-    const typeFromDefaultValue = parseValueTypeDefault(payload.typeDefinition);
-    const typeFromConstant = parseValueTypeConstant(payload.typeDefinition);
+    const { controller, token, typeDefinition } = payload;
+    const typeObject = { controller, token, typeObject: typeDefinition };
+    const typeFromObject = parseValueTypeObject(typeObject);
+    const typeFromDefaultValue = parseValueTypeDefault(typeDefinition);
+    const typeFromConstant = parseValueTypeConstant(typeDefinition);
     const type = typeFromObject || typeFromDefaultValue || typeFromConstant;
     if (type)
       return type;
-    const propertyPath = payload.controller ? `${payload.controller}.${payload.typeDefinition}` : payload.token;
-    throw new Error(`Unknown value type "${propertyPath}" for "${payload.token}" value`);
+    const propertyPath = controller ? `${controller}.${typeDefinition}` : token;
+    throw new Error(`Unknown value type "${propertyPath}" for "${token}" value`);
   }
   function defaultValueForDefinition(typeDefinition) {
     const constant = parseValueTypeConstant(typeDefinition);
     if (constant)
       return defaultValuesByType[constant];
-    const defaultValue = typeDefinition.default;
-    if (defaultValue !== void 0)
-      return defaultValue;
+    const hasDefault = hasProperty(typeDefinition, "default");
+    const hasType = hasProperty(typeDefinition, "type");
+    const typeObject = typeDefinition;
+    if (hasDefault)
+      return typeObject.default;
+    if (hasType) {
+      const { type } = typeObject;
+      const constantFromType = parseValueTypeConstant(type);
+      if (constantFromType)
+        return defaultValuesByType[constantFromType];
+    }
     return typeDefinition;
   }
   function valueDescriptorForTokenAndTypeDefinition(payload) {
-    const key = `${dasherize(payload.token)}-value`;
+    const { token, typeDefinition } = payload;
+    const key = `${dasherize(token)}-value`;
     const type = parseValueTypeDefinition(payload);
     return {
       type,
       key,
       name: camelize(key),
       get defaultValue() {
-        return defaultValueForDefinition(payload.typeDefinition);
+        return defaultValueForDefinition(typeDefinition);
       },
       get hasCustomDefaultValue() {
-        return parseValueTypeDefault(payload.typeDefinition) !== void 0;
+        return parseValueTypeDefault(typeDefinition) !== void 0;
       },
       reader: readers[type],
       writer: writers[type] || writers.default
@@ -40924,7 +42424,7 @@ img.ProseMirror-separator {
       return !(value == "0" || String(value).toLowerCase() == "false");
     },
     number(value) {
-      return Number(value);
+      return Number(value.replace(/_/g, ""));
     },
     object(value) {
       const object = JSON.parse(value);
@@ -41012,557 +42512,453 @@ img.ProseMirror-separator {
       autofocusNode.focus();
   };
 
-  // node_modules/chart.js/dist/chunks/helpers.segment.mjs
-  function noop() {
+  // node_modules/bali-view-components/node_modules/@hotwired/stimulus/dist/stimulus.js
+  function camelize2(value) {
+    return value.replace(/(?:[_-])([a-z0-9])/g, (_, char) => char.toUpperCase());
   }
-  var uid = function() {
-    let id = 0;
-    return function() {
-      return id++;
-    };
-  }();
-  function isNullOrUndef(value) {
-    return value === null || typeof value === "undefined";
+  function namespaceCamelize2(value) {
+    return camelize2(value.replace(/--/g, "-").replace(/__/g, "_"));
   }
-  function isArray(value) {
-    if (Array.isArray && Array.isArray(value)) {
-      return true;
+  function capitalize2(value) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+  function dasherize2(value) {
+    return value.replace(/([A-Z])/g, (_, char) => `-${char.toLowerCase()}`);
+  }
+  function readInheritableStaticArrayValues2(constructor, propertyName) {
+    const ancestors = getAncestorsForConstructor2(constructor);
+    return Array.from(ancestors.reduce((values, constructor2) => {
+      getOwnStaticArrayValues2(constructor2, propertyName).forEach((name) => values.add(name));
+      return values;
+    }, /* @__PURE__ */ new Set()));
+  }
+  function readInheritableStaticObjectPairs2(constructor, propertyName) {
+    const ancestors = getAncestorsForConstructor2(constructor);
+    return ancestors.reduce((pairs, constructor2) => {
+      pairs.push(...getOwnStaticObjectPairs2(constructor2, propertyName));
+      return pairs;
+    }, []);
+  }
+  function getAncestorsForConstructor2(constructor) {
+    const ancestors = [];
+    while (constructor) {
+      ancestors.push(constructor);
+      constructor = Object.getPrototypeOf(constructor);
     }
-    const type = Object.prototype.toString.call(value);
-    if (type.slice(0, 7) === "[object" && type.slice(-6) === "Array]") {
-      return true;
-    }
-    return false;
+    return ancestors.reverse();
   }
-  function isObject(value) {
-    return value !== null && Object.prototype.toString.call(value) === "[object Object]";
+  function getOwnStaticArrayValues2(constructor, propertyName) {
+    const definition = constructor[propertyName];
+    return Array.isArray(definition) ? definition : [];
   }
-  var isNumberFinite = (value) => (typeof value === "number" || value instanceof Number) && isFinite(+value);
-  function finiteOrDefault(value, defaultValue) {
-    return isNumberFinite(value) ? value : defaultValue;
+  function getOwnStaticObjectPairs2(constructor, propertyName) {
+    const definition = constructor[propertyName];
+    return definition ? Object.keys(definition).map((key) => [key, definition[key]]) : [];
   }
-  function valueOrDefault(value, defaultValue) {
-    return typeof value === "undefined" ? defaultValue : value;
-  }
-  var toPercentage = (value, dimension) => typeof value === "string" && value.endsWith("%") ? parseFloat(value) / 100 : value / dimension;
-  var toDimension = (value, dimension) => typeof value === "string" && value.endsWith("%") ? parseFloat(value) / 100 * dimension : +value;
-  function callback(fn2, args, thisArg) {
-    if (fn2 && typeof fn2.call === "function") {
-      return fn2.apply(thisArg, args);
-    }
-  }
-  function each(loopable, fn2, thisArg, reverse) {
-    let i, len, keys2;
-    if (isArray(loopable)) {
-      len = loopable.length;
-      if (reverse) {
-        for (i = len - 1; i >= 0; i--) {
-          fn2.call(thisArg, loopable[i], i);
-        }
-      } else {
-        for (i = 0; i < len; i++) {
-          fn2.call(thisArg, loopable[i], i);
-        }
-      }
-    } else if (isObject(loopable)) {
-      keys2 = Object.keys(loopable);
-      len = keys2.length;
-      for (i = 0; i < len; i++) {
-        fn2.call(thisArg, loopable[keys2[i]], keys2[i]);
-      }
-    }
-  }
-  function _elementsEqual(a0, a1) {
-    let i, ilen, v0, v1;
-    if (!a0 || !a1 || a0.length !== a1.length) {
-      return false;
-    }
-    for (i = 0, ilen = a0.length; i < ilen; ++i) {
-      v0 = a0[i];
-      v1 = a1[i];
-      if (v0.datasetIndex !== v1.datasetIndex || v0.index !== v1.index) {
-        return false;
-      }
-    }
-    return true;
-  }
-  function clone$1(source2) {
-    if (isArray(source2)) {
-      return source2.map(clone$1);
-    }
-    if (isObject(source2)) {
-      const target = /* @__PURE__ */ Object.create(null);
-      const keys2 = Object.keys(source2);
-      const klen = keys2.length;
-      let k = 0;
-      for (; k < klen; ++k) {
-        target[keys2[k]] = clone$1(source2[keys2[k]]);
-      }
-      return target;
-    }
-    return source2;
-  }
-  function isValidKey(key) {
-    return ["__proto__", "prototype", "constructor"].indexOf(key) === -1;
-  }
-  function _merger(key, target, source2, options) {
-    if (!isValidKey(key)) {
-      return;
-    }
-    const tval = target[key];
-    const sval = source2[key];
-    if (isObject(tval) && isObject(sval)) {
-      merge(tval, sval, options);
+  var getOwnKeys2 = (() => {
+    if (typeof Object.getOwnPropertySymbols == "function") {
+      return (object) => [...Object.getOwnPropertyNames(object), ...Object.getOwnPropertySymbols(object)];
     } else {
-      target[key] = clone$1(sval);
+      return Object.getOwnPropertyNames;
     }
-  }
-  function merge(target, source2, options) {
-    const sources = isArray(source2) ? source2 : [source2];
-    const ilen = sources.length;
-    if (!isObject(target)) {
-      return target;
-    }
-    options = options || {};
-    const merger = options.merger || _merger;
-    for (let i = 0; i < ilen; ++i) {
-      source2 = sources[i];
-      if (!isObject(source2)) {
-        continue;
+  })();
+  var extend3 = (() => {
+    function extendWithReflect(constructor) {
+      function extended() {
+        return Reflect.construct(constructor, arguments, new.target);
       }
-      const keys2 = Object.keys(source2);
-      for (let k = 0, klen = keys2.length; k < klen; ++k) {
-        merger(keys2[k], target, source2, options);
-      }
-    }
-    return target;
-  }
-  function mergeIf(target, source2) {
-    return merge(target, source2, { merger: _mergerIf });
-  }
-  function _mergerIf(key, target, source2) {
-    if (!isValidKey(key)) {
-      return;
-    }
-    const tval = target[key];
-    const sval = source2[key];
-    if (isObject(tval) && isObject(sval)) {
-      mergeIf(tval, sval);
-    } else if (!Object.prototype.hasOwnProperty.call(target, key)) {
-      target[key] = clone$1(sval);
-    }
-  }
-  var keyResolvers = {
-    "": (v) => v,
-    x: (o) => o.x,
-    y: (o) => o.y
-  };
-  function resolveObjectKey(obj, key) {
-    const resolver = keyResolvers[key] || (keyResolvers[key] = _getKeyResolver(key));
-    return resolver(obj);
-  }
-  function _getKeyResolver(key) {
-    const keys2 = _splitKey(key);
-    return (obj) => {
-      for (const k of keys2) {
-        if (k === "") {
-          break;
-        }
-        obj = obj && obj[k];
-      }
-      return obj;
-    };
-  }
-  function _splitKey(key) {
-    const parts = key.split(".");
-    const keys2 = [];
-    let tmp = "";
-    for (const part of parts) {
-      tmp += part;
-      if (tmp.endsWith("\\")) {
-        tmp = tmp.slice(0, -1) + ".";
-      } else {
-        keys2.push(tmp);
-        tmp = "";
-      }
-    }
-    return keys2;
-  }
-  function _capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-  var defined = (value) => typeof value !== "undefined";
-  var isFunction = (value) => typeof value === "function";
-  var setsEqual = (a, b) => {
-    if (a.size !== b.size) {
-      return false;
-    }
-    for (const item of a) {
-      if (!b.has(item)) {
-        return false;
-      }
-    }
-    return true;
-  };
-  function _isClickEvent(e) {
-    return e.type === "mouseup" || e.type === "click" || e.type === "contextmenu";
-  }
-  var PI = Math.PI;
-  var TAU = 2 * PI;
-  var PITAU = TAU + PI;
-  var INFINITY = Number.POSITIVE_INFINITY;
-  var RAD_PER_DEG = PI / 180;
-  var HALF_PI = PI / 2;
-  var QUARTER_PI = PI / 4;
-  var TWO_THIRDS_PI = PI * 2 / 3;
-  var log10 = Math.log10;
-  var sign = Math.sign;
-  function niceNum(range) {
-    const roundedRange = Math.round(range);
-    range = almostEquals(range, roundedRange, range / 1e3) ? roundedRange : range;
-    const niceRange = Math.pow(10, Math.floor(log10(range)));
-    const fraction = range / niceRange;
-    const niceFraction = fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10;
-    return niceFraction * niceRange;
-  }
-  function _factorize(value) {
-    const result = [];
-    const sqrt = Math.sqrt(value);
-    let i;
-    for (i = 1; i < sqrt; i++) {
-      if (value % i === 0) {
-        result.push(i);
-        result.push(value / i);
-      }
-    }
-    if (sqrt === (sqrt | 0)) {
-      result.push(sqrt);
-    }
-    result.sort((a, b) => a - b).pop();
-    return result;
-  }
-  function isNumber(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-  }
-  function almostEquals(x, y, epsilon) {
-    return Math.abs(x - y) < epsilon;
-  }
-  function almostWhole(x, epsilon) {
-    const rounded = Math.round(x);
-    return rounded - epsilon <= x && rounded + epsilon >= x;
-  }
-  function _setMinAndMaxByKey(array, target, property) {
-    let i, ilen, value;
-    for (i = 0, ilen = array.length; i < ilen; i++) {
-      value = array[i][property];
-      if (!isNaN(value)) {
-        target.min = Math.min(target.min, value);
-        target.max = Math.max(target.max, value);
-      }
-    }
-  }
-  function toRadians(degrees) {
-    return degrees * (PI / 180);
-  }
-  function toDegrees(radians) {
-    return radians * (180 / PI);
-  }
-  function _decimalPlaces(x) {
-    if (!isNumberFinite(x)) {
-      return;
-    }
-    let e = 1;
-    let p = 0;
-    while (Math.round(x * e) / e !== x) {
-      e *= 10;
-      p++;
-    }
-    return p;
-  }
-  function getAngleFromPoint(centrePoint, anglePoint) {
-    const distanceFromXCenter = anglePoint.x - centrePoint.x;
-    const distanceFromYCenter = anglePoint.y - centrePoint.y;
-    const radialDistanceFromCenter = Math.sqrt(distanceFromXCenter * distanceFromXCenter + distanceFromYCenter * distanceFromYCenter);
-    let angle = Math.atan2(distanceFromYCenter, distanceFromXCenter);
-    if (angle < -0.5 * PI) {
-      angle += TAU;
-    }
-    return {
-      angle,
-      distance: radialDistanceFromCenter
-    };
-  }
-  function distanceBetweenPoints(pt1, pt2) {
-    return Math.sqrt(Math.pow(pt2.x - pt1.x, 2) + Math.pow(pt2.y - pt1.y, 2));
-  }
-  function _angleDiff(a, b) {
-    return (a - b + PITAU) % TAU - PI;
-  }
-  function _normalizeAngle(a) {
-    return (a % TAU + TAU) % TAU;
-  }
-  function _angleBetween(angle, start3, end2, sameAngleIsFullCircle) {
-    const a = _normalizeAngle(angle);
-    const s = _normalizeAngle(start3);
-    const e = _normalizeAngle(end2);
-    const angleToStart = _normalizeAngle(s - a);
-    const angleToEnd = _normalizeAngle(e - a);
-    const startToAngle = _normalizeAngle(a - s);
-    const endToAngle = _normalizeAngle(a - e);
-    return a === s || a === e || sameAngleIsFullCircle && s === e || angleToStart > angleToEnd && startToAngle < endToAngle;
-  }
-  function _limitValue(value, min2, max2) {
-    return Math.max(min2, Math.min(max2, value));
-  }
-  function _int16Range(value) {
-    return _limitValue(value, -32768, 32767);
-  }
-  function _isBetween(value, start3, end2, epsilon = 1e-6) {
-    return value >= Math.min(start3, end2) - epsilon && value <= Math.max(start3, end2) + epsilon;
-  }
-  function _lookup(table, value, cmp2) {
-    cmp2 = cmp2 || ((index3) => table[index3] < value);
-    let hi = table.length - 1;
-    let lo = 0;
-    let mid;
-    while (hi - lo > 1) {
-      mid = lo + hi >> 1;
-      if (cmp2(mid)) {
-        lo = mid;
-      } else {
-        hi = mid;
-      }
-    }
-    return { lo, hi };
-  }
-  var _lookupByKey = (table, key, value, last) => _lookup(table, value, last ? (index3) => table[index3][key] <= value : (index3) => table[index3][key] < value);
-  var _rlookupByKey = (table, key, value) => _lookup(table, value, (index3) => table[index3][key] >= value);
-  function _filterBetween(values, min2, max2) {
-    let start3 = 0;
-    let end2 = values.length;
-    while (start3 < end2 && values[start3] < min2) {
-      start3++;
-    }
-    while (end2 > start3 && values[end2 - 1] > max2) {
-      end2--;
-    }
-    return start3 > 0 || end2 < values.length ? values.slice(start3, end2) : values;
-  }
-  var arrayEvents = ["push", "pop", "shift", "splice", "unshift"];
-  function listenArrayEvents(array, listener) {
-    if (array._chartjs) {
-      array._chartjs.listeners.push(listener);
-      return;
-    }
-    Object.defineProperty(array, "_chartjs", {
-      configurable: true,
-      enumerable: false,
-      value: {
-        listeners: [listener]
-      }
-    });
-    arrayEvents.forEach((key) => {
-      const method = "_onData" + _capitalize(key);
-      const base2 = array[key];
-      Object.defineProperty(array, key, {
-        configurable: true,
-        enumerable: false,
-        value(...args) {
-          const res = base2.apply(this, args);
-          array._chartjs.listeners.forEach((object) => {
-            if (typeof object[method] === "function") {
-              object[method](...args);
-            }
-          });
-          return res;
-        }
+      extended.prototype = Object.create(constructor.prototype, {
+        constructor: { value: extended }
       });
-    });
-  }
-  function unlistenArrayEvents(array, listener) {
-    const stub = array._chartjs;
-    if (!stub) {
-      return;
+      Reflect.setPrototypeOf(extended, constructor);
+      return extended;
     }
-    const listeners = stub.listeners;
-    const index3 = listeners.indexOf(listener);
-    if (index3 !== -1) {
-      listeners.splice(index3, 1);
+    function testReflectExtension() {
+      const a = function() {
+        this.a.call(this);
+      };
+      const b = extendWithReflect(a);
+      b.prototype.a = function() {
+      };
+      return new b();
     }
-    if (listeners.length > 0) {
-      return;
-    }
-    arrayEvents.forEach((key) => {
-      delete array[key];
-    });
-    delete array._chartjs;
-  }
-  function _arrayUnique(items) {
-    const set2 = /* @__PURE__ */ new Set();
-    let i, ilen;
-    for (i = 0, ilen = items.length; i < ilen; ++i) {
-      set2.add(items[i]);
-    }
-    if (set2.size === ilen) {
-      return items;
-    }
-    return Array.from(set2);
-  }
-  var requestAnimFrame = function() {
-    if (typeof window === "undefined") {
-      return function(callback2) {
-        return callback2();
+    try {
+      testReflectExtension();
+      return extendWithReflect;
+    } catch (error3) {
+      return (constructor) => class extended extends constructor {
       };
     }
-    return window.requestAnimationFrame;
-  }();
-  function throttled(fn2, thisArg, updateFn) {
-    const updateArgs = updateFn || ((args2) => Array.prototype.slice.call(args2));
-    let ticking = false;
-    let args = [];
-    return function(...rest) {
-      args = updateArgs(rest);
-      if (!ticking) {
-        ticking = true;
-        requestAnimFrame.call(window, () => {
-          ticking = false;
-          fn2.apply(thisArg, args);
-        });
-      }
-    };
-  }
-  function debounce(fn2, delay) {
-    let timeout;
-    return function(...args) {
-      if (delay) {
-        clearTimeout(timeout);
-        timeout = setTimeout(fn2, delay, args);
-      } else {
-        fn2.apply(this, args);
-      }
-      return delay;
-    };
-  }
-  var _toLeftRightCenter = (align) => align === "start" ? "left" : align === "end" ? "right" : "center";
-  var _alignStartEnd = (align, start3, end2) => align === "start" ? start3 : align === "end" ? end2 : (start3 + end2) / 2;
-  var _textX = (align, left2, right2, rtl) => {
-    const check2 = rtl ? "left" : "right";
-    return align === check2 ? right2 : align === "center" ? (left2 + right2) / 2 : left2;
+  })();
+  var defaultSchema2 = {
+    controllerAttribute: "data-controller",
+    actionAttribute: "data-action",
+    targetAttribute: "data-target",
+    targetAttributeForScope: (identifier) => `data-${identifier}-target`,
+    outletAttributeForScope: (identifier, outlet) => `data-${identifier}-${outlet}-outlet`,
+    keyMappings: Object.assign(Object.assign({ enter: "Enter", tab: "Tab", esc: "Escape", space: " ", up: "ArrowUp", down: "ArrowDown", left: "ArrowLeft", right: "ArrowRight", home: "Home", end: "End" }, objectFromEntries2("abcdefghijklmnopqrstuvwxyz".split("").map((c) => [c, c]))), objectFromEntries2("0123456789".split("").map((n) => [n, n])))
   };
-  function _getStartAndCountOfVisiblePoints(meta, points, animationsDisabled) {
-    const pointCount = points.length;
-    let start3 = 0;
-    let count = pointCount;
-    if (meta._sorted) {
-      const { iScale, _parsed } = meta;
-      const axis = iScale.axis;
-      const { min: min2, max: max2, minDefined, maxDefined } = iScale.getUserBounds();
-      if (minDefined) {
-        start3 = _limitValue(
-          Math.min(
-            _lookupByKey(_parsed, iScale.axis, min2).lo,
-            animationsDisabled ? pointCount : _lookupByKey(points, axis, iScale.getPixelForValue(min2)).lo
-          ),
-          0,
-          pointCount - 1
-        );
-      }
-      if (maxDefined) {
-        count = _limitValue(
-          Math.max(
-            _lookupByKey(_parsed, iScale.axis, max2, true).hi + 1,
-            animationsDisabled ? 0 : _lookupByKey(points, axis, iScale.getPixelForValue(max2), true).hi + 1
-          ),
-          start3,
-          pointCount
-        ) - start3;
-      } else {
-        count = pointCount - start3;
-      }
-    }
-    return { start: start3, count };
+  function objectFromEntries2(array) {
+    return array.reduce((memo, [k, v]) => Object.assign(Object.assign({}, memo), { [k]: v }), {});
   }
-  function _scaleRangesChanged(meta) {
-    const { xScale, yScale, _scaleRanges } = meta;
-    const newRanges = {
-      xmin: xScale.min,
-      xmax: xScale.max,
-      ymin: yScale.min,
-      ymax: yScale.max
+  function ClassPropertiesBlessing2(constructor) {
+    const classes = readInheritableStaticArrayValues2(constructor, "classes");
+    return classes.reduce((properties, classDefinition) => {
+      return Object.assign(properties, propertiesForClassDefinition2(classDefinition));
+    }, {});
+  }
+  function propertiesForClassDefinition2(key) {
+    return {
+      [`${key}Class`]: {
+        get() {
+          const { classes } = this;
+          if (classes.has(key)) {
+            return classes.get(key);
+          } else {
+            const attribute = classes.getAttributeName(key);
+            throw new Error(`Missing attribute "${attribute}"`);
+          }
+        }
+      },
+      [`${key}Classes`]: {
+        get() {
+          return this.classes.getAll(key);
+        }
+      },
+      [`has${capitalize2(key)}Class`]: {
+        get() {
+          return this.classes.has(key);
+        }
+      }
     };
-    if (!_scaleRanges) {
-      meta._scaleRanges = newRanges;
+  }
+  function OutletPropertiesBlessing2(constructor) {
+    const outlets = readInheritableStaticArrayValues2(constructor, "outlets");
+    return outlets.reduce((properties, outletDefinition) => {
+      return Object.assign(properties, propertiesForOutletDefinition2(outletDefinition));
+    }, {});
+  }
+  function propertiesForOutletDefinition2(name) {
+    const camelizedName = namespaceCamelize2(name);
+    return {
+      [`${camelizedName}Outlet`]: {
+        get() {
+          const outlet = this.outlets.find(name);
+          if (outlet) {
+            const outletController = this.application.getControllerForElementAndIdentifier(outlet, name);
+            if (outletController) {
+              return outletController;
+            } else {
+              throw new Error(`Missing "data-controller=${name}" attribute on outlet element for "${this.identifier}" controller`);
+            }
+          }
+          throw new Error(`Missing outlet element "${name}" for "${this.identifier}" controller`);
+        }
+      },
+      [`${camelizedName}Outlets`]: {
+        get() {
+          const outlets = this.outlets.findAll(name);
+          if (outlets.length > 0) {
+            return outlets.map((outlet) => {
+              const controller = this.application.getControllerForElementAndIdentifier(outlet, name);
+              if (controller) {
+                return controller;
+              } else {
+                console.warn(`The provided outlet element is missing the outlet controller "${name}" for "${this.identifier}"`, outlet);
+              }
+            }).filter((controller) => controller);
+          }
+          return [];
+        }
+      },
+      [`${camelizedName}OutletElement`]: {
+        get() {
+          const outlet = this.outlets.find(name);
+          if (outlet) {
+            return outlet;
+          } else {
+            throw new Error(`Missing outlet element "${name}" for "${this.identifier}" controller`);
+          }
+        }
+      },
+      [`${camelizedName}OutletElements`]: {
+        get() {
+          return this.outlets.findAll(name);
+        }
+      },
+      [`has${capitalize2(camelizedName)}Outlet`]: {
+        get() {
+          return this.outlets.has(name);
+        }
+      }
+    };
+  }
+  function TargetPropertiesBlessing2(constructor) {
+    const targets = readInheritableStaticArrayValues2(constructor, "targets");
+    return targets.reduce((properties, targetDefinition) => {
+      return Object.assign(properties, propertiesForTargetDefinition2(targetDefinition));
+    }, {});
+  }
+  function propertiesForTargetDefinition2(name) {
+    return {
+      [`${name}Target`]: {
+        get() {
+          const target = this.targets.find(name);
+          if (target) {
+            return target;
+          } else {
+            throw new Error(`Missing target element "${name}" for "${this.identifier}" controller`);
+          }
+        }
+      },
+      [`${name}Targets`]: {
+        get() {
+          return this.targets.findAll(name);
+        }
+      },
+      [`has${capitalize2(name)}Target`]: {
+        get() {
+          return this.targets.has(name);
+        }
+      }
+    };
+  }
+  function ValuePropertiesBlessing2(constructor) {
+    const valueDefinitionPairs = readInheritableStaticObjectPairs2(constructor, "values");
+    const propertyDescriptorMap = {
+      valueDescriptorMap: {
+        get() {
+          return valueDefinitionPairs.reduce((result, valueDefinitionPair) => {
+            const valueDescriptor = parseValueDefinitionPair2(valueDefinitionPair, this.identifier);
+            const attributeName = this.data.getAttributeNameForKey(valueDescriptor.key);
+            return Object.assign(result, { [attributeName]: valueDescriptor });
+          }, {});
+        }
+      }
+    };
+    return valueDefinitionPairs.reduce((properties, valueDefinitionPair) => {
+      return Object.assign(properties, propertiesForValueDefinitionPair2(valueDefinitionPair));
+    }, propertyDescriptorMap);
+  }
+  function propertiesForValueDefinitionPair2(valueDefinitionPair, controller) {
+    const definition = parseValueDefinitionPair2(valueDefinitionPair, controller);
+    const { key, name, reader: read2, writer: write2 } = definition;
+    return {
+      [name]: {
+        get() {
+          const value = this.data.get(key);
+          if (value !== null) {
+            return read2(value);
+          } else {
+            return definition.defaultValue;
+          }
+        },
+        set(value) {
+          if (value === void 0) {
+            this.data.delete(key);
+          } else {
+            this.data.set(key, write2(value));
+          }
+        }
+      },
+      [`has${capitalize2(name)}`]: {
+        get() {
+          return this.data.has(key) || definition.hasCustomDefaultValue;
+        }
+      }
+    };
+  }
+  function parseValueDefinitionPair2([token, typeDefinition], controller) {
+    return valueDescriptorForTokenAndTypeDefinition2({
+      controller,
+      token,
+      typeDefinition
+    });
+  }
+  function parseValueTypeConstant2(constant) {
+    switch (constant) {
+      case Array:
+        return "array";
+      case Boolean:
+        return "boolean";
+      case Number:
+        return "number";
+      case Object:
+        return "object";
+      case String:
+        return "string";
+    }
+  }
+  function parseValueTypeDefault2(defaultValue) {
+    switch (typeof defaultValue) {
+      case "boolean":
+        return "boolean";
+      case "number":
+        return "number";
+      case "string":
+        return "string";
+    }
+    if (Array.isArray(defaultValue))
+      return "array";
+    if (Object.prototype.toString.call(defaultValue) === "[object Object]")
+      return "object";
+  }
+  function parseValueTypeObject2(payload) {
+    const typeFromObject = parseValueTypeConstant2(payload.typeObject.type);
+    if (!typeFromObject)
+      return;
+    const defaultValueType = parseValueTypeDefault2(payload.typeObject.default);
+    if (typeFromObject !== defaultValueType) {
+      const propertyPath = payload.controller ? `${payload.controller}.${payload.token}` : payload.token;
+      throw new Error(`The specified default value for the Stimulus Value "${propertyPath}" must match the defined type "${typeFromObject}". The provided default value of "${payload.typeObject.default}" is of type "${defaultValueType}".`);
+    }
+    return typeFromObject;
+  }
+  function parseValueTypeDefinition2(payload) {
+    const typeFromObject = parseValueTypeObject2({
+      controller: payload.controller,
+      token: payload.token,
+      typeObject: payload.typeDefinition
+    });
+    const typeFromDefaultValue = parseValueTypeDefault2(payload.typeDefinition);
+    const typeFromConstant = parseValueTypeConstant2(payload.typeDefinition);
+    const type = typeFromObject || typeFromDefaultValue || typeFromConstant;
+    if (type)
+      return type;
+    const propertyPath = payload.controller ? `${payload.controller}.${payload.typeDefinition}` : payload.token;
+    throw new Error(`Unknown value type "${propertyPath}" for "${payload.token}" value`);
+  }
+  function defaultValueForDefinition2(typeDefinition) {
+    const constant = parseValueTypeConstant2(typeDefinition);
+    if (constant)
+      return defaultValuesByType2[constant];
+    const defaultValue = typeDefinition.default;
+    if (defaultValue !== void 0)
+      return defaultValue;
+    return typeDefinition;
+  }
+  function valueDescriptorForTokenAndTypeDefinition2(payload) {
+    const key = `${dasherize2(payload.token)}-value`;
+    const type = parseValueTypeDefinition2(payload);
+    return {
+      type,
+      key,
+      name: camelize2(key),
+      get defaultValue() {
+        return defaultValueForDefinition2(payload.typeDefinition);
+      },
+      get hasCustomDefaultValue() {
+        return parseValueTypeDefault2(payload.typeDefinition) !== void 0;
+      },
+      reader: readers2[type],
+      writer: writers2[type] || writers2.default
+    };
+  }
+  var defaultValuesByType2 = {
+    get array() {
+      return [];
+    },
+    boolean: false,
+    number: 0,
+    get object() {
+      return {};
+    },
+    string: ""
+  };
+  var readers2 = {
+    array(value) {
+      const array = JSON.parse(value);
+      if (!Array.isArray(array)) {
+        throw new TypeError(`expected value of type "array" but instead got value "${value}" of type "${parseValueTypeDefault2(array)}"`);
+      }
+      return array;
+    },
+    boolean(value) {
+      return !(value == "0" || String(value).toLowerCase() == "false");
+    },
+    number(value) {
+      return Number(value);
+    },
+    object(value) {
+      const object = JSON.parse(value);
+      if (object === null || typeof object != "object" || Array.isArray(object)) {
+        throw new TypeError(`expected value of type "object" but instead got value "${value}" of type "${parseValueTypeDefault2(object)}"`);
+      }
+      return object;
+    },
+    string(value) {
+      return value;
+    }
+  };
+  var writers2 = {
+    default: writeString2,
+    array: writeJSON2,
+    object: writeJSON2
+  };
+  function writeJSON2(value) {
+    return JSON.stringify(value);
+  }
+  function writeString2(value) {
+    return `${value}`;
+  }
+  var Controller2 = class {
+    constructor(context) {
+      this.context = context;
+    }
+    static get shouldLoad() {
       return true;
     }
-    const changed = _scaleRanges.xmin !== xScale.min || _scaleRanges.xmax !== xScale.max || _scaleRanges.ymin !== yScale.min || _scaleRanges.ymax !== yScale.max;
-    Object.assign(_scaleRanges, newRanges);
-    return changed;
-  }
-  var atEdge = (t) => t === 0 || t === 1;
-  var elasticIn = (t, s, p) => -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * TAU / p));
-  var elasticOut = (t, s, p) => Math.pow(2, -10 * t) * Math.sin((t - s) * TAU / p) + 1;
-  var effects = {
-    linear: (t) => t,
-    easeInQuad: (t) => t * t,
-    easeOutQuad: (t) => -t * (t - 2),
-    easeInOutQuad: (t) => (t /= 0.5) < 1 ? 0.5 * t * t : -0.5 * (--t * (t - 2) - 1),
-    easeInCubic: (t) => t * t * t,
-    easeOutCubic: (t) => (t -= 1) * t * t + 1,
-    easeInOutCubic: (t) => (t /= 0.5) < 1 ? 0.5 * t * t * t : 0.5 * ((t -= 2) * t * t + 2),
-    easeInQuart: (t) => t * t * t * t,
-    easeOutQuart: (t) => -((t -= 1) * t * t * t - 1),
-    easeInOutQuart: (t) => (t /= 0.5) < 1 ? 0.5 * t * t * t * t : -0.5 * ((t -= 2) * t * t * t - 2),
-    easeInQuint: (t) => t * t * t * t * t,
-    easeOutQuint: (t) => (t -= 1) * t * t * t * t + 1,
-    easeInOutQuint: (t) => (t /= 0.5) < 1 ? 0.5 * t * t * t * t * t : 0.5 * ((t -= 2) * t * t * t * t + 2),
-    easeInSine: (t) => -Math.cos(t * HALF_PI) + 1,
-    easeOutSine: (t) => Math.sin(t * HALF_PI),
-    easeInOutSine: (t) => -0.5 * (Math.cos(PI * t) - 1),
-    easeInExpo: (t) => t === 0 ? 0 : Math.pow(2, 10 * (t - 1)),
-    easeOutExpo: (t) => t === 1 ? 1 : -Math.pow(2, -10 * t) + 1,
-    easeInOutExpo: (t) => atEdge(t) ? t : t < 0.5 ? 0.5 * Math.pow(2, 10 * (t * 2 - 1)) : 0.5 * (-Math.pow(2, -10 * (t * 2 - 1)) + 2),
-    easeInCirc: (t) => t >= 1 ? t : -(Math.sqrt(1 - t * t) - 1),
-    easeOutCirc: (t) => Math.sqrt(1 - (t -= 1) * t),
-    easeInOutCirc: (t) => (t /= 0.5) < 1 ? -0.5 * (Math.sqrt(1 - t * t) - 1) : 0.5 * (Math.sqrt(1 - (t -= 2) * t) + 1),
-    easeInElastic: (t) => atEdge(t) ? t : elasticIn(t, 0.075, 0.3),
-    easeOutElastic: (t) => atEdge(t) ? t : elasticOut(t, 0.075, 0.3),
-    easeInOutElastic(t) {
-      const s = 0.1125;
-      const p = 0.45;
-      return atEdge(t) ? t : t < 0.5 ? 0.5 * elasticIn(t * 2, s, p) : 0.5 + 0.5 * elasticOut(t * 2 - 1, s, p);
-    },
-    easeInBack(t) {
-      const s = 1.70158;
-      return t * t * ((s + 1) * t - s);
-    },
-    easeOutBack(t) {
-      const s = 1.70158;
-      return (t -= 1) * t * ((s + 1) * t + s) + 1;
-    },
-    easeInOutBack(t) {
-      let s = 1.70158;
-      if ((t /= 0.5) < 1) {
-        return 0.5 * (t * t * (((s *= 1.525) + 1) * t - s));
-      }
-      return 0.5 * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2);
-    },
-    easeInBounce: (t) => 1 - effects.easeOutBounce(1 - t),
-    easeOutBounce(t) {
-      const m = 7.5625;
-      const d = 2.75;
-      if (t < 1 / d) {
-        return m * t * t;
-      }
-      if (t < 2 / d) {
-        return m * (t -= 1.5 / d) * t + 0.75;
-      }
-      if (t < 2.5 / d) {
-        return m * (t -= 2.25 / d) * t + 0.9375;
-      }
-      return m * (t -= 2.625 / d) * t + 0.984375;
-    },
-    easeInOutBounce: (t) => t < 0.5 ? effects.easeInBounce(t * 2) * 0.5 : effects.easeOutBounce(t * 2 - 1) * 0.5 + 0.5
+    static afterLoad(_identifier, _application) {
+      return;
+    }
+    get application() {
+      return this.context.application;
+    }
+    get scope() {
+      return this.context.scope;
+    }
+    get element() {
+      return this.scope.element;
+    }
+    get identifier() {
+      return this.scope.identifier;
+    }
+    get targets() {
+      return this.scope.targets;
+    }
+    get outlets() {
+      return this.scope.outlets;
+    }
+    get classes() {
+      return this.scope.classes;
+    }
+    get data() {
+      return this.scope.data;
+    }
+    initialize() {
+    }
+    connect() {
+    }
+    disconnect() {
+    }
+    dispatch(eventName, { target = this.element, detail = {}, prefix = this.identifier, bubbles = true, cancelable = true } = {}) {
+      const type = prefix ? `${prefix}:${eventName}` : eventName;
+      const event = new CustomEvent(type, { detail, bubbles, cancelable });
+      target.dispatchEvent(event);
+      return event;
+    }
   };
+  Controller2.blessings = [
+    ClassPropertiesBlessing2,
+    TargetPropertiesBlessing2,
+    ValuePropertiesBlessing2,
+    OutletPropertiesBlessing2
+  ];
+  Controller2.targets = [];
+  Controller2.outlets = [];
+  Controller2.values = {};
+
+  // node_modules/@kurkle/color/dist/color.esm.js
   function round(v) {
     return v + 0.5 | 0;
   }
@@ -42006,9 +43402,9 @@ img.ProseMirror-separator {
     }
     return hueParse(str);
   }
-  var Color = class {
+  var Color = class _Color {
     constructor(input) {
-      if (input instanceof Color) {
+      if (input instanceof _Color) {
         return input;
       }
       const type = typeof input;
@@ -42068,7 +43464,7 @@ img.ProseMirror-separator {
       return this;
     }
     clone() {
-      return new Color(this.rgb);
+      return new _Color(this.rgb);
     }
     alpha(a) {
       this._rgb.a = n2b(a);
@@ -42118,9 +43514,577 @@ img.ProseMirror-separator {
       return this;
     }
   };
-  function index_esm(input) {
-    return new Color(input);
+
+  // node_modules/chart.js/dist/chunks/helpers.segment.js
+  function noop() {
   }
+  var uid = /* @__PURE__ */ (() => {
+    let id = 0;
+    return () => id++;
+  })();
+  function isNullOrUndef(value) {
+    return value === null || typeof value === "undefined";
+  }
+  function isArray(value) {
+    if (Array.isArray && Array.isArray(value)) {
+      return true;
+    }
+    const type = Object.prototype.toString.call(value);
+    if (type.slice(0, 7) === "[object" && type.slice(-6) === "Array]") {
+      return true;
+    }
+    return false;
+  }
+  function isObject(value) {
+    return value !== null && Object.prototype.toString.call(value) === "[object Object]";
+  }
+  function isNumberFinite(value) {
+    return (typeof value === "number" || value instanceof Number) && isFinite(+value);
+  }
+  function finiteOrDefault(value, defaultValue) {
+    return isNumberFinite(value) ? value : defaultValue;
+  }
+  function valueOrDefault(value, defaultValue) {
+    return typeof value === "undefined" ? defaultValue : value;
+  }
+  var toPercentage = (value, dimension) => typeof value === "string" && value.endsWith("%") ? parseFloat(value) / 100 : +value / dimension;
+  var toDimension = (value, dimension) => typeof value === "string" && value.endsWith("%") ? parseFloat(value) / 100 * dimension : +value;
+  function callback(fn2, args, thisArg) {
+    if (fn2 && typeof fn2.call === "function") {
+      return fn2.apply(thisArg, args);
+    }
+  }
+  function each(loopable, fn2, thisArg, reverse) {
+    let i, len, keys2;
+    if (isArray(loopable)) {
+      len = loopable.length;
+      if (reverse) {
+        for (i = len - 1; i >= 0; i--) {
+          fn2.call(thisArg, loopable[i], i);
+        }
+      } else {
+        for (i = 0; i < len; i++) {
+          fn2.call(thisArg, loopable[i], i);
+        }
+      }
+    } else if (isObject(loopable)) {
+      keys2 = Object.keys(loopable);
+      len = keys2.length;
+      for (i = 0; i < len; i++) {
+        fn2.call(thisArg, loopable[keys2[i]], keys2[i]);
+      }
+    }
+  }
+  function _elementsEqual(a0, a1) {
+    let i, ilen, v0, v1;
+    if (!a0 || !a1 || a0.length !== a1.length) {
+      return false;
+    }
+    for (i = 0, ilen = a0.length; i < ilen; ++i) {
+      v0 = a0[i];
+      v1 = a1[i];
+      if (v0.datasetIndex !== v1.datasetIndex || v0.index !== v1.index) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function clone2(source2) {
+    if (isArray(source2)) {
+      return source2.map(clone2);
+    }
+    if (isObject(source2)) {
+      const target = /* @__PURE__ */ Object.create(null);
+      const keys2 = Object.keys(source2);
+      const klen = keys2.length;
+      let k = 0;
+      for (; k < klen; ++k) {
+        target[keys2[k]] = clone2(source2[keys2[k]]);
+      }
+      return target;
+    }
+    return source2;
+  }
+  function isValidKey(key) {
+    return [
+      "__proto__",
+      "prototype",
+      "constructor"
+    ].indexOf(key) === -1;
+  }
+  function _merger(key, target, source2, options) {
+    if (!isValidKey(key)) {
+      return;
+    }
+    const tval = target[key];
+    const sval = source2[key];
+    if (isObject(tval) && isObject(sval)) {
+      merge(tval, sval, options);
+    } else {
+      target[key] = clone2(sval);
+    }
+  }
+  function merge(target, source2, options) {
+    const sources = isArray(source2) ? source2 : [
+      source2
+    ];
+    const ilen = sources.length;
+    if (!isObject(target)) {
+      return target;
+    }
+    options = options || {};
+    const merger = options.merger || _merger;
+    let current;
+    for (let i = 0; i < ilen; ++i) {
+      current = sources[i];
+      if (!isObject(current)) {
+        continue;
+      }
+      const keys2 = Object.keys(current);
+      for (let k = 0, klen = keys2.length; k < klen; ++k) {
+        merger(keys2[k], target, current, options);
+      }
+    }
+    return target;
+  }
+  function mergeIf(target, source2) {
+    return merge(target, source2, {
+      merger: _mergerIf
+    });
+  }
+  function _mergerIf(key, target, source2) {
+    if (!isValidKey(key)) {
+      return;
+    }
+    const tval = target[key];
+    const sval = source2[key];
+    if (isObject(tval) && isObject(sval)) {
+      mergeIf(tval, sval);
+    } else if (!Object.prototype.hasOwnProperty.call(target, key)) {
+      target[key] = clone2(sval);
+    }
+  }
+  var keyResolvers = {
+    // Chart.helpers.core resolveObjectKey should resolve empty key to root object
+    "": (v) => v,
+    // default resolvers
+    x: (o) => o.x,
+    y: (o) => o.y
+  };
+  function _splitKey(key) {
+    const parts = key.split(".");
+    const keys2 = [];
+    let tmp = "";
+    for (const part of parts) {
+      tmp += part;
+      if (tmp.endsWith("\\")) {
+        tmp = tmp.slice(0, -1) + ".";
+      } else {
+        keys2.push(tmp);
+        tmp = "";
+      }
+    }
+    return keys2;
+  }
+  function _getKeyResolver(key) {
+    const keys2 = _splitKey(key);
+    return (obj) => {
+      for (const k of keys2) {
+        if (k === "") {
+          break;
+        }
+        obj = obj && obj[k];
+      }
+      return obj;
+    };
+  }
+  function resolveObjectKey(obj, key) {
+    const resolver = keyResolvers[key] || (keyResolvers[key] = _getKeyResolver(key));
+    return resolver(obj);
+  }
+  function _capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+  var defined = (value) => typeof value !== "undefined";
+  var isFunction = (value) => typeof value === "function";
+  var setsEqual = (a, b) => {
+    if (a.size !== b.size) {
+      return false;
+    }
+    for (const item of a) {
+      if (!b.has(item)) {
+        return false;
+      }
+    }
+    return true;
+  };
+  function _isClickEvent(e) {
+    return e.type === "mouseup" || e.type === "click" || e.type === "contextmenu";
+  }
+  var PI = Math.PI;
+  var TAU = 2 * PI;
+  var PITAU = TAU + PI;
+  var INFINITY = Number.POSITIVE_INFINITY;
+  var RAD_PER_DEG = PI / 180;
+  var HALF_PI = PI / 2;
+  var QUARTER_PI = PI / 4;
+  var TWO_THIRDS_PI = PI * 2 / 3;
+  var log10 = Math.log10;
+  var sign = Math.sign;
+  function almostEquals(x, y, epsilon) {
+    return Math.abs(x - y) < epsilon;
+  }
+  function niceNum(range) {
+    const roundedRange = Math.round(range);
+    range = almostEquals(range, roundedRange, range / 1e3) ? roundedRange : range;
+    const niceRange = Math.pow(10, Math.floor(log10(range)));
+    const fraction = range / niceRange;
+    const niceFraction = fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10;
+    return niceFraction * niceRange;
+  }
+  function _factorize(value) {
+    const result = [];
+    const sqrt = Math.sqrt(value);
+    let i;
+    for (i = 1; i < sqrt; i++) {
+      if (value % i === 0) {
+        result.push(i);
+        result.push(value / i);
+      }
+    }
+    if (sqrt === (sqrt | 0)) {
+      result.push(sqrt);
+    }
+    result.sort((a, b) => a - b).pop();
+    return result;
+  }
+  function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+  function almostWhole(x, epsilon) {
+    const rounded = Math.round(x);
+    return rounded - epsilon <= x && rounded + epsilon >= x;
+  }
+  function _setMinAndMaxByKey(array, target, property) {
+    let i, ilen, value;
+    for (i = 0, ilen = array.length; i < ilen; i++) {
+      value = array[i][property];
+      if (!isNaN(value)) {
+        target.min = Math.min(target.min, value);
+        target.max = Math.max(target.max, value);
+      }
+    }
+  }
+  function toRadians(degrees) {
+    return degrees * (PI / 180);
+  }
+  function toDegrees(radians) {
+    return radians * (180 / PI);
+  }
+  function _decimalPlaces(x) {
+    if (!isNumberFinite(x)) {
+      return;
+    }
+    let e = 1;
+    let p = 0;
+    while (Math.round(x * e) / e !== x) {
+      e *= 10;
+      p++;
+    }
+    return p;
+  }
+  function getAngleFromPoint(centrePoint, anglePoint) {
+    const distanceFromXCenter = anglePoint.x - centrePoint.x;
+    const distanceFromYCenter = anglePoint.y - centrePoint.y;
+    const radialDistanceFromCenter = Math.sqrt(distanceFromXCenter * distanceFromXCenter + distanceFromYCenter * distanceFromYCenter);
+    let angle = Math.atan2(distanceFromYCenter, distanceFromXCenter);
+    if (angle < -0.5 * PI) {
+      angle += TAU;
+    }
+    return {
+      angle,
+      distance: radialDistanceFromCenter
+    };
+  }
+  function distanceBetweenPoints(pt1, pt2) {
+    return Math.sqrt(Math.pow(pt2.x - pt1.x, 2) + Math.pow(pt2.y - pt1.y, 2));
+  }
+  function _angleDiff(a, b) {
+    return (a - b + PITAU) % TAU - PI;
+  }
+  function _normalizeAngle(a) {
+    return (a % TAU + TAU) % TAU;
+  }
+  function _angleBetween(angle, start3, end2, sameAngleIsFullCircle) {
+    const a = _normalizeAngle(angle);
+    const s = _normalizeAngle(start3);
+    const e = _normalizeAngle(end2);
+    const angleToStart = _normalizeAngle(s - a);
+    const angleToEnd = _normalizeAngle(e - a);
+    const startToAngle = _normalizeAngle(a - s);
+    const endToAngle = _normalizeAngle(a - e);
+    return a === s || a === e || sameAngleIsFullCircle && s === e || angleToStart > angleToEnd && startToAngle < endToAngle;
+  }
+  function _limitValue(value, min2, max2) {
+    return Math.max(min2, Math.min(max2, value));
+  }
+  function _int16Range(value) {
+    return _limitValue(value, -32768, 32767);
+  }
+  function _isBetween(value, start3, end2, epsilon = 1e-6) {
+    return value >= Math.min(start3, end2) - epsilon && value <= Math.max(start3, end2) + epsilon;
+  }
+  function _lookup(table, value, cmp2) {
+    cmp2 = cmp2 || ((index3) => table[index3] < value);
+    let hi = table.length - 1;
+    let lo = 0;
+    let mid;
+    while (hi - lo > 1) {
+      mid = lo + hi >> 1;
+      if (cmp2(mid)) {
+        lo = mid;
+      } else {
+        hi = mid;
+      }
+    }
+    return {
+      lo,
+      hi
+    };
+  }
+  var _lookupByKey = (table, key, value, last) => _lookup(table, value, last ? (index3) => {
+    const ti = table[index3][key];
+    return ti < value || ti === value && table[index3 + 1][key] === value;
+  } : (index3) => table[index3][key] < value);
+  var _rlookupByKey = (table, key, value) => _lookup(table, value, (index3) => table[index3][key] >= value);
+  function _filterBetween(values, min2, max2) {
+    let start3 = 0;
+    let end2 = values.length;
+    while (start3 < end2 && values[start3] < min2) {
+      start3++;
+    }
+    while (end2 > start3 && values[end2 - 1] > max2) {
+      end2--;
+    }
+    return start3 > 0 || end2 < values.length ? values.slice(start3, end2) : values;
+  }
+  var arrayEvents = [
+    "push",
+    "pop",
+    "shift",
+    "splice",
+    "unshift"
+  ];
+  function listenArrayEvents(array, listener) {
+    if (array._chartjs) {
+      array._chartjs.listeners.push(listener);
+      return;
+    }
+    Object.defineProperty(array, "_chartjs", {
+      configurable: true,
+      enumerable: false,
+      value: {
+        listeners: [
+          listener
+        ]
+      }
+    });
+    arrayEvents.forEach((key) => {
+      const method = "_onData" + _capitalize(key);
+      const base2 = array[key];
+      Object.defineProperty(array, key, {
+        configurable: true,
+        enumerable: false,
+        value(...args) {
+          const res = base2.apply(this, args);
+          array._chartjs.listeners.forEach((object) => {
+            if (typeof object[method] === "function") {
+              object[method](...args);
+            }
+          });
+          return res;
+        }
+      });
+    });
+  }
+  function unlistenArrayEvents(array, listener) {
+    const stub = array._chartjs;
+    if (!stub) {
+      return;
+    }
+    const listeners = stub.listeners;
+    const index3 = listeners.indexOf(listener);
+    if (index3 !== -1) {
+      listeners.splice(index3, 1);
+    }
+    if (listeners.length > 0) {
+      return;
+    }
+    arrayEvents.forEach((key) => {
+      delete array[key];
+    });
+    delete array._chartjs;
+  }
+  function _arrayUnique(items) {
+    const set2 = new Set(items);
+    if (set2.size === items.length) {
+      return items;
+    }
+    return Array.from(set2);
+  }
+  var requestAnimFrame = function() {
+    if (typeof window === "undefined") {
+      return function(callback2) {
+        return callback2();
+      };
+    }
+    return window.requestAnimationFrame;
+  }();
+  function throttled(fn2, thisArg) {
+    let argsToUse = [];
+    let ticking = false;
+    return function(...args) {
+      argsToUse = args;
+      if (!ticking) {
+        ticking = true;
+        requestAnimFrame.call(window, () => {
+          ticking = false;
+          fn2.apply(thisArg, argsToUse);
+        });
+      }
+    };
+  }
+  function debounce(fn2, delay) {
+    let timeout;
+    return function(...args) {
+      if (delay) {
+        clearTimeout(timeout);
+        timeout = setTimeout(fn2, delay, args);
+      } else {
+        fn2.apply(this, args);
+      }
+      return delay;
+    };
+  }
+  var _toLeftRightCenter = (align) => align === "start" ? "left" : align === "end" ? "right" : "center";
+  var _alignStartEnd = (align, start3, end2) => align === "start" ? start3 : align === "end" ? end2 : (start3 + end2) / 2;
+  var _textX = (align, left2, right2, rtl) => {
+    const check2 = rtl ? "left" : "right";
+    return align === check2 ? right2 : align === "center" ? (left2 + right2) / 2 : left2;
+  };
+  function _getStartAndCountOfVisiblePoints(meta, points, animationsDisabled) {
+    const pointCount = points.length;
+    let start3 = 0;
+    let count = pointCount;
+    if (meta._sorted) {
+      const { iScale, _parsed } = meta;
+      const axis = iScale.axis;
+      const { min: min2, max: max2, minDefined, maxDefined } = iScale.getUserBounds();
+      if (minDefined) {
+        start3 = _limitValue(Math.min(
+          // @ts-expect-error Need to type _parsed
+          _lookupByKey(_parsed, axis, min2).lo,
+          // @ts-expect-error Need to fix types on _lookupByKey
+          animationsDisabled ? pointCount : _lookupByKey(points, axis, iScale.getPixelForValue(min2)).lo
+        ), 0, pointCount - 1);
+      }
+      if (maxDefined) {
+        count = _limitValue(Math.max(
+          // @ts-expect-error Need to type _parsed
+          _lookupByKey(_parsed, iScale.axis, max2, true).hi + 1,
+          // @ts-expect-error Need to fix types on _lookupByKey
+          animationsDisabled ? 0 : _lookupByKey(points, axis, iScale.getPixelForValue(max2), true).hi + 1
+        ), start3, pointCount) - start3;
+      } else {
+        count = pointCount - start3;
+      }
+    }
+    return {
+      start: start3,
+      count
+    };
+  }
+  function _scaleRangesChanged(meta) {
+    const { xScale, yScale, _scaleRanges } = meta;
+    const newRanges = {
+      xmin: xScale.min,
+      xmax: xScale.max,
+      ymin: yScale.min,
+      ymax: yScale.max
+    };
+    if (!_scaleRanges) {
+      meta._scaleRanges = newRanges;
+      return true;
+    }
+    const changed = _scaleRanges.xmin !== xScale.min || _scaleRanges.xmax !== xScale.max || _scaleRanges.ymin !== yScale.min || _scaleRanges.ymax !== yScale.max;
+    Object.assign(_scaleRanges, newRanges);
+    return changed;
+  }
+  var atEdge = (t) => t === 0 || t === 1;
+  var elasticIn = (t, s, p) => -(Math.pow(2, 10 * (t -= 1)) * Math.sin((t - s) * TAU / p));
+  var elasticOut = (t, s, p) => Math.pow(2, -10 * t) * Math.sin((t - s) * TAU / p) + 1;
+  var effects = {
+    linear: (t) => t,
+    easeInQuad: (t) => t * t,
+    easeOutQuad: (t) => -t * (t - 2),
+    easeInOutQuad: (t) => (t /= 0.5) < 1 ? 0.5 * t * t : -0.5 * (--t * (t - 2) - 1),
+    easeInCubic: (t) => t * t * t,
+    easeOutCubic: (t) => (t -= 1) * t * t + 1,
+    easeInOutCubic: (t) => (t /= 0.5) < 1 ? 0.5 * t * t * t : 0.5 * ((t -= 2) * t * t + 2),
+    easeInQuart: (t) => t * t * t * t,
+    easeOutQuart: (t) => -((t -= 1) * t * t * t - 1),
+    easeInOutQuart: (t) => (t /= 0.5) < 1 ? 0.5 * t * t * t * t : -0.5 * ((t -= 2) * t * t * t - 2),
+    easeInQuint: (t) => t * t * t * t * t,
+    easeOutQuint: (t) => (t -= 1) * t * t * t * t + 1,
+    easeInOutQuint: (t) => (t /= 0.5) < 1 ? 0.5 * t * t * t * t * t : 0.5 * ((t -= 2) * t * t * t * t + 2),
+    easeInSine: (t) => -Math.cos(t * HALF_PI) + 1,
+    easeOutSine: (t) => Math.sin(t * HALF_PI),
+    easeInOutSine: (t) => -0.5 * (Math.cos(PI * t) - 1),
+    easeInExpo: (t) => t === 0 ? 0 : Math.pow(2, 10 * (t - 1)),
+    easeOutExpo: (t) => t === 1 ? 1 : -Math.pow(2, -10 * t) + 1,
+    easeInOutExpo: (t) => atEdge(t) ? t : t < 0.5 ? 0.5 * Math.pow(2, 10 * (t * 2 - 1)) : 0.5 * (-Math.pow(2, -10 * (t * 2 - 1)) + 2),
+    easeInCirc: (t) => t >= 1 ? t : -(Math.sqrt(1 - t * t) - 1),
+    easeOutCirc: (t) => Math.sqrt(1 - (t -= 1) * t),
+    easeInOutCirc: (t) => (t /= 0.5) < 1 ? -0.5 * (Math.sqrt(1 - t * t) - 1) : 0.5 * (Math.sqrt(1 - (t -= 2) * t) + 1),
+    easeInElastic: (t) => atEdge(t) ? t : elasticIn(t, 0.075, 0.3),
+    easeOutElastic: (t) => atEdge(t) ? t : elasticOut(t, 0.075, 0.3),
+    easeInOutElastic(t) {
+      const s = 0.1125;
+      const p = 0.45;
+      return atEdge(t) ? t : t < 0.5 ? 0.5 * elasticIn(t * 2, s, p) : 0.5 + 0.5 * elasticOut(t * 2 - 1, s, p);
+    },
+    easeInBack(t) {
+      const s = 1.70158;
+      return t * t * ((s + 1) * t - s);
+    },
+    easeOutBack(t) {
+      const s = 1.70158;
+      return (t -= 1) * t * ((s + 1) * t + s) + 1;
+    },
+    easeInOutBack(t) {
+      let s = 1.70158;
+      if ((t /= 0.5) < 1) {
+        return 0.5 * (t * t * (((s *= 1.525) + 1) * t - s));
+      }
+      return 0.5 * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2);
+    },
+    easeInBounce: (t) => 1 - effects.easeOutBounce(1 - t),
+    easeOutBounce(t) {
+      const m = 7.5625;
+      const d = 2.75;
+      if (t < 1 / d) {
+        return m * t * t;
+      }
+      if (t < 2 / d) {
+        return m * (t -= 1.5 / d) * t + 0.75;
+      }
+      if (t < 2.5 / d) {
+        return m * (t -= 2.25 / d) * t + 0.9375;
+      }
+      return m * (t -= 2.625 / d) * t + 0.984375;
+    },
+    easeInOutBounce: (t) => t < 0.5 ? effects.easeInBounce(t * 2) * 0.5 : effects.easeOutBounce(t * 2 - 1) * 0.5 + 0.5
+  };
   function isPatternOrGradient(value) {
     if (value && typeof value === "object") {
       const type = value.toString();
@@ -42129,10 +44093,239 @@ img.ProseMirror-separator {
     return false;
   }
   function color(value) {
-    return isPatternOrGradient(value) ? value : index_esm(value);
+    return isPatternOrGradient(value) ? value : new Color(value);
   }
   function getHoverColor(value) {
-    return isPatternOrGradient(value) ? value : index_esm(value).saturate(0.5).darken(0.1).hexString();
+    return isPatternOrGradient(value) ? value : new Color(value).saturate(0.5).darken(0.1).hexString();
+  }
+  var numbers = [
+    "x",
+    "y",
+    "borderWidth",
+    "radius",
+    "tension"
+  ];
+  var colors = [
+    "color",
+    "borderColor",
+    "backgroundColor"
+  ];
+  function applyAnimationsDefaults(defaults4) {
+    defaults4.set("animation", {
+      delay: void 0,
+      duration: 1e3,
+      easing: "easeOutQuart",
+      fn: void 0,
+      from: void 0,
+      loop: void 0,
+      to: void 0,
+      type: void 0
+    });
+    defaults4.describe("animation", {
+      _fallback: false,
+      _indexable: false,
+      _scriptable: (name) => name !== "onProgress" && name !== "onComplete" && name !== "fn"
+    });
+    defaults4.set("animations", {
+      colors: {
+        type: "color",
+        properties: colors
+      },
+      numbers: {
+        type: "number",
+        properties: numbers
+      }
+    });
+    defaults4.describe("animations", {
+      _fallback: "animation"
+    });
+    defaults4.set("transitions", {
+      active: {
+        animation: {
+          duration: 400
+        }
+      },
+      resize: {
+        animation: {
+          duration: 0
+        }
+      },
+      show: {
+        animations: {
+          colors: {
+            from: "transparent"
+          },
+          visible: {
+            type: "boolean",
+            duration: 0
+          }
+        }
+      },
+      hide: {
+        animations: {
+          colors: {
+            to: "transparent"
+          },
+          visible: {
+            type: "boolean",
+            easing: "linear",
+            fn: (v) => v | 0
+          }
+        }
+      }
+    });
+  }
+  function applyLayoutsDefaults(defaults4) {
+    defaults4.set("layout", {
+      autoPadding: true,
+      padding: {
+        top: 0,
+        right: 0,
+        bottom: 0,
+        left: 0
+      }
+    });
+  }
+  var intlCache = /* @__PURE__ */ new Map();
+  function getNumberFormat(locale, options) {
+    options = options || {};
+    const cacheKey = locale + JSON.stringify(options);
+    let formatter2 = intlCache.get(cacheKey);
+    if (!formatter2) {
+      formatter2 = new Intl.NumberFormat(locale, options);
+      intlCache.set(cacheKey, formatter2);
+    }
+    return formatter2;
+  }
+  function formatNumber(num, locale, options) {
+    return getNumberFormat(locale, options).format(num);
+  }
+  var formatters = {
+    values(value) {
+      return isArray(value) ? value : "" + value;
+    },
+    numeric(tickValue, index3, ticks) {
+      if (tickValue === 0) {
+        return "0";
+      }
+      const locale = this.chart.options.locale;
+      let notation;
+      let delta = tickValue;
+      if (ticks.length > 1) {
+        const maxTick = Math.max(Math.abs(ticks[0].value), Math.abs(ticks[ticks.length - 1].value));
+        if (maxTick < 1e-4 || maxTick > 1e15) {
+          notation = "scientific";
+        }
+        delta = calculateDelta(tickValue, ticks);
+      }
+      const logDelta = log10(Math.abs(delta));
+      const numDecimal = isNaN(logDelta) ? 1 : Math.max(Math.min(-1 * Math.floor(logDelta), 20), 0);
+      const options = {
+        notation,
+        minimumFractionDigits: numDecimal,
+        maximumFractionDigits: numDecimal
+      };
+      Object.assign(options, this.options.ticks.format);
+      return formatNumber(tickValue, locale, options);
+    },
+    logarithmic(tickValue, index3, ticks) {
+      if (tickValue === 0) {
+        return "0";
+      }
+      const remain = ticks[index3].significand || tickValue / Math.pow(10, Math.floor(log10(tickValue)));
+      if ([
+        1,
+        2,
+        3,
+        5,
+        10,
+        15
+      ].includes(remain) || index3 > 0.8 * ticks.length) {
+        return formatters.numeric.call(this, tickValue, index3, ticks);
+      }
+      return "";
+    }
+  };
+  function calculateDelta(tickValue, ticks) {
+    let delta = ticks.length > 3 ? ticks[2].value - ticks[1].value : ticks[1].value - ticks[0].value;
+    if (Math.abs(delta) >= 1 && tickValue !== Math.floor(tickValue)) {
+      delta = tickValue - Math.floor(tickValue);
+    }
+    return delta;
+  }
+  var Ticks = {
+    formatters
+  };
+  function applyScaleDefaults(defaults4) {
+    defaults4.set("scale", {
+      display: true,
+      offset: false,
+      reverse: false,
+      beginAtZero: false,
+      bounds: "ticks",
+      clip: true,
+      grace: 0,
+      grid: {
+        display: true,
+        lineWidth: 1,
+        drawOnChartArea: true,
+        drawTicks: true,
+        tickLength: 8,
+        tickWidth: (_ctx, options) => options.lineWidth,
+        tickColor: (_ctx, options) => options.color,
+        offset: false
+      },
+      border: {
+        display: true,
+        dash: [],
+        dashOffset: 0,
+        width: 1
+      },
+      title: {
+        display: false,
+        text: "",
+        padding: {
+          top: 4,
+          bottom: 4
+        }
+      },
+      ticks: {
+        minRotation: 0,
+        maxRotation: 50,
+        mirror: false,
+        textStrokeWidth: 0,
+        textStrokeColor: "",
+        padding: 3,
+        display: true,
+        autoSkip: true,
+        autoSkipPadding: 3,
+        labelOffset: 0,
+        callback: Ticks.formatters.values,
+        minor: {},
+        major: {},
+        align: "center",
+        crossAlign: "near",
+        showLabelBackdrop: false,
+        backdropColor: "rgba(255, 255, 255, 0.75)",
+        backdropPadding: 2
+      }
+    });
+    defaults4.route("scale.ticks", "color", "", "color");
+    defaults4.route("scale.grid", "color", "", "borderColor");
+    defaults4.route("scale.border", "color", "", "borderColor");
+    defaults4.route("scale.title", "color", "", "color");
+    defaults4.describe("scale", {
+      _fallback: false,
+      _scriptable: (name) => !name.startsWith("before") && !name.startsWith("after") && name !== "callback" && name !== "parser",
+      _indexable: (name) => name !== "borderDash" && name !== "tickBorderDash" && name !== "dash"
+    });
+    defaults4.describe("scales", {
+      _fallback: "scale"
+    });
+    defaults4.describe("scale.ticks", {
+      _scriptable: (name) => name !== "backdropPadding" && name !== "callback",
+      _indexable: (name) => name !== "backdropPadding"
+    });
   }
   var overrides = /* @__PURE__ */ Object.create(null);
   var descriptors = /* @__PURE__ */ Object.create(null);
@@ -42154,7 +44347,7 @@ img.ProseMirror-separator {
     return merge(getScope$1(root2, ""), scope);
   }
   var Defaults = class {
-    constructor(_descriptors2) {
+    constructor(_descriptors2, _appliers) {
       this.animation = void 0;
       this.backgroundColor = "rgba(0,0,0,0.1)";
       this.borderColor = "rgba(0,0,0,0.1)";
@@ -42197,6 +44390,7 @@ img.ProseMirror-separator {
       this.showLine = true;
       this.drawActiveElementsOnTop = true;
       this.describe(_descriptors2);
+      this.apply(_appliers);
     }
     set(scope, values) {
       return set(this, scope, values);
@@ -42235,8 +44429,11 @@ img.ProseMirror-separator {
         }
       });
     }
+    apply(appliers) {
+      appliers.forEach((apply2) => apply2(this));
+    }
   };
-  var defaults = new Defaults({
+  var defaults = /* @__PURE__ */ new Defaults({
     _scriptable: (name) => !name.startsWith("on"),
     _indexable: (name) => name !== "events",
     hover: {
@@ -42246,7 +44443,11 @@ img.ProseMirror-separator {
       _scriptable: false,
       _indexable: false
     }
-  });
+  }, [
+    applyAnimationsDefaults,
+    applyLayoutsDefaults,
+    applyScaleDefaults
+  ]);
   function toFontString(font) {
     if (!font || isNullOrUndef(font.size) || isNullOrUndef(font.family)) {
       return null;
@@ -42280,7 +44481,7 @@ img.ProseMirror-separator {
     let i, j, jlen, thing, nestedThing;
     for (i = 0; i < ilen; i++) {
       thing = arrayOfThings[i];
-      if (thing !== void 0 && thing !== null && isArray(thing) !== true) {
+      if (thing !== void 0 && thing !== null && !isArray(thing)) {
         longest = _measureText(ctx, data, gc, longest, thing);
       } else if (isArray(thing)) {
         for (j = 0, jlen = thing.length; j < jlen; j++) {
@@ -42317,7 +44518,7 @@ img.ProseMirror-separator {
     drawPointLegend(ctx, options, x, y, null);
   }
   function drawPointLegend(ctx, options, x, y, w) {
-    let type, xOffset, yOffset, size, cornerRadius, width;
+    let type, xOffset, yOffset, size, cornerRadius, width, xOffsetW, yOffsetW;
     const style2 = options.pointStyle;
     const rotation = options.rotation;
     const radius = options.radius;
@@ -42347,22 +44548,25 @@ img.ProseMirror-separator {
         ctx.closePath();
         break;
       case "triangle":
-        ctx.moveTo(x + Math.sin(rad) * radius, y - Math.cos(rad) * radius);
+        width = w ? w / 2 : radius;
+        ctx.moveTo(x + Math.sin(rad) * width, y - Math.cos(rad) * radius);
         rad += TWO_THIRDS_PI;
-        ctx.lineTo(x + Math.sin(rad) * radius, y - Math.cos(rad) * radius);
+        ctx.lineTo(x + Math.sin(rad) * width, y - Math.cos(rad) * radius);
         rad += TWO_THIRDS_PI;
-        ctx.lineTo(x + Math.sin(rad) * radius, y - Math.cos(rad) * radius);
+        ctx.lineTo(x + Math.sin(rad) * width, y - Math.cos(rad) * radius);
         ctx.closePath();
         break;
       case "rectRounded":
         cornerRadius = radius * 0.516;
         size = radius - cornerRadius;
         xOffset = Math.cos(rad + QUARTER_PI) * size;
+        xOffsetW = Math.cos(rad + QUARTER_PI) * (w ? w / 2 - cornerRadius : size);
         yOffset = Math.sin(rad + QUARTER_PI) * size;
-        ctx.arc(x - xOffset, y - yOffset, cornerRadius, rad - PI, rad - HALF_PI);
-        ctx.arc(x + yOffset, y - xOffset, cornerRadius, rad - HALF_PI, rad);
-        ctx.arc(x + xOffset, y + yOffset, cornerRadius, rad, rad + HALF_PI);
-        ctx.arc(x - yOffset, y + xOffset, cornerRadius, rad + HALF_PI, rad + PI);
+        yOffsetW = Math.sin(rad + QUARTER_PI) * (w ? w / 2 - cornerRadius : size);
+        ctx.arc(x - xOffsetW, y - yOffset, cornerRadius, rad - PI, rad - HALF_PI);
+        ctx.arc(x + yOffsetW, y - xOffset, cornerRadius, rad - HALF_PI, rad);
+        ctx.arc(x + xOffsetW, y + yOffset, cornerRadius, rad, rad + HALF_PI);
+        ctx.arc(x - yOffsetW, y + xOffset, cornerRadius, rad + HALF_PI, rad + PI);
         ctx.closePath();
         break;
       case "rect":
@@ -42374,38 +44578,46 @@ img.ProseMirror-separator {
         }
         rad += QUARTER_PI;
       case "rectRot":
+        xOffsetW = Math.cos(rad) * (w ? w / 2 : radius);
         xOffset = Math.cos(rad) * radius;
         yOffset = Math.sin(rad) * radius;
-        ctx.moveTo(x - xOffset, y - yOffset);
-        ctx.lineTo(x + yOffset, y - xOffset);
-        ctx.lineTo(x + xOffset, y + yOffset);
-        ctx.lineTo(x - yOffset, y + xOffset);
+        yOffsetW = Math.sin(rad) * (w ? w / 2 : radius);
+        ctx.moveTo(x - xOffsetW, y - yOffset);
+        ctx.lineTo(x + yOffsetW, y - xOffset);
+        ctx.lineTo(x + xOffsetW, y + yOffset);
+        ctx.lineTo(x - yOffsetW, y + xOffset);
         ctx.closePath();
         break;
       case "crossRot":
         rad += QUARTER_PI;
       case "cross":
+        xOffsetW = Math.cos(rad) * (w ? w / 2 : radius);
         xOffset = Math.cos(rad) * radius;
         yOffset = Math.sin(rad) * radius;
-        ctx.moveTo(x - xOffset, y - yOffset);
-        ctx.lineTo(x + xOffset, y + yOffset);
-        ctx.moveTo(x + yOffset, y - xOffset);
-        ctx.lineTo(x - yOffset, y + xOffset);
+        yOffsetW = Math.sin(rad) * (w ? w / 2 : radius);
+        ctx.moveTo(x - xOffsetW, y - yOffset);
+        ctx.lineTo(x + xOffsetW, y + yOffset);
+        ctx.moveTo(x + yOffsetW, y - xOffset);
+        ctx.lineTo(x - yOffsetW, y + xOffset);
         break;
       case "star":
+        xOffsetW = Math.cos(rad) * (w ? w / 2 : radius);
         xOffset = Math.cos(rad) * radius;
         yOffset = Math.sin(rad) * radius;
-        ctx.moveTo(x - xOffset, y - yOffset);
-        ctx.lineTo(x + xOffset, y + yOffset);
-        ctx.moveTo(x + yOffset, y - xOffset);
-        ctx.lineTo(x - yOffset, y + xOffset);
+        yOffsetW = Math.sin(rad) * (w ? w / 2 : radius);
+        ctx.moveTo(x - xOffsetW, y - yOffset);
+        ctx.lineTo(x + xOffsetW, y + yOffset);
+        ctx.moveTo(x + yOffsetW, y - xOffset);
+        ctx.lineTo(x - yOffsetW, y + xOffset);
         rad += QUARTER_PI;
+        xOffsetW = Math.cos(rad) * (w ? w / 2 : radius);
         xOffset = Math.cos(rad) * radius;
         yOffset = Math.sin(rad) * radius;
-        ctx.moveTo(x - xOffset, y - yOffset);
-        ctx.lineTo(x + xOffset, y + yOffset);
-        ctx.moveTo(x + yOffset, y - xOffset);
-        ctx.lineTo(x - yOffset, y + xOffset);
+        yOffsetW = Math.sin(rad) * (w ? w / 2 : radius);
+        ctx.moveTo(x - xOffsetW, y - yOffset);
+        ctx.lineTo(x + xOffsetW, y + yOffset);
+        ctx.moveTo(x + yOffsetW, y - xOffset);
+        ctx.lineTo(x - yOffsetW, y + xOffset);
         break;
       case "line":
         xOffset = w ? w / 2 : Math.cos(rad) * radius;
@@ -42415,7 +44627,10 @@ img.ProseMirror-separator {
         break;
       case "dash":
         ctx.moveTo(x, y);
-        ctx.lineTo(x + Math.cos(rad) * radius, y + Math.sin(rad) * radius);
+        ctx.lineTo(x + Math.cos(rad) * (w ? w / 2 : radius), y + Math.sin(rad) * radius);
+        break;
+      case false:
+        ctx.closePath();
         break;
     }
     ctx.fill();
@@ -42455,38 +44670,7 @@ img.ProseMirror-separator {
     if (!previous) {
       return ctx.lineTo(target.x, target.y);
     }
-    ctx.bezierCurveTo(
-      flip2 ? previous.cp1x : previous.cp2x,
-      flip2 ? previous.cp1y : previous.cp2y,
-      flip2 ? target.cp2x : target.cp1x,
-      flip2 ? target.cp2y : target.cp1y,
-      target.x,
-      target.y
-    );
-  }
-  function renderText(ctx, text2, x, y, font, opts = {}) {
-    const lines = isArray(text2) ? text2 : [text2];
-    const stroke = opts.strokeWidth > 0 && opts.strokeColor !== "";
-    let i, line;
-    ctx.save();
-    ctx.font = font.string;
-    setRenderOpts(ctx, opts);
-    for (i = 0; i < lines.length; ++i) {
-      line = lines[i];
-      if (stroke) {
-        if (opts.strokeColor) {
-          ctx.strokeStyle = opts.strokeColor;
-        }
-        if (!isNullOrUndef(opts.strokeWidth)) {
-          ctx.lineWidth = opts.strokeWidth;
-        }
-        ctx.strokeText(line, x, y, opts.maxWidth);
-      }
-      ctx.fillText(line, x, y, opts.maxWidth);
-      decorateText(ctx, x, y, line, opts);
-      y += font.lineHeight;
-    }
-    ctx.restore();
+    ctx.bezierCurveTo(flip2 ? previous.cp1x : previous.cp2x, flip2 ? previous.cp1y : previous.cp2y, flip2 ? target.cp2x : target.cp1x, flip2 ? target.cp2y : target.cp1y, target.x, target.y);
   }
   function setRenderOpts(ctx, opts) {
     if (opts.translation) {
@@ -42521,9 +44705,44 @@ img.ProseMirror-separator {
       ctx.stroke();
     }
   }
+  function drawBackdrop(ctx, opts) {
+    const oldColor = ctx.fillStyle;
+    ctx.fillStyle = opts.color;
+    ctx.fillRect(opts.left, opts.top, opts.width, opts.height);
+    ctx.fillStyle = oldColor;
+  }
+  function renderText(ctx, text2, x, y, font, opts = {}) {
+    const lines = isArray(text2) ? text2 : [
+      text2
+    ];
+    const stroke = opts.strokeWidth > 0 && opts.strokeColor !== "";
+    let i, line;
+    ctx.save();
+    ctx.font = font.string;
+    setRenderOpts(ctx, opts);
+    for (i = 0; i < lines.length; ++i) {
+      line = lines[i];
+      if (opts.backdrop) {
+        drawBackdrop(ctx, opts.backdrop);
+      }
+      if (stroke) {
+        if (opts.strokeColor) {
+          ctx.strokeStyle = opts.strokeColor;
+        }
+        if (!isNullOrUndef(opts.strokeWidth)) {
+          ctx.lineWidth = opts.strokeWidth;
+        }
+        ctx.strokeText(line, x, y, opts.maxWidth);
+      }
+      ctx.fillText(line, x, y, opts.maxWidth);
+      decorateText(ctx, x, y, line, opts);
+      y += Number(font.lineHeight);
+    }
+    ctx.restore();
+  }
   function addRoundedRectPath(ctx, rect) {
     const { x, y, w, h, radius } = rect;
-    ctx.arc(x + radius.topLeft, y + radius.topLeft, radius.topLeft, -HALF_PI, PI, true);
+    ctx.arc(x + radius.topLeft, y + radius.topLeft, radius.topLeft, 1.5 * PI, PI, true);
     ctx.lineTo(x, y + h - radius.bottomLeft);
     ctx.arc(x + radius.bottomLeft, y + h - radius.bottomLeft, radius.bottomLeft, PI, HALF_PI, true);
     ctx.lineTo(x + w - radius.bottomRight, y + h);
@@ -42532,8 +44751,8 @@ img.ProseMirror-separator {
     ctx.arc(x + w - radius.topRight, y + radius.topRight, radius.topRight, 0, -HALF_PI, true);
     ctx.lineTo(x + radius.topLeft, y);
   }
-  var LINE_HEIGHT = new RegExp(/^(normal|(\d+(?:\.\d+)?)(px|em|%)?)$/);
-  var FONT_STYLE = new RegExp(/^(normal|italic|initial|inherit|unset|(oblique( -?[0-9]?[0-9]deg)?))$/);
+  var LINE_HEIGHT = /^(normal|(\d+(?:\.\d+)?)(px|em|%)?)$/;
+  var FONT_STYLE = /^(normal|italic|initial|inherit|unset|(oblique( -?[0-9]?[0-9]deg)?))$/;
   function toLineHeight(value, size) {
     const matches3 = ("" + value).match(LINE_HEIGHT);
     if (!matches3 || matches3[1] === "normal") {
@@ -42561,10 +44780,20 @@ img.ProseMirror-separator {
     return ret;
   }
   function toTRBL(value) {
-    return _readValueToProps(value, { top: "y", right: "x", bottom: "y", left: "x" });
+    return _readValueToProps(value, {
+      top: "y",
+      right: "x",
+      bottom: "y",
+      left: "x"
+    });
   }
   function toTRBLCorners(value) {
-    return _readValueToProps(value, ["topLeft", "topRight", "bottomLeft", "bottomRight"]);
+    return _readValueToProps(value, [
+      "topLeft",
+      "topRight",
+      "bottomLeft",
+      "bottomRight"
+    ]);
   }
   function toPadding(value) {
     const obj = toTRBL(value);
@@ -42582,7 +44811,7 @@ img.ProseMirror-separator {
     let style2 = valueOrDefault(options.style, fallback.style);
     if (style2 && !("" + style2).match(FONT_STYLE)) {
       console.warn('Invalid font style specified: "' + style2 + '"');
-      style2 = "";
+      style2 = void 0;
     }
     const font = {
       family: valueOrDefault(options.family, fallback.family),
@@ -42631,45 +44860,69 @@ img.ProseMirror-separator {
   function createContext(parentContext, context) {
     return Object.assign(Object.create(parentContext), context);
   }
-  function _createResolver(scopes, prefixes = [""], rootScopes = scopes, fallback, getTarget = () => scopes[0]) {
-    if (!defined(fallback)) {
+  function _createResolver(scopes, prefixes = [
+    ""
+  ], rootScopes, fallback, getTarget = () => scopes[0]) {
+    const finalRootScopes = rootScopes || scopes;
+    if (typeof fallback === "undefined") {
       fallback = _resolve("_fallback", scopes);
     }
     const cache2 = {
       [Symbol.toStringTag]: "Object",
       _cacheable: true,
       _scopes: scopes,
-      _rootScopes: rootScopes,
+      _rootScopes: finalRootScopes,
       _fallback: fallback,
       _getTarget: getTarget,
-      override: (scope) => _createResolver([scope, ...scopes], prefixes, rootScopes, fallback)
+      override: (scope) => _createResolver([
+        scope,
+        ...scopes
+      ], prefixes, finalRootScopes, fallback)
     };
     return new Proxy(cache2, {
+      /**
+      * A trap for the delete operator.
+      */
       deleteProperty(target, prop) {
         delete target[prop];
         delete target._keys;
         delete scopes[0][prop];
         return true;
       },
+      /**
+      * A trap for getting property values.
+      */
       get(target, prop) {
-        return _cached(
-          target,
-          prop,
-          () => _resolveWithPrefixes(prop, prefixes, scopes, target)
-        );
+        return _cached(target, prop, () => _resolveWithPrefixes(prop, prefixes, scopes, target));
       },
+      /**
+      * A trap for Object.getOwnPropertyDescriptor.
+      * Also used by Object.hasOwnProperty.
+      */
       getOwnPropertyDescriptor(target, prop) {
         return Reflect.getOwnPropertyDescriptor(target._scopes[0], prop);
       },
+      /**
+      * A trap for Object.getPrototypeOf.
+      */
       getPrototypeOf() {
         return Reflect.getPrototypeOf(scopes[0]);
       },
+      /**
+      * A trap for the in operator.
+      */
       has(target, prop) {
         return getKeysFromAllScopes(target).includes(prop);
       },
+      /**
+      * A trap for Object.getOwnPropertyNames and Object.getOwnPropertySymbols.
+      */
       ownKeys(target) {
         return getKeysFromAllScopes(target);
       },
+      /**
+      * A trap for setting property values.
+      */
       set(target, prop, value) {
         const storage = target._storage || (target._storage = getTarget());
         target[prop] = storage[prop] = value;
@@ -42690,30 +44943,51 @@ img.ProseMirror-separator {
       override: (scope) => _attachContext(proxy.override(scope), context, subProxy, descriptorDefaults)
     };
     return new Proxy(cache2, {
+      /**
+      * A trap for the delete operator.
+      */
       deleteProperty(target, prop) {
         delete target[prop];
         delete proxy[prop];
         return true;
       },
+      /**
+      * A trap for getting property values.
+      */
       get(target, prop, receiver) {
-        return _cached(
-          target,
-          prop,
-          () => _resolveWithContext(target, prop, receiver)
-        );
+        return _cached(target, prop, () => _resolveWithContext(target, prop, receiver));
       },
+      /**
+      * A trap for Object.getOwnPropertyDescriptor.
+      * Also used by Object.hasOwnProperty.
+      */
       getOwnPropertyDescriptor(target, prop) {
-        return target._descriptors.allKeys ? Reflect.has(proxy, prop) ? { enumerable: true, configurable: true } : void 0 : Reflect.getOwnPropertyDescriptor(proxy, prop);
+        return target._descriptors.allKeys ? Reflect.has(proxy, prop) ? {
+          enumerable: true,
+          configurable: true
+        } : void 0 : Reflect.getOwnPropertyDescriptor(proxy, prop);
       },
+      /**
+      * A trap for Object.getPrototypeOf.
+      */
       getPrototypeOf() {
         return Reflect.getPrototypeOf(proxy);
       },
+      /**
+      * A trap for the in operator.
+      */
       has(target, prop) {
         return Reflect.has(proxy, prop);
       },
+      /**
+      * A trap for Object.getOwnPropertyNames and Object.getOwnPropertySymbols.
+      */
       ownKeys() {
         return Reflect.ownKeys(proxy);
       },
+      /**
+      * A trap for setting property values.
+      */
       set(target, prop, value) {
         proxy[prop] = value;
         delete target[prop];
@@ -42721,7 +44995,10 @@ img.ProseMirror-separator {
       }
     });
   }
-  function _descriptors(proxy, defaults4 = { scriptable: true, indexable: true }) {
+  function _descriptors(proxy, defaults4 = {
+    scriptable: true,
+    indexable: true
+  }) {
     const { _scriptable = defaults4.scriptable, _indexable = defaults4.indexable, _allKeys = defaults4.allKeys } = proxy;
     return {
       allKeys: _allKeys,
@@ -42755,13 +45032,13 @@ img.ProseMirror-separator {
     }
     return value;
   }
-  function _resolveScriptable(prop, value, target, receiver) {
+  function _resolveScriptable(prop, getValue, target, receiver) {
     const { _proxy, _context, _subProxy, _stack } = target;
     if (_stack.has(prop)) {
       throw new Error("Recursion detected: " + Array.from(_stack).join("->") + "->" + prop);
     }
     _stack.add(prop);
-    value = value(_context, _subProxy || receiver);
+    let value = getValue(_context, _subProxy || receiver);
     _stack.delete(prop);
     if (needsSubResolver(prop, value)) {
       value = createSubResolver(_proxy._scopes, _proxy, prop, value);
@@ -42770,8 +45047,8 @@ img.ProseMirror-separator {
   }
   function _resolveArray(prop, value, target, isIndexable) {
     const { _proxy, _context, _subProxy, _descriptors: descriptors2 } = target;
-    if (defined(_context.index) && isIndexable(prop)) {
-      value = value[_context.index % value.length];
+    if (typeof _context.index !== "undefined" && isIndexable(prop)) {
+      return value[_context.index % value.length];
     } else if (isObject(value[0])) {
       const arr = value;
       const scopes = _proxy._scopes.filter((s) => s !== arr);
@@ -42793,10 +45070,10 @@ img.ProseMirror-separator {
       if (scope) {
         set2.add(scope);
         const fallback = resolveFallback(scope._fallback, key, value);
-        if (defined(fallback) && fallback !== key && fallback !== parentFallback) {
+        if (typeof fallback !== "undefined" && fallback !== key && fallback !== parentFallback) {
           return fallback;
         }
-      } else if (scope === false && defined(parentFallback) && key !== parentFallback) {
+      } else if (scope === false && typeof parentFallback !== "undefined" && key !== parentFallback) {
         return null;
       }
     }
@@ -42805,26 +45082,25 @@ img.ProseMirror-separator {
   function createSubResolver(parentScopes, resolver, prop, value) {
     const rootScopes = resolver._rootScopes;
     const fallback = resolveFallback(resolver._fallback, prop, value);
-    const allScopes = [...parentScopes, ...rootScopes];
+    const allScopes = [
+      ...parentScopes,
+      ...rootScopes
+    ];
     const set2 = /* @__PURE__ */ new Set();
     set2.add(value);
     let key = addScopesFromKey(set2, allScopes, prop, fallback || prop, value);
     if (key === null) {
       return false;
     }
-    if (defined(fallback) && fallback !== prop) {
+    if (typeof fallback !== "undefined" && fallback !== prop) {
       key = addScopesFromKey(set2, allScopes, fallback, key, value);
       if (key === null) {
         return false;
       }
     }
-    return _createResolver(
-      Array.from(set2),
-      [""],
-      rootScopes,
-      fallback,
-      () => subGetTarget(resolver, prop, value)
-    );
+    return _createResolver(Array.from(set2), [
+      ""
+    ], rootScopes, fallback, () => subGetTarget(resolver, prop, value));
   }
   function addScopesFromKey(set2, allScopes, key, fallback, item) {
     while (key) {
@@ -42841,13 +45117,13 @@ img.ProseMirror-separator {
     if (isArray(target) && isObject(value)) {
       return value;
     }
-    return target;
+    return target || {};
   }
   function _resolveWithPrefixes(prop, prefixes, scopes, proxy) {
     let value;
     for (const prefix of prefixes) {
       value = _resolve(readKey(prefix, prop), scopes);
-      if (defined(value)) {
+      if (typeof value !== "undefined") {
         return needsSubResolver(prop, value) ? createSubResolver(scopes, proxy, prop, value) : value;
       }
     }
@@ -42858,7 +45134,7 @@ img.ProseMirror-separator {
         continue;
       }
       const value = scope[key];
-      if (defined(value)) {
+      if (typeof value !== "undefined") {
         return value;
       }
     }
@@ -43028,12 +45304,7 @@ img.ProseMirror-separator {
       let prev = loop ? points[points.length - 1] : points[0];
       for (i = 0, ilen = points.length; i < ilen; ++i) {
         point = points[i];
-        controlPoints = splineCurve(
-          prev,
-          point,
-          points[Math.min(i + 1, ilen - (loop ? 0 : 1)) % ilen],
-          options.tension
-        );
+        controlPoints = splineCurve(prev, point, points[Math.min(i + 1, ilen - (loop ? 0 : 1)) % ilen], options.tension);
         point.cp1x = controlPoints.previous.x;
         point.cp1y = controlPoints.previous.y;
         point.cp2x = controlPoints.next.x;
@@ -43067,11 +45338,16 @@ img.ProseMirror-separator {
     }
     return valueInPixels;
   }
-  var getComputedStyle2 = (element) => window.getComputedStyle(element, null);
+  var getComputedStyle2 = (element) => element.ownerDocument.defaultView.getComputedStyle(element, null);
   function getStyle(el, property) {
     return getComputedStyle2(el).getPropertyValue(property);
   }
-  var positions = ["top", "right", "bottom", "left"];
+  var positions = [
+    "top",
+    "right",
+    "bottom",
+    "left"
+  ];
   function getPositionedStyle(styles, style2, suffix) {
     const result = {};
     suffix = suffix ? "-" + suffix : "";
@@ -43099,18 +45375,22 @@ img.ProseMirror-separator {
       y = source2.clientY - rect.top;
       box = true;
     }
-    return { x, y, box };
+    return {
+      x,
+      y,
+      box
+    };
   }
-  function getRelativePosition(evt, chart) {
-    if ("native" in evt) {
-      return evt;
+  function getRelativePosition(event, chart) {
+    if ("native" in event) {
+      return event;
     }
     const { canvas, currentDevicePixelRatio } = chart;
     const style2 = getComputedStyle2(canvas);
     const borderBox = style2.boxSizing === "border-box";
     const paddings = getPositionedStyle(style2, "padding");
     const borders = getPositionedStyle(style2, "border", "width");
-    const { x, y, box } = getCanvasPosition(evt, canvas);
+    const { x, y, box } = getCanvasPosition(event, canvas);
     const xOffset = paddings.left + (box && borders.left);
     const yOffset = paddings.top + (box && borders.top);
     let { width, height } = chart;
@@ -43163,11 +45443,16 @@ img.ProseMirror-separator {
       height -= paddings.height + borders.height;
     }
     width = Math.max(0, width - margins.width);
-    height = Math.max(0, aspectRatio ? Math.floor(width / aspectRatio) : height - margins.height);
+    height = Math.max(0, aspectRatio ? width / aspectRatio : height - margins.height);
     width = round1(Math.min(width, maxWidth, containerSize.maxWidth));
     height = round1(Math.min(height, maxHeight, containerSize.maxHeight));
     if (width && !height) {
       height = round1(width / 2);
+    }
+    const maintainHeight = bbWidth !== void 0 || bbHeight !== void 0;
+    if (maintainHeight && aspectRatio && containerSize.height && height > containerSize.height) {
+      height = containerSize.height;
+      width = round1(Math.floor(height * aspectRatio));
     }
     return {
       width,
@@ -43178,8 +45463,8 @@ img.ProseMirror-separator {
     const pixelRatio = forceRatio || 1;
     const deviceHeight = Math.floor(chart.height * pixelRatio);
     const deviceWidth = Math.floor(chart.width * pixelRatio);
-    chart.height = deviceHeight / pixelRatio;
-    chart.width = deviceWidth / pixelRatio;
+    chart.height = Math.floor(chart.height);
+    chart.width = Math.floor(chart.width);
     const canvas = chart.canvas;
     if (canvas.style && (forceStyle || !canvas.style.height && !canvas.style.width)) {
       canvas.style.height = `${chart.height}px`;
@@ -43203,8 +45488,10 @@ img.ProseMirror-separator {
           return false;
         }
       };
-      window.addEventListener("test", null, options);
-      window.removeEventListener("test", null, options);
+      if (_isDomSupported()) {
+        window.addEventListener("test", null, options);
+        window.removeEventListener("test", null, options);
+      }
     } catch (e) {
     }
     return passiveSupported;
@@ -43227,28 +45514,20 @@ img.ProseMirror-separator {
     };
   }
   function _bezierInterpolation(p1, p2, t, mode) {
-    const cp1 = { x: p1.cp2x, y: p1.cp2y };
-    const cp2 = { x: p2.cp1x, y: p2.cp1y };
+    const cp1 = {
+      x: p1.cp2x,
+      y: p1.cp2y
+    };
+    const cp2 = {
+      x: p2.cp1x,
+      y: p2.cp1y
+    };
     const a = _pointInLine(p1, cp1, t);
     const b = _pointInLine(cp1, cp2, t);
     const c = _pointInLine(cp2, p2, t);
     const d = _pointInLine(a, b, t);
     const e = _pointInLine(b, c, t);
     return _pointInLine(d, e, t);
-  }
-  var intlCache = /* @__PURE__ */ new Map();
-  function getNumberFormat(locale, options) {
-    options = options || {};
-    const cacheKey = locale + JSON.stringify(options);
-    let formatter2 = intlCache.get(cacheKey);
-    if (!formatter2) {
-      formatter2 = new Intl.NumberFormat(locale, options);
-      intlCache.set(cacheKey, formatter2);
-    }
-    return formatter2;
-  }
-  function formatNumber(num, locale, options) {
-    return getNumberFormat(locale, options).format(num);
   }
   var getRightToLeftAdapter = function(rectX, width) {
     return {
@@ -43355,11 +45634,18 @@ img.ProseMirror-separator {
     if (end2 < start3) {
       end2 += count;
     }
-    return { start: start3, end: end2, loop, style: segment.style };
+    return {
+      start: start3,
+      end: end2,
+      loop,
+      style: segment.style
+    };
   }
   function _boundSegment(segment, points, bounds) {
     if (!bounds) {
-      return [segment];
+      return [
+        segment
+      ];
     }
     const { property, start: startBound, end: endBound } = bounds;
     const count = points.length;
@@ -43387,14 +45673,26 @@ img.ProseMirror-separator {
         subStart = compare(value, startBound) === 0 ? i : prev;
       }
       if (subStart !== null && shouldStop()) {
-        result.push(normalizeSegment({ start: subStart, end: i, loop, count, style: style2 }));
+        result.push(normalizeSegment({
+          start: subStart,
+          end: i,
+          loop,
+          count,
+          style: style2
+        }));
         subStart = null;
       }
       prev = i;
       prevValue = value;
     }
     if (subStart !== null) {
-      result.push(normalizeSegment({ start: subStart, end: end2, loop, count, style: style2 }));
+      result.push(normalizeSegment({
+        start: subStart,
+        end: end2,
+        loop,
+        count,
+        style: style2
+      }));
     }
     return result;
   }
@@ -43428,7 +45726,10 @@ img.ProseMirror-separator {
       end2--;
     }
     end2 %= count;
-    return { start: start3, end: end2 };
+    return {
+      start: start3,
+      end: end2
+    };
   }
   function solidSegments(points, start3, max2, loop) {
     const count = points.length;
@@ -43441,7 +45742,11 @@ img.ProseMirror-separator {
       if (cur.skip || cur.stop) {
         if (!prev.skip) {
           loop = false;
-          result.push({ start: start3 % count, end: (end2 - 1) % count, loop });
+          result.push({
+            start: start3 % count,
+            end: (end2 - 1) % count,
+            loop
+          });
           start3 = last = cur.stop ? end2 : null;
         }
       } else {
@@ -43453,7 +45758,11 @@ img.ProseMirror-separator {
       prev = cur;
     }
     if (last !== null) {
-      result.push({ start: start3 % count, end: last % count, loop });
+      result.push({
+        start: start3 % count,
+        end: last % count,
+        loop
+      });
     }
     return result;
   }
@@ -43467,7 +45776,13 @@ img.ProseMirror-separator {
     const loop = !!line._loop;
     const { start: start3, end: end2 } = findStartAndEnd(points, count, loop, spanGaps);
     if (spanGaps === true) {
-      return splitByStyles(line, [{ start: start3, end: end2, loop }], points, segmentOptions);
+      return splitByStyles(line, [
+        {
+          start: start3,
+          end: end2,
+          loop
+        }
+      ], points, segmentOptions);
     }
     const max2 = end2 < start3 ? end2 + count : end2;
     const completeLoop = !!line._fullLoop && start3 === 0 && end2 === count - 1;
@@ -43501,7 +45816,12 @@ img.ProseMirror-separator {
         e += dir;
       }
       if (s % count !== e % count) {
-        result.push({ start: s % count, end: e % count, loop: l, style: st });
+        result.push({
+          start: s % count,
+          end: e % count,
+          loop: l,
+          style: st
+        });
         prevStyle = st;
         start3 = e % count;
       }
@@ -43544,10 +45864,23 @@ img.ProseMirror-separator {
     };
   }
   function styleChanged(style2, prevStyle) {
-    return prevStyle && JSON.stringify(style2) !== JSON.stringify(prevStyle);
+    if (!prevStyle) {
+      return false;
+    }
+    const cache2 = [];
+    const replacer = function(key, value) {
+      if (!isPatternOrGradient(value)) {
+        return value;
+      }
+      if (!cache2.includes(value)) {
+        cache2.push(value);
+      }
+      return cache2.indexOf(value);
+    };
+    return JSON.stringify(style2, replacer) !== JSON.stringify(prevStyle, replacer);
   }
 
-  // node_modules/chart.js/dist/chart.mjs
+  // node_modules/chart.js/dist/chart.js
   var Animator = class {
     constructor() {
       this._request = null;
@@ -43683,7 +46016,7 @@ img.ProseMirror-separator {
       return this._charts.delete(chart);
     }
   };
-  var animator = new Animator();
+  var animator = /* @__PURE__ */ new Animator();
   var transparent = "transparent";
   var interpolators = {
     boolean(from3, to2, factor) {
@@ -43701,8 +46034,17 @@ img.ProseMirror-separator {
   var Animation = class {
     constructor(cfg, target, prop, to2) {
       const currentValue = target[prop];
-      to2 = resolve([cfg.to, to2, currentValue, cfg.from]);
-      const from3 = resolve([cfg.from, currentValue, to2]);
+      to2 = resolve([
+        cfg.to,
+        to2,
+        currentValue,
+        cfg.from
+      ]);
+      const from3 = resolve([
+        cfg.from,
+        currentValue,
+        to2
+      ]);
       this._active = true;
       this._fn = cfg.fn || interpolators[cfg.type || typeof from3];
       this._easing = effects[cfg.easing] || effects.linear;
@@ -43728,8 +46070,17 @@ img.ProseMirror-separator {
         this._duration = Math.floor(Math.max(remain, cfg.duration));
         this._total += elapsed;
         this._loop = !!cfg.loop;
-        this._to = resolve([cfg.to, to2, currentValue, cfg.from]);
-        this._from = resolve([cfg.from, currentValue, to2]);
+        this._to = resolve([
+          cfg.to,
+          to2,
+          currentValue,
+          cfg.from
+        ]);
+        this._from = resolve([
+          cfg.from,
+          currentValue,
+          to2
+        ]);
       }
     }
     cancel() {
@@ -43765,7 +46116,10 @@ img.ProseMirror-separator {
     wait() {
       const promises = this._promises || (this._promises = []);
       return new Promise((res, rej) => {
-        promises.push({ res, rej });
+        promises.push({
+          res,
+          rej
+        });
       });
     }
     _notify(resolved) {
@@ -43776,72 +46130,6 @@ img.ProseMirror-separator {
       }
     }
   };
-  var numbers = ["x", "y", "borderWidth", "radius", "tension"];
-  var colors = ["color", "borderColor", "backgroundColor"];
-  defaults.set("animation", {
-    delay: void 0,
-    duration: 1e3,
-    easing: "easeOutQuart",
-    fn: void 0,
-    from: void 0,
-    loop: void 0,
-    to: void 0,
-    type: void 0
-  });
-  var animationOptions = Object.keys(defaults.animation);
-  defaults.describe("animation", {
-    _fallback: false,
-    _indexable: false,
-    _scriptable: (name) => name !== "onProgress" && name !== "onComplete" && name !== "fn"
-  });
-  defaults.set("animations", {
-    colors: {
-      type: "color",
-      properties: colors
-    },
-    numbers: {
-      type: "number",
-      properties: numbers
-    }
-  });
-  defaults.describe("animations", {
-    _fallback: "animation"
-  });
-  defaults.set("transitions", {
-    active: {
-      animation: {
-        duration: 400
-      }
-    },
-    resize: {
-      animation: {
-        duration: 0
-      }
-    },
-    show: {
-      animations: {
-        colors: {
-          from: "transparent"
-        },
-        visible: {
-          type: "boolean",
-          duration: 0
-        }
-      }
-    },
-    hide: {
-      animations: {
-        colors: {
-          to: "transparent"
-        },
-        visible: {
-          type: "boolean",
-          easing: "linear",
-          fn: (v) => v | 0
-        }
-      }
-    }
-  });
   var Animations = class {
     constructor(chart, config) {
       this._chart = chart;
@@ -43852,6 +46140,7 @@ img.ProseMirror-separator {
       if (!isObject(config)) {
         return;
       }
+      const animationOptions = Object.keys(defaults.animation);
       const animatedProps = this._properties;
       Object.getOwnPropertyNames(config).forEach((key) => {
         const cfg = config[key];
@@ -43862,7 +46151,9 @@ img.ProseMirror-separator {
         for (const option2 of animationOptions) {
           resolved[option2] = cfg[option2];
         }
-        (isArray(cfg.properties) && cfg.properties || [key]).forEach((prop) => {
+        (isArray(cfg.properties) && cfg.properties || [
+          key
+        ]).forEach((prop) => {
           if (prop === key || !animatedProps.has(prop)) {
             animatedProps.set(prop, resolved);
           }
@@ -43953,7 +46244,10 @@ img.ProseMirror-separator {
       return;
     }
     if (options.$shared) {
-      target.options = options = Object.assign({}, options, { $shared: false, $animations: {} });
+      target.options = options = Object.assign({}, options, {
+        $shared: false,
+        $animations: {}
+      });
     }
     return options;
   }
@@ -44023,7 +46317,7 @@ img.ProseMirror-separator {
         break;
       }
       otherValue = stack.values[datasetIndex];
-      if (isNumberFinite(otherValue) && (singleMode || (value === 0 || sign(value) === sign(otherValue)))) {
+      if (isNumberFinite(otherValue) && (singleMode || value === 0 || sign(value) === sign(otherValue))) {
         value += otherValue;
       }
     }
@@ -44086,6 +46380,8 @@ img.ProseMirror-separator {
       stack[datasetIndex] = value;
       stack._top = getLastIndexInStack(stack, vScale, true, meta.type);
       stack._bottom = getLastIndexInStack(stack, vScale, false, meta.type);
+      const visualValues = stack._visualValues || (stack._visualValues = {});
+      visualValues[datasetIndex] = value;
     }
   }
   function getFirstScaleId(chart, axis) {
@@ -44093,17 +46389,14 @@ img.ProseMirror-separator {
     return Object.keys(scales2).filter((key) => scales2[key].axis === axis).shift();
   }
   function createDatasetContext(parent, index3) {
-    return createContext(
-      parent,
-      {
-        active: false,
-        dataset: void 0,
-        datasetIndex: index3,
-        index: index3,
-        mode: "default",
-        type: "dataset"
-      }
-    );
+    return createContext(parent, {
+      active: false,
+      dataset: void 0,
+      datasetIndex: index3,
+      index: index3,
+      mode: "default",
+      type: "dataset"
+    });
   }
   function createDataContext(parent, index3, element) {
     return createContext(parent, {
@@ -44130,12 +46423,21 @@ img.ProseMirror-separator {
         return;
       }
       delete stacks[axis][datasetIndex];
+      if (stacks[axis]._visualValues !== void 0 && stacks[axis]._visualValues[datasetIndex] !== void 0) {
+        delete stacks[axis]._visualValues[datasetIndex];
+      }
     }
   }
   var isDirectUpdateMode = (mode) => mode === "reset" || mode === "none";
   var cloneIfNotShared = (cached, shared) => shared ? cached : Object.assign({}, cached);
-  var createStack = (canStack, meta, chart) => canStack && !meta.hidden && meta._stacked && { keys: getSortedDatasetIndices(chart, true), values: null };
+  var createStack = (canStack, meta, chart) => canStack && !meta.hidden && meta._stacked && {
+    keys: getSortedDatasetIndices(chart, true),
+    values: null
+  };
   var DatasetController = class {
+    static defaults = {};
+    static datasetElementType = null;
+    static dataElementType = null;
     constructor(chart, datasetIndex) {
       this.chart = chart;
       this._ctx = chart.ctx;
@@ -44154,6 +46456,8 @@ img.ProseMirror-separator {
       this.supportsDecimation = false;
       this.$context = void 0;
       this._syncList = [];
+      this.datasetElementType = new.target.datasetElementType;
+      this.dataElementType = new.target.dataElementType;
       this.initialize();
     }
     initialize() {
@@ -44162,6 +46466,9 @@ img.ProseMirror-separator {
       this.linkScales();
       meta._stacked = isStacked(meta.vScale, meta);
       this.addElements();
+      if (this.options.fill && !this.chart.isPluginEnabled("filler")) {
+        console.warn("Tried to use the 'fill' option without the 'Filler' plugin enabled. Please import and register the 'Filler' plugin and make sure it is not disabled in the options");
+      }
     }
     updateIndex(datasetIndex) {
       if (this.index !== datasetIndex) {
@@ -44356,9 +46663,11 @@ img.ProseMirror-separator {
       const value = parsed[scale.axis];
       const stack = {
         keys: getSortedDatasetIndices(chart, true),
-        values: parsed._stacks[scale.axis]
+        values: parsed._stacks[scale.axis]._visualValues
       };
-      return applyStack(stack, value, meta.index, { mode });
+      return applyStack(stack, value, meta.index, {
+        mode
+      });
     }
     updateRangeFromParsed(range, scale, parsed, stack) {
       const parsedValue = parsed[scale.axis];
@@ -44378,7 +46687,10 @@ img.ProseMirror-separator {
       const ilen = _parsed.length;
       const otherScale = this._getOtherScale(scale);
       const stack = createStack(canStack, meta, this.chart);
-      const range = { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY };
+      const range = {
+        min: Number.POSITIVE_INFINITY,
+        max: Number.NEGATIVE_INFINITY
+      };
       const { min: otherMin, max: otherMax } = getUserBounds(otherScale);
       let i, parsed;
       function _skip() {
@@ -44506,10 +46818,18 @@ img.ProseMirror-separator {
       }
       const config = this.chart.config;
       const scopeKeys = config.datasetElementScopeKeys(this._type, elementType2);
-      const prefixes = active ? [`${elementType2}Hover`, "hover", elementType2, ""] : [elementType2, ""];
+      const prefixes = active ? [
+        `${elementType2}Hover`,
+        "hover",
+        elementType2,
+        ""
+      ] : [
+        elementType2,
+        ""
+      ];
       const scopes = config.getOptionScopes(this.getDataset(), scopeKeys);
       const names2 = Object.keys(defaults.elements[elementType2]);
-      const context = () => this.getContext(index3, active);
+      const context = () => this.getContext(index3, active, mode);
       const values = config.resolveNamedOptions(scopes, names2, context, prefixes);
       if (values.$shared) {
         values.$shared = sharing;
@@ -44553,7 +46873,10 @@ img.ProseMirror-separator {
       const sharedOptions = this.getSharedOptions(firstOpts);
       const includeOptions = this.includeOptions(mode, sharedOptions) || sharedOptions !== previouslySharedOptions;
       this.updateSharedOptions(sharedOptions, mode, firstOpts);
-      return { sharedOptions, includeOptions };
+      return {
+        sharedOptions,
+        includeOptions
+      };
     }
     updateElement(element, index3, properties, mode) {
       if (isDirectUpdateMode(mode)) {
@@ -44653,34 +46976,58 @@ img.ProseMirror-separator {
         const [method, arg1, arg2] = args;
         this[method](arg1, arg2);
       }
-      this.chart._dataChanges.push([this.index, ...args]);
+      this.chart._dataChanges.push([
+        this.index,
+        ...args
+      ]);
     }
     _onDataPush() {
       const count = arguments.length;
-      this._sync(["_insertElements", this.getDataset().data.length - count, count]);
+      this._sync([
+        "_insertElements",
+        this.getDataset().data.length - count,
+        count
+      ]);
     }
     _onDataPop() {
-      this._sync(["_removeElements", this._cachedMeta.data.length - 1, 1]);
+      this._sync([
+        "_removeElements",
+        this._cachedMeta.data.length - 1,
+        1
+      ]);
     }
     _onDataShift() {
-      this._sync(["_removeElements", 0, 1]);
+      this._sync([
+        "_removeElements",
+        0,
+        1
+      ]);
     }
     _onDataSplice(start3, count) {
       if (count) {
-        this._sync(["_removeElements", start3, count]);
+        this._sync([
+          "_removeElements",
+          start3,
+          count
+        ]);
       }
       const newCount = arguments.length - 2;
       if (newCount) {
-        this._sync(["_insertElements", start3, newCount]);
+        this._sync([
+          "_insertElements",
+          start3,
+          newCount
+        ]);
       }
     }
     _onDataUnshift() {
-      this._sync(["_insertElements", 0, arguments.length]);
+      this._sync([
+        "_insertElements",
+        0,
+        arguments.length
+      ]);
     }
   };
-  DatasetController.defaults = {};
-  DatasetController.prototype.datasetElementType = null;
-  DatasetController.prototype.dataElementType = null;
   function getAllScaleValues(scale, type) {
     if (!scale._cache.$bar) {
       const visibleMetas = scale.getMatchingVisibleMetas(type);
@@ -44824,7 +47171,13 @@ img.ProseMirror-separator {
       top2 = "start";
       bottom2 = "end";
     }
-    return { start: start3, end: end2, reverse, top: top2, bottom: bottom2 };
+    return {
+      start: start3,
+      end: end2,
+      reverse,
+      top: top2,
+      bottom: bottom2
+    };
   }
   function setBorderSkipped(properties, options, stack, index3) {
     let edge = options.borderSkipped;
@@ -44834,7 +47187,12 @@ img.ProseMirror-separator {
       return;
     }
     if (edge === true) {
-      properties.borderSkipped = { top: true, right: true, bottom: true, left: true };
+      properties.borderSkipped = {
+        top: true,
+        right: true,
+        bottom: true,
+        left: true
+      };
       return;
     }
     const { start: start3, end: end2, reverse, top: top2, bottom: bottom2 } = borderProps(properties);
@@ -44871,6 +47229,41 @@ img.ProseMirror-separator {
     properties.inflateAmount = inflateAmount === "auto" ? ratio === 1 ? 0.33 : 0 : inflateAmount;
   }
   var BarController = class extends DatasetController {
+    static id = "bar";
+    static defaults = {
+      datasetElementType: false,
+      dataElementType: "bar",
+      categoryPercentage: 0.8,
+      barPercentage: 0.9,
+      grouped: true,
+      animations: {
+        numbers: {
+          type: "number",
+          properties: [
+            "x",
+            "y",
+            "base",
+            "width",
+            "height"
+          ]
+        }
+      }
+    };
+    static overrides = {
+      scales: {
+        _index_: {
+          type: "category",
+          offset: true,
+          grid: {
+            offset: true
+          }
+        },
+        _value_: {
+          type: "linear",
+          beginAtZero: true
+        }
+      }
+    };
     parsePrimitiveData(meta, data, start3, count) {
       return parseArrayOrPrimitive(meta, data, start3, count);
     }
@@ -44933,13 +47326,16 @@ img.ProseMirror-separator {
       const { sharedOptions, includeOptions } = this._getSharedOptions(start3, mode);
       for (let i = start3; i < start3 + count; i++) {
         const parsed = this.getParsed(i);
-        const vpixels = reset2 || isNullOrUndef(parsed[vScale.axis]) ? { base: base2, head: base2 } : this._calculateBarValuePixels(i);
+        const vpixels = reset2 || isNullOrUndef(parsed[vScale.axis]) ? {
+          base: base2,
+          head: base2
+        } : this._calculateBarValuePixels(i);
         const ipixels = this._calculateBarIndexPixels(i, ruler);
         const stack = (parsed._stacks || {})[vScale.axis];
         const properties = {
           horizontal,
           base: vpixels.base,
-          enableBorderRadius: !stack || isFloatBar(parsed._custom) || (index3 === stack._top || index3 === stack._bottom),
+          enableBorderRadius: !stack || isFloatBar(parsed._custom) || index3 === stack._top || index3 === stack._bottom,
           x: horizontal ? vpixels.head : ipixels.center,
           y: horizontal ? ipixels.center : vpixels.head,
           height: horizontal ? ipixels.size : Math.abs(vpixels.size),
@@ -45013,7 +47409,7 @@ img.ProseMirror-separator {
       };
     }
     _calculateBarValuePixels(index3) {
-      const { _cachedMeta: { vScale, _stacked }, options: { base: baseValue, minBarLength } } = this;
+      const { _cachedMeta: { vScale, _stacked, index: datasetIndex }, options: { base: baseValue, minBarLength } } = this;
       const actualBase = baseValue || 0;
       const parsed = this.getParsed(index3);
       const custom = parsed._custom;
@@ -45053,6 +47449,9 @@ img.ProseMirror-separator {
         const max2 = Math.max(startPixel, endPixel);
         base2 = Math.max(Math.min(base2, max2), min2);
         head = base2 + size;
+        if (_stacked && !floating) {
+          parsed._stacks[vScale.axis]._visualValues[datasetIndex] = vScale.getValueForPixel(head) - vScale.getValueForPixel(base2);
+        }
       }
       if (base2 === vScale.getPixelForValue(actualBase)) {
         const halfGrid = sign(size) * vScale.getLineWidthForValue(actualBase) / 2;
@@ -45102,36 +47501,33 @@ img.ProseMirror-separator {
       }
     }
   };
-  BarController.id = "bar";
-  BarController.defaults = {
-    datasetElementType: false,
-    dataElementType: "bar",
-    categoryPercentage: 0.8,
-    barPercentage: 0.9,
-    grouped: true,
-    animations: {
-      numbers: {
-        type: "number",
-        properties: ["x", "y", "base", "width", "height"]
-      }
-    }
-  };
-  BarController.overrides = {
-    scales: {
-      _index_: {
-        type: "category",
-        offset: true,
-        grid: {
-          offset: true
-        }
-      },
-      _value_: {
-        type: "linear",
-        beginAtZero: true
-      }
-    }
-  };
   var BubbleController = class extends DatasetController {
+    static id = "bubble";
+    static defaults = {
+      datasetElementType: false,
+      dataElementType: "point",
+      animations: {
+        numbers: {
+          type: "number",
+          properties: [
+            "x",
+            "y",
+            "borderWidth",
+            "radius"
+          ]
+        }
+      }
+    };
+    static overrides = {
+      scales: {
+        x: {
+          type: "linear"
+        },
+        y: {
+          type: "linear"
+        }
+      }
+    };
     initialize() {
       this.enableOptionSharing = true;
       super.initialize();
@@ -45169,13 +47565,14 @@ img.ProseMirror-separator {
     }
     getLabelAndValue(index3) {
       const meta = this._cachedMeta;
+      const labels = this.chart.data.labels || [];
       const { xScale, yScale } = meta;
       const parsed = this.getParsed(index3);
       const x = xScale.getLabelForValue(parsed.x);
       const y = yScale.getLabelForValue(parsed.y);
       const r = parsed._custom;
       return {
-        label: meta.label,
+        label: labels[index3] || "",
         value: "(" + x + ", " + y + (r ? ", " + r : "") + ")"
       };
     }
@@ -45209,7 +47606,9 @@ img.ProseMirror-separator {
       const parsed = this.getParsed(index3);
       let values = super.resolveDataElementOptions(index3, mode);
       if (values.$shared) {
-        values = Object.assign({}, values, { $shared: false });
+        values = Object.assign({}, values, {
+          $shared: false
+        });
       }
       const radius = values.radius;
       if (mode !== "active") {
@@ -45217,36 +47616,6 @@ img.ProseMirror-separator {
       }
       values.radius += valueOrDefault(parsed && parsed._custom, radius);
       return values;
-    }
-  };
-  BubbleController.id = "bubble";
-  BubbleController.defaults = {
-    datasetElementType: false,
-    dataElementType: "point",
-    animations: {
-      numbers: {
-        type: "number",
-        properties: ["x", "y", "borderWidth", "radius"]
-      }
-    }
-  };
-  BubbleController.overrides = {
-    scales: {
-      x: {
-        type: "linear"
-      },
-      y: {
-        type: "linear"
-      }
-    },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          title() {
-            return "";
-          }
-        }
-      }
     }
   };
   function getRatioAndOffset(rotation, circumference, cutout) {
@@ -45272,9 +47641,84 @@ img.ProseMirror-separator {
       offsetX = -(maxX + minX) / 2;
       offsetY = -(maxY + minY) / 2;
     }
-    return { ratioX, ratioY, offsetX, offsetY };
+    return {
+      ratioX,
+      ratioY,
+      offsetX,
+      offsetY
+    };
   }
   var DoughnutController = class extends DatasetController {
+    static id = "doughnut";
+    static defaults = {
+      datasetElementType: false,
+      dataElementType: "arc",
+      animation: {
+        animateRotate: true,
+        animateScale: false
+      },
+      animations: {
+        numbers: {
+          type: "number",
+          properties: [
+            "circumference",
+            "endAngle",
+            "innerRadius",
+            "outerRadius",
+            "startAngle",
+            "x",
+            "y",
+            "offset",
+            "borderWidth",
+            "spacing"
+          ]
+        }
+      },
+      cutout: "50%",
+      rotation: 0,
+      circumference: 360,
+      radius: "100%",
+      spacing: 0,
+      indexAxis: "r"
+    };
+    static descriptors = {
+      _scriptable: (name) => name !== "spacing",
+      _indexable: (name) => name !== "spacing" && !name.startsWith("borderDash") && !name.startsWith("hoverBorderDash")
+    };
+    static overrides = {
+      aspectRatio: 1,
+      plugins: {
+        legend: {
+          labels: {
+            generateLabels(chart) {
+              const data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                const { labels: { pointStyle, color: color2 } } = chart.legend.options;
+                return data.labels.map((label, i) => {
+                  const meta = chart.getDatasetMeta(0);
+                  const style2 = meta.controller.getStyle(i);
+                  return {
+                    text: label,
+                    fillStyle: style2.backgroundColor,
+                    strokeStyle: style2.borderColor,
+                    fontColor: color2,
+                    lineWidth: style2.borderWidth,
+                    pointStyle,
+                    hidden: !chart.getDataVisibility(i),
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
+          },
+          onClick(e, legendItem, legend) {
+            legend.chart.toggleDataVisibility(legendItem.index);
+            legend.chart.update();
+          }
+        }
+      }
+    };
     constructor(chart, datasetIndex) {
       super(chart, datasetIndex);
       this.enableOptionSharing = true;
@@ -45312,7 +47756,7 @@ img.ProseMirror-separator {
       let min2 = TAU;
       let max2 = -TAU;
       for (let i = 0; i < this.chart.data.datasets.length; ++i) {
-        if (this.chart.isDatasetVisible(i)) {
+        if (this.chart.isDatasetVisible(i) && this.chart.getDatasetMeta(i).type === this._type) {
           const controller = this.chart.getDatasetMeta(i).controller;
           const rotation = controller._getRotation();
           const circumference = controller._getCircumference();
@@ -45473,83 +47917,24 @@ img.ProseMirror-separator {
       return this._getRingWeightOffset(this.chart.data.datasets.length) || 1;
     }
   };
-  DoughnutController.id = "doughnut";
-  DoughnutController.defaults = {
-    datasetElementType: false,
-    dataElementType: "arc",
-    animation: {
-      animateRotate: true,
-      animateScale: false
-    },
-    animations: {
-      numbers: {
-        type: "number",
-        properties: ["circumference", "endAngle", "innerRadius", "outerRadius", "startAngle", "x", "y", "offset", "borderWidth", "spacing"]
-      }
-    },
-    cutout: "50%",
-    rotation: 0,
-    circumference: 360,
-    radius: "100%",
-    spacing: 0,
-    indexAxis: "r"
-  };
-  DoughnutController.descriptors = {
-    _scriptable: (name) => name !== "spacing",
-    _indexable: (name) => name !== "spacing"
-  };
-  DoughnutController.overrides = {
-    aspectRatio: 1,
-    plugins: {
-      legend: {
-        labels: {
-          generateLabels(chart) {
-            const data = chart.data;
-            if (data.labels.length && data.datasets.length) {
-              const { labels: { pointStyle } } = chart.legend.options;
-              return data.labels.map((label, i) => {
-                const meta = chart.getDatasetMeta(0);
-                const style2 = meta.controller.getStyle(i);
-                return {
-                  text: label,
-                  fillStyle: style2.backgroundColor,
-                  strokeStyle: style2.borderColor,
-                  lineWidth: style2.borderWidth,
-                  pointStyle,
-                  hidden: !chart.getDataVisibility(i),
-                  index: i
-                };
-              });
-            }
-            return [];
-          }
-        },
-        onClick(e, legendItem, legend) {
-          legend.chart.toggleDataVisibility(legendItem.index);
-          legend.chart.update();
-        }
-      },
-      tooltip: {
-        callbacks: {
-          title() {
-            return "";
-          },
-          label(tooltipItem) {
-            let dataLabel = tooltipItem.label;
-            const value = ": " + tooltipItem.formattedValue;
-            if (isArray(dataLabel)) {
-              dataLabel = dataLabel.slice();
-              dataLabel[0] += value;
-            } else {
-              dataLabel += value;
-            }
-            return dataLabel;
-          }
-        }
-      }
-    }
-  };
   var LineController = class extends DatasetController {
+    static id = "line";
+    static defaults = {
+      datasetElementType: "line",
+      dataElementType: "point",
+      showLine: true,
+      spanGaps: false
+    };
+    static overrides = {
+      scales: {
+        _index_: {
+          type: "category"
+        },
+        _value_: {
+          type: "linear"
+        }
+      }
+    };
     initialize() {
       this.enableOptionSharing = true;
       this.supportsDecimation = true;
@@ -45590,11 +47975,17 @@ img.ProseMirror-separator {
       const { spanGaps, segment } = this.options;
       const maxGapLength = isNumber(spanGaps) ? spanGaps : Number.POSITIVE_INFINITY;
       const directUpdate = this.chart._animationsDisabled || reset2 || mode === "none";
+      const end2 = start3 + count;
+      const pointsCount = points.length;
       let prevParsed = start3 > 0 && this.getParsed(start3 - 1);
-      for (let i = start3; i < start3 + count; ++i) {
+      for (let i = 0; i < pointsCount; ++i) {
         const point = points[i];
-        const parsed = this.getParsed(i);
         const properties = directUpdate ? point : {};
+        if (i < start3 || i >= end2) {
+          properties.skip = true;
+          continue;
+        }
+        const parsed = this.getParsed(i);
         const nullData = isNullOrUndef(parsed[vAxis]);
         const iPixel = properties[iAxis] = iScale.getPixelForValue(parsed[iAxis], i);
         const vPixel = properties[vAxis] = reset2 || nullData ? vScale.getBasePixel() : vScale.getPixelForValue(_stacked ? this.applyStack(vScale, parsed, _stacked) : parsed[vAxis], i);
@@ -45631,24 +48022,80 @@ img.ProseMirror-separator {
       super.draw();
     }
   };
-  LineController.id = "line";
-  LineController.defaults = {
-    datasetElementType: "line",
-    dataElementType: "point",
-    showLine: true,
-    spanGaps: false
-  };
-  LineController.overrides = {
-    scales: {
-      _index_: {
-        type: "category"
-      },
-      _value_: {
-        type: "linear"
-      }
-    }
-  };
   var PolarAreaController = class extends DatasetController {
+    static id = "polarArea";
+    static defaults = {
+      dataElementType: "arc",
+      animation: {
+        animateRotate: true,
+        animateScale: true
+      },
+      animations: {
+        numbers: {
+          type: "number",
+          properties: [
+            "x",
+            "y",
+            "startAngle",
+            "endAngle",
+            "innerRadius",
+            "outerRadius"
+          ]
+        }
+      },
+      indexAxis: "r",
+      startAngle: 0
+    };
+    static overrides = {
+      aspectRatio: 1,
+      plugins: {
+        legend: {
+          labels: {
+            generateLabels(chart) {
+              const data = chart.data;
+              if (data.labels.length && data.datasets.length) {
+                const { labels: { pointStyle, color: color2 } } = chart.legend.options;
+                return data.labels.map((label, i) => {
+                  const meta = chart.getDatasetMeta(0);
+                  const style2 = meta.controller.getStyle(i);
+                  return {
+                    text: label,
+                    fillStyle: style2.backgroundColor,
+                    strokeStyle: style2.borderColor,
+                    fontColor: color2,
+                    lineWidth: style2.borderWidth,
+                    pointStyle,
+                    hidden: !chart.getDataVisibility(i),
+                    index: i
+                  };
+                });
+              }
+              return [];
+            }
+          },
+          onClick(e, legendItem, legend) {
+            legend.chart.toggleDataVisibility(legendItem.index);
+            legend.chart.update();
+          }
+        }
+      },
+      scales: {
+        r: {
+          type: "radialLinear",
+          angleLines: {
+            display: false
+          },
+          beginAtZero: true,
+          grid: {
+            circular: true
+          },
+          pointLabels: {
+            display: false
+          },
+          startAngle: 0
+        }
+      }
+    };
     constructor(chart, datasetIndex) {
       super(chart, datasetIndex);
       this.innerRadius = void 0;
@@ -45674,7 +48121,10 @@ img.ProseMirror-separator {
     }
     getMinMax() {
       const meta = this._cachedMeta;
-      const range = { min: Number.POSITIVE_INFINITY, max: Number.NEGATIVE_INFINITY };
+      const range = {
+        min: Number.POSITIVE_INFINITY,
+        max: Number.NEGATIVE_INFINITY
+      };
       meta.data.forEach((element, index3) => {
         const parsed = this.getParsed(index3).r;
         if (!isNaN(parsed) && this.chart.getDataVisibility(index3)) {
@@ -45754,91 +48204,36 @@ img.ProseMirror-separator {
       return this.chart.getDataVisibility(index3) ? toRadians(this.resolveDataElementOptions(index3, mode).angle || defaultAngle) : 0;
     }
   };
-  PolarAreaController.id = "polarArea";
-  PolarAreaController.defaults = {
-    dataElementType: "arc",
-    animation: {
-      animateRotate: true,
-      animateScale: true
-    },
-    animations: {
-      numbers: {
-        type: "number",
-        properties: ["x", "y", "startAngle", "endAngle", "innerRadius", "outerRadius"]
-      }
-    },
-    indexAxis: "r",
-    startAngle: 0
-  };
-  PolarAreaController.overrides = {
-    aspectRatio: 1,
-    plugins: {
-      legend: {
-        labels: {
-          generateLabels(chart) {
-            const data = chart.data;
-            if (data.labels.length && data.datasets.length) {
-              const { labels: { pointStyle } } = chart.legend.options;
-              return data.labels.map((label, i) => {
-                const meta = chart.getDatasetMeta(0);
-                const style2 = meta.controller.getStyle(i);
-                return {
-                  text: label,
-                  fillStyle: style2.backgroundColor,
-                  strokeStyle: style2.borderColor,
-                  lineWidth: style2.borderWidth,
-                  pointStyle,
-                  hidden: !chart.getDataVisibility(i),
-                  index: i
-                };
-              });
-            }
-            return [];
-          }
-        },
-        onClick(e, legendItem, legend) {
-          legend.chart.toggleDataVisibility(legendItem.index);
-          legend.chart.update();
-        }
-      },
-      tooltip: {
-        callbacks: {
-          title() {
-            return "";
-          },
-          label(context) {
-            return context.chart.data.labels[context.dataIndex] + ": " + context.formattedValue;
-          }
-        }
-      }
-    },
-    scales: {
-      r: {
-        type: "radialLinear",
-        angleLines: {
-          display: false
-        },
-        beginAtZero: true,
-        grid: {
-          circular: true
-        },
-        pointLabels: {
-          display: false
-        },
-        startAngle: 0
-      }
-    }
-  };
   var PieController = class extends DoughnutController {
-  };
-  PieController.id = "pie";
-  PieController.defaults = {
-    cutout: 0,
-    rotation: 0,
-    circumference: 360,
-    radius: "100%"
+    static id = "pie";
+    static defaults = {
+      cutout: 0,
+      rotation: 0,
+      circumference: 360,
+      radius: "100%"
+    };
   };
   var RadarController = class extends DatasetController {
+    static id = "radar";
+    static defaults = {
+      datasetElementType: "line",
+      dataElementType: "point",
+      indexAxis: "r",
+      showLine: true,
+      elements: {
+        line: {
+          fill: "start"
+        }
+      }
+    };
+    static overrides = {
+      aspectRatio: 1,
+      scales: {
+        r: {
+          type: "radialLinear"
+        }
+      }
+    };
     getLabelAndValue(index3) {
       const vScale = this._cachedMeta.vScale;
       const parsed = this.getParsed(index3);
@@ -45890,37 +48285,1050 @@ img.ProseMirror-separator {
       }
     }
   };
-  RadarController.id = "radar";
-  RadarController.defaults = {
-    datasetElementType: "line",
-    dataElementType: "point",
-    indexAxis: "r",
-    showLine: true,
-    elements: {
-      line: {
-        fill: "start"
+  var ScatterController = class extends DatasetController {
+    static id = "scatter";
+    static defaults = {
+      datasetElementType: false,
+      dataElementType: "point",
+      showLine: false,
+      fill: false
+    };
+    static overrides = {
+      interaction: {
+        mode: "point"
+      },
+      scales: {
+        x: {
+          type: "linear"
+        },
+        y: {
+          type: "linear"
+        }
+      }
+    };
+    getLabelAndValue(index3) {
+      const meta = this._cachedMeta;
+      const labels = this.chart.data.labels || [];
+      const { xScale, yScale } = meta;
+      const parsed = this.getParsed(index3);
+      const x = xScale.getLabelForValue(parsed.x);
+      const y = yScale.getLabelForValue(parsed.y);
+      return {
+        label: labels[index3] || "",
+        value: "(" + x + ", " + y + ")"
+      };
+    }
+    update(mode) {
+      const meta = this._cachedMeta;
+      const { data: points = [] } = meta;
+      const animationsDisabled = this.chart._animationsDisabled;
+      let { start: start3, count } = _getStartAndCountOfVisiblePoints(meta, points, animationsDisabled);
+      this._drawStart = start3;
+      this._drawCount = count;
+      if (_scaleRangesChanged(meta)) {
+        start3 = 0;
+        count = points.length;
+      }
+      if (this.options.showLine) {
+        if (!this.datasetElementType) {
+          this.addElements();
+        }
+        const { dataset: line, _dataset } = meta;
+        line._chart = this.chart;
+        line._datasetIndex = this.index;
+        line._decimated = !!_dataset._decimated;
+        line.points = points;
+        const options = this.resolveDatasetElementOptions(mode);
+        options.segment = this.options.segment;
+        this.updateElement(line, void 0, {
+          animated: !animationsDisabled,
+          options
+        }, mode);
+      } else if (this.datasetElementType) {
+        delete meta.dataset;
+        this.datasetElementType = false;
+      }
+      this.updateElements(points, start3, count, mode);
+    }
+    addElements() {
+      const { showLine } = this.options;
+      if (!this.datasetElementType && showLine) {
+        this.datasetElementType = this.chart.registry.getElement("line");
+      }
+      super.addElements();
+    }
+    updateElements(points, start3, count, mode) {
+      const reset2 = mode === "reset";
+      const { iScale, vScale, _stacked, _dataset } = this._cachedMeta;
+      const firstOpts = this.resolveDataElementOptions(start3, mode);
+      const sharedOptions = this.getSharedOptions(firstOpts);
+      const includeOptions = this.includeOptions(mode, sharedOptions);
+      const iAxis = iScale.axis;
+      const vAxis = vScale.axis;
+      const { spanGaps, segment } = this.options;
+      const maxGapLength = isNumber(spanGaps) ? spanGaps : Number.POSITIVE_INFINITY;
+      const directUpdate = this.chart._animationsDisabled || reset2 || mode === "none";
+      let prevParsed = start3 > 0 && this.getParsed(start3 - 1);
+      for (let i = start3; i < start3 + count; ++i) {
+        const point = points[i];
+        const parsed = this.getParsed(i);
+        const properties = directUpdate ? point : {};
+        const nullData = isNullOrUndef(parsed[vAxis]);
+        const iPixel = properties[iAxis] = iScale.getPixelForValue(parsed[iAxis], i);
+        const vPixel = properties[vAxis] = reset2 || nullData ? vScale.getBasePixel() : vScale.getPixelForValue(_stacked ? this.applyStack(vScale, parsed, _stacked) : parsed[vAxis], i);
+        properties.skip = isNaN(iPixel) || isNaN(vPixel) || nullData;
+        properties.stop = i > 0 && Math.abs(parsed[iAxis] - prevParsed[iAxis]) > maxGapLength;
+        if (segment) {
+          properties.parsed = parsed;
+          properties.raw = _dataset.data[i];
+        }
+        if (includeOptions) {
+          properties.options = sharedOptions || this.resolveDataElementOptions(i, point.active ? "active" : mode);
+        }
+        if (!directUpdate) {
+          this.updateElement(point, i, properties, mode);
+        }
+        prevParsed = parsed;
+      }
+      this.updateSharedOptions(sharedOptions, mode, firstOpts);
+    }
+    getMaxOverflow() {
+      const meta = this._cachedMeta;
+      const data = meta.data || [];
+      if (!this.options.showLine) {
+        let max2 = 0;
+        for (let i = data.length - 1; i >= 0; --i) {
+          max2 = Math.max(max2, data[i].size(this.resolveDataElementOptions(i)) / 2);
+        }
+        return max2 > 0 && max2;
+      }
+      const dataset = meta.dataset;
+      const border = dataset.options && dataset.options.borderWidth || 0;
+      if (!data.length) {
+        return border;
+      }
+      const firstPoint = data[0].size(this.resolveDataElementOptions(0));
+      const lastPoint = data[data.length - 1].size(this.resolveDataElementOptions(data.length - 1));
+      return Math.max(border, firstPoint, lastPoint) / 2;
+    }
+  };
+  var controllers = /* @__PURE__ */ Object.freeze({
+    __proto__: null,
+    BarController,
+    BubbleController,
+    DoughnutController,
+    LineController,
+    PieController,
+    PolarAreaController,
+    RadarController,
+    ScatterController
+  });
+  function abstract() {
+    throw new Error("This method is not implemented: Check that a complete date adapter is provided.");
+  }
+  var DateAdapterBase = class _DateAdapterBase {
+    /**
+    * Override default date adapter methods.
+    * Accepts type parameter to define options type.
+    * @example
+    * Chart._adapters._date.override<{myAdapterOption: string}>({
+    *   init() {
+    *     console.log(this.options.myAdapterOption);
+    *   }
+    * })
+    */
+    static override(members) {
+      Object.assign(_DateAdapterBase.prototype, members);
+    }
+    options;
+    constructor(options) {
+      this.options = options || {};
+    }
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    init() {
+    }
+    formats() {
+      return abstract();
+    }
+    parse() {
+      return abstract();
+    }
+    format() {
+      return abstract();
+    }
+    add() {
+      return abstract();
+    }
+    diff() {
+      return abstract();
+    }
+    startOf() {
+      return abstract();
+    }
+    endOf() {
+      return abstract();
+    }
+  };
+  var adapters = {
+    _date: DateAdapterBase
+  };
+  function binarySearch(metaset, axis, value, intersect) {
+    const { controller, data, _sorted } = metaset;
+    const iScale = controller._cachedMeta.iScale;
+    if (iScale && axis === iScale.axis && axis !== "r" && _sorted && data.length) {
+      const lookupMethod = iScale._reversePixels ? _rlookupByKey : _lookupByKey;
+      if (!intersect) {
+        return lookupMethod(data, axis, value);
+      } else if (controller._sharedOptions) {
+        const el = data[0];
+        const range = typeof el.getRange === "function" && el.getRange(axis);
+        if (range) {
+          const start3 = lookupMethod(data, axis, value - range);
+          const end2 = lookupMethod(data, axis, value + range);
+          return {
+            lo: start3.lo,
+            hi: end2.hi
+          };
+        }
+      }
+    }
+    return {
+      lo: 0,
+      hi: data.length - 1
+    };
+  }
+  function evaluateInteractionItems(chart, axis, position, handler, intersect) {
+    const metasets = chart.getSortedVisibleDatasetMetas();
+    const value = position[axis];
+    for (let i = 0, ilen = metasets.length; i < ilen; ++i) {
+      const { index: index3, data } = metasets[i];
+      const { lo, hi } = binarySearch(metasets[i], axis, value, intersect);
+      for (let j = lo; j <= hi; ++j) {
+        const element = data[j];
+        if (!element.skip) {
+          handler(element, index3, j);
+        }
+      }
+    }
+  }
+  function getDistanceMetricForAxis(axis) {
+    const useX = axis.indexOf("x") !== -1;
+    const useY = axis.indexOf("y") !== -1;
+    return function(pt1, pt2) {
+      const deltaX = useX ? Math.abs(pt1.x - pt2.x) : 0;
+      const deltaY = useY ? Math.abs(pt1.y - pt2.y) : 0;
+      return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+    };
+  }
+  function getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible) {
+    const items = [];
+    if (!includeInvisible && !chart.isPointInArea(position)) {
+      return items;
+    }
+    const evaluationFunc = function(element, datasetIndex, index3) {
+      if (!includeInvisible && !_isPointInArea(element, chart.chartArea, 0)) {
+        return;
+      }
+      if (element.inRange(position.x, position.y, useFinalPosition)) {
+        items.push({
+          element,
+          datasetIndex,
+          index: index3
+        });
+      }
+    };
+    evaluateInteractionItems(chart, axis, position, evaluationFunc, true);
+    return items;
+  }
+  function getNearestRadialItems(chart, position, axis, useFinalPosition) {
+    let items = [];
+    function evaluationFunc(element, datasetIndex, index3) {
+      const { startAngle, endAngle } = element.getProps([
+        "startAngle",
+        "endAngle"
+      ], useFinalPosition);
+      const { angle } = getAngleFromPoint(element, {
+        x: position.x,
+        y: position.y
+      });
+      if (_angleBetween(angle, startAngle, endAngle)) {
+        items.push({
+          element,
+          datasetIndex,
+          index: index3
+        });
+      }
+    }
+    evaluateInteractionItems(chart, axis, position, evaluationFunc);
+    return items;
+  }
+  function getNearestCartesianItems(chart, position, axis, intersect, useFinalPosition, includeInvisible) {
+    let items = [];
+    const distanceMetric = getDistanceMetricForAxis(axis);
+    let minDistance = Number.POSITIVE_INFINITY;
+    function evaluationFunc(element, datasetIndex, index3) {
+      const inRange2 = element.inRange(position.x, position.y, useFinalPosition);
+      if (intersect && !inRange2) {
+        return;
+      }
+      const center = element.getCenterPoint(useFinalPosition);
+      const pointInArea = !!includeInvisible || chart.isPointInArea(center);
+      if (!pointInArea && !inRange2) {
+        return;
+      }
+      const distance = distanceMetric(position, center);
+      if (distance < minDistance) {
+        items = [
+          {
+            element,
+            datasetIndex,
+            index: index3
+          }
+        ];
+        minDistance = distance;
+      } else if (distance === minDistance) {
+        items.push({
+          element,
+          datasetIndex,
+          index: index3
+        });
+      }
+    }
+    evaluateInteractionItems(chart, axis, position, evaluationFunc);
+    return items;
+  }
+  function getNearestItems(chart, position, axis, intersect, useFinalPosition, includeInvisible) {
+    if (!includeInvisible && !chart.isPointInArea(position)) {
+      return [];
+    }
+    return axis === "r" && !intersect ? getNearestRadialItems(chart, position, axis, useFinalPosition) : getNearestCartesianItems(chart, position, axis, intersect, useFinalPosition, includeInvisible);
+  }
+  function getAxisItems(chart, position, axis, intersect, useFinalPosition) {
+    const items = [];
+    const rangeMethod = axis === "x" ? "inXRange" : "inYRange";
+    let intersectsItem = false;
+    evaluateInteractionItems(chart, axis, position, (element, datasetIndex, index3) => {
+      if (element[rangeMethod](position[axis], useFinalPosition)) {
+        items.push({
+          element,
+          datasetIndex,
+          index: index3
+        });
+        intersectsItem = intersectsItem || element.inRange(position.x, position.y, useFinalPosition);
+      }
+    });
+    if (intersect && !intersectsItem) {
+      return [];
+    }
+    return items;
+  }
+  var Interaction = {
+    evaluateInteractionItems,
+    modes: {
+      index(chart, e, options, useFinalPosition) {
+        const position = getRelativePosition(e, chart);
+        const axis = options.axis || "x";
+        const includeInvisible = options.includeInvisible || false;
+        const items = options.intersect ? getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible) : getNearestItems(chart, position, axis, false, useFinalPosition, includeInvisible);
+        const elements2 = [];
+        if (!items.length) {
+          return [];
+        }
+        chart.getSortedVisibleDatasetMetas().forEach((meta) => {
+          const index3 = items[0].index;
+          const element = meta.data[index3];
+          if (element && !element.skip) {
+            elements2.push({
+              element,
+              datasetIndex: meta.index,
+              index: index3
+            });
+          }
+        });
+        return elements2;
+      },
+      dataset(chart, e, options, useFinalPosition) {
+        const position = getRelativePosition(e, chart);
+        const axis = options.axis || "xy";
+        const includeInvisible = options.includeInvisible || false;
+        let items = options.intersect ? getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible) : getNearestItems(chart, position, axis, false, useFinalPosition, includeInvisible);
+        if (items.length > 0) {
+          const datasetIndex = items[0].datasetIndex;
+          const data = chart.getDatasetMeta(datasetIndex).data;
+          items = [];
+          for (let i = 0; i < data.length; ++i) {
+            items.push({
+              element: data[i],
+              datasetIndex,
+              index: i
+            });
+          }
+        }
+        return items;
+      },
+      point(chart, e, options, useFinalPosition) {
+        const position = getRelativePosition(e, chart);
+        const axis = options.axis || "xy";
+        const includeInvisible = options.includeInvisible || false;
+        return getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible);
+      },
+      nearest(chart, e, options, useFinalPosition) {
+        const position = getRelativePosition(e, chart);
+        const axis = options.axis || "xy";
+        const includeInvisible = options.includeInvisible || false;
+        return getNearestItems(chart, position, axis, options.intersect, useFinalPosition, includeInvisible);
+      },
+      x(chart, e, options, useFinalPosition) {
+        const position = getRelativePosition(e, chart);
+        return getAxisItems(chart, position, "x", options.intersect, useFinalPosition);
+      },
+      y(chart, e, options, useFinalPosition) {
+        const position = getRelativePosition(e, chart);
+        return getAxisItems(chart, position, "y", options.intersect, useFinalPosition);
       }
     }
   };
-  RadarController.overrides = {
-    aspectRatio: 1,
-    scales: {
-      r: {
-        type: "radialLinear"
+  var STATIC_POSITIONS = [
+    "left",
+    "top",
+    "right",
+    "bottom"
+  ];
+  function filterByPosition(array, position) {
+    return array.filter((v) => v.pos === position);
+  }
+  function filterDynamicPositionByAxis(array, axis) {
+    return array.filter((v) => STATIC_POSITIONS.indexOf(v.pos) === -1 && v.box.axis === axis);
+  }
+  function sortByWeight(array, reverse) {
+    return array.sort((a, b) => {
+      const v0 = reverse ? b : a;
+      const v1 = reverse ? a : b;
+      return v0.weight === v1.weight ? v0.index - v1.index : v0.weight - v1.weight;
+    });
+  }
+  function wrapBoxes(boxes) {
+    const layoutBoxes = [];
+    let i, ilen, box, pos, stack, stackWeight;
+    for (i = 0, ilen = (boxes || []).length; i < ilen; ++i) {
+      box = boxes[i];
+      ({ position: pos, options: { stack, stackWeight = 1 } } = box);
+      layoutBoxes.push({
+        index: i,
+        box,
+        pos,
+        horizontal: box.isHorizontal(),
+        weight: box.weight,
+        stack: stack && pos + stack,
+        stackWeight
+      });
+    }
+    return layoutBoxes;
+  }
+  function buildStacks(layouts2) {
+    const stacks = {};
+    for (const wrap2 of layouts2) {
+      const { stack, pos, stackWeight } = wrap2;
+      if (!stack || !STATIC_POSITIONS.includes(pos)) {
+        continue;
+      }
+      const _stack = stacks[stack] || (stacks[stack] = {
+        count: 0,
+        placed: 0,
+        weight: 0,
+        size: 0
+      });
+      _stack.count++;
+      _stack.weight += stackWeight;
+    }
+    return stacks;
+  }
+  function setLayoutDims(layouts2, params) {
+    const stacks = buildStacks(layouts2);
+    const { vBoxMaxWidth, hBoxMaxHeight } = params;
+    let i, ilen, layout;
+    for (i = 0, ilen = layouts2.length; i < ilen; ++i) {
+      layout = layouts2[i];
+      const { fullSize } = layout.box;
+      const stack = stacks[layout.stack];
+      const factor = stack && layout.stackWeight / stack.weight;
+      if (layout.horizontal) {
+        layout.width = factor ? factor * vBoxMaxWidth : fullSize && params.availableWidth;
+        layout.height = hBoxMaxHeight;
+      } else {
+        layout.width = vBoxMaxWidth;
+        layout.height = factor ? factor * hBoxMaxHeight : fullSize && params.availableHeight;
       }
     }
+    return stacks;
+  }
+  function buildLayoutBoxes(boxes) {
+    const layoutBoxes = wrapBoxes(boxes);
+    const fullSize = sortByWeight(layoutBoxes.filter((wrap2) => wrap2.box.fullSize), true);
+    const left2 = sortByWeight(filterByPosition(layoutBoxes, "left"), true);
+    const right2 = sortByWeight(filterByPosition(layoutBoxes, "right"));
+    const top2 = sortByWeight(filterByPosition(layoutBoxes, "top"), true);
+    const bottom2 = sortByWeight(filterByPosition(layoutBoxes, "bottom"));
+    const centerHorizontal = filterDynamicPositionByAxis(layoutBoxes, "x");
+    const centerVertical = filterDynamicPositionByAxis(layoutBoxes, "y");
+    return {
+      fullSize,
+      leftAndTop: left2.concat(top2),
+      rightAndBottom: right2.concat(centerVertical).concat(bottom2).concat(centerHorizontal),
+      chartArea: filterByPosition(layoutBoxes, "chartArea"),
+      vertical: left2.concat(right2).concat(centerVertical),
+      horizontal: top2.concat(bottom2).concat(centerHorizontal)
+    };
+  }
+  function getCombinedMax(maxPadding, chartArea, a, b) {
+    return Math.max(maxPadding[a], chartArea[a]) + Math.max(maxPadding[b], chartArea[b]);
+  }
+  function updateMaxPadding(maxPadding, boxPadding) {
+    maxPadding.top = Math.max(maxPadding.top, boxPadding.top);
+    maxPadding.left = Math.max(maxPadding.left, boxPadding.left);
+    maxPadding.bottom = Math.max(maxPadding.bottom, boxPadding.bottom);
+    maxPadding.right = Math.max(maxPadding.right, boxPadding.right);
+  }
+  function updateDims(chartArea, params, layout, stacks) {
+    const { pos, box } = layout;
+    const maxPadding = chartArea.maxPadding;
+    if (!isObject(pos)) {
+      if (layout.size) {
+        chartArea[pos] -= layout.size;
+      }
+      const stack = stacks[layout.stack] || {
+        size: 0,
+        count: 1
+      };
+      stack.size = Math.max(stack.size, layout.horizontal ? box.height : box.width);
+      layout.size = stack.size / stack.count;
+      chartArea[pos] += layout.size;
+    }
+    if (box.getPadding) {
+      updateMaxPadding(maxPadding, box.getPadding());
+    }
+    const newWidth = Math.max(0, params.outerWidth - getCombinedMax(maxPadding, chartArea, "left", "right"));
+    const newHeight = Math.max(0, params.outerHeight - getCombinedMax(maxPadding, chartArea, "top", "bottom"));
+    const widthChanged = newWidth !== chartArea.w;
+    const heightChanged = newHeight !== chartArea.h;
+    chartArea.w = newWidth;
+    chartArea.h = newHeight;
+    return layout.horizontal ? {
+      same: widthChanged,
+      other: heightChanged
+    } : {
+      same: heightChanged,
+      other: widthChanged
+    };
+  }
+  function handleMaxPadding(chartArea) {
+    const maxPadding = chartArea.maxPadding;
+    function updatePos(pos) {
+      const change = Math.max(maxPadding[pos] - chartArea[pos], 0);
+      chartArea[pos] += change;
+      return change;
+    }
+    chartArea.y += updatePos("top");
+    chartArea.x += updatePos("left");
+    updatePos("right");
+    updatePos("bottom");
+  }
+  function getMargins(horizontal, chartArea) {
+    const maxPadding = chartArea.maxPadding;
+    function marginForPositions(positions2) {
+      const margin = {
+        left: 0,
+        top: 0,
+        right: 0,
+        bottom: 0
+      };
+      positions2.forEach((pos) => {
+        margin[pos] = Math.max(chartArea[pos], maxPadding[pos]);
+      });
+      return margin;
+    }
+    return horizontal ? marginForPositions([
+      "left",
+      "right"
+    ]) : marginForPositions([
+      "top",
+      "bottom"
+    ]);
+  }
+  function fitBoxes(boxes, chartArea, params, stacks) {
+    const refitBoxes = [];
+    let i, ilen, layout, box, refit, changed;
+    for (i = 0, ilen = boxes.length, refit = 0; i < ilen; ++i) {
+      layout = boxes[i];
+      box = layout.box;
+      box.update(layout.width || chartArea.w, layout.height || chartArea.h, getMargins(layout.horizontal, chartArea));
+      const { same, other } = updateDims(chartArea, params, layout, stacks);
+      refit |= same && refitBoxes.length;
+      changed = changed || other;
+      if (!box.fullSize) {
+        refitBoxes.push(layout);
+      }
+    }
+    return refit && fitBoxes(refitBoxes, chartArea, params, stacks) || changed;
+  }
+  function setBoxDims(box, left2, top2, width, height) {
+    box.top = top2;
+    box.left = left2;
+    box.right = left2 + width;
+    box.bottom = top2 + height;
+    box.width = width;
+    box.height = height;
+  }
+  function placeBoxes(boxes, chartArea, params, stacks) {
+    const userPadding = params.padding;
+    let { x, y } = chartArea;
+    for (const layout of boxes) {
+      const box = layout.box;
+      const stack = stacks[layout.stack] || {
+        count: 1,
+        placed: 0,
+        weight: 1
+      };
+      const weight = layout.stackWeight / stack.weight || 1;
+      if (layout.horizontal) {
+        const width = chartArea.w * weight;
+        const height = stack.size || box.height;
+        if (defined(stack.start)) {
+          y = stack.start;
+        }
+        if (box.fullSize) {
+          setBoxDims(box, userPadding.left, y, params.outerWidth - userPadding.right - userPadding.left, height);
+        } else {
+          setBoxDims(box, chartArea.left + stack.placed, y, width, height);
+        }
+        stack.start = y;
+        stack.placed += width;
+        y = box.bottom;
+      } else {
+        const height = chartArea.h * weight;
+        const width = stack.size || box.width;
+        if (defined(stack.start)) {
+          x = stack.start;
+        }
+        if (box.fullSize) {
+          setBoxDims(box, x, userPadding.top, width, params.outerHeight - userPadding.bottom - userPadding.top);
+        } else {
+          setBoxDims(box, x, chartArea.top + stack.placed, width, height);
+        }
+        stack.start = x;
+        stack.placed += height;
+        x = box.right;
+      }
+    }
+    chartArea.x = x;
+    chartArea.y = y;
+  }
+  var layouts = {
+    addBox(chart, item) {
+      if (!chart.boxes) {
+        chart.boxes = [];
+      }
+      item.fullSize = item.fullSize || false;
+      item.position = item.position || "top";
+      item.weight = item.weight || 0;
+      item._layers = item._layers || function() {
+        return [
+          {
+            z: 0,
+            draw(chartArea) {
+              item.draw(chartArea);
+            }
+          }
+        ];
+      };
+      chart.boxes.push(item);
+    },
+    removeBox(chart, layoutItem) {
+      const index3 = chart.boxes ? chart.boxes.indexOf(layoutItem) : -1;
+      if (index3 !== -1) {
+        chart.boxes.splice(index3, 1);
+      }
+    },
+    configure(chart, item, options) {
+      item.fullSize = options.fullSize;
+      item.position = options.position;
+      item.weight = options.weight;
+    },
+    update(chart, width, height, minPadding) {
+      if (!chart) {
+        return;
+      }
+      const padding = toPadding(chart.options.layout.padding);
+      const availableWidth = Math.max(width - padding.width, 0);
+      const availableHeight = Math.max(height - padding.height, 0);
+      const boxes = buildLayoutBoxes(chart.boxes);
+      const verticalBoxes = boxes.vertical;
+      const horizontalBoxes = boxes.horizontal;
+      each(chart.boxes, (box) => {
+        if (typeof box.beforeLayout === "function") {
+          box.beforeLayout();
+        }
+      });
+      const visibleVerticalBoxCount = verticalBoxes.reduce((total, wrap2) => wrap2.box.options && wrap2.box.options.display === false ? total : total + 1, 0) || 1;
+      const params = Object.freeze({
+        outerWidth: width,
+        outerHeight: height,
+        padding,
+        availableWidth,
+        availableHeight,
+        vBoxMaxWidth: availableWidth / 2 / visibleVerticalBoxCount,
+        hBoxMaxHeight: availableHeight / 2
+      });
+      const maxPadding = Object.assign({}, padding);
+      updateMaxPadding(maxPadding, toPadding(minPadding));
+      const chartArea = Object.assign({
+        maxPadding,
+        w: availableWidth,
+        h: availableHeight,
+        x: padding.left,
+        y: padding.top
+      }, padding);
+      const stacks = setLayoutDims(verticalBoxes.concat(horizontalBoxes), params);
+      fitBoxes(boxes.fullSize, chartArea, params, stacks);
+      fitBoxes(verticalBoxes, chartArea, params, stacks);
+      if (fitBoxes(horizontalBoxes, chartArea, params, stacks)) {
+        fitBoxes(verticalBoxes, chartArea, params, stacks);
+      }
+      handleMaxPadding(chartArea);
+      placeBoxes(boxes.leftAndTop, chartArea, params, stacks);
+      chartArea.x += chartArea.w;
+      chartArea.y += chartArea.h;
+      placeBoxes(boxes.rightAndBottom, chartArea, params, stacks);
+      chart.chartArea = {
+        left: chartArea.left,
+        top: chartArea.top,
+        right: chartArea.left + chartArea.w,
+        bottom: chartArea.top + chartArea.h,
+        height: chartArea.h,
+        width: chartArea.w
+      };
+      each(boxes.chartArea, (layout) => {
+        const box = layout.box;
+        Object.assign(box, chart.chartArea);
+        box.update(chartArea.w, chartArea.h, {
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0
+        });
+      });
+    }
   };
+  var BasePlatform = class {
+    acquireContext(canvas, aspectRatio) {
+    }
+    releaseContext(context) {
+      return false;
+    }
+    addEventListener(chart, type, listener) {
+    }
+    removeEventListener(chart, type, listener) {
+    }
+    getDevicePixelRatio() {
+      return 1;
+    }
+    getMaximumSize(element, width, height, aspectRatio) {
+      width = Math.max(0, width || element.width);
+      height = height || element.height;
+      return {
+        width,
+        height: Math.max(0, aspectRatio ? Math.floor(width / aspectRatio) : height)
+      };
+    }
+    isAttached(canvas) {
+      return true;
+    }
+    updateConfig(config) {
+    }
+  };
+  var BasicPlatform = class extends BasePlatform {
+    acquireContext(item) {
+      return item && item.getContext && item.getContext("2d") || null;
+    }
+    updateConfig(config) {
+      config.options.animation = false;
+    }
+  };
+  var EXPANDO_KEY = "$chartjs";
+  var EVENT_TYPES = {
+    touchstart: "mousedown",
+    touchmove: "mousemove",
+    touchend: "mouseup",
+    pointerenter: "mouseenter",
+    pointerdown: "mousedown",
+    pointermove: "mousemove",
+    pointerup: "mouseup",
+    pointerleave: "mouseout",
+    pointerout: "mouseout"
+  };
+  var isNullOrEmpty = (value) => value === null || value === "";
+  function initCanvas(canvas, aspectRatio) {
+    const style2 = canvas.style;
+    const renderHeight = canvas.getAttribute("height");
+    const renderWidth = canvas.getAttribute("width");
+    canvas[EXPANDO_KEY] = {
+      initial: {
+        height: renderHeight,
+        width: renderWidth,
+        style: {
+          display: style2.display,
+          height: style2.height,
+          width: style2.width
+        }
+      }
+    };
+    style2.display = style2.display || "block";
+    style2.boxSizing = style2.boxSizing || "border-box";
+    if (isNullOrEmpty(renderWidth)) {
+      const displayWidth = readUsedSize(canvas, "width");
+      if (displayWidth !== void 0) {
+        canvas.width = displayWidth;
+      }
+    }
+    if (isNullOrEmpty(renderHeight)) {
+      if (canvas.style.height === "") {
+        canvas.height = canvas.width / (aspectRatio || 2);
+      } else {
+        const displayHeight = readUsedSize(canvas, "height");
+        if (displayHeight !== void 0) {
+          canvas.height = displayHeight;
+        }
+      }
+    }
+    return canvas;
+  }
+  var eventListenerOptions = supportsEventListenerOptions ? {
+    passive: true
+  } : false;
+  function addListener(node, type, listener) {
+    node.addEventListener(type, listener, eventListenerOptions);
+  }
+  function removeListener(chart, type, listener) {
+    chart.canvas.removeEventListener(type, listener, eventListenerOptions);
+  }
+  function fromNativeEvent(event, chart) {
+    const type = EVENT_TYPES[event.type] || event.type;
+    const { x, y } = getRelativePosition(event, chart);
+    return {
+      type,
+      chart,
+      native: event,
+      x: x !== void 0 ? x : null,
+      y: y !== void 0 ? y : null
+    };
+  }
+  function nodeListContains(nodeList, canvas) {
+    for (const node of nodeList) {
+      if (node === canvas || node.contains(canvas)) {
+        return true;
+      }
+    }
+  }
+  function createAttachObserver(chart, type, listener) {
+    const canvas = chart.canvas;
+    const observer = new MutationObserver((entries) => {
+      let trigger = false;
+      for (const entry of entries) {
+        trigger = trigger || nodeListContains(entry.addedNodes, canvas);
+        trigger = trigger && !nodeListContains(entry.removedNodes, canvas);
+      }
+      if (trigger) {
+        listener();
+      }
+    });
+    observer.observe(document, {
+      childList: true,
+      subtree: true
+    });
+    return observer;
+  }
+  function createDetachObserver(chart, type, listener) {
+    const canvas = chart.canvas;
+    const observer = new MutationObserver((entries) => {
+      let trigger = false;
+      for (const entry of entries) {
+        trigger = trigger || nodeListContains(entry.removedNodes, canvas);
+        trigger = trigger && !nodeListContains(entry.addedNodes, canvas);
+      }
+      if (trigger) {
+        listener();
+      }
+    });
+    observer.observe(document, {
+      childList: true,
+      subtree: true
+    });
+    return observer;
+  }
+  var drpListeningCharts = /* @__PURE__ */ new Map();
+  var oldDevicePixelRatio = 0;
+  function onWindowResize() {
+    const dpr = window.devicePixelRatio;
+    if (dpr === oldDevicePixelRatio) {
+      return;
+    }
+    oldDevicePixelRatio = dpr;
+    drpListeningCharts.forEach((resize, chart) => {
+      if (chart.currentDevicePixelRatio !== dpr) {
+        resize();
+      }
+    });
+  }
+  function listenDevicePixelRatioChanges(chart, resize) {
+    if (!drpListeningCharts.size) {
+      window.addEventListener("resize", onWindowResize);
+    }
+    drpListeningCharts.set(chart, resize);
+  }
+  function unlistenDevicePixelRatioChanges(chart) {
+    drpListeningCharts.delete(chart);
+    if (!drpListeningCharts.size) {
+      window.removeEventListener("resize", onWindowResize);
+    }
+  }
+  function createResizeObserver(chart, type, listener) {
+    const canvas = chart.canvas;
+    const container = canvas && _getParentNode(canvas);
+    if (!container) {
+      return;
+    }
+    const resize = throttled((width, height) => {
+      const w = container.clientWidth;
+      listener(width, height);
+      if (w < container.clientWidth) {
+        listener();
+      }
+    }, window);
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      const width = entry.contentRect.width;
+      const height = entry.contentRect.height;
+      if (width === 0 && height === 0) {
+        return;
+      }
+      resize(width, height);
+    });
+    observer.observe(container);
+    listenDevicePixelRatioChanges(chart, resize);
+    return observer;
+  }
+  function releaseObserver(chart, type, observer) {
+    if (observer) {
+      observer.disconnect();
+    }
+    if (type === "resize") {
+      unlistenDevicePixelRatioChanges(chart);
+    }
+  }
+  function createProxyAndListen(chart, type, listener) {
+    const canvas = chart.canvas;
+    const proxy = throttled((event) => {
+      if (chart.ctx !== null) {
+        listener(fromNativeEvent(event, chart));
+      }
+    }, chart);
+    addListener(canvas, type, proxy);
+    return proxy;
+  }
+  var DomPlatform = class extends BasePlatform {
+    acquireContext(canvas, aspectRatio) {
+      const context = canvas && canvas.getContext && canvas.getContext("2d");
+      if (context && context.canvas === canvas) {
+        initCanvas(canvas, aspectRatio);
+        return context;
+      }
+      return null;
+    }
+    releaseContext(context) {
+      const canvas = context.canvas;
+      if (!canvas[EXPANDO_KEY]) {
+        return false;
+      }
+      const initial = canvas[EXPANDO_KEY].initial;
+      [
+        "height",
+        "width"
+      ].forEach((prop) => {
+        const value = initial[prop];
+        if (isNullOrUndef(value)) {
+          canvas.removeAttribute(prop);
+        } else {
+          canvas.setAttribute(prop, value);
+        }
+      });
+      const style2 = initial.style || {};
+      Object.keys(style2).forEach((key) => {
+        canvas.style[key] = style2[key];
+      });
+      canvas.width = canvas.width;
+      delete canvas[EXPANDO_KEY];
+      return true;
+    }
+    addEventListener(chart, type, listener) {
+      this.removeEventListener(chart, type);
+      const proxies = chart.$proxies || (chart.$proxies = {});
+      const handlers2 = {
+        attach: createAttachObserver,
+        detach: createDetachObserver,
+        resize: createResizeObserver
+      };
+      const handler = handlers2[type] || createProxyAndListen;
+      proxies[type] = handler(chart, type, listener);
+    }
+    removeEventListener(chart, type) {
+      const proxies = chart.$proxies || (chart.$proxies = {});
+      const proxy = proxies[type];
+      if (!proxy) {
+        return;
+      }
+      const handlers2 = {
+        attach: releaseObserver,
+        detach: releaseObserver,
+        resize: releaseObserver
+      };
+      const handler = handlers2[type] || removeListener;
+      handler(chart, type, proxy);
+      proxies[type] = void 0;
+    }
+    getDevicePixelRatio() {
+      return window.devicePixelRatio;
+    }
+    getMaximumSize(canvas, width, height, aspectRatio) {
+      return getMaximumSize(canvas, width, height, aspectRatio);
+    }
+    isAttached(canvas) {
+      const container = _getParentNode(canvas);
+      return !!(container && container.isConnected);
+    }
+  };
+  function _detectPlatform(canvas) {
+    if (!_isDomSupported() || typeof OffscreenCanvas !== "undefined" && canvas instanceof OffscreenCanvas) {
+      return BasicPlatform;
+    }
+    return DomPlatform;
+  }
   var Element2 = class {
-    constructor() {
-      this.x = void 0;
-      this.y = void 0;
-      this.active = false;
-      this.options = void 0;
-      this.$animations = void 0;
-    }
+    static defaults = {};
+    static defaultRoutes = void 0;
+    x;
+    y;
+    active = false;
+    options;
+    $animations;
     tooltipPosition(useFinalPosition) {
-      const { x, y } = this.getProps(["x", "y"], useFinalPosition);
-      return { x, y };
+      const { x, y } = this.getProps([
+        "x",
+        "y"
+      ], useFinalPosition);
+      return {
+        x,
+        y
+      };
     }
     hasValue() {
       return isNumber(this.x) && isNumber(this.y);
@@ -45937,120 +49345,10 @@ img.ProseMirror-separator {
       return ret;
     }
   };
-  Element2.defaults = {};
-  Element2.defaultRoutes = void 0;
-  var formatters = {
-    values(value) {
-      return isArray(value) ? value : "" + value;
-    },
-    numeric(tickValue, index3, ticks) {
-      if (tickValue === 0) {
-        return "0";
-      }
-      const locale = this.chart.options.locale;
-      let notation;
-      let delta = tickValue;
-      if (ticks.length > 1) {
-        const maxTick = Math.max(Math.abs(ticks[0].value), Math.abs(ticks[ticks.length - 1].value));
-        if (maxTick < 1e-4 || maxTick > 1e15) {
-          notation = "scientific";
-        }
-        delta = calculateDelta(tickValue, ticks);
-      }
-      const logDelta = log10(Math.abs(delta));
-      const numDecimal = Math.max(Math.min(-1 * Math.floor(logDelta), 20), 0);
-      const options = { notation, minimumFractionDigits: numDecimal, maximumFractionDigits: numDecimal };
-      Object.assign(options, this.options.ticks.format);
-      return formatNumber(tickValue, locale, options);
-    },
-    logarithmic(tickValue, index3, ticks) {
-      if (tickValue === 0) {
-        return "0";
-      }
-      const remain = tickValue / Math.pow(10, Math.floor(log10(tickValue)));
-      if (remain === 1 || remain === 2 || remain === 5) {
-        return formatters.numeric.call(this, tickValue, index3, ticks);
-      }
-      return "";
-    }
-  };
-  function calculateDelta(tickValue, ticks) {
-    let delta = ticks.length > 3 ? ticks[2].value - ticks[1].value : ticks[1].value - ticks[0].value;
-    if (Math.abs(delta) >= 1 && tickValue !== Math.floor(tickValue)) {
-      delta = tickValue - Math.floor(tickValue);
-    }
-    return delta;
-  }
-  var Ticks = { formatters };
-  defaults.set("scale", {
-    display: true,
-    offset: false,
-    reverse: false,
-    beginAtZero: false,
-    bounds: "ticks",
-    grace: 0,
-    grid: {
-      display: true,
-      lineWidth: 1,
-      drawBorder: true,
-      drawOnChartArea: true,
-      drawTicks: true,
-      tickLength: 8,
-      tickWidth: (_ctx, options) => options.lineWidth,
-      tickColor: (_ctx, options) => options.color,
-      offset: false,
-      borderDash: [],
-      borderDashOffset: 0,
-      borderWidth: 1
-    },
-    title: {
-      display: false,
-      text: "",
-      padding: {
-        top: 4,
-        bottom: 4
-      }
-    },
-    ticks: {
-      minRotation: 0,
-      maxRotation: 50,
-      mirror: false,
-      textStrokeWidth: 0,
-      textStrokeColor: "",
-      padding: 3,
-      display: true,
-      autoSkip: true,
-      autoSkipPadding: 3,
-      labelOffset: 0,
-      callback: Ticks.formatters.values,
-      minor: {},
-      major: {},
-      align: "center",
-      crossAlign: "near",
-      showLabelBackdrop: false,
-      backdropColor: "rgba(255, 255, 255, 0.75)",
-      backdropPadding: 2
-    }
-  });
-  defaults.route("scale.ticks", "color", "", "color");
-  defaults.route("scale.grid", "color", "", "borderColor");
-  defaults.route("scale.grid", "borderColor", "", "borderColor");
-  defaults.route("scale.title", "color", "", "color");
-  defaults.describe("scale", {
-    _fallback: false,
-    _scriptable: (name) => !name.startsWith("before") && !name.startsWith("after") && name !== "callback" && name !== "parser",
-    _indexable: (name) => name !== "borderDash" && name !== "tickBorderDash"
-  });
-  defaults.describe("scales", {
-    _fallback: "scale"
-  });
-  defaults.describe("scale.ticks", {
-    _scriptable: (name) => name !== "backdropPadding" && name !== "callback",
-    _indexable: (name) => name !== "backdropPadding"
-  });
   function autoSkip(scale, ticks) {
     const tickOpts = scale.options.ticks;
-    const ticksLimit = tickOpts.maxTicksLimit || determineMaxTicks(scale);
+    const determinedMaxTicks = determineMaxTicks(scale);
+    const ticksLimit = Math.min(tickOpts.maxTicksLimit || determinedMaxTicks, determinedMaxTicks);
     const majorIndices = tickOpts.major.enabled ? getMajorIndices(ticks) : [];
     const numMajorIndices = majorIndices.length;
     const first2 = majorIndices[0];
@@ -46157,6 +49455,7 @@ img.ProseMirror-separator {
   }
   var reverseAlign = (align) => align === "left" ? "right" : align === "right" ? "left" : align;
   var offsetFromEdge = (scale, edge, offset2) => edge === "top" || edge === "left" ? scale[edge] + offset2 : scale[edge] - offset2;
+  var getTicksLimit = (ticksLength, maxTicksLimit) => Math.min(maxTicksLimit || ticksLength, ticksLength);
   function sample(arr, numItems) {
     const result = [];
     const increment = arr.length / numItems;
@@ -46267,9 +49566,14 @@ img.ProseMirror-separator {
       titleY = _alignStartEnd(align, bottom2, top2);
       rotation = position === "left" ? -HALF_PI : HALF_PI;
     }
-    return { titleX, titleY, maxWidth, rotation };
+    return {
+      titleX,
+      titleY,
+      maxWidth,
+      rotation
+    };
   }
-  var Scale = class extends Element2 {
+  var Scale = class _Scale extends Element2 {
     constructor(cfg) {
       super();
       this.id = cfg.id;
@@ -46348,7 +49652,10 @@ img.ProseMirror-separator {
       let { min: min2, max: max2, minDefined, maxDefined } = this.getUserBounds();
       let range;
       if (minDefined && maxDefined) {
-        return { min: min2, max: max2 };
+        return {
+          min: min2,
+          max: max2
+        };
       }
       const metas = this.getMatchingVisibleMetas();
       for (let i = 0, ilen = metas.length; i < ilen; ++i) {
@@ -46382,12 +49689,18 @@ img.ProseMirror-separator {
       const data = this.chart.data;
       return this.options.labels || (this.isHorizontal() ? data.xLabels : data.yLabels) || data.labels || [];
     }
+    getLabelItems(chartArea = this.chart.chartArea) {
+      const items = this._labelItems || (this._labelItems = this._computeLabelItems(chartArea));
+      return items;
+    }
     beforeLayout() {
       this._cache = {};
       this._dataLimitsCached = false;
     }
     beforeUpdate() {
-      callback(this.options.beforeUpdate, [this]);
+      callback(this.options.beforeUpdate, [
+        this
+      ]);
     }
     update(maxWidth, maxHeight, margins) {
       const { beginAtZero, grace, ticks: tickOpts } = this.options;
@@ -46456,10 +49769,14 @@ img.ProseMirror-separator {
       this._alignToPixels = this.options.alignToPixels;
     }
     afterUpdate() {
-      callback(this.options.afterUpdate, [this]);
+      callback(this.options.afterUpdate, [
+        this
+      ]);
     }
     beforeSetDimensions() {
-      callback(this.options.beforeSetDimensions, [this]);
+      callback(this.options.beforeSetDimensions, [
+        this
+      ]);
     }
     setDimensions() {
       if (this.isHorizontal()) {
@@ -46477,11 +49794,15 @@ img.ProseMirror-separator {
       this.paddingBottom = 0;
     }
     afterSetDimensions() {
-      callback(this.options.afterSetDimensions, [this]);
+      callback(this.options.afterSetDimensions, [
+        this
+      ]);
     }
     _callHooks(name) {
       this.chart.notifyPlugins(name, this.getContext());
-      callback(this.options[name], [this]);
+      callback(this.options[name], [
+        this
+      ]);
     }
     beforeDataLimits() {
       this._callHooks("beforeDataLimits");
@@ -46501,26 +49822,36 @@ img.ProseMirror-separator {
       this._callHooks("afterBuildTicks");
     }
     beforeTickToLabelConversion() {
-      callback(this.options.beforeTickToLabelConversion, [this]);
+      callback(this.options.beforeTickToLabelConversion, [
+        this
+      ]);
     }
     generateTickLabels(ticks) {
       const tickOpts = this.options.ticks;
       let i, ilen, tick;
       for (i = 0, ilen = ticks.length; i < ilen; i++) {
         tick = ticks[i];
-        tick.label = callback(tickOpts.callback, [tick.value, i, ticks], this);
+        tick.label = callback(tickOpts.callback, [
+          tick.value,
+          i,
+          ticks
+        ], this);
       }
     }
     afterTickToLabelConversion() {
-      callback(this.options.afterTickToLabelConversion, [this]);
+      callback(this.options.afterTickToLabelConversion, [
+        this
+      ]);
     }
     beforeCalculateLabelRotation() {
-      callback(this.options.beforeCalculateLabelRotation, [this]);
+      callback(this.options.beforeCalculateLabelRotation, [
+        this
+      ]);
     }
     calculateLabelRotation() {
       const options = this.options;
       const tickOpts = options.ticks;
-      const numTicks = this.ticks.length;
+      const numTicks = getTicksLimit(this.ticks.length, options.ticks.maxTicksLimit);
       const minRotation = tickOpts.minRotation || 0;
       const maxRotation = tickOpts.maxRotation;
       let labelRotation = minRotation;
@@ -46538,21 +49869,22 @@ img.ProseMirror-separator {
         tickWidth = maxWidth / (numTicks - (options.offset ? 0.5 : 1));
         maxHeight = this.maxHeight - getTickMarkLength(options.grid) - tickOpts.padding - getTitleHeight(options.title, this.chart.options.font);
         maxLabelDiagonal = Math.sqrt(maxLabelWidth * maxLabelWidth + maxLabelHeight * maxLabelHeight);
-        labelRotation = toDegrees(Math.min(
-          Math.asin(_limitValue((labelSizes.highest.height + 6) / tickWidth, -1, 1)),
-          Math.asin(_limitValue(maxHeight / maxLabelDiagonal, -1, 1)) - Math.asin(_limitValue(maxLabelHeight / maxLabelDiagonal, -1, 1))
-        ));
+        labelRotation = toDegrees(Math.min(Math.asin(_limitValue((labelSizes.highest.height + 6) / tickWidth, -1, 1)), Math.asin(_limitValue(maxHeight / maxLabelDiagonal, -1, 1)) - Math.asin(_limitValue(maxLabelHeight / maxLabelDiagonal, -1, 1))));
         labelRotation = Math.max(minRotation, Math.min(maxRotation, labelRotation));
       }
       this.labelRotation = labelRotation;
     }
     afterCalculateLabelRotation() {
-      callback(this.options.afterCalculateLabelRotation, [this]);
+      callback(this.options.afterCalculateLabelRotation, [
+        this
+      ]);
     }
     afterAutoSkip() {
     }
     beforeFit() {
-      callback(this.options.beforeFit, [this]);
+      callback(this.options.beforeFit, [
+        this
+      ]);
     }
     fit() {
       const minSize = {
@@ -46646,7 +49978,9 @@ img.ProseMirror-separator {
       }
     }
     afterFit() {
-      callback(this.options.afterFit, [this]);
+      callback(this.options.afterFit, [
+        this
+      ]);
     }
     isHorizontal() {
       const { axis, position } = this.options;
@@ -46676,22 +50010,26 @@ img.ProseMirror-separator {
         if (sampleSize < ticks.length) {
           ticks = sample(ticks, sampleSize);
         }
-        this._labelSizes = labelSizes = this._computeLabelSizes(ticks, ticks.length);
+        this._labelSizes = labelSizes = this._computeLabelSizes(ticks, ticks.length, this.options.ticks.maxTicksLimit);
       }
       return labelSizes;
     }
-    _computeLabelSizes(ticks, length) {
+    _computeLabelSizes(ticks, length, maxTicksLimit) {
       const { ctx, _longestTextCache: caches } = this;
       const widths = [];
       const heights = [];
+      const increment = Math.floor(length / getTicksLimit(length, maxTicksLimit));
       let widestLabelSize = 0;
       let highestLabelSize = 0;
       let i, j, jlen, label, tickFont, fontString, cache2, lineHeight, width, height, nestedLabel;
-      for (i = 0; i < length; ++i) {
+      for (i = 0; i < length; i += increment) {
         label = ticks[i].label;
         tickFont = this._resolveTickFontOptions(i);
         ctx.font = fontString = tickFont.string;
-        cache2 = caches[fontString] = caches[fontString] || { data: {}, gc: [] };
+        cache2 = caches[fontString] = caches[fontString] || {
+          data: {},
+          gc: []
+        };
         lineHeight = tickFont.lineHeight;
         width = height = 0;
         if (!isNullOrUndef(label) && !isArray(label)) {
@@ -46714,7 +50052,10 @@ img.ProseMirror-separator {
       garbageCollect(caches, length);
       const widest = widths.indexOf(widestLabelSize);
       const highest = heights.indexOf(highestLabelSize);
-      const valueAt = (idx) => ({ width: widths[idx] || 0, height: heights[idx] || 0 });
+      const valueAt = (idx) => ({
+        width: widths[idx] || 0,
+        height: heights[idx] || 0
+      });
       return {
         first: valueAt(0),
         last: valueAt(length - 1),
@@ -46787,15 +50128,15 @@ img.ProseMirror-separator {
       const axis = this.axis;
       const chart = this.chart;
       const options = this.options;
-      const { grid, position } = options;
+      const { grid, position, border } = options;
       const offset2 = grid.offset;
       const isHorizontal = this.isHorizontal();
       const ticks = this.ticks;
       const ticksLength = ticks.length + (offset2 ? 1 : 0);
       const tl = getTickMarkLength(grid);
       const items = [];
-      const borderOpts = grid.setContext(this.getContext());
-      const axisWidth = borderOpts.drawBorder ? borderOpts.borderWidth : 0;
+      const borderOpts = border.setContext(this.getContext());
+      const axisWidth = borderOpts.display ? borderOpts.width : 0;
       const axisHalfWidth = axisWidth / 2;
       const alignBorderValue = function(pixel) {
         return _alignPixel(chart, pixel, axisWidth);
@@ -46854,11 +50195,13 @@ img.ProseMirror-separator {
       const limit = valueOrDefault(options.ticks.maxTicksLimit, ticksLength);
       const step = Math.max(1, Math.ceil(ticksLength / limit));
       for (i = 0; i < ticksLength; i += step) {
-        const optsAtIndex = grid.setContext(this.getContext(i));
+        const context = this.getContext(i);
+        const optsAtIndex = grid.setContext(context);
+        const optsAtIndexBorder = border.setContext(context);
         const lineWidth = optsAtIndex.lineWidth;
         const lineColor = optsAtIndex.color;
-        const borderDash = optsAtIndex.borderDash || [];
-        const borderDashOffset = optsAtIndex.borderDashOffset;
+        const borderDash = optsAtIndexBorder.dash || [];
+        const borderDashOffset = optsAtIndexBorder.dashOffset;
         const tickWidth = optsAtIndex.tickWidth;
         const tickColor = optsAtIndex.tickColor;
         const tickBorderDash = optsAtIndex.tickBorderDash || [];
@@ -46995,6 +50338,9 @@ img.ProseMirror-separator {
           if (mirror) {
             textOffset *= -1;
           }
+          if (rotation !== 0 && !optsAtIndex.showLabelBackdrop) {
+            x += lineHeight / 2 * Math.sin(rotation);
+          }
         } else {
           y = pixel;
           textOffset = (1 - lineCount) * lineHeight / 2;
@@ -47004,8 +50350,8 @@ img.ProseMirror-separator {
           const labelPadding = toPadding(optsAtIndex.backdropPadding);
           const height = labelSizes.heights[i];
           const width = labelSizes.widths[i];
-          let top2 = y + textOffset - labelPadding.top;
-          let left2 = x - labelPadding.left;
+          let top2 = textOffset - labelPadding.top;
+          let left2 = 0 - labelPadding.left;
           switch (textBaseline) {
             case "middle":
               top2 -= height / 2;
@@ -47021,6 +50367,13 @@ img.ProseMirror-separator {
             case "right":
               left2 -= width;
               break;
+            case "inner":
+              if (i === ilen - 1) {
+                left2 -= width;
+              } else if (i > 0) {
+                left2 -= width / 2;
+              }
+              break;
           }
           backdrop = {
             left: left2,
@@ -47031,17 +50384,22 @@ img.ProseMirror-separator {
           };
         }
         items.push({
-          rotation,
           label,
           font,
-          color: color2,
-          strokeColor,
-          strokeWidth,
           textOffset,
-          textAlign: tickTextAlign,
-          textBaseline,
-          translation: [x, y],
-          backdrop
+          options: {
+            rotation,
+            color: color2,
+            strokeColor,
+            strokeWidth,
+            textAlign: tickTextAlign,
+            textBaseline,
+            translation: [
+              x,
+              y
+            ],
+            backdrop
+          }
         });
       }
       return items;
@@ -47120,7 +50478,10 @@ img.ProseMirror-separator {
       } else {
         textAlign = "right";
       }
-      return { textAlign, x };
+      return {
+        textAlign,
+        x
+      };
     }
     _computeLabelArea() {
       if (this.options.ticks.mirror) {
@@ -47129,10 +50490,20 @@ img.ProseMirror-separator {
       const chart = this.chart;
       const position = this.options.position;
       if (position === "left" || position === "right") {
-        return { top: 0, left: this.left, bottom: chart.height, right: this.right };
+        return {
+          top: 0,
+          left: this.left,
+          bottom: chart.height,
+          right: this.right
+        };
       }
       if (position === "top" || position === "bottom") {
-        return { top: this.top, left: 0, bottom: this.bottom, right: chart.width };
+        return {
+          top: this.top,
+          left: 0,
+          bottom: this.bottom,
+          right: chart.width
+        };
       }
     }
     drawBackground() {
@@ -47181,31 +50552,35 @@ img.ProseMirror-separator {
         for (i = 0, ilen = items.length; i < ilen; ++i) {
           const item = items[i];
           if (grid.drawOnChartArea) {
-            drawLine(
-              { x: item.x1, y: item.y1 },
-              { x: item.x2, y: item.y2 },
-              item
-            );
+            drawLine({
+              x: item.x1,
+              y: item.y1
+            }, {
+              x: item.x2,
+              y: item.y2
+            }, item);
           }
           if (grid.drawTicks) {
-            drawLine(
-              { x: item.tx1, y: item.ty1 },
-              { x: item.tx2, y: item.ty2 },
-              {
-                color: item.tickColor,
-                width: item.tickWidth,
-                borderDash: item.tickBorderDash,
-                borderDashOffset: item.tickBorderDashOffset
-              }
-            );
+            drawLine({
+              x: item.tx1,
+              y: item.ty1
+            }, {
+              x: item.tx2,
+              y: item.ty2
+            }, {
+              color: item.tickColor,
+              width: item.tickWidth,
+              borderDash: item.tickBorderDash,
+              borderDashOffset: item.tickBorderDashOffset
+            });
           }
         }
       }
     }
     drawBorder() {
-      const { chart, ctx, options: { grid } } = this;
-      const borderOpts = grid.setContext(this.getContext());
-      const axisWidth = grid.drawBorder ? borderOpts.borderWidth : 0;
+      const { chart, ctx, options: { border, grid } } = this;
+      const borderOpts = border.setContext(this.getContext());
+      const axisWidth = border.display ? borderOpts.width : 0;
       if (!axisWidth) {
         return;
       }
@@ -47222,8 +50597,8 @@ img.ProseMirror-separator {
         x1 = x2 = borderValue;
       }
       ctx.save();
-      ctx.lineWidth = borderOpts.borderWidth;
-      ctx.strokeStyle = borderOpts.borderColor;
+      ctx.lineWidth = borderOpts.width;
+      ctx.strokeStyle = borderOpts.color;
       ctx.beginPath();
       ctx.moveTo(x1, y1);
       ctx.lineTo(x2, y2);
@@ -47240,18 +50615,13 @@ img.ProseMirror-separator {
       if (area) {
         clipArea(ctx, area);
       }
-      const items = this._labelItems || (this._labelItems = this._computeLabelItems(chartArea));
-      let i, ilen;
-      for (i = 0, ilen = items.length; i < ilen; ++i) {
-        const item = items[i];
+      const items = this.getLabelItems(chartArea);
+      for (const item of items) {
+        const renderTextOptions = item.options;
         const tickFont = item.font;
         const label = item.label;
-        if (item.backdrop) {
-          ctx.fillStyle = item.backdrop.color;
-          ctx.fillRect(item.backdrop.left, item.backdrop.top, item.backdrop.width, item.backdrop.height);
-        }
-        let y = item.textOffset;
-        renderText(ctx, label, 0, y, tickFont, item);
+        const y = item.textOffset;
+        renderText(ctx, label, 0, y, tickFont, renderTextOptions);
       }
       if (area) {
         unclipArea(ctx);
@@ -47281,7 +50651,10 @@ img.ProseMirror-separator {
         rotation,
         textAlign: titleAlign(align, position, reverse),
         textBaseline: "middle",
-        translation: [titleX, titleY]
+        translation: [
+          titleX,
+          titleY
+        ]
       });
     }
     draw(chartArea) {
@@ -47298,32 +50671,39 @@ img.ProseMirror-separator {
       const opts = this.options;
       const tz = opts.ticks && opts.ticks.z || 0;
       const gz = valueOrDefault(opts.grid && opts.grid.z, -1);
-      if (!this._isVisible() || this.draw !== Scale.prototype.draw) {
-        return [{
+      const bz = valueOrDefault(opts.border && opts.border.z, 0);
+      if (!this._isVisible() || this.draw !== _Scale.prototype.draw) {
+        return [
+          {
+            z: tz,
+            draw: (chartArea) => {
+              this.draw(chartArea);
+            }
+          }
+        ];
+      }
+      return [
+        {
+          z: gz,
+          draw: (chartArea) => {
+            this.drawBackground();
+            this.drawGrid(chartArea);
+            this.drawTitle();
+          }
+        },
+        {
+          z: bz,
+          draw: () => {
+            this.drawBorder();
+          }
+        },
+        {
           z: tz,
           draw: (chartArea) => {
-            this.draw(chartArea);
+            this.drawLabels(chartArea);
           }
-        }];
-      }
-      return [{
-        z: gz,
-        draw: (chartArea) => {
-          this.drawBackground();
-          this.drawGrid(chartArea);
-          this.drawTitle();
         }
-      }, {
-        z: gz + 1,
-        draw: () => {
-          this.drawBorder();
-        }
-      }, {
-        z: tz,
-        draw: (chartArea) => {
-          this.drawLabels(chartArea);
-        }
-      }];
+      ];
     }
     getMatchingVisibleMetas(type) {
       const metas = this.chart.getSortedVisibleDatasetMetas();
@@ -47415,7 +50795,9 @@ img.ProseMirror-separator {
     Object.keys(routes).forEach((property) => {
       const propertyParts = property.split(".");
       const sourceName = propertyParts.pop();
-      const sourceScope = [scope].concat(propertyParts).join(".");
+      const sourceScope = [
+        scope
+      ].concat(propertyParts).join(".");
       const parts = routes[property].split(".");
       const targetName = parts.pop();
       const targetScope = parts.join(".");
@@ -47431,7 +50813,11 @@ img.ProseMirror-separator {
       this.elements = new TypedRegistry(Element2, "elements");
       this.plugins = new TypedRegistry(Object, "plugins");
       this.scales = new TypedRegistry(Scale, "scales");
-      this._typedRegistries = [this.controllers, this.scales, this.elements];
+      this._typedRegistries = [
+        this.controllers,
+        this.scales,
+        this.elements
+      ];
     }
     add(...args) {
       this._each("register", args);
@@ -47476,7 +50862,9 @@ img.ProseMirror-separator {
       this._each("unregister", args, this.scales);
     }
     _each(method, args, typedRegistry) {
-      [...args].forEach((arg) => {
+      [
+        ...args
+      ].forEach((arg) => {
         const reg = typedRegistry || this._getRegistryForType(arg);
         if (typedRegistry || reg.isForType(arg) || reg === this.plugins && arg.id) {
           this._exec(method, reg, arg);
@@ -47511,938 +50899,7 @@ img.ProseMirror-separator {
       return item;
     }
   };
-  var registry = new Registry();
-  var ScatterController = class extends DatasetController {
-    update(mode) {
-      const meta = this._cachedMeta;
-      const { data: points = [] } = meta;
-      const animationsDisabled = this.chart._animationsDisabled;
-      let { start: start3, count } = _getStartAndCountOfVisiblePoints(meta, points, animationsDisabled);
-      this._drawStart = start3;
-      this._drawCount = count;
-      if (_scaleRangesChanged(meta)) {
-        start3 = 0;
-        count = points.length;
-      }
-      if (this.options.showLine) {
-        const { dataset: line, _dataset } = meta;
-        line._chart = this.chart;
-        line._datasetIndex = this.index;
-        line._decimated = !!_dataset._decimated;
-        line.points = points;
-        const options = this.resolveDatasetElementOptions(mode);
-        options.segment = this.options.segment;
-        this.updateElement(line, void 0, {
-          animated: !animationsDisabled,
-          options
-        }, mode);
-      }
-      this.updateElements(points, start3, count, mode);
-    }
-    addElements() {
-      const { showLine } = this.options;
-      if (!this.datasetElementType && showLine) {
-        this.datasetElementType = registry.getElement("line");
-      }
-      super.addElements();
-    }
-    updateElements(points, start3, count, mode) {
-      const reset2 = mode === "reset";
-      const { iScale, vScale, _stacked, _dataset } = this._cachedMeta;
-      const firstOpts = this.resolveDataElementOptions(start3, mode);
-      const sharedOptions = this.getSharedOptions(firstOpts);
-      const includeOptions = this.includeOptions(mode, sharedOptions);
-      const iAxis = iScale.axis;
-      const vAxis = vScale.axis;
-      const { spanGaps, segment } = this.options;
-      const maxGapLength = isNumber(spanGaps) ? spanGaps : Number.POSITIVE_INFINITY;
-      const directUpdate = this.chart._animationsDisabled || reset2 || mode === "none";
-      let prevParsed = start3 > 0 && this.getParsed(start3 - 1);
-      for (let i = start3; i < start3 + count; ++i) {
-        const point = points[i];
-        const parsed = this.getParsed(i);
-        const properties = directUpdate ? point : {};
-        const nullData = isNullOrUndef(parsed[vAxis]);
-        const iPixel = properties[iAxis] = iScale.getPixelForValue(parsed[iAxis], i);
-        const vPixel = properties[vAxis] = reset2 || nullData ? vScale.getBasePixel() : vScale.getPixelForValue(_stacked ? this.applyStack(vScale, parsed, _stacked) : parsed[vAxis], i);
-        properties.skip = isNaN(iPixel) || isNaN(vPixel) || nullData;
-        properties.stop = i > 0 && Math.abs(parsed[iAxis] - prevParsed[iAxis]) > maxGapLength;
-        if (segment) {
-          properties.parsed = parsed;
-          properties.raw = _dataset.data[i];
-        }
-        if (includeOptions) {
-          properties.options = sharedOptions || this.resolveDataElementOptions(i, point.active ? "active" : mode);
-        }
-        if (!directUpdate) {
-          this.updateElement(point, i, properties, mode);
-        }
-        prevParsed = parsed;
-      }
-      this.updateSharedOptions(sharedOptions, mode, firstOpts);
-    }
-    getMaxOverflow() {
-      const meta = this._cachedMeta;
-      const data = meta.data || [];
-      if (!this.options.showLine) {
-        let max2 = 0;
-        for (let i = data.length - 1; i >= 0; --i) {
-          max2 = Math.max(max2, data[i].size(this.resolveDataElementOptions(i)) / 2);
-        }
-        return max2 > 0 && max2;
-      }
-      const dataset = meta.dataset;
-      const border = dataset.options && dataset.options.borderWidth || 0;
-      if (!data.length) {
-        return border;
-      }
-      const firstPoint = data[0].size(this.resolveDataElementOptions(0));
-      const lastPoint = data[data.length - 1].size(this.resolveDataElementOptions(data.length - 1));
-      return Math.max(border, firstPoint, lastPoint) / 2;
-    }
-  };
-  ScatterController.id = "scatter";
-  ScatterController.defaults = {
-    datasetElementType: false,
-    dataElementType: "point",
-    showLine: false,
-    fill: false
-  };
-  ScatterController.overrides = {
-    interaction: {
-      mode: "point"
-    },
-    plugins: {
-      tooltip: {
-        callbacks: {
-          title() {
-            return "";
-          },
-          label(item) {
-            return "(" + item.label + ", " + item.formattedValue + ")";
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        type: "linear"
-      },
-      y: {
-        type: "linear"
-      }
-    }
-  };
-  var controllers = /* @__PURE__ */ Object.freeze({
-    __proto__: null,
-    BarController,
-    BubbleController,
-    DoughnutController,
-    LineController,
-    PolarAreaController,
-    PieController,
-    RadarController,
-    ScatterController
-  });
-  function abstract() {
-    throw new Error("This method is not implemented: Check that a complete date adapter is provided.");
-  }
-  var DateAdapter = class {
-    constructor(options) {
-      this.options = options || {};
-    }
-    init(chartOptions) {
-    }
-    formats() {
-      return abstract();
-    }
-    parse(value, format2) {
-      return abstract();
-    }
-    format(timestamp, format2) {
-      return abstract();
-    }
-    add(timestamp, amount, unit) {
-      return abstract();
-    }
-    diff(a, b, unit) {
-      return abstract();
-    }
-    startOf(timestamp, unit, weekday) {
-      return abstract();
-    }
-    endOf(timestamp, unit) {
-      return abstract();
-    }
-  };
-  DateAdapter.override = function(members) {
-    Object.assign(DateAdapter.prototype, members);
-  };
-  var adapters = {
-    _date: DateAdapter
-  };
-  function binarySearch(metaset, axis, value, intersect) {
-    const { controller, data, _sorted } = metaset;
-    const iScale = controller._cachedMeta.iScale;
-    if (iScale && axis === iScale.axis && axis !== "r" && _sorted && data.length) {
-      const lookupMethod = iScale._reversePixels ? _rlookupByKey : _lookupByKey;
-      if (!intersect) {
-        return lookupMethod(data, axis, value);
-      } else if (controller._sharedOptions) {
-        const el = data[0];
-        const range = typeof el.getRange === "function" && el.getRange(axis);
-        if (range) {
-          const start3 = lookupMethod(data, axis, value - range);
-          const end2 = lookupMethod(data, axis, value + range);
-          return { lo: start3.lo, hi: end2.hi };
-        }
-      }
-    }
-    return { lo: 0, hi: data.length - 1 };
-  }
-  function evaluateInteractionItems(chart, axis, position, handler, intersect) {
-    const metasets = chart.getSortedVisibleDatasetMetas();
-    const value = position[axis];
-    for (let i = 0, ilen = metasets.length; i < ilen; ++i) {
-      const { index: index3, data } = metasets[i];
-      const { lo, hi } = binarySearch(metasets[i], axis, value, intersect);
-      for (let j = lo; j <= hi; ++j) {
-        const element = data[j];
-        if (!element.skip) {
-          handler(element, index3, j);
-        }
-      }
-    }
-  }
-  function getDistanceMetricForAxis(axis) {
-    const useX = axis.indexOf("x") !== -1;
-    const useY = axis.indexOf("y") !== -1;
-    return function(pt1, pt2) {
-      const deltaX = useX ? Math.abs(pt1.x - pt2.x) : 0;
-      const deltaY = useY ? Math.abs(pt1.y - pt2.y) : 0;
-      return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-    };
-  }
-  function getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible) {
-    const items = [];
-    if (!includeInvisible && !chart.isPointInArea(position)) {
-      return items;
-    }
-    const evaluationFunc = function(element, datasetIndex, index3) {
-      if (!includeInvisible && !_isPointInArea(element, chart.chartArea, 0)) {
-        return;
-      }
-      if (element.inRange(position.x, position.y, useFinalPosition)) {
-        items.push({ element, datasetIndex, index: index3 });
-      }
-    };
-    evaluateInteractionItems(chart, axis, position, evaluationFunc, true);
-    return items;
-  }
-  function getNearestRadialItems(chart, position, axis, useFinalPosition) {
-    let items = [];
-    function evaluationFunc(element, datasetIndex, index3) {
-      const { startAngle, endAngle } = element.getProps(["startAngle", "endAngle"], useFinalPosition);
-      const { angle } = getAngleFromPoint(element, { x: position.x, y: position.y });
-      if (_angleBetween(angle, startAngle, endAngle)) {
-        items.push({ element, datasetIndex, index: index3 });
-      }
-    }
-    evaluateInteractionItems(chart, axis, position, evaluationFunc);
-    return items;
-  }
-  function getNearestCartesianItems(chart, position, axis, intersect, useFinalPosition, includeInvisible) {
-    let items = [];
-    const distanceMetric = getDistanceMetricForAxis(axis);
-    let minDistance = Number.POSITIVE_INFINITY;
-    function evaluationFunc(element, datasetIndex, index3) {
-      const inRange2 = element.inRange(position.x, position.y, useFinalPosition);
-      if (intersect && !inRange2) {
-        return;
-      }
-      const center = element.getCenterPoint(useFinalPosition);
-      const pointInArea = !!includeInvisible || chart.isPointInArea(center);
-      if (!pointInArea && !inRange2) {
-        return;
-      }
-      const distance = distanceMetric(position, center);
-      if (distance < minDistance) {
-        items = [{ element, datasetIndex, index: index3 }];
-        minDistance = distance;
-      } else if (distance === minDistance) {
-        items.push({ element, datasetIndex, index: index3 });
-      }
-    }
-    evaluateInteractionItems(chart, axis, position, evaluationFunc);
-    return items;
-  }
-  function getNearestItems(chart, position, axis, intersect, useFinalPosition, includeInvisible) {
-    if (!includeInvisible && !chart.isPointInArea(position)) {
-      return [];
-    }
-    return axis === "r" && !intersect ? getNearestRadialItems(chart, position, axis, useFinalPosition) : getNearestCartesianItems(chart, position, axis, intersect, useFinalPosition, includeInvisible);
-  }
-  function getAxisItems(chart, position, axis, intersect, useFinalPosition) {
-    const items = [];
-    const rangeMethod = axis === "x" ? "inXRange" : "inYRange";
-    let intersectsItem = false;
-    evaluateInteractionItems(chart, axis, position, (element, datasetIndex, index3) => {
-      if (element[rangeMethod](position[axis], useFinalPosition)) {
-        items.push({ element, datasetIndex, index: index3 });
-        intersectsItem = intersectsItem || element.inRange(position.x, position.y, useFinalPosition);
-      }
-    });
-    if (intersect && !intersectsItem) {
-      return [];
-    }
-    return items;
-  }
-  var Interaction = {
-    evaluateInteractionItems,
-    modes: {
-      index(chart, e, options, useFinalPosition) {
-        const position = getRelativePosition(e, chart);
-        const axis = options.axis || "x";
-        const includeInvisible = options.includeInvisible || false;
-        const items = options.intersect ? getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible) : getNearestItems(chart, position, axis, false, useFinalPosition, includeInvisible);
-        const elements2 = [];
-        if (!items.length) {
-          return [];
-        }
-        chart.getSortedVisibleDatasetMetas().forEach((meta) => {
-          const index3 = items[0].index;
-          const element = meta.data[index3];
-          if (element && !element.skip) {
-            elements2.push({ element, datasetIndex: meta.index, index: index3 });
-          }
-        });
-        return elements2;
-      },
-      dataset(chart, e, options, useFinalPosition) {
-        const position = getRelativePosition(e, chart);
-        const axis = options.axis || "xy";
-        const includeInvisible = options.includeInvisible || false;
-        let items = options.intersect ? getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible) : getNearestItems(chart, position, axis, false, useFinalPosition, includeInvisible);
-        if (items.length > 0) {
-          const datasetIndex = items[0].datasetIndex;
-          const data = chart.getDatasetMeta(datasetIndex).data;
-          items = [];
-          for (let i = 0; i < data.length; ++i) {
-            items.push({ element: data[i], datasetIndex, index: i });
-          }
-        }
-        return items;
-      },
-      point(chart, e, options, useFinalPosition) {
-        const position = getRelativePosition(e, chart);
-        const axis = options.axis || "xy";
-        const includeInvisible = options.includeInvisible || false;
-        return getIntersectItems(chart, position, axis, useFinalPosition, includeInvisible);
-      },
-      nearest(chart, e, options, useFinalPosition) {
-        const position = getRelativePosition(e, chart);
-        const axis = options.axis || "xy";
-        const includeInvisible = options.includeInvisible || false;
-        return getNearestItems(chart, position, axis, options.intersect, useFinalPosition, includeInvisible);
-      },
-      x(chart, e, options, useFinalPosition) {
-        const position = getRelativePosition(e, chart);
-        return getAxisItems(chart, position, "x", options.intersect, useFinalPosition);
-      },
-      y(chart, e, options, useFinalPosition) {
-        const position = getRelativePosition(e, chart);
-        return getAxisItems(chart, position, "y", options.intersect, useFinalPosition);
-      }
-    }
-  };
-  var STATIC_POSITIONS = ["left", "top", "right", "bottom"];
-  function filterByPosition(array, position) {
-    return array.filter((v) => v.pos === position);
-  }
-  function filterDynamicPositionByAxis(array, axis) {
-    return array.filter((v) => STATIC_POSITIONS.indexOf(v.pos) === -1 && v.box.axis === axis);
-  }
-  function sortByWeight(array, reverse) {
-    return array.sort((a, b) => {
-      const v0 = reverse ? b : a;
-      const v1 = reverse ? a : b;
-      return v0.weight === v1.weight ? v0.index - v1.index : v0.weight - v1.weight;
-    });
-  }
-  function wrapBoxes(boxes) {
-    const layoutBoxes = [];
-    let i, ilen, box, pos, stack, stackWeight;
-    for (i = 0, ilen = (boxes || []).length; i < ilen; ++i) {
-      box = boxes[i];
-      ({ position: pos, options: { stack, stackWeight = 1 } } = box);
-      layoutBoxes.push({
-        index: i,
-        box,
-        pos,
-        horizontal: box.isHorizontal(),
-        weight: box.weight,
-        stack: stack && pos + stack,
-        stackWeight
-      });
-    }
-    return layoutBoxes;
-  }
-  function buildStacks(layouts2) {
-    const stacks = {};
-    for (const wrap2 of layouts2) {
-      const { stack, pos, stackWeight } = wrap2;
-      if (!stack || !STATIC_POSITIONS.includes(pos)) {
-        continue;
-      }
-      const _stack = stacks[stack] || (stacks[stack] = { count: 0, placed: 0, weight: 0, size: 0 });
-      _stack.count++;
-      _stack.weight += stackWeight;
-    }
-    return stacks;
-  }
-  function setLayoutDims(layouts2, params) {
-    const stacks = buildStacks(layouts2);
-    const { vBoxMaxWidth, hBoxMaxHeight } = params;
-    let i, ilen, layout;
-    for (i = 0, ilen = layouts2.length; i < ilen; ++i) {
-      layout = layouts2[i];
-      const { fullSize } = layout.box;
-      const stack = stacks[layout.stack];
-      const factor = stack && layout.stackWeight / stack.weight;
-      if (layout.horizontal) {
-        layout.width = factor ? factor * vBoxMaxWidth : fullSize && params.availableWidth;
-        layout.height = hBoxMaxHeight;
-      } else {
-        layout.width = vBoxMaxWidth;
-        layout.height = factor ? factor * hBoxMaxHeight : fullSize && params.availableHeight;
-      }
-    }
-    return stacks;
-  }
-  function buildLayoutBoxes(boxes) {
-    const layoutBoxes = wrapBoxes(boxes);
-    const fullSize = sortByWeight(layoutBoxes.filter((wrap2) => wrap2.box.fullSize), true);
-    const left2 = sortByWeight(filterByPosition(layoutBoxes, "left"), true);
-    const right2 = sortByWeight(filterByPosition(layoutBoxes, "right"));
-    const top2 = sortByWeight(filterByPosition(layoutBoxes, "top"), true);
-    const bottom2 = sortByWeight(filterByPosition(layoutBoxes, "bottom"));
-    const centerHorizontal = filterDynamicPositionByAxis(layoutBoxes, "x");
-    const centerVertical = filterDynamicPositionByAxis(layoutBoxes, "y");
-    return {
-      fullSize,
-      leftAndTop: left2.concat(top2),
-      rightAndBottom: right2.concat(centerVertical).concat(bottom2).concat(centerHorizontal),
-      chartArea: filterByPosition(layoutBoxes, "chartArea"),
-      vertical: left2.concat(right2).concat(centerVertical),
-      horizontal: top2.concat(bottom2).concat(centerHorizontal)
-    };
-  }
-  function getCombinedMax(maxPadding, chartArea, a, b) {
-    return Math.max(maxPadding[a], chartArea[a]) + Math.max(maxPadding[b], chartArea[b]);
-  }
-  function updateMaxPadding(maxPadding, boxPadding) {
-    maxPadding.top = Math.max(maxPadding.top, boxPadding.top);
-    maxPadding.left = Math.max(maxPadding.left, boxPadding.left);
-    maxPadding.bottom = Math.max(maxPadding.bottom, boxPadding.bottom);
-    maxPadding.right = Math.max(maxPadding.right, boxPadding.right);
-  }
-  function updateDims(chartArea, params, layout, stacks) {
-    const { pos, box } = layout;
-    const maxPadding = chartArea.maxPadding;
-    if (!isObject(pos)) {
-      if (layout.size) {
-        chartArea[pos] -= layout.size;
-      }
-      const stack = stacks[layout.stack] || { size: 0, count: 1 };
-      stack.size = Math.max(stack.size, layout.horizontal ? box.height : box.width);
-      layout.size = stack.size / stack.count;
-      chartArea[pos] += layout.size;
-    }
-    if (box.getPadding) {
-      updateMaxPadding(maxPadding, box.getPadding());
-    }
-    const newWidth = Math.max(0, params.outerWidth - getCombinedMax(maxPadding, chartArea, "left", "right"));
-    const newHeight = Math.max(0, params.outerHeight - getCombinedMax(maxPadding, chartArea, "top", "bottom"));
-    const widthChanged = newWidth !== chartArea.w;
-    const heightChanged = newHeight !== chartArea.h;
-    chartArea.w = newWidth;
-    chartArea.h = newHeight;
-    return layout.horizontal ? { same: widthChanged, other: heightChanged } : { same: heightChanged, other: widthChanged };
-  }
-  function handleMaxPadding(chartArea) {
-    const maxPadding = chartArea.maxPadding;
-    function updatePos(pos) {
-      const change = Math.max(maxPadding[pos] - chartArea[pos], 0);
-      chartArea[pos] += change;
-      return change;
-    }
-    chartArea.y += updatePos("top");
-    chartArea.x += updatePos("left");
-    updatePos("right");
-    updatePos("bottom");
-  }
-  function getMargins(horizontal, chartArea) {
-    const maxPadding = chartArea.maxPadding;
-    function marginForPositions(positions2) {
-      const margin = { left: 0, top: 0, right: 0, bottom: 0 };
-      positions2.forEach((pos) => {
-        margin[pos] = Math.max(chartArea[pos], maxPadding[pos]);
-      });
-      return margin;
-    }
-    return horizontal ? marginForPositions(["left", "right"]) : marginForPositions(["top", "bottom"]);
-  }
-  function fitBoxes(boxes, chartArea, params, stacks) {
-    const refitBoxes = [];
-    let i, ilen, layout, box, refit, changed;
-    for (i = 0, ilen = boxes.length, refit = 0; i < ilen; ++i) {
-      layout = boxes[i];
-      box = layout.box;
-      box.update(
-        layout.width || chartArea.w,
-        layout.height || chartArea.h,
-        getMargins(layout.horizontal, chartArea)
-      );
-      const { same, other } = updateDims(chartArea, params, layout, stacks);
-      refit |= same && refitBoxes.length;
-      changed = changed || other;
-      if (!box.fullSize) {
-        refitBoxes.push(layout);
-      }
-    }
-    return refit && fitBoxes(refitBoxes, chartArea, params, stacks) || changed;
-  }
-  function setBoxDims(box, left2, top2, width, height) {
-    box.top = top2;
-    box.left = left2;
-    box.right = left2 + width;
-    box.bottom = top2 + height;
-    box.width = width;
-    box.height = height;
-  }
-  function placeBoxes(boxes, chartArea, params, stacks) {
-    const userPadding = params.padding;
-    let { x, y } = chartArea;
-    for (const layout of boxes) {
-      const box = layout.box;
-      const stack = stacks[layout.stack] || { count: 1, placed: 0, weight: 1 };
-      const weight = layout.stackWeight / stack.weight || 1;
-      if (layout.horizontal) {
-        const width = chartArea.w * weight;
-        const height = stack.size || box.height;
-        if (defined(stack.start)) {
-          y = stack.start;
-        }
-        if (box.fullSize) {
-          setBoxDims(box, userPadding.left, y, params.outerWidth - userPadding.right - userPadding.left, height);
-        } else {
-          setBoxDims(box, chartArea.left + stack.placed, y, width, height);
-        }
-        stack.start = y;
-        stack.placed += width;
-        y = box.bottom;
-      } else {
-        const height = chartArea.h * weight;
-        const width = stack.size || box.width;
-        if (defined(stack.start)) {
-          x = stack.start;
-        }
-        if (box.fullSize) {
-          setBoxDims(box, x, userPadding.top, width, params.outerHeight - userPadding.bottom - userPadding.top);
-        } else {
-          setBoxDims(box, x, chartArea.top + stack.placed, width, height);
-        }
-        stack.start = x;
-        stack.placed += height;
-        x = box.right;
-      }
-    }
-    chartArea.x = x;
-    chartArea.y = y;
-  }
-  defaults.set("layout", {
-    autoPadding: true,
-    padding: {
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0
-    }
-  });
-  var layouts = {
-    addBox(chart, item) {
-      if (!chart.boxes) {
-        chart.boxes = [];
-      }
-      item.fullSize = item.fullSize || false;
-      item.position = item.position || "top";
-      item.weight = item.weight || 0;
-      item._layers = item._layers || function() {
-        return [{
-          z: 0,
-          draw(chartArea) {
-            item.draw(chartArea);
-          }
-        }];
-      };
-      chart.boxes.push(item);
-    },
-    removeBox(chart, layoutItem) {
-      const index3 = chart.boxes ? chart.boxes.indexOf(layoutItem) : -1;
-      if (index3 !== -1) {
-        chart.boxes.splice(index3, 1);
-      }
-    },
-    configure(chart, item, options) {
-      item.fullSize = options.fullSize;
-      item.position = options.position;
-      item.weight = options.weight;
-    },
-    update(chart, width, height, minPadding) {
-      if (!chart) {
-        return;
-      }
-      const padding = toPadding(chart.options.layout.padding);
-      const availableWidth = Math.max(width - padding.width, 0);
-      const availableHeight = Math.max(height - padding.height, 0);
-      const boxes = buildLayoutBoxes(chart.boxes);
-      const verticalBoxes = boxes.vertical;
-      const horizontalBoxes = boxes.horizontal;
-      each(chart.boxes, (box) => {
-        if (typeof box.beforeLayout === "function") {
-          box.beforeLayout();
-        }
-      });
-      const visibleVerticalBoxCount = verticalBoxes.reduce((total, wrap2) => wrap2.box.options && wrap2.box.options.display === false ? total : total + 1, 0) || 1;
-      const params = Object.freeze({
-        outerWidth: width,
-        outerHeight: height,
-        padding,
-        availableWidth,
-        availableHeight,
-        vBoxMaxWidth: availableWidth / 2 / visibleVerticalBoxCount,
-        hBoxMaxHeight: availableHeight / 2
-      });
-      const maxPadding = Object.assign({}, padding);
-      updateMaxPadding(maxPadding, toPadding(minPadding));
-      const chartArea = Object.assign({
-        maxPadding,
-        w: availableWidth,
-        h: availableHeight,
-        x: padding.left,
-        y: padding.top
-      }, padding);
-      const stacks = setLayoutDims(verticalBoxes.concat(horizontalBoxes), params);
-      fitBoxes(boxes.fullSize, chartArea, params, stacks);
-      fitBoxes(verticalBoxes, chartArea, params, stacks);
-      if (fitBoxes(horizontalBoxes, chartArea, params, stacks)) {
-        fitBoxes(verticalBoxes, chartArea, params, stacks);
-      }
-      handleMaxPadding(chartArea);
-      placeBoxes(boxes.leftAndTop, chartArea, params, stacks);
-      chartArea.x += chartArea.w;
-      chartArea.y += chartArea.h;
-      placeBoxes(boxes.rightAndBottom, chartArea, params, stacks);
-      chart.chartArea = {
-        left: chartArea.left,
-        top: chartArea.top,
-        right: chartArea.left + chartArea.w,
-        bottom: chartArea.top + chartArea.h,
-        height: chartArea.h,
-        width: chartArea.w
-      };
-      each(boxes.chartArea, (layout) => {
-        const box = layout.box;
-        Object.assign(box, chart.chartArea);
-        box.update(chartArea.w, chartArea.h, { left: 0, top: 0, right: 0, bottom: 0 });
-      });
-    }
-  };
-  var BasePlatform = class {
-    acquireContext(canvas, aspectRatio) {
-    }
-    releaseContext(context) {
-      return false;
-    }
-    addEventListener(chart, type, listener) {
-    }
-    removeEventListener(chart, type, listener) {
-    }
-    getDevicePixelRatio() {
-      return 1;
-    }
-    getMaximumSize(element, width, height, aspectRatio) {
-      width = Math.max(0, width || element.width);
-      height = height || element.height;
-      return {
-        width,
-        height: Math.max(0, aspectRatio ? Math.floor(width / aspectRatio) : height)
-      };
-    }
-    isAttached(canvas) {
-      return true;
-    }
-    updateConfig(config) {
-    }
-  };
-  var BasicPlatform = class extends BasePlatform {
-    acquireContext(item) {
-      return item && item.getContext && item.getContext("2d") || null;
-    }
-    updateConfig(config) {
-      config.options.animation = false;
-    }
-  };
-  var EXPANDO_KEY = "$chartjs";
-  var EVENT_TYPES = {
-    touchstart: "mousedown",
-    touchmove: "mousemove",
-    touchend: "mouseup",
-    pointerenter: "mouseenter",
-    pointerdown: "mousedown",
-    pointermove: "mousemove",
-    pointerup: "mouseup",
-    pointerleave: "mouseout",
-    pointerout: "mouseout"
-  };
-  var isNullOrEmpty = (value) => value === null || value === "";
-  function initCanvas(canvas, aspectRatio) {
-    const style2 = canvas.style;
-    const renderHeight = canvas.getAttribute("height");
-    const renderWidth = canvas.getAttribute("width");
-    canvas[EXPANDO_KEY] = {
-      initial: {
-        height: renderHeight,
-        width: renderWidth,
-        style: {
-          display: style2.display,
-          height: style2.height,
-          width: style2.width
-        }
-      }
-    };
-    style2.display = style2.display || "block";
-    style2.boxSizing = style2.boxSizing || "border-box";
-    if (isNullOrEmpty(renderWidth)) {
-      const displayWidth = readUsedSize(canvas, "width");
-      if (displayWidth !== void 0) {
-        canvas.width = displayWidth;
-      }
-    }
-    if (isNullOrEmpty(renderHeight)) {
-      if (canvas.style.height === "") {
-        canvas.height = canvas.width / (aspectRatio || 2);
-      } else {
-        const displayHeight = readUsedSize(canvas, "height");
-        if (displayHeight !== void 0) {
-          canvas.height = displayHeight;
-        }
-      }
-    }
-    return canvas;
-  }
-  var eventListenerOptions = supportsEventListenerOptions ? { passive: true } : false;
-  function addListener(node, type, listener) {
-    node.addEventListener(type, listener, eventListenerOptions);
-  }
-  function removeListener(chart, type, listener) {
-    chart.canvas.removeEventListener(type, listener, eventListenerOptions);
-  }
-  function fromNativeEvent(event, chart) {
-    const type = EVENT_TYPES[event.type] || event.type;
-    const { x, y } = getRelativePosition(event, chart);
-    return {
-      type,
-      chart,
-      native: event,
-      x: x !== void 0 ? x : null,
-      y: y !== void 0 ? y : null
-    };
-  }
-  function nodeListContains(nodeList, canvas) {
-    for (const node of nodeList) {
-      if (node === canvas || node.contains(canvas)) {
-        return true;
-      }
-    }
-  }
-  function createAttachObserver(chart, type, listener) {
-    const canvas = chart.canvas;
-    const observer = new MutationObserver((entries) => {
-      let trigger = false;
-      for (const entry of entries) {
-        trigger = trigger || nodeListContains(entry.addedNodes, canvas);
-        trigger = trigger && !nodeListContains(entry.removedNodes, canvas);
-      }
-      if (trigger) {
-        listener();
-      }
-    });
-    observer.observe(document, { childList: true, subtree: true });
-    return observer;
-  }
-  function createDetachObserver(chart, type, listener) {
-    const canvas = chart.canvas;
-    const observer = new MutationObserver((entries) => {
-      let trigger = false;
-      for (const entry of entries) {
-        trigger = trigger || nodeListContains(entry.removedNodes, canvas);
-        trigger = trigger && !nodeListContains(entry.addedNodes, canvas);
-      }
-      if (trigger) {
-        listener();
-      }
-    });
-    observer.observe(document, { childList: true, subtree: true });
-    return observer;
-  }
-  var drpListeningCharts = /* @__PURE__ */ new Map();
-  var oldDevicePixelRatio = 0;
-  function onWindowResize() {
-    const dpr = window.devicePixelRatio;
-    if (dpr === oldDevicePixelRatio) {
-      return;
-    }
-    oldDevicePixelRatio = dpr;
-    drpListeningCharts.forEach((resize, chart) => {
-      if (chart.currentDevicePixelRatio !== dpr) {
-        resize();
-      }
-    });
-  }
-  function listenDevicePixelRatioChanges(chart, resize) {
-    if (!drpListeningCharts.size) {
-      window.addEventListener("resize", onWindowResize);
-    }
-    drpListeningCharts.set(chart, resize);
-  }
-  function unlistenDevicePixelRatioChanges(chart) {
-    drpListeningCharts.delete(chart);
-    if (!drpListeningCharts.size) {
-      window.removeEventListener("resize", onWindowResize);
-    }
-  }
-  function createResizeObserver(chart, type, listener) {
-    const canvas = chart.canvas;
-    const container = canvas && _getParentNode(canvas);
-    if (!container) {
-      return;
-    }
-    const resize = throttled((width, height) => {
-      const w = container.clientWidth;
-      listener(width, height);
-      if (w < container.clientWidth) {
-        listener();
-      }
-    }, window);
-    const observer = new ResizeObserver((entries) => {
-      const entry = entries[0];
-      const width = entry.contentRect.width;
-      const height = entry.contentRect.height;
-      if (width === 0 && height === 0) {
-        return;
-      }
-      resize(width, height);
-    });
-    observer.observe(container);
-    listenDevicePixelRatioChanges(chart, resize);
-    return observer;
-  }
-  function releaseObserver(chart, type, observer) {
-    if (observer) {
-      observer.disconnect();
-    }
-    if (type === "resize") {
-      unlistenDevicePixelRatioChanges(chart);
-    }
-  }
-  function createProxyAndListen(chart, type, listener) {
-    const canvas = chart.canvas;
-    const proxy = throttled((event) => {
-      if (chart.ctx !== null) {
-        listener(fromNativeEvent(event, chart));
-      }
-    }, chart, (args) => {
-      const event = args[0];
-      return [event, event.offsetX, event.offsetY];
-    });
-    addListener(canvas, type, proxy);
-    return proxy;
-  }
-  var DomPlatform = class extends BasePlatform {
-    acquireContext(canvas, aspectRatio) {
-      const context = canvas && canvas.getContext && canvas.getContext("2d");
-      if (context && context.canvas === canvas) {
-        initCanvas(canvas, aspectRatio);
-        return context;
-      }
-      return null;
-    }
-    releaseContext(context) {
-      const canvas = context.canvas;
-      if (!canvas[EXPANDO_KEY]) {
-        return false;
-      }
-      const initial = canvas[EXPANDO_KEY].initial;
-      ["height", "width"].forEach((prop) => {
-        const value = initial[prop];
-        if (isNullOrUndef(value)) {
-          canvas.removeAttribute(prop);
-        } else {
-          canvas.setAttribute(prop, value);
-        }
-      });
-      const style2 = initial.style || {};
-      Object.keys(style2).forEach((key) => {
-        canvas.style[key] = style2[key];
-      });
-      canvas.width = canvas.width;
-      delete canvas[EXPANDO_KEY];
-      return true;
-    }
-    addEventListener(chart, type, listener) {
-      this.removeEventListener(chart, type);
-      const proxies = chart.$proxies || (chart.$proxies = {});
-      const handlers2 = {
-        attach: createAttachObserver,
-        detach: createDetachObserver,
-        resize: createResizeObserver
-      };
-      const handler = handlers2[type] || createProxyAndListen;
-      proxies[type] = handler(chart, type, listener);
-    }
-    removeEventListener(chart, type) {
-      const proxies = chart.$proxies || (chart.$proxies = {});
-      const proxy = proxies[type];
-      if (!proxy) {
-        return;
-      }
-      const handlers2 = {
-        attach: releaseObserver,
-        detach: releaseObserver,
-        resize: releaseObserver
-      };
-      const handler = handlers2[type] || removeListener;
-      handler(chart, type, proxy);
-      proxies[type] = void 0;
-    }
-    getDevicePixelRatio() {
-      return window.devicePixelRatio;
-    }
-    getMaximumSize(canvas, width, height, aspectRatio) {
-      return getMaximumSize(canvas, width, height, aspectRatio);
-    }
-    isAttached(canvas) {
-      const container = _getParentNode(canvas);
-      return !!(container && container.isConnected);
-    }
-  };
-  function _detectPlatform(canvas) {
-    if (!_isDomSupported() || typeof OffscreenCanvas !== "undefined" && canvas instanceof OffscreenCanvas) {
-      return BasicPlatform;
-    }
-    return DomPlatform;
-  }
+  var registry = /* @__PURE__ */ new Registry();
   var PluginService = class {
     constructor() {
       this._init = [];
@@ -48465,7 +50922,11 @@ img.ProseMirror-separator {
       for (const descriptor of descriptors2) {
         const plugin = descriptor.plugin;
         const method = plugin[hook];
-        const params = [chart, args, descriptor.options];
+        const params = [
+          chart,
+          args,
+          descriptor.options
+        ];
         if (callback(method, params, plugin) === false && args.cancelable) {
           return false;
         }
@@ -48515,7 +50976,10 @@ img.ProseMirror-separator {
         localIds[plugin.id] = true;
       }
     }
-    return { plugins: plugins3, localIds };
+    return {
+      plugins: plugins3,
+      localIds
+    };
   }
   function getOpts(options, all) {
     if (!all && options === false) {
@@ -48537,7 +51001,10 @@ img.ProseMirror-separator {
       }
       result.push({
         plugin,
-        options: pluginOpts(chart.config, { plugin, local: localIds[id] }, opts, context)
+        options: pluginOpts(chart.config, {
+          plugin,
+          local: localIds[id]
+        }, opts, context)
       });
     }
     return result;
@@ -48548,7 +51015,9 @@ img.ProseMirror-separator {
     if (local && plugin.defaults) {
       scopes.push(plugin.defaults);
     }
-    return config.createResolver(scopes, context, [""], {
+    return config.createResolver(scopes, context, [
+      ""
+    ], {
       scriptable: false,
       indexable: false,
       allKeys: true
@@ -48571,6 +51040,11 @@ img.ProseMirror-separator {
   function getDefaultScaleIDFromAxis(axis, indexAxis) {
     return axis === indexAxis ? "_index_" : "_value_";
   }
+  function idMatchesAxis(id) {
+    if (id === "x" || id === "y" || id === "r") {
+      return id;
+    }
+  }
   function axisFromPosition(position) {
     if (position === "top" || position === "bottom") {
       return "x";
@@ -48579,17 +51053,40 @@ img.ProseMirror-separator {
       return "y";
     }
   }
-  function determineAxis(id, scaleOptions) {
-    if (id === "x" || id === "y") {
+  function determineAxis(id, ...scaleOptions) {
+    if (idMatchesAxis(id)) {
       return id;
     }
-    return scaleOptions.axis || axisFromPosition(scaleOptions.position) || id.charAt(0).toLowerCase();
+    for (const opts of scaleOptions) {
+      const axis = opts.axis || axisFromPosition(opts.position) || id.length > 1 && idMatchesAxis(id[0].toLowerCase());
+      if (axis) {
+        return axis;
+      }
+    }
+    throw new Error(`Cannot determine type of '${id}' axis. Please provide 'axis' or 'position' option.`);
+  }
+  function getAxisFromDataset(id, axis, dataset) {
+    if (dataset[axis + "AxisID"] === id) {
+      return {
+        axis
+      };
+    }
+  }
+  function retrieveAxisFromDatasets(id, config) {
+    if (config.data && config.data.datasets) {
+      const boundDs = config.data.datasets.filter((d) => d.xAxisID === id || d.yAxisID === id);
+      if (boundDs.length) {
+        return getAxisFromDataset(id, "x", boundDs[0]) || getAxisFromDataset(id, "y", boundDs[0]);
+      }
+    }
+    return {};
   }
   function mergeScaleConfig(config, options) {
-    const chartDefaults = overrides[config.type] || { scales: {} };
+    const chartDefaults = overrides[config.type] || {
+      scales: {}
+    };
     const configScales = options.scales || {};
     const chartIndexAxis = getIndexAxis(config.type, options);
-    const firstIDs = /* @__PURE__ */ Object.create(null);
     const scales2 = /* @__PURE__ */ Object.create(null);
     Object.keys(configScales).forEach((id) => {
       const scaleConf = configScales[id];
@@ -48599,11 +51096,17 @@ img.ProseMirror-separator {
       if (scaleConf._proxy) {
         return console.warn(`Ignoring resolver passed as options for scale: ${id}`);
       }
-      const axis = determineAxis(id, scaleConf);
+      const axis = determineAxis(id, scaleConf, retrieveAxisFromDatasets(id, config), defaults.scales[scaleConf.type]);
       const defaultId = getDefaultScaleIDFromAxis(axis, chartIndexAxis);
       const defaultScaleOptions = chartDefaults.scales || {};
-      firstIDs[axis] = firstIDs[axis] || id;
-      scales2[id] = mergeIf(/* @__PURE__ */ Object.create(null), [{ axis }, scaleConf, defaultScaleOptions[axis], defaultScaleOptions[defaultId]]);
+      scales2[id] = mergeIf(/* @__PURE__ */ Object.create(null), [
+        {
+          axis
+        },
+        scaleConf,
+        defaultScaleOptions[axis],
+        defaultScaleOptions[defaultId]
+      ]);
     });
     config.data.datasets.forEach((dataset) => {
       const type = dataset.type || config.type;
@@ -48612,14 +51115,23 @@ img.ProseMirror-separator {
       const defaultScaleOptions = datasetDefaults.scales || {};
       Object.keys(defaultScaleOptions).forEach((defaultID) => {
         const axis = getAxisFromDefaultScaleID(defaultID, indexAxis);
-        const id = dataset[axis + "AxisID"] || firstIDs[axis] || axis;
+        const id = dataset[axis + "AxisID"] || axis;
         scales2[id] = scales2[id] || /* @__PURE__ */ Object.create(null);
-        mergeIf(scales2[id], [{ axis }, configScales[id], defaultScaleOptions[defaultID]]);
+        mergeIf(scales2[id], [
+          {
+            axis
+          },
+          configScales[id],
+          defaultScaleOptions[defaultID]
+        ]);
       });
     });
     Object.keys(scales2).forEach((key) => {
       const scale = scales2[key];
-      mergeIf(scale, [defaults.scales[scale.type], defaults.scale]);
+      mergeIf(scale, [
+        defaults.scales[scale.type],
+        defaults.scale
+      ]);
     });
     return scales2;
   }
@@ -48697,50 +51209,44 @@ img.ProseMirror-separator {
       this._resolverCache.clear();
     }
     datasetScopeKeys(datasetType) {
-      return cachedKeys(
-        datasetType,
-        () => [[
+      return cachedKeys(datasetType, () => [
+        [
           `datasets.${datasetType}`,
           ""
-        ]]
-      );
+        ]
+      ]);
     }
     datasetAnimationScopeKeys(datasetType, transition) {
-      return cachedKeys(
-        `${datasetType}.transition.${transition}`,
-        () => [
-          [
-            `datasets.${datasetType}.transitions.${transition}`,
-            `transitions.${transition}`
-          ],
-          [
-            `datasets.${datasetType}`,
-            ""
-          ]
+      return cachedKeys(`${datasetType}.transition.${transition}`, () => [
+        [
+          `datasets.${datasetType}.transitions.${transition}`,
+          `transitions.${transition}`
+        ],
+        [
+          `datasets.${datasetType}`,
+          ""
         ]
-      );
+      ]);
     }
     datasetElementScopeKeys(datasetType, elementType2) {
-      return cachedKeys(
-        `${datasetType}-${elementType2}`,
-        () => [[
+      return cachedKeys(`${datasetType}-${elementType2}`, () => [
+        [
           `datasets.${datasetType}.elements.${elementType2}`,
           `datasets.${datasetType}`,
           `elements.${elementType2}`,
           ""
-        ]]
-      );
+        ]
+      ]);
     }
     pluginScopeKeys(plugin) {
       const id = plugin.id;
       const type = this.type;
-      return cachedKeys(
-        `${type}-plugin-${id}`,
-        () => [[
+      return cachedKeys(`${type}-plugin-${id}`, () => [
+        [
           `plugins.${id}`,
           ...plugin.additionalOptionScopes || []
-        ]]
-      );
+        ]
+      ]);
     }
     _cachedScopes(mainScope, resetCache) {
       const _scopeCache = this._scopeCache;
@@ -48784,13 +51290,19 @@ img.ProseMirror-separator {
         options,
         overrides[type] || {},
         defaults.datasets[type] || {},
-        { type },
+        {
+          type
+        },
         defaults,
         descriptors
       ];
     }
-    resolveNamedOptions(scopes, names2, context, prefixes = [""]) {
-      const result = { $shared: true };
+    resolveNamedOptions(scopes, names2, context, prefixes = [
+      ""
+    ]) {
+      const result = {
+        $shared: true
+      };
       const { resolver, subPrefixes } = getResolver(this._resolverCache, scopes, prefixes);
       let options = resolver;
       if (needContext(resolver, names2)) {
@@ -48804,7 +51316,9 @@ img.ProseMirror-separator {
       }
       return result;
     }
-    createResolver(scopes, context, prefixes = [""], descriptorDefaults) {
+    createResolver(scopes, context, prefixes = [
+      ""
+    ], descriptorDefaults) {
       const { resolver } = getResolver(this._resolverCache, scopes, prefixes);
       return isObject(context) ? _attachContext(resolver, context, void 0, descriptorDefaults) : resolver;
     }
@@ -48827,7 +51341,7 @@ img.ProseMirror-separator {
     }
     return cached;
   }
-  var hasFunction = (value) => isObject(value) && Object.getOwnPropertyNames(value).reduce((acc, key) => acc || isFunction(value[key]), false);
+  var hasFunction = (value) => isObject(value) && Object.getOwnPropertyNames(value).some((key) => isFunction(value[key]));
   function needContext(proxy, names2) {
     const { isScriptable, isIndexable } = _descriptors(proxy);
     for (const prop of names2) {
@@ -48840,8 +51354,14 @@ img.ProseMirror-separator {
     }
     return false;
   }
-  var version = "3.9.1";
-  var KNOWN_POSITIONS = ["top", "bottom", "left", "right", "chartArea"];
+  var version = "4.4.1";
+  var KNOWN_POSITIONS = [
+    "top",
+    "bottom",
+    "left",
+    "right",
+    "chartArea"
+  ];
   function positionIsHorizontal(position, axis) {
     return position === "top" || position === "bottom" || KNOWN_POSITIONS.indexOf(position) === -1 && axis === "x";
   }
@@ -48852,14 +51372,18 @@ img.ProseMirror-separator {
   }
   function onAnimationsComplete(context) {
     const chart = context.chart;
-    const animationOptions2 = chart.options.animation;
+    const animationOptions = chart.options.animation;
     chart.notifyPlugins("afterRender");
-    callback(animationOptions2 && animationOptions2.onComplete, [context], chart);
+    callback(animationOptions && animationOptions.onComplete, [
+      context
+    ], chart);
   }
   function onAnimationProgress(context) {
     const chart = context.chart;
-    const animationOptions2 = chart.options.animation;
-    callback(animationOptions2 && animationOptions2.onProgress, [context], chart);
+    const animationOptions = chart.options.animation;
+    callback(animationOptions && animationOptions.onProgress, [
+      context
+    ], chart);
   }
   function getCanvas(item) {
     if (_isDomSupported() && typeof item === "string") {
@@ -48899,15 +51423,42 @@ img.ProseMirror-separator {
     }
     return e;
   }
+  function getSizeForArea(scale, chartArea, field) {
+    return scale.options.clip ? scale[field] : chartArea[field];
+  }
+  function getDatasetArea(meta, chartArea) {
+    const { xScale, yScale } = meta;
+    if (xScale && yScale) {
+      return {
+        left: getSizeForArea(xScale, chartArea, "left"),
+        right: getSizeForArea(xScale, chartArea, "right"),
+        top: getSizeForArea(yScale, chartArea, "top"),
+        bottom: getSizeForArea(yScale, chartArea, "bottom")
+      };
+    }
+    return chartArea;
+  }
   var Chart = class {
+    static defaults = defaults;
+    static instances = instances;
+    static overrides = overrides;
+    static registry = registry;
+    static version = version;
+    static getChart = getChart;
+    static register(...items) {
+      registry.add(...items);
+      invalidatePlugins();
+    }
+    static unregister(...items) {
+      registry.remove(...items);
+      invalidatePlugins();
+    }
     constructor(item, userConfig) {
       const config = this.config = new Config(userConfig);
       const initialCanvas = getCanvas(item);
       const existingChart = getChart(initialCanvas);
       if (existingChart) {
-        throw new Error(
-          "Canvas is already in use. Chart with ID '" + existingChart.id + "' must be destroyed before the canvas with ID '" + existingChart.canvas.id + "' can be reused."
-        );
+        throw new Error("Canvas is already in use. Chart with ID '" + existingChart.id + "' must be destroyed before the canvas with ID '" + existingChart.canvas.id + "' can be reused.");
       }
       const options = config.createResolver(config.chartOptionScopes(), this.getContext());
       this.platform = new (config.platform || _detectPlatform(initialCanvas))();
@@ -48977,6 +51528,9 @@ img.ProseMirror-separator {
     set options(options) {
       this.config.options = options;
     }
+    get registry() {
+      return registry;
+    }
     _initialize() {
       this.notifyPlugins("beforeInit");
       if (this.options.responsive) {
@@ -49000,7 +51554,10 @@ img.ProseMirror-separator {
       if (!animator.running(this)) {
         this._resize(width, height);
       } else {
-        this._resizeBeforeDraw = { width, height };
+        this._resizeBeforeDraw = {
+          width,
+          height
+        };
       }
     }
     _resize(width, height) {
@@ -49016,8 +51573,13 @@ img.ProseMirror-separator {
       if (!retinaScale(this, newRatio, true)) {
         return;
       }
-      this.notifyPlugins("resize", { size: newSize });
-      callback(options.onResize, [this, newSize], this);
+      this.notifyPlugins("resize", {
+        size: newSize
+      });
+      callback(options.onResize, [
+        this,
+        newSize
+      ], this);
       if (this.attached) {
         if (this._doResize(mode)) {
           this.render();
@@ -49041,19 +51603,17 @@ img.ProseMirror-separator {
       }, {});
       let items = [];
       if (scaleOpts) {
-        items = items.concat(
-          Object.keys(scaleOpts).map((id) => {
-            const scaleOptions = scaleOpts[id];
-            const axis = determineAxis(id, scaleOptions);
-            const isRadial = axis === "r";
-            const isHorizontal = axis === "x";
-            return {
-              options: scaleOptions,
-              dposition: isRadial ? "chartArea" : isHorizontal ? "bottom" : "left",
-              dtype: isRadial ? "radialLinear" : isHorizontal ? "category" : "linear"
-            };
-          })
-        );
+        items = items.concat(Object.keys(scaleOpts).map((id) => {
+          const scaleOptions = scaleOpts[id];
+          const axis = determineAxis(id, scaleOptions);
+          const isRadial = axis === "r";
+          const isHorizontal = axis === "x";
+          return {
+            options: scaleOptions,
+            dposition: isRadial ? "chartArea" : isHorizontal ? "bottom" : "left",
+            dtype: isRadial ? "radialLinear" : isHorizontal ? "category" : "linear"
+          };
+        }));
       }
       each(items, (item) => {
         const scaleOptions = item.options;
@@ -49138,7 +51698,7 @@ img.ProseMirror-separator {
         } else {
           const ControllerClass = registry.getController(type);
           const { datasetElementType, dataElementType } = defaults.datasets[type];
-          Object.assign(ControllerClass.prototype, {
+          Object.assign(ControllerClass, {
             dataElementType: registry.getElement(dataElementType),
             datasetElementType: datasetElementType && registry.getElement(datasetElementType)
           });
@@ -49167,7 +51727,10 @@ img.ProseMirror-separator {
       this._checkEventBindings();
       this._updateHiddenIndices();
       this._plugins.invalidate();
-      if (this.notifyPlugins("beforeUpdate", { mode, cancelable: true }) === false) {
+      if (this.notifyPlugins("beforeUpdate", {
+        mode,
+        cancelable: true
+      }) === false) {
         return;
       }
       const newControllers = this.buildOrUpdateControllers();
@@ -49187,7 +51750,9 @@ img.ProseMirror-separator {
         });
       }
       this._updateDatasets(mode);
-      this.notifyPlugins("afterUpdate", { mode });
+      this.notifyPlugins("afterUpdate", {
+        mode
+      });
       this._layers.sort(compare2Level("z", "_idx"));
       const { _active, _lastEvent } = this;
       if (_lastEvent) {
@@ -49228,19 +51793,23 @@ img.ProseMirror-separator {
       }
       this._dataChanges = [];
       const datasetCount = this.data.datasets.length;
-      const makeSet = (idx) => new Set(
-        _dataChanges.filter((c) => c[0] === idx).map((c, i) => i + "," + c.splice(1).join(","))
-      );
+      const makeSet = (idx) => new Set(_dataChanges.filter((c) => c[0] === idx).map((c, i) => i + "," + c.splice(1).join(",")));
       const changeSet = makeSet(0);
       for (let i = 1; i < datasetCount; i++) {
         if (!setsEqual(changeSet, makeSet(i))) {
           return;
         }
       }
-      return Array.from(changeSet).map((c) => c.split(",")).map((a) => ({ method: a[1], start: +a[2], count: +a[3] }));
+      return Array.from(changeSet).map((c) => c.split(",")).map((a) => ({
+        method: a[1],
+        start: +a[2],
+        count: +a[3]
+      }));
     }
     _updateLayout(minPadding) {
-      if (this.notifyPlugins("beforeLayout", { cancelable: true }) === false) {
+      if (this.notifyPlugins("beforeLayout", {
+        cancelable: true
+      }) === false) {
         return;
       }
       layouts.update(this, this.width, this.height, minPadding);
@@ -49262,20 +51831,32 @@ img.ProseMirror-separator {
       this.notifyPlugins("afterLayout");
     }
     _updateDatasets(mode) {
-      if (this.notifyPlugins("beforeDatasetsUpdate", { mode, cancelable: true }) === false) {
+      if (this.notifyPlugins("beforeDatasetsUpdate", {
+        mode,
+        cancelable: true
+      }) === false) {
         return;
       }
       for (let i = 0, ilen = this.data.datasets.length; i < ilen; ++i) {
         this.getDatasetMeta(i).controller.configure();
       }
       for (let i = 0, ilen = this.data.datasets.length; i < ilen; ++i) {
-        this._updateDataset(i, isFunction(mode) ? mode({ datasetIndex: i }) : mode);
+        this._updateDataset(i, isFunction(mode) ? mode({
+          datasetIndex: i
+        }) : mode);
       }
-      this.notifyPlugins("afterDatasetsUpdate", { mode });
+      this.notifyPlugins("afterDatasetsUpdate", {
+        mode
+      });
     }
     _updateDataset(index3, mode) {
       const meta = this.getDatasetMeta(index3);
-      const args = { meta, index: index3, mode, cancelable: true };
+      const args = {
+        meta,
+        index: index3,
+        mode,
+        cancelable: true
+      };
       if (this.notifyPlugins("beforeDatasetUpdate", args) === false) {
         return;
       }
@@ -49284,7 +51865,9 @@ img.ProseMirror-separator {
       this.notifyPlugins("afterDatasetUpdate", args);
     }
     render() {
-      if (this.notifyPlugins("beforeRender", { cancelable: true }) === false) {
+      if (this.notifyPlugins("beforeRender", {
+        cancelable: true
+      }) === false) {
         return;
       }
       if (animator.has(this)) {
@@ -49293,7 +51876,9 @@ img.ProseMirror-separator {
         }
       } else {
         this.draw();
-        onAnimationsComplete({ chart: this });
+        onAnimationsComplete({
+          chart: this
+        });
       }
     }
     draw() {
@@ -49307,7 +51892,9 @@ img.ProseMirror-separator {
       if (this.width <= 0 || this.height <= 0) {
         return;
       }
-      if (this.notifyPlugins("beforeDraw", { cancelable: true }) === false) {
+      if (this.notifyPlugins("beforeDraw", {
+        cancelable: true
+      }) === false) {
         return;
       }
       const layers = this._layers;
@@ -49336,7 +51923,9 @@ img.ProseMirror-separator {
       return this._getSortedDatasetMetas(true);
     }
     _drawDatasets() {
-      if (this.notifyPlugins("beforeDatasetsDraw", { cancelable: true }) === false) {
+      if (this.notifyPlugins("beforeDatasetsDraw", {
+        cancelable: true
+      }) === false) {
         return;
       }
       const metasets = this.getSortedVisibleDatasetMetas();
@@ -49349,7 +51938,7 @@ img.ProseMirror-separator {
       const ctx = this.ctx;
       const clip = meta._clip;
       const useClip = !clip.disabled;
-      const area = this.chartArea;
+      const area = getDatasetArea(meta, this.chartArea);
       const args = {
         meta,
         index: meta.index,
@@ -49407,7 +51996,10 @@ img.ProseMirror-separator {
       return meta;
     }
     getContext() {
-      return this.$context || (this.$context = createContext(null, { chart: this, type: "chart" }));
+      return this.$context || (this.$context = createContext(null, {
+        chart: this,
+        type: "chart"
+      }));
     }
     getVisibleDatasetCount() {
       return this.getSortedVisibleDatasetMetas().length;
@@ -49439,7 +52031,9 @@ img.ProseMirror-separator {
         this.update();
       } else {
         this.setDatasetVisibility(datasetIndex, visible);
-        anims.update(meta, { visible });
+        anims.update(meta, {
+          visible
+        });
         this.update((ctx) => ctx.datasetIndex === datasetIndex ? mode : void 0);
       }
     }
@@ -49476,7 +52070,6 @@ img.ProseMirror-separator {
         this.canvas = null;
         this.ctx = null;
       }
-      this.notifyPlugins("destroy");
       delete instances[this.id];
       this.notifyPlugins("afterDestroy");
     }
@@ -49598,6 +52191,9 @@ img.ProseMirror-separator {
     notifyPlugins(hook, args, filter) {
       return this._plugins.notify(this, hook, args, filter);
     }
+    isPluginEnabled(pluginId) {
+      return this._plugins._cache.filter((p) => p.plugin.id === pluginId).length === 1;
+    }
     _updateHoverStyles(active, lastActive, replay) {
       const hoverOptions = this.options.hover;
       const diff = (a, b) => a.filter((x) => !b.some((y) => x.datasetIndex === y.datasetIndex && x.index === y.index));
@@ -49637,9 +52233,17 @@ img.ProseMirror-separator {
       const lastEvent = determineLastEvent(e, this._lastEvent, inChartArea, isClick);
       if (inChartArea) {
         this._lastEvent = null;
-        callback(options.onHover, [e, active, this], this);
+        callback(options.onHover, [
+          e,
+          active,
+          this
+        ], this);
         if (isClick) {
-          callback(options.onClick, [e, active, this], this);
+          callback(options.onClick, [
+            e,
+            active,
+            this
+          ], this);
         }
       }
       const changed = !_elementsEqual(active, lastActive);
@@ -49661,48 +52265,9 @@ img.ProseMirror-separator {
       return this.getElementsAtEventForMode(e, hoverOptions.mode, hoverOptions, useFinalPosition);
     }
   };
-  var invalidatePlugins = () => each(Chart.instances, (chart) => chart._plugins.invalidate());
-  var enumerable = true;
-  Object.defineProperties(Chart, {
-    defaults: {
-      enumerable,
-      value: defaults
-    },
-    instances: {
-      enumerable,
-      value: instances
-    },
-    overrides: {
-      enumerable,
-      value: overrides
-    },
-    registry: {
-      enumerable,
-      value: registry
-    },
-    version: {
-      enumerable,
-      value: version
-    },
-    getChart: {
-      enumerable,
-      value: getChart
-    },
-    register: {
-      enumerable,
-      value: (...items) => {
-        registry.add(...items);
-        invalidatePlugins();
-      }
-    },
-    unregister: {
-      enumerable,
-      value: (...items) => {
-        registry.remove(...items);
-        invalidatePlugins();
-      }
-    }
-  });
+  function invalidatePlugins() {
+    return each(Chart.instances, (chart) => chart._plugins.invalidate());
+  }
   function clipArc(ctx, element, endAngle) {
     const { startAngle, pixelMargin, x, y, outerRadius, innerRadius } = element;
     let angleMargin = pixelMargin / outerRadius;
@@ -49718,7 +52283,12 @@ img.ProseMirror-separator {
     ctx.clip();
   }
   function toRadiusCorners(value) {
-    return _readValueToProps(value, ["outerStart", "outerEnd", "innerStart", "innerEnd"]);
+    return _readValueToProps(value, [
+      "outerStart",
+      "outerEnd",
+      "innerStart",
+      "innerEnd"
+    ]);
   }
   function parseBorderRadius$1(arc, innerRadius, outerRadius, angleDelta) {
     const o = toRadiusCorners(arc.options.borderRadius);
@@ -49769,7 +52339,9 @@ img.ProseMirror-separator {
     const innerEndAdjustedAngle = endAngle - innerEnd / innerEndAdjustedRadius;
     ctx.beginPath();
     if (circular) {
-      ctx.arc(x, y, outerRadius, outerStartAdjustedAngle, outerEndAdjustedAngle);
+      const outerMidAdjustedAngle = (outerStartAdjustedAngle + outerEndAdjustedAngle) / 2;
+      ctx.arc(x, y, outerRadius, outerStartAdjustedAngle, outerMidAdjustedAngle);
+      ctx.arc(x, y, outerRadius, outerMidAdjustedAngle, outerEndAdjustedAngle);
       if (outerEnd > 0) {
         const pCenter = rThetaToXY(outerEndAdjustedRadius, outerEndAdjustedAngle, x, y);
         ctx.arc(pCenter.x, pCenter.y, outerEnd, outerEndAdjustedAngle, endAngle + HALF_PI);
@@ -49780,7 +52352,9 @@ img.ProseMirror-separator {
         const pCenter = rThetaToXY(innerEndAdjustedRadius, innerEndAdjustedAngle, x, y);
         ctx.arc(pCenter.x, pCenter.y, innerEnd, endAngle + HALF_PI, innerEndAdjustedAngle + Math.PI);
       }
-      ctx.arc(x, y, innerRadius, endAngle - innerEnd / innerRadius, startAngle + innerStart / innerRadius, true);
+      const innerMidAdjustedAngle = (endAngle - innerEnd / innerRadius + (startAngle + innerStart / innerRadius)) / 2;
+      ctx.arc(x, y, innerRadius, endAngle - innerEnd / innerRadius, innerMidAdjustedAngle, true);
+      ctx.arc(x, y, innerRadius, innerMidAdjustedAngle, startAngle + innerStart / innerRadius, true);
       if (innerStart > 0) {
         const pCenter = rThetaToXY(innerStartAdjustedRadius, innerStartAdjustedAngle, x, y);
         ctx.arc(pCenter.x, pCenter.y, innerStart, innerStartAdjustedAngle + Math.PI, startAngle - HALF_PI);
@@ -49806,47 +52380,27 @@ img.ProseMirror-separator {
     const { fullCircles, startAngle, circumference } = element;
     let endAngle = element.endAngle;
     if (fullCircles) {
-      pathArc(ctx, element, offset2, spacing, startAngle + TAU, circular);
+      pathArc(ctx, element, offset2, spacing, endAngle, circular);
       for (let i = 0; i < fullCircles; ++i) {
         ctx.fill();
       }
       if (!isNaN(circumference)) {
-        endAngle = startAngle + circumference % TAU;
-        if (circumference % TAU === 0) {
-          endAngle += TAU;
-        }
+        endAngle = startAngle + (circumference % TAU || TAU);
       }
     }
     pathArc(ctx, element, offset2, spacing, endAngle, circular);
     ctx.fill();
     return endAngle;
   }
-  function drawFullCircleBorders(ctx, element, inner) {
-    const { x, y, startAngle, pixelMargin, fullCircles } = element;
-    const outerRadius = Math.max(element.outerRadius - pixelMargin, 0);
-    const innerRadius = element.innerRadius + pixelMargin;
-    let i;
-    if (inner) {
-      clipArc(ctx, element, startAngle + TAU);
-    }
-    ctx.beginPath();
-    ctx.arc(x, y, innerRadius, startAngle + TAU, startAngle, true);
-    for (i = 0; i < fullCircles; ++i) {
-      ctx.stroke();
-    }
-    ctx.beginPath();
-    ctx.arc(x, y, outerRadius, startAngle, startAngle + TAU);
-    for (i = 0; i < fullCircles; ++i) {
-      ctx.stroke();
-    }
-  }
-  function drawBorder(ctx, element, offset2, spacing, endAngle, circular) {
-    const { options } = element;
-    const { borderWidth, borderJoinStyle } = options;
+  function drawBorder(ctx, element, offset2, spacing, circular) {
+    const { fullCircles, startAngle, circumference, options } = element;
+    const { borderWidth, borderJoinStyle, borderDash, borderDashOffset } = options;
     const inner = options.borderAlign === "inner";
     if (!borderWidth) {
       return;
     }
+    ctx.setLineDash(borderDash || []);
+    ctx.lineDashOffset = borderDashOffset;
     if (inner) {
       ctx.lineWidth = borderWidth * 2;
       ctx.lineJoin = borderJoinStyle || "round";
@@ -49854,16 +52408,53 @@ img.ProseMirror-separator {
       ctx.lineWidth = borderWidth;
       ctx.lineJoin = borderJoinStyle || "bevel";
     }
-    if (element.fullCircles) {
-      drawFullCircleBorders(ctx, element, inner);
+    let endAngle = element.endAngle;
+    if (fullCircles) {
+      pathArc(ctx, element, offset2, spacing, endAngle, circular);
+      for (let i = 0; i < fullCircles; ++i) {
+        ctx.stroke();
+      }
+      if (!isNaN(circumference)) {
+        endAngle = startAngle + (circumference % TAU || TAU);
+      }
     }
     if (inner) {
       clipArc(ctx, element, endAngle);
     }
-    pathArc(ctx, element, offset2, spacing, endAngle, circular);
-    ctx.stroke();
+    if (!fullCircles) {
+      pathArc(ctx, element, offset2, spacing, endAngle, circular);
+      ctx.stroke();
+    }
   }
   var ArcElement = class extends Element2 {
+    static id = "arc";
+    static defaults = {
+      borderAlign: "center",
+      borderColor: "#fff",
+      borderDash: [],
+      borderDashOffset: 0,
+      borderJoinStyle: void 0,
+      borderRadius: 0,
+      borderWidth: 2,
+      offset: 0,
+      spacing: 0,
+      angle: void 0,
+      circular: true
+    };
+    static defaultRoutes = {
+      backgroundColor: "backgroundColor"
+    };
+    static descriptors = {
+      _scriptable: true,
+      _indexable: (name) => name !== "borderDash"
+    };
+    circumference;
+    endAngle;
+    fullCircles;
+    innerRadius;
+    outerRadius;
+    pixelMargin;
+    startAngle;
     constructor(cfg) {
       super();
       this.options = void 0;
@@ -49879,8 +52470,14 @@ img.ProseMirror-separator {
       }
     }
     inRange(chartX, chartY, useFinalPosition) {
-      const point = this.getProps(["x", "y"], useFinalPosition);
-      const { angle, distance } = getAngleFromPoint(point, { x: chartX, y: chartY });
+      const point = this.getProps([
+        "x",
+        "y"
+      ], useFinalPosition);
+      const { angle, distance } = getAngleFromPoint(point, {
+        x: chartX,
+        y: chartY
+      });
       const { startAngle, endAngle, innerRadius, outerRadius, circumference } = this.getProps([
         "startAngle",
         "endAngle",
@@ -49888,7 +52485,7 @@ img.ProseMirror-separator {
         "outerRadius",
         "circumference"
       ], useFinalPosition);
-      const rAdjust = this.options.spacing / 2;
+      const rAdjust = (this.options.spacing + this.options.borderWidth) / 2;
       const _circumference = valueOrDefault(circumference, endAngle - startAngle);
       const betweenAngles = _circumference >= TAU || _angleBetween(angle, startAngle, endAngle);
       const withinRadius = _isBetween(distance, innerRadius + rAdjust, outerRadius + rAdjust);
@@ -49901,8 +52498,7 @@ img.ProseMirror-separator {
         "startAngle",
         "endAngle",
         "innerRadius",
-        "outerRadius",
-        "circumference"
+        "outerRadius"
       ], useFinalPosition);
       const { offset: offset2, spacing } = this.options;
       const halfAngle = (startAngle + endAngle) / 2;
@@ -49917,7 +52513,7 @@ img.ProseMirror-separator {
     }
     draw(ctx) {
       const { options, circumference } = this;
-      const offset2 = (options.offset || 0) / 2;
+      const offset2 = (options.offset || 0) / 4;
       const spacing = (options.spacing || 0) / 2;
       const circular = options.circular;
       this.pixelMargin = options.borderAlign === "inner" ? 0.33 : 0;
@@ -49926,36 +52522,16 @@ img.ProseMirror-separator {
         return;
       }
       ctx.save();
-      let radiusOffset = 0;
-      if (offset2) {
-        radiusOffset = offset2 / 2;
-        const halfAngle = (this.startAngle + this.endAngle) / 2;
-        ctx.translate(Math.cos(halfAngle) * radiusOffset, Math.sin(halfAngle) * radiusOffset);
-        if (this.circumference >= PI) {
-          radiusOffset = offset2;
-        }
-      }
+      const halfAngle = (this.startAngle + this.endAngle) / 2;
+      ctx.translate(Math.cos(halfAngle) * offset2, Math.sin(halfAngle) * offset2);
+      const fix = 1 - Math.sin(Math.min(PI, circumference || 0));
+      const radiusOffset = offset2 * fix;
       ctx.fillStyle = options.backgroundColor;
       ctx.strokeStyle = options.borderColor;
-      const endAngle = drawArc(ctx, this, radiusOffset, spacing, circular);
-      drawBorder(ctx, this, radiusOffset, spacing, endAngle, circular);
+      drawArc(ctx, this, radiusOffset, spacing, circular);
+      drawBorder(ctx, this, radiusOffset, spacing, circular);
       ctx.restore();
     }
-  };
-  ArcElement.id = "arc";
-  ArcElement.defaults = {
-    borderAlign: "center",
-    borderColor: "#fff",
-    borderJoinStyle: void 0,
-    borderRadius: 0,
-    borderWidth: 2,
-    offset: 0,
-    spacing: 0,
-    angle: void 0,
-    circular: true
-  };
-  ArcElement.defaultRoutes = {
-    backgroundColor: "backgroundColor"
   };
   function setStyle(ctx, options, style2 = options) {
     ctx.lineCap = valueOrDefault(style2.borderCapStyle, options.borderCapStyle);
@@ -50092,7 +52668,10 @@ img.ProseMirror-separator {
     for (const segment of segments) {
       setStyle(ctx, options, segment.style);
       ctx.beginPath();
-      if (segmentMethod(ctx, line, segment, { start: start3, end: start3 + count - 1 })) {
+      if (segmentMethod(ctx, line, segment, {
+        start: start3,
+        end: start3 + count - 1
+      })) {
         ctx.closePath();
       }
       ctx.stroke();
@@ -50107,6 +52686,28 @@ img.ProseMirror-separator {
     }
   }
   var LineElement = class extends Element2 {
+    static id = "line";
+    static defaults = {
+      borderCapStyle: "butt",
+      borderDash: [],
+      borderDashOffset: 0,
+      borderJoinStyle: "miter",
+      borderWidth: 3,
+      capBezierPoints: true,
+      cubicInterpolationMode: "default",
+      fill: false,
+      spanGaps: false,
+      stepped: false,
+      tension: 0
+    };
+    static defaultRoutes = {
+      backgroundColor: "backgroundColor",
+      borderColor: "borderColor"
+    };
+    static descriptors = {
+      _scriptable: true,
+      _indexable: (name) => name !== "borderDash" && name !== "fill"
+    };
     constructor(cfg) {
       super();
       this.animated = true;
@@ -50159,7 +52760,11 @@ img.ProseMirror-separator {
       const options = this.options;
       const value = point[property];
       const points = this.points;
-      const segments = _boundSegments(this, { property, start: value, end: value });
+      const segments = _boundSegments(this, {
+        property,
+        start: value,
+        end: value
+      });
       if (!segments.length) {
         return;
       }
@@ -50192,7 +52797,10 @@ img.ProseMirror-separator {
       start3 = start3 || 0;
       count = count || this.points.length - start3;
       for (const segment of segments) {
-        loop &= segmentMethod(ctx, this, segment, { start: start3, end: start3 + count - 1 });
+        loop &= segmentMethod(ctx, this, segment, {
+          start: start3,
+          end: start3 + count - 1
+        });
       }
       return !!loop;
     }
@@ -50210,34 +52818,37 @@ img.ProseMirror-separator {
       }
     }
   };
-  LineElement.id = "line";
-  LineElement.defaults = {
-    borderCapStyle: "butt",
-    borderDash: [],
-    borderDashOffset: 0,
-    borderJoinStyle: "miter",
-    borderWidth: 3,
-    capBezierPoints: true,
-    cubicInterpolationMode: "default",
-    fill: false,
-    spanGaps: false,
-    stepped: false,
-    tension: 0
-  };
-  LineElement.defaultRoutes = {
-    backgroundColor: "backgroundColor",
-    borderColor: "borderColor"
-  };
-  LineElement.descriptors = {
-    _scriptable: true,
-    _indexable: (name) => name !== "borderDash" && name !== "fill"
-  };
   function inRange$1(el, pos, axis, useFinalPosition) {
     const options = el.options;
-    const { [axis]: value } = el.getProps([axis], useFinalPosition);
+    const { [axis]: value } = el.getProps([
+      axis
+    ], useFinalPosition);
     return Math.abs(pos - value) < options.radius + options.hitRadius;
   }
   var PointElement = class extends Element2 {
+    static id = "point";
+    parsed;
+    skip;
+    stop;
+    /**
+    * @type {any}
+    */
+    static defaults = {
+      borderWidth: 1,
+      hitRadius: 1,
+      hoverBorderWidth: 1,
+      hoverRadius: 4,
+      pointStyle: "circle",
+      radius: 3,
+      rotation: 0
+    };
+    /**
+    * @type {any}
+    */
+    static defaultRoutes = {
+      backgroundColor: "backgroundColor",
+      borderColor: "borderColor"
+    };
     constructor(cfg) {
       super();
       this.options = void 0;
@@ -50250,7 +52861,10 @@ img.ProseMirror-separator {
     }
     inRange(mouseX, mouseY, useFinalPosition) {
       const options = this.options;
-      const { x, y } = this.getProps(["x", "y"], useFinalPosition);
+      const { x, y } = this.getProps([
+        "x",
+        "y"
+      ], useFinalPosition);
       return Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2) < Math.pow(options.hitRadius + options.radius, 2);
     }
     inXRange(mouseX, useFinalPosition) {
@@ -50260,8 +52874,14 @@ img.ProseMirror-separator {
       return inRange$1(this, mouseY, "y", useFinalPosition);
     }
     getCenterPoint(useFinalPosition) {
-      const { x, y } = this.getProps(["x", "y"], useFinalPosition);
-      return { x, y };
+      const { x, y } = this.getProps([
+        "x",
+        "y"
+      ], useFinalPosition);
+      return {
+        x,
+        y
+      };
     }
     size(options) {
       options = options || this.options || {};
@@ -50285,22 +52905,14 @@ img.ProseMirror-separator {
       return options.radius + options.hitRadius;
     }
   };
-  PointElement.id = "point";
-  PointElement.defaults = {
-    borderWidth: 1,
-    hitRadius: 1,
-    hoverBorderWidth: 1,
-    hoverRadius: 4,
-    pointStyle: "circle",
-    radius: 3,
-    rotation: 0
-  };
-  PointElement.defaultRoutes = {
-    backgroundColor: "backgroundColor",
-    borderColor: "borderColor"
-  };
   function getBarBounds(bar, useFinalPosition) {
-    const { x, y, base: base2, width, height } = bar.getProps(["x", "y", "base", "width", "height"], useFinalPosition);
+    const { x, y, base: base2, width, height } = bar.getProps([
+      "x",
+      "y",
+      "base",
+      "width",
+      "height"
+    ], useFinalPosition);
     let left2, right2, top2, bottom2, half;
     if (bar.horizontal) {
       half = height / 2;
@@ -50315,7 +52927,12 @@ img.ProseMirror-separator {
       top2 = Math.min(y, base2);
       bottom2 = Math.max(y, base2);
     }
-    return { left: left2, top: top2, right: right2, bottom: bottom2 };
+    return {
+      left: left2,
+      top: top2,
+      right: right2,
+      bottom: bottom2
+    };
   }
   function skipOrLimit(skip2, value, min2, max2) {
     return skip2 ? 0 : _limitValue(value, min2, max2);
@@ -50332,7 +52949,9 @@ img.ProseMirror-separator {
     };
   }
   function parseBorderRadius(bar, maxW, maxH) {
-    const { enableBorderRadius } = bar.getProps(["enableBorderRadius"]);
+    const { enableBorderRadius } = bar.getProps([
+      "enableBorderRadius"
+    ]);
     const value = bar.options.borderRadius;
     const o = toTRBLCorners(value);
     const maxR = Math.min(maxW, maxH);
@@ -50400,6 +53019,18 @@ img.ProseMirror-separator {
     };
   }
   var BarElement = class extends Element2 {
+    static id = "bar";
+    static defaults = {
+      borderSkipped: "start",
+      borderWidth: 0,
+      borderRadius: 0,
+      inflateAmount: "auto",
+      pointStyle: void 0
+    };
+    static defaultRoutes = {
+      backgroundColor: "backgroundColor",
+      borderColor: "borderColor"
+    };
     constructor(cfg) {
       super();
       this.options = void 0;
@@ -50441,7 +53072,12 @@ img.ProseMirror-separator {
       return inRange(this, null, mouseY, useFinalPosition);
     }
     getCenterPoint(useFinalPosition) {
-      const { x, y, base: base2, horizontal } = this.getProps(["x", "y", "base", "horizontal"], useFinalPosition);
+      const { x, y, base: base2, horizontal } = this.getProps([
+        "x",
+        "y",
+        "base",
+        "horizontal"
+      ], useFinalPosition);
       return {
         x: horizontal ? (x + base2) / 2 : x,
         y: horizontal ? y : (y + base2) / 2
@@ -50451,25 +53087,87 @@ img.ProseMirror-separator {
       return axis === "x" ? this.width / 2 : this.height / 2;
     }
   };
-  BarElement.id = "bar";
-  BarElement.defaults = {
-    borderSkipped: "start",
-    borderWidth: 0,
-    borderRadius: 0,
-    inflateAmount: "auto",
-    pointStyle: void 0
-  };
-  BarElement.defaultRoutes = {
-    backgroundColor: "backgroundColor",
-    borderColor: "borderColor"
-  };
   var elements = /* @__PURE__ */ Object.freeze({
     __proto__: null,
     ArcElement,
+    BarElement,
     LineElement,
-    PointElement,
-    BarElement
+    PointElement
   });
+  var BORDER_COLORS = [
+    "rgb(54, 162, 235)",
+    "rgb(255, 99, 132)",
+    "rgb(255, 159, 64)",
+    "rgb(255, 205, 86)",
+    "rgb(75, 192, 192)",
+    "rgb(153, 102, 255)",
+    "rgb(201, 203, 207)"
+    // grey
+  ];
+  var BACKGROUND_COLORS = /* @__PURE__ */ BORDER_COLORS.map((color2) => color2.replace("rgb(", "rgba(").replace(")", ", 0.5)"));
+  function getBorderColor(i) {
+    return BORDER_COLORS[i % BORDER_COLORS.length];
+  }
+  function getBackgroundColor(i) {
+    return BACKGROUND_COLORS[i % BACKGROUND_COLORS.length];
+  }
+  function colorizeDefaultDataset(dataset, i) {
+    dataset.borderColor = getBorderColor(i);
+    dataset.backgroundColor = getBackgroundColor(i);
+    return ++i;
+  }
+  function colorizeDoughnutDataset(dataset, i) {
+    dataset.backgroundColor = dataset.data.map(() => getBorderColor(i++));
+    return i;
+  }
+  function colorizePolarAreaDataset(dataset, i) {
+    dataset.backgroundColor = dataset.data.map(() => getBackgroundColor(i++));
+    return i;
+  }
+  function getColorizer(chart) {
+    let i = 0;
+    return (dataset, datasetIndex) => {
+      const controller = chart.getDatasetMeta(datasetIndex).controller;
+      if (controller instanceof DoughnutController) {
+        i = colorizeDoughnutDataset(dataset, i);
+      } else if (controller instanceof PolarAreaController) {
+        i = colorizePolarAreaDataset(dataset, i);
+      } else if (controller) {
+        i = colorizeDefaultDataset(dataset, i);
+      }
+    };
+  }
+  function containsColorsDefinitions(descriptors2) {
+    let k;
+    for (k in descriptors2) {
+      if (descriptors2[k].borderColor || descriptors2[k].backgroundColor) {
+        return true;
+      }
+    }
+    return false;
+  }
+  function containsColorsDefinition(descriptor) {
+    return descriptor && (descriptor.borderColor || descriptor.backgroundColor);
+  }
+  var plugin_colors = {
+    id: "colors",
+    defaults: {
+      enabled: true,
+      forceOverride: false
+    },
+    beforeLayout(chart, _args, options) {
+      if (!options.enabled) {
+        return;
+      }
+      const { data: { datasets }, options: chartOptions } = chart.config;
+      const { elements: elements2 } = chartOptions;
+      if (!options.forceOverride && (containsColorsDefinitions(datasets) || containsColorsDefinition(chartOptions) || elements2 && containsColorsDefinitions(elements2))) {
+        return;
+      }
+      const colorizer = getColorizer(chart);
+      datasets.forEach(colorizer);
+    }
+  };
   function lttbDecimation(data, start3, count, availableWidth, options) {
     const samples = options.samples || availableWidth;
     if (samples >= count) {
@@ -50500,9 +53198,7 @@ img.ProseMirror-separator {
       const { x: pointAx, y: pointAy } = data[a];
       maxArea = area = -1;
       for (j = rangeOffs; j < rangeTo; j++) {
-        area = 0.5 * Math.abs(
-          (pointAx - avgX) * (data[j].y - pointAy) - (pointAx - data[j].x) * (avgY - pointAy)
-        );
+        area = 0.5 * Math.abs((pointAx - avgX) * (data[j].y - pointAy) - (pointAx - data[j].x) * (avgY - pointAy));
         if (area > maxArea) {
           maxArea = area;
           maxAreaPoint = data[j];
@@ -50573,7 +53269,12 @@ img.ProseMirror-separator {
       const data = dataset._data;
       delete dataset._decimated;
       delete dataset._data;
-      Object.defineProperty(dataset, "data", { value: data });
+      Object.defineProperty(dataset, "data", {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: data
+      });
     }
   }
   function cleanDecimatedData(chart) {
@@ -50595,7 +53296,10 @@ img.ProseMirror-separator {
     } else {
       count = pointCount - start3;
     }
-    return { start: start3, count };
+    return {
+      start: start3,
+      count
+    };
   }
   var plugin_decimation = {
     id: "decimation",
@@ -50613,7 +53317,10 @@ img.ProseMirror-separator {
         const { _data, indexAxis } = dataset;
         const meta = chart.getDatasetMeta(datasetIndex);
         const data = _data || dataset.data;
-        if (resolve([indexAxis, chart.options.indexAxis]) === "y") {
+        if (resolve([
+          indexAxis,
+          chart.options.indexAxis
+        ]) === "y") {
           return;
         }
         if (!meta.controller.supportsDecimation) {
@@ -50712,7 +53419,11 @@ img.ProseMirror-separator {
       start3 = _normalizeAngle(start3);
       end2 = _normalizeAngle(end2);
     }
-    return { property, start: start3, end: end2 };
+    return {
+      property,
+      start: start3,
+      end: end2
+    };
   }
   function _pointsFromSegments(boundary, line) {
     const { x = null, y = null } = boundary || {};
@@ -50723,11 +53434,23 @@ img.ProseMirror-separator {
       const first2 = linePoints[start3];
       const last = linePoints[end2];
       if (y !== null) {
-        points.push({ x: first2.x, y });
-        points.push({ x: last.x, y });
+        points.push({
+          x: first2.x,
+          y
+        });
+        points.push({
+          x: last.x,
+          y
+        });
       } else if (x !== null) {
-        points.push({ x, y: first2.y });
-        points.push({ x, y: last.y });
+        points.push({
+          x,
+          y: first2.y
+        });
+        points.push({
+          x,
+          y: last.y
+        });
       }
     });
     return points;
@@ -50758,7 +53481,9 @@ img.ProseMirror-separator {
     }
     return points.length ? new LineElement({
       points,
-      options: { tension: 0 },
+      options: {
+        tension: 0
+      },
       _loop,
       _fullLoop: _loop
     }) : null;
@@ -50769,7 +53494,9 @@ img.ProseMirror-separator {
   function _resolveTarget(sources, index3, propagate) {
     const source2 = sources[index3];
     let fill2 = source2.fill;
-    const visited = [index3];
+    const visited = [
+      index3
+    ];
     let target;
     if (!propagate) {
       return fill2;
@@ -50799,7 +53526,13 @@ img.ProseMirror-separator {
     if (isNumberFinite(target) && Math.floor(target) === target) {
       return decodeTargetIndex(fill2[0], index3, target, count);
     }
-    return ["origin", "start", "end", "stack", "shape"].indexOf(fill2) >= 0 && fill2;
+    return [
+      "origin",
+      "start",
+      "end",
+      "stack",
+      "shape"
+    ].indexOf(fill2) >= 0 && fill2;
   }
   function decodeTargetIndex(firstCh, index3, target, count) {
     if (firstCh === "-" || firstCh === "+") {
@@ -50857,14 +53590,20 @@ img.ProseMirror-separator {
     const segments = line.segments;
     const sourcePoints = line.points;
     const linesBelow = getLinesBelow(scale, index3);
-    linesBelow.push(_createBoundaryLine({ x: null, y: scale.bottom }, line));
+    linesBelow.push(_createBoundaryLine({
+      x: null,
+      y: scale.bottom
+    }, line));
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
       for (let j = segment.start; j <= segment.end; j++) {
         addPointsBelow(points, sourcePoints[j], linesBelow);
       }
     }
-    return new LineElement({ points, options: {} });
+    return new LineElement({
+      points,
+      options: {}
+    });
   }
   function getLinesBelow(scale, index3) {
     const below = [];
@@ -50919,7 +53658,11 @@ img.ProseMirror-separator {
         break;
       }
     }
-    return { first: first2, last, point };
+    return {
+      first: first2,
+      last,
+      point
+    };
   }
   var simpleArc = class {
     constructor(opts) {
@@ -50929,7 +53672,10 @@ img.ProseMirror-separator {
     }
     pathSegment(ctx, bounds, opts) {
       const { x, y, radius } = this;
-      bounds = bounds || { start: 0, end: TAU };
+      bounds = bounds || {
+        start: 0,
+        end: TAU
+      };
       ctx.arc(x, y, radius, bounds.end, bounds.start, true);
       return !opts.bounds;
     }
@@ -51013,7 +53759,15 @@ img.ProseMirror-separator {
     const { above = color2, below = color2 } = fillOption || {};
     if (target && line.points.length) {
       clipArea(ctx, area);
-      doFill(ctx, { line, target, above, below, area, scale, axis });
+      doFill(ctx, {
+        line,
+        target,
+        above,
+        below,
+        area,
+        scale,
+        axis
+      });
       unclipArea(ctx);
     }
   }
@@ -51023,12 +53777,24 @@ img.ProseMirror-separator {
     ctx.save();
     if (property === "x" && below !== above) {
       clipVertical(ctx, target, area.top);
-      fill(ctx, { line, target, color: above, scale, property });
+      fill(ctx, {
+        line,
+        target,
+        color: above,
+        scale,
+        property
+      });
       ctx.restore();
       ctx.save();
       clipVertical(ctx, target, area.bottom);
     }
-    fill(ctx, { line, target, color: below, scale, property });
+    fill(ctx, {
+      line,
+      target,
+      color: below,
+      scale,
+      property
+    });
     ctx.restore();
   }
   function clipVertical(ctx, target, clipY) {
@@ -51047,7 +53813,9 @@ img.ProseMirror-separator {
         ctx.lineTo(firstPoint.x, clipY);
         ctx.lineTo(firstPoint.x, firstPoint.y);
       }
-      lineLoop = !!target.pathSegment(ctx, segment, { move: lineLoop });
+      lineLoop = !!target.pathSegment(ctx, segment, {
+        move: lineLoop
+      });
       if (lineLoop) {
         ctx.closePath();
       } else {
@@ -51076,7 +53844,10 @@ img.ProseMirror-separator {
         } else {
           interpolatedLineTo(ctx, target, end2, property);
         }
-        const targetLoop = !!target.pathSegment(ctx, tgt, { move: lineLoop, reverse: true });
+        const targetLoop = !!target.pathSegment(ctx, tgt, {
+          move: lineLoop,
+          reverse: true
+        });
         loop = lineLoop && targetLoop;
         if (!loop) {
           interpolatedLineTo(ctx, target, start3, property);
@@ -51233,7 +54004,9 @@ img.ProseMirror-separator {
     }
     buildLabels() {
       const labelOpts = this.options.labels || {};
-      let legendItems = callback(labelOpts.generateLabels, [this.chart], this) || [];
+      let legendItems = callback(labelOpts.generateLabels, [
+        this.chart
+      ], this) || [];
       if (labelOpts.filter) {
         legendItems = legendItems.filter((item) => labelOpts.filter(item, this.chart.data));
       }
@@ -51263,7 +54036,7 @@ img.ProseMirror-separator {
         height = this._fitRows(titleHeight, fontSize, boxWidth, itemHeight) + 10;
       } else {
         height = this.maxHeight;
-        width = this._fitCols(titleHeight, fontSize, boxWidth, itemHeight) + 10;
+        width = this._fitCols(titleHeight, labelFont, boxWidth, itemHeight) + 10;
       }
       this.width = Math.min(width, options.maxWidth || this.maxWidth);
       this.height = Math.min(height, options.maxHeight || this.maxHeight);
@@ -51271,7 +54044,9 @@ img.ProseMirror-separator {
     _fitRows(titleHeight, fontSize, boxWidth, itemHeight) {
       const { ctx, maxWidth, options: { labels: { padding } } } = this;
       const hitboxes = this.legendHitBoxes = [];
-      const lineWidths = this.lineWidths = [0];
+      const lineWidths = this.lineWidths = [
+        0
+      ];
       const lineHeight = itemHeight + padding;
       let totalHeight = titleHeight;
       ctx.textAlign = "left";
@@ -51286,12 +54061,18 @@ img.ProseMirror-separator {
           top2 += lineHeight;
           row++;
         }
-        hitboxes[i] = { left: 0, top: top2, row, width: itemWidth, height: itemHeight };
+        hitboxes[i] = {
+          left: 0,
+          top: top2,
+          row,
+          width: itemWidth,
+          height: itemHeight
+        };
         lineWidths[lineWidths.length - 1] += itemWidth + padding;
       });
       return totalHeight;
     }
-    _fitCols(titleHeight, fontSize, boxWidth, itemHeight) {
+    _fitCols(titleHeight, labelFont, boxWidth, _itemHeight) {
       const { ctx, maxHeight, options: { labels: { padding } } } = this;
       const hitboxes = this.legendHitBoxes = [];
       const columnSizes = this.columnSizes = [];
@@ -51302,20 +54083,32 @@ img.ProseMirror-separator {
       let left2 = 0;
       let col = 0;
       this.legendItems.forEach((legendItem, i) => {
-        const itemWidth = boxWidth + fontSize / 2 + ctx.measureText(legendItem.text).width;
+        const { itemWidth, itemHeight } = calculateItemSize(boxWidth, labelFont, ctx, legendItem, _itemHeight);
         if (i > 0 && currentColHeight + itemHeight + 2 * padding > heightLimit) {
           totalWidth += currentColWidth2 + padding;
-          columnSizes.push({ width: currentColWidth2, height: currentColHeight });
+          columnSizes.push({
+            width: currentColWidth2,
+            height: currentColHeight
+          });
           left2 += currentColWidth2 + padding;
           col++;
           currentColWidth2 = currentColHeight = 0;
         }
-        hitboxes[i] = { left: left2, top: currentColHeight, col, width: itemWidth, height: itemHeight };
+        hitboxes[i] = {
+          left: left2,
+          top: currentColHeight,
+          col,
+          width: itemWidth,
+          height: itemHeight
+        };
         currentColWidth2 = Math.max(currentColWidth2, itemWidth);
         currentColHeight += itemHeight + padding;
       });
       totalWidth += currentColWidth2;
-      columnSizes.push({ width: currentColWidth2, height: currentColHeight });
+      columnSizes.push({
+        width: currentColWidth2,
+        height: currentColHeight
+      });
       return totalWidth;
     }
     adjustHitBoxes() {
@@ -51369,7 +54162,7 @@ img.ProseMirror-separator {
       const defaultColor = defaults.color;
       const rtlHelper = getRtlAdapter(opts.rtl, this.left, this.width);
       const labelFont = toFont(labelOpts.font);
-      const { color: fontColor, padding } = labelOpts;
+      const { padding } = labelOpts;
       const fontSize = labelFont.size;
       const halfFontSize = fontSize / 2;
       let cursor;
@@ -51449,8 +54242,8 @@ img.ProseMirror-separator {
       overrideTextDirection(this.ctx, opts.textDirection);
       const lineHeight = itemHeight + padding;
       this.legendItems.forEach((legendItem, i) => {
-        ctx.strokeStyle = legendItem.fontColor || fontColor;
-        ctx.fillStyle = legendItem.fontColor || fontColor;
+        ctx.strokeStyle = legendItem.fontColor;
+        ctx.fillStyle = legendItem.fontColor;
         const textWidth = ctx.measureText(legendItem.text).width;
         const textAlign = rtlHelper.textAlign(legendItem.textAlign || (legendItem.textAlign = labelOpts.textAlign));
         const width = boxWidth + halfFontSize + textWidth;
@@ -51474,6 +54267,9 @@ img.ProseMirror-separator {
         fillText(rtlHelper.x(x), y, legendItem);
         if (isHorizontal) {
           cursor.x += width + padding;
+        } else if (typeof legendItem.text !== "string") {
+          const fontLineHeight = labelFont.lineHeight;
+          cursor.y += calculateLegendItemHeight(legendItem, fontLineHeight) + padding;
         } else {
           cursor.y += lineHeight;
         }
@@ -51541,17 +54337,55 @@ img.ProseMirror-separator {
         const previous = this._hoveredItem;
         const sameItem = itemsEqual(previous, hoveredItem);
         if (previous && !sameItem) {
-          callback(opts.onLeave, [e, previous, this], this);
+          callback(opts.onLeave, [
+            e,
+            previous,
+            this
+          ], this);
         }
         this._hoveredItem = hoveredItem;
         if (hoveredItem && !sameItem) {
-          callback(opts.onHover, [e, hoveredItem, this], this);
+          callback(opts.onHover, [
+            e,
+            hoveredItem,
+            this
+          ], this);
         }
       } else if (hoveredItem) {
-        callback(opts.onClick, [e, hoveredItem, this], this);
+        callback(opts.onClick, [
+          e,
+          hoveredItem,
+          this
+        ], this);
       }
     }
   };
+  function calculateItemSize(boxWidth, labelFont, ctx, legendItem, _itemHeight) {
+    const itemWidth = calculateItemWidth(legendItem, boxWidth, labelFont, ctx);
+    const itemHeight = calculateItemHeight(_itemHeight, legendItem, labelFont.lineHeight);
+    return {
+      itemWidth,
+      itemHeight
+    };
+  }
+  function calculateItemWidth(legendItem, boxWidth, labelFont, ctx) {
+    let legendItemText = legendItem.text;
+    if (legendItemText && typeof legendItemText !== "string") {
+      legendItemText = legendItemText.reduce((a, b) => a.length > b.length ? a : b);
+    }
+    return boxWidth + labelFont.size / 2 + ctx.measureText(legendItemText).width;
+  }
+  function calculateItemHeight(_itemHeight, legendItem, fontLineHeight) {
+    let itemHeight = _itemHeight;
+    if (typeof legendItem.text !== "string") {
+      itemHeight = calculateLegendItemHeight(legendItem, fontLineHeight);
+    }
+    return itemHeight;
+  }
+  function calculateLegendItemHeight(legendItem, fontLineHeight) {
+    const labelHeight = legendItem.text ? legendItem.text.length : 0;
+    return fontLineHeight * labelHeight;
+  }
   function isListened(type, opts) {
     if ((type === "mousemove" || type === "mouseout") && (opts.onHover || opts.onLeave)) {
       return true;
@@ -51565,7 +54399,11 @@ img.ProseMirror-separator {
     id: "legend",
     _element: Legend,
     start(chart, _args, options) {
-      const legend = chart.legend = new Legend({ ctx: chart.ctx, options, chart });
+      const legend = chart.legend = new Legend({
+        ctx: chart.ctx,
+        options,
+        chart
+      });
       layouts.configure(chart, legend, options);
       layouts.addBox(chart, legend);
     },
@@ -51614,7 +54452,7 @@ img.ProseMirror-separator {
         padding: 10,
         generateLabels(chart) {
           const datasets = chart.data.datasets;
-          const { labels: { usePointStyle, pointStyle, textAlign, color: color2 } } = chart.legend.options;
+          const { labels: { usePointStyle, pointStyle, textAlign, color: color2, useBorderRadius, borderRadius } } = chart.legend.options;
           return chart._getSortedDatasetMetas().map((meta) => {
             const style2 = meta.controller.getStyle(usePointStyle ? 0 : void 0);
             const borderWidth = toPadding(style2.borderWidth);
@@ -51632,7 +54470,7 @@ img.ProseMirror-separator {
               pointStyle: pointStyle || style2.pointStyle,
               rotation: style2.rotation,
               textAlign: textAlign || style2.textAlign,
-              borderRadius: 0,
+              borderRadius: useBorderRadius && (borderRadius || style2.borderRadius),
               datasetIndex: meta.index
             };
           }, this);
@@ -51648,7 +54486,11 @@ img.ProseMirror-separator {
     descriptors: {
       _scriptable: (name) => !name.startsWith("on"),
       labels: {
-        _scriptable: (name) => !["generateLabels", "filter", "sort"].includes(name)
+        _scriptable: (name) => ![
+          "generateLabels",
+          "filter",
+          "sort"
+        ].includes(name)
       }
     }
   };
@@ -51713,7 +54555,12 @@ img.ProseMirror-separator {
         }
         maxWidth = bottom2 - top2;
       }
-      return { titleX, titleY, maxWidth, rotation };
+      return {
+        titleX,
+        titleY,
+        maxWidth,
+        rotation
+      };
     }
     draw() {
       const ctx = this.ctx;
@@ -51731,7 +54578,10 @@ img.ProseMirror-separator {
         rotation,
         textAlign: _toLeftRightCenter(opts.align),
         textBaseline: "middle",
-        translation: [titleX, titleY]
+        translation: [
+          titleX,
+          titleY
+        ]
       });
     }
   };
@@ -51953,7 +54803,10 @@ img.ProseMirror-separator {
     each(tooltip.footer, maxLineWidth);
     ctx.restore();
     width += padding.width;
-    return { width, height };
+    return {
+      width,
+      height
+    };
   }
   function determineYAlign(chart, size) {
     const { y, height } = size;
@@ -52058,7 +54911,78 @@ img.ProseMirror-separator {
     const override = context && context.dataset && context.dataset.tooltip && context.dataset.tooltip.callbacks;
     return override ? callbacks.override(override) : callbacks;
   }
+  var defaultCallbacks = {
+    beforeTitle: noop,
+    title(tooltipItems) {
+      if (tooltipItems.length > 0) {
+        const item = tooltipItems[0];
+        const labels = item.chart.data.labels;
+        const labelCount = labels ? labels.length : 0;
+        if (this && this.options && this.options.mode === "dataset") {
+          return item.dataset.label || "";
+        } else if (item.label) {
+          return item.label;
+        } else if (labelCount > 0 && item.dataIndex < labelCount) {
+          return labels[item.dataIndex];
+        }
+      }
+      return "";
+    },
+    afterTitle: noop,
+    beforeBody: noop,
+    beforeLabel: noop,
+    label(tooltipItem) {
+      if (this && this.options && this.options.mode === "dataset") {
+        return tooltipItem.label + ": " + tooltipItem.formattedValue || tooltipItem.formattedValue;
+      }
+      let label = tooltipItem.dataset.label || "";
+      if (label) {
+        label += ": ";
+      }
+      const value = tooltipItem.formattedValue;
+      if (!isNullOrUndef(value)) {
+        label += value;
+      }
+      return label;
+    },
+    labelColor(tooltipItem) {
+      const meta = tooltipItem.chart.getDatasetMeta(tooltipItem.datasetIndex);
+      const options = meta.controller.getStyle(tooltipItem.dataIndex);
+      return {
+        borderColor: options.borderColor,
+        backgroundColor: options.backgroundColor,
+        borderWidth: options.borderWidth,
+        borderDash: options.borderDash,
+        borderDashOffset: options.borderDashOffset,
+        borderRadius: 0
+      };
+    },
+    labelTextColor() {
+      return this.options.bodyColor;
+    },
+    labelPointStyle(tooltipItem) {
+      const meta = tooltipItem.chart.getDatasetMeta(tooltipItem.datasetIndex);
+      const options = meta.controller.getStyle(tooltipItem.dataIndex);
+      return {
+        pointStyle: options.pointStyle,
+        rotation: options.rotation
+      };
+    },
+    afterLabel: noop,
+    afterBody: noop,
+    beforeFooter: noop,
+    footer: noop,
+    afterFooter: noop
+  };
+  function invokeCallbackWithFallback(callbacks, name, ctx, arg) {
+    const result = callbacks[name].call(ctx, arg);
+    if (typeof result === "undefined") {
+      return defaultCallbacks[name].call(ctx, arg);
+    }
+    return result;
+  }
   var Tooltip = class extends Element2 {
+    static positioners = positioners;
     constructor(config) {
       super();
       this.opacity = 0;
@@ -52069,8 +54993,7 @@ img.ProseMirror-separator {
       this._tooltipItems = [];
       this.$animations = void 0;
       this.$context = void 0;
-      this.chart = config.chart || config._chart;
-      this._chart = this.chart;
+      this.chart = config.chart;
       this.options = config.options;
       this.dataPoints = void 0;
       this.title = void 0;
@@ -52114,9 +55037,9 @@ img.ProseMirror-separator {
     }
     getTitle(context, options) {
       const { callbacks } = options;
-      const beforeTitle = callbacks.beforeTitle.apply(this, [context]);
-      const title = callbacks.title.apply(this, [context]);
-      const afterTitle = callbacks.afterTitle.apply(this, [context]);
+      const beforeTitle = invokeCallbackWithFallback(callbacks, "beforeTitle", this, context);
+      const title = invokeCallbackWithFallback(callbacks, "title", this, context);
+      const afterTitle = invokeCallbackWithFallback(callbacks, "afterTitle", this, context);
       let lines = [];
       lines = pushOrConcat(lines, splitNewlines(beforeTitle));
       lines = pushOrConcat(lines, splitNewlines(title));
@@ -52124,7 +55047,7 @@ img.ProseMirror-separator {
       return lines;
     }
     getBeforeBody(tooltipItems, options) {
-      return getBeforeAfterBodyLines(options.callbacks.beforeBody.apply(this, [tooltipItems]));
+      return getBeforeAfterBodyLines(invokeCallbackWithFallback(options.callbacks, "beforeBody", this, tooltipItems));
     }
     getBody(tooltipItems, options) {
       const { callbacks } = options;
@@ -52136,21 +55059,21 @@ img.ProseMirror-separator {
           after: []
         };
         const scoped = overrideCallbacks(callbacks, context);
-        pushOrConcat(bodyItem.before, splitNewlines(scoped.beforeLabel.call(this, context)));
-        pushOrConcat(bodyItem.lines, scoped.label.call(this, context));
-        pushOrConcat(bodyItem.after, splitNewlines(scoped.afterLabel.call(this, context)));
+        pushOrConcat(bodyItem.before, splitNewlines(invokeCallbackWithFallback(scoped, "beforeLabel", this, context)));
+        pushOrConcat(bodyItem.lines, invokeCallbackWithFallback(scoped, "label", this, context));
+        pushOrConcat(bodyItem.after, splitNewlines(invokeCallbackWithFallback(scoped, "afterLabel", this, context)));
         bodyItems.push(bodyItem);
       });
       return bodyItems;
     }
     getAfterBody(tooltipItems, options) {
-      return getBeforeAfterBodyLines(options.callbacks.afterBody.apply(this, [tooltipItems]));
+      return getBeforeAfterBodyLines(invokeCallbackWithFallback(options.callbacks, "afterBody", this, tooltipItems));
     }
     getFooter(tooltipItems, options) {
       const { callbacks } = options;
-      const beforeFooter = callbacks.beforeFooter.apply(this, [tooltipItems]);
-      const footer = callbacks.footer.apply(this, [tooltipItems]);
-      const afterFooter = callbacks.afterFooter.apply(this, [tooltipItems]);
+      const beforeFooter = invokeCallbackWithFallback(callbacks, "beforeFooter", this, tooltipItems);
+      const footer = invokeCallbackWithFallback(callbacks, "footer", this, tooltipItems);
+      const afterFooter = invokeCallbackWithFallback(callbacks, "afterFooter", this, tooltipItems);
       let lines = [];
       lines = pushOrConcat(lines, splitNewlines(beforeFooter));
       lines = pushOrConcat(lines, splitNewlines(footer));
@@ -52176,9 +55099,9 @@ img.ProseMirror-separator {
       }
       each(tooltipItems, (context) => {
         const scoped = overrideCallbacks(options.callbacks, context);
-        labelColors.push(scoped.labelColor.call(this, context));
-        labelPointStyles.push(scoped.labelPointStyle.call(this, context));
-        labelTextColors.push(scoped.labelTextColor.call(this, context));
+        labelColors.push(invokeCallbackWithFallback(scoped, "labelColor", this, context));
+        labelPointStyles.push(invokeCallbackWithFallback(scoped, "labelPointStyle", this, context));
+        labelTextColors.push(invokeCallbackWithFallback(scoped, "labelTextColor", this, context));
       });
       this.labelColors = labelColors;
       this.labelPointStyles = labelPointStyles;
@@ -52227,7 +55150,11 @@ img.ProseMirror-separator {
         this._resolveAnimations().update(this, properties);
       }
       if (changed && options.external) {
-        options.external.call(this, { chart: this.chart, tooltip: this, replay });
+        options.external.call(this, {
+          chart: this.chart,
+          tooltip: this,
+          replay
+        });
       }
     }
     drawCaret(tooltipPoint, ctx, size, options) {
@@ -52278,7 +55205,14 @@ img.ProseMirror-separator {
         }
         y3 = y1;
       }
-      return { x1, x2, x3, y1, y2, y3 };
+      return {
+        x1,
+        x2,
+        x3,
+        y1,
+        y2,
+        y3
+      };
     }
     drawTitle(pt, ctx, options) {
       const title = this.title;
@@ -52303,9 +55237,9 @@ img.ProseMirror-separator {
       }
     }
     _drawColorBox(ctx, pt, i, rtlHelper, options) {
-      const labelColors = this.labelColors[i];
+      const labelColor = this.labelColors[i];
       const labelPointStyle = this.labelPointStyles[i];
-      const { boxHeight, boxWidth, boxPadding } = options;
+      const { boxHeight, boxWidth } = options;
       const bodyFont = toFont(options.bodyFont);
       const colorX = getAlignedX(this, "left", options);
       const rtlColorX = rtlHelper.x(colorX);
@@ -52323,17 +55257,17 @@ img.ProseMirror-separator {
         ctx.strokeStyle = options.multiKeyBackground;
         ctx.fillStyle = options.multiKeyBackground;
         drawPoint(ctx, drawOptions, centerX, centerY);
-        ctx.strokeStyle = labelColors.borderColor;
-        ctx.fillStyle = labelColors.backgroundColor;
+        ctx.strokeStyle = labelColor.borderColor;
+        ctx.fillStyle = labelColor.backgroundColor;
         drawPoint(ctx, drawOptions, centerX, centerY);
       } else {
-        ctx.lineWidth = isObject(labelColors.borderWidth) ? Math.max(...Object.values(labelColors.borderWidth)) : labelColors.borderWidth || 1;
-        ctx.strokeStyle = labelColors.borderColor;
-        ctx.setLineDash(labelColors.borderDash || []);
-        ctx.lineDashOffset = labelColors.borderDashOffset || 0;
-        const outerX = rtlHelper.leftForLtr(rtlColorX, boxWidth - boxPadding);
-        const innerX = rtlHelper.leftForLtr(rtlHelper.xPlus(rtlColorX, 1), boxWidth - boxPadding - 2);
-        const borderRadius = toTRBLCorners(labelColors.borderRadius);
+        ctx.lineWidth = isObject(labelColor.borderWidth) ? Math.max(...Object.values(labelColor.borderWidth)) : labelColor.borderWidth || 1;
+        ctx.strokeStyle = labelColor.borderColor;
+        ctx.setLineDash(labelColor.borderDash || []);
+        ctx.lineDashOffset = labelColor.borderDashOffset || 0;
+        const outerX = rtlHelper.leftForLtr(rtlColorX, boxWidth);
+        const innerX = rtlHelper.leftForLtr(rtlHelper.xPlus(rtlColorX, 1), boxWidth - 2);
+        const borderRadius = toTRBLCorners(labelColor.borderRadius);
         if (Object.values(borderRadius).some((v) => v !== 0)) {
           ctx.beginPath();
           ctx.fillStyle = options.multiKeyBackground;
@@ -52346,7 +55280,7 @@ img.ProseMirror-separator {
           });
           ctx.fill();
           ctx.stroke();
-          ctx.fillStyle = labelColors.backgroundColor;
+          ctx.fillStyle = labelColor.backgroundColor;
           ctx.beginPath();
           addRoundedRectPath(ctx, {
             x: innerX,
@@ -52360,7 +55294,7 @@ img.ProseMirror-separator {
           ctx.fillStyle = options.multiKeyBackground;
           ctx.fillRect(outerX, colorY, boxWidth, boxHeight);
           ctx.strokeRect(outerX, colorY, boxWidth, boxHeight);
-          ctx.fillStyle = labelColors.backgroundColor;
+          ctx.fillStyle = labelColor.backgroundColor;
           ctx.fillRect(innerX, colorY + 1, boxWidth - 2, boxHeight - 2);
         }
       }
@@ -52574,7 +55508,7 @@ img.ProseMirror-separator {
         return [];
       }
       if (!inChartArea) {
-        return lastActive;
+        return lastActive.filter((i) => this.chart.data.datasets[i.datasetIndex] && this.chart.getDatasetMeta(i.datasetIndex).controller.getParsed(i.index) !== void 0);
       }
       const active = this.chart.getElementsAtEventForMode(e, options.mode, options, replay);
       if (options.reverse) {
@@ -52588,14 +55522,16 @@ img.ProseMirror-separator {
       return position !== false && (caretX !== position.x || caretY !== position.y);
     }
   };
-  Tooltip.positioners = positioners;
   var plugin_tooltip = {
     id: "tooltip",
     _element: Tooltip,
     positioners,
     afterInit(chart, _args, options) {
       if (options) {
-        chart.tooltip = new Tooltip({ chart, options });
+        chart.tooltip = new Tooltip({
+          chart,
+          options
+        });
       }
     },
     beforeUpdate(chart, _args, options) {
@@ -52614,7 +55550,10 @@ img.ProseMirror-separator {
         const args = {
           tooltip
         };
-        if (chart.notifyPlugins("beforeTooltipDraw", args) === false) {
+        if (chart.notifyPlugins("beforeTooltipDraw", {
+          ...args,
+          cancelable: true
+        }) === false) {
           return;
         }
         tooltip.draw(chart.ctx);
@@ -52670,76 +55609,21 @@ img.ProseMirror-separator {
       animations: {
         numbers: {
           type: "number",
-          properties: ["x", "y", "width", "height", "caretX", "caretY"]
+          properties: [
+            "x",
+            "y",
+            "width",
+            "height",
+            "caretX",
+            "caretY"
+          ]
         },
         opacity: {
           easing: "linear",
           duration: 200
         }
       },
-      callbacks: {
-        beforeTitle: noop,
-        title(tooltipItems) {
-          if (tooltipItems.length > 0) {
-            const item = tooltipItems[0];
-            const labels = item.chart.data.labels;
-            const labelCount = labels ? labels.length : 0;
-            if (this && this.options && this.options.mode === "dataset") {
-              return item.dataset.label || "";
-            } else if (item.label) {
-              return item.label;
-            } else if (labelCount > 0 && item.dataIndex < labelCount) {
-              return labels[item.dataIndex];
-            }
-          }
-          return "";
-        },
-        afterTitle: noop,
-        beforeBody: noop,
-        beforeLabel: noop,
-        label(tooltipItem) {
-          if (this && this.options && this.options.mode === "dataset") {
-            return tooltipItem.label + ": " + tooltipItem.formattedValue || tooltipItem.formattedValue;
-          }
-          let label = tooltipItem.dataset.label || "";
-          if (label) {
-            label += ": ";
-          }
-          const value = tooltipItem.formattedValue;
-          if (!isNullOrUndef(value)) {
-            label += value;
-          }
-          return label;
-        },
-        labelColor(tooltipItem) {
-          const meta = tooltipItem.chart.getDatasetMeta(tooltipItem.datasetIndex);
-          const options = meta.controller.getStyle(tooltipItem.dataIndex);
-          return {
-            borderColor: options.borderColor,
-            backgroundColor: options.backgroundColor,
-            borderWidth: options.borderWidth,
-            borderDash: options.borderDash,
-            borderDashOffset: options.borderDashOffset,
-            borderRadius: 0
-          };
-        },
-        labelTextColor() {
-          return this.options.bodyColor;
-        },
-        labelPointStyle(tooltipItem) {
-          const meta = tooltipItem.chart.getDatasetMeta(tooltipItem.datasetIndex);
-          const options = meta.controller.getStyle(tooltipItem.dataIndex);
-          return {
-            pointStyle: options.pointStyle,
-            rotation: options.rotation
-          };
-        },
-        afterLabel: noop,
-        afterBody: noop,
-        beforeFooter: noop,
-        footer: noop,
-        afterFooter: noop
-      }
+      callbacks: defaultCallbacks
     },
     defaultRoutes: {
       bodyFont: "font",
@@ -52760,10 +55644,13 @@ img.ProseMirror-separator {
         _fallback: "animation"
       }
     },
-    additionalOptionScopes: ["interaction"]
+    additionalOptionScopes: [
+      "interaction"
+    ]
   };
   var plugins = /* @__PURE__ */ Object.freeze({
     __proto__: null,
+    Colors: plugin_colors,
     Decimation: plugin_decimation,
     Filler: index,
     Legend: plugin_legend,
@@ -52774,7 +55661,10 @@ img.ProseMirror-separator {
   var addIfString = (labels, raw, index3, addedLabels) => {
     if (typeof raw === "string") {
       index3 = labels.push(raw) - 1;
-      addedLabels.unshift({ index: index3, label: raw });
+      addedLabels.unshift({
+        index: index3,
+        label: raw
+      });
     } else if (isNaN(raw)) {
       index3 = null;
     }
@@ -52789,7 +55679,20 @@ img.ProseMirror-separator {
     return first2 !== last ? index3 : first2;
   }
   var validIndex = (index3, max2) => index3 === null ? null : _limitValue(Math.round(index3), 0, max2);
+  function _getLabelForValue(value) {
+    const labels = this.getLabels();
+    if (value >= 0 && value < labels.length) {
+      return labels[value];
+    }
+    return value;
+  }
   var CategoryScale = class extends Scale {
+    static id = "category";
+    static defaults = {
+      ticks: {
+        callback: _getLabelForValue
+      }
+    };
     constructor(cfg) {
       super(cfg);
       this._startValue = void 0;
@@ -52841,16 +55744,14 @@ img.ProseMirror-separator {
       this._valueRange = Math.max(labels.length - (offset2 ? 0 : 1), 1);
       this._startValue = this.min - (offset2 ? 0.5 : 0);
       for (let value = min2; value <= max2; value++) {
-        ticks.push({ value });
+        ticks.push({
+          value
+        });
       }
       return ticks;
     }
     getLabelForValue(value) {
-      const labels = this.getLabels();
-      if (value >= 0 && value < labels.length) {
-        return labels[value];
-      }
-      return value;
+      return _getLabelForValue.call(this, value);
     }
     configure() {
       super.configure();
@@ -52878,12 +55779,6 @@ img.ProseMirror-separator {
       return this.bottom;
     }
   };
-  CategoryScale.id = "category";
-  CategoryScale.defaults = {
-    ticks: {
-      callback: CategoryScale.prototype.getLabelForValue
-    }
-  };
   function generateTicks$1(generationOptions, dataRange) {
     const ticks = [];
     const MIN_SPACING = 1e-14;
@@ -52898,7 +55793,14 @@ img.ProseMirror-separator {
     let spacing = niceNum((rmax - rmin) / maxSpaces / unit) * unit;
     let factor, niceMin, niceMax, numSpaces;
     if (spacing < MIN_SPACING && !minDefined && !maxDefined) {
-      return [{ value: rmin }, { value: rmax }];
+      return [
+        {
+          value: rmin
+        },
+        {
+          value: rmax
+        }
+      ];
     }
     numSpaces = Math.ceil(rmax / spacing) - Math.floor(rmin / spacing);
     if (numSpaces > maxSpaces) {
@@ -52933,17 +55835,16 @@ img.ProseMirror-separator {
         numSpaces = Math.ceil(numSpaces);
       }
     }
-    const decimalPlaces = Math.max(
-      _decimalPlaces(spacing),
-      _decimalPlaces(niceMin)
-    );
+    const decimalPlaces = Math.max(_decimalPlaces(spacing), _decimalPlaces(niceMin));
     factor = Math.pow(10, isNullOrUndef(precision) ? decimalPlaces : precision);
     niceMin = Math.round(niceMin * factor) / factor;
     niceMax = Math.round(niceMax * factor) / factor;
     let j = 0;
     if (minDefined) {
       if (includeBounds && niceMin !== min2) {
-        ticks.push({ value: min2 });
+        ticks.push({
+          value: min2
+        });
         if (niceMin < min2) {
           j++;
         }
@@ -52955,16 +55856,26 @@ img.ProseMirror-separator {
       }
     }
     for (; j < numSpaces; ++j) {
-      ticks.push({ value: Math.round((niceMin + j * spacing) * factor) / factor });
+      const tickValue = Math.round((niceMin + j * spacing) * factor) / factor;
+      if (maxDefined && tickValue > max2) {
+        break;
+      }
+      ticks.push({
+        value: tickValue
+      });
     }
     if (maxDefined && includeBounds && niceMax !== max2) {
       if (ticks.length && almostEquals(ticks[ticks.length - 1].value, max2, relativeLabelSize(max2, minSpacing, generationOptions))) {
         ticks[ticks.length - 1].value = max2;
       } else {
-        ticks.push({ value: max2 });
+        ticks.push({
+          value: max2
+        });
       }
     } else if (!maxDefined || niceMax === max2) {
-      ticks.push({ value: niceMax });
+      ticks.push({
+        value: niceMax
+      });
     }
     return ticks;
   }
@@ -53008,10 +55919,7 @@ img.ProseMirror-separator {
         }
       }
       if (min2 === max2) {
-        let offset2 = 1;
-        if (max2 >= Number.MAX_SAFE_INTEGER || min2 <= Number.MIN_SAFE_INTEGER) {
-          offset2 = Math.abs(max2 * 0.05);
-        }
+        let offset2 = max2 === 0 ? 1 : Math.abs(max2 * 0.05);
         setMax(max2 + offset2);
         if (!beginAtZero) {
           setMin(min2 - offset2);
@@ -53094,6 +56002,12 @@ img.ProseMirror-separator {
     }
   };
   var LinearScale = class extends LinearScaleBase {
+    static id = "linear";
+    static defaults = {
+      ticks: {
+        callback: Ticks.formatters.numeric
+      }
+    };
     determineDataLimits() {
       const { min: min2, max: max2 } = this.getMinMax(true);
       this.min = isNumberFinite(min2) ? min2 : 0;
@@ -53115,39 +56029,77 @@ img.ProseMirror-separator {
       return this._startValue + this.getDecimalForPixel(pixel) * this._valueRange;
     }
   };
-  LinearScale.id = "linear";
-  LinearScale.defaults = {
-    ticks: {
-      callback: Ticks.formatters.numeric
-    }
-  };
+  var log10Floor = (v) => Math.floor(log10(v));
+  var changeExponent = (v, m) => Math.pow(10, log10Floor(v) + m);
   function isMajor(tickVal) {
-    const remain = tickVal / Math.pow(10, Math.floor(log10(tickVal)));
+    const remain = tickVal / Math.pow(10, log10Floor(tickVal));
     return remain === 1;
   }
-  function generateTicks(generationOptions, dataRange) {
-    const endExp = Math.floor(log10(dataRange.max));
-    const endSignificand = Math.ceil(dataRange.max / Math.pow(10, endExp));
+  function steps(min2, max2, rangeExp) {
+    const rangeStep = Math.pow(10, rangeExp);
+    const start3 = Math.floor(min2 / rangeStep);
+    const end2 = Math.ceil(max2 / rangeStep);
+    return end2 - start3;
+  }
+  function startExp(min2, max2) {
+    const range = max2 - min2;
+    let rangeExp = log10Floor(range);
+    while (steps(min2, max2, rangeExp) > 10) {
+      rangeExp++;
+    }
+    while (steps(min2, max2, rangeExp) < 10) {
+      rangeExp--;
+    }
+    return Math.min(rangeExp, log10Floor(min2));
+  }
+  function generateTicks(generationOptions, { min: min2, max: max2 }) {
+    min2 = finiteOrDefault(generationOptions.min, min2);
     const ticks = [];
-    let tickVal = finiteOrDefault(generationOptions.min, Math.pow(10, Math.floor(log10(dataRange.min))));
-    let exp = Math.floor(log10(tickVal));
-    let significand = Math.floor(tickVal / Math.pow(10, exp));
+    const minExp = log10Floor(min2);
+    let exp = startExp(min2, max2);
     let precision = exp < 0 ? Math.pow(10, Math.abs(exp)) : 1;
-    do {
-      ticks.push({ value: tickVal, major: isMajor(tickVal) });
-      ++significand;
-      if (significand === 10) {
-        significand = 1;
-        ++exp;
+    const stepSize = Math.pow(10, exp);
+    const base2 = minExp > exp ? Math.pow(10, minExp) : 0;
+    const start3 = Math.round((min2 - base2) * precision) / precision;
+    const offset2 = Math.floor((min2 - base2) / stepSize / 10) * stepSize * 10;
+    let significand = Math.floor((start3 - offset2) / Math.pow(10, exp));
+    let value = finiteOrDefault(generationOptions.min, Math.round((base2 + offset2 + significand * Math.pow(10, exp)) * precision) / precision);
+    while (value < max2) {
+      ticks.push({
+        value,
+        major: isMajor(value),
+        significand
+      });
+      if (significand >= 10) {
+        significand = significand < 15 ? 15 : 20;
+      } else {
+        significand++;
+      }
+      if (significand >= 20) {
+        exp++;
+        significand = 2;
         precision = exp >= 0 ? 1 : precision;
       }
-      tickVal = Math.round(significand * Math.pow(10, exp) * precision) / precision;
-    } while (exp < endExp || exp === endExp && significand < endSignificand);
-    const lastTick = finiteOrDefault(generationOptions.max, tickVal);
-    ticks.push({ value: lastTick, major: isMajor(tickVal) });
+      value = Math.round((base2 + offset2 + significand * Math.pow(10, exp)) * precision) / precision;
+    }
+    const lastTick = finiteOrDefault(generationOptions.max, value);
+    ticks.push({
+      value: lastTick,
+      major: isMajor(lastTick),
+      significand
+    });
     return ticks;
   }
   var LogarithmicScale = class extends Scale {
+    static id = "logarithmic";
+    static defaults = {
+      ticks: {
+        callback: Ticks.formatters.logarithmic,
+        major: {
+          enabled: true
+        }
+      }
+    };
     constructor(cfg) {
       super(cfg);
       this.start = void 0;
@@ -53156,7 +56108,10 @@ img.ProseMirror-separator {
       this._valueRange = 0;
     }
     parse(raw, index3) {
-      const value = LinearScaleBase.prototype.parse.apply(this, [raw, index3]);
+      const value = LinearScaleBase.prototype.parse.apply(this, [
+        raw,
+        index3
+      ]);
       if (value === 0) {
         this._zero = true;
         return void 0;
@@ -53170,6 +56125,9 @@ img.ProseMirror-separator {
       if (this.options.beginAtZero) {
         this._zero = true;
       }
+      if (this._zero && this.min !== this._suggestedMin && !isNumberFinite(this._userMin)) {
+        this.min = min2 === changeExponent(this.min, 0) ? changeExponent(this.min, -1) : changeExponent(this.min, 0);
+      }
       this.handleTickRangeOptions();
     }
     handleTickRangeOptions() {
@@ -53178,24 +56136,20 @@ img.ProseMirror-separator {
       let max2 = this.max;
       const setMin = (v) => min2 = minDefined ? min2 : v;
       const setMax = (v) => max2 = maxDefined ? max2 : v;
-      const exp = (v, m) => Math.pow(10, Math.floor(log10(v)) + m);
       if (min2 === max2) {
         if (min2 <= 0) {
           setMin(1);
           setMax(10);
         } else {
-          setMin(exp(min2, -1));
-          setMax(exp(max2, 1));
+          setMin(changeExponent(min2, -1));
+          setMax(changeExponent(max2, 1));
         }
       }
       if (min2 <= 0) {
-        setMin(exp(max2, -1));
+        setMin(changeExponent(max2, -1));
       }
       if (max2 <= 0) {
-        setMax(exp(min2, 1));
-      }
-      if (this._zero && this.min !== this._suggestedMin && min2 === exp(this.min, 0)) {
-        setMin(exp(min2, -1));
+        setMax(changeExponent(min2, 1));
       }
       this.min = min2;
       this.max = max2;
@@ -53243,15 +56197,6 @@ img.ProseMirror-separator {
       return Math.pow(10, this._startValue + decimal * this._valueRange);
     }
   };
-  LogarithmicScale.id = "logarithmic";
-  LogarithmicScale.defaults = {
-    ticks: {
-      callback: Ticks.formatters.logarithmic,
-      major: {
-        enabled: true
-      }
-    }
-  };
   function getTickBackdropHeight(opts) {
     const tickOpts = opts.ticks;
     if (tickOpts.display && opts.display) {
@@ -53261,7 +56206,9 @@ img.ProseMirror-separator {
     return 0;
   }
   function measureLabelSize(ctx, font, label) {
-    label = isArray(label) ? label : [label];
+    label = isArray(label) ? label : [
+      label
+    ];
     return {
       w: _longestText(ctx, font.string, label),
       h: label.length * font.lineHeight
@@ -53310,12 +56257,7 @@ img.ProseMirror-separator {
       const vLimits = determineLimits(angle, pointPosition.y, textSize.h, 90, 270);
       updateLimits(limits, orig, angleRadians, hLimits, vLimits);
     }
-    scale.setCenterPoint(
-      orig.l - limits.l,
-      limits.r - orig.r,
-      orig.t - limits.t,
-      limits.b - orig.b
-    );
+    scale.setCenterPoint(orig.l - limits.l, limits.r - orig.r, orig.t - limits.t, limits.b - orig.b);
     scale._pointLabelItems = buildPointLabelItems(scale, labelSizes, padding);
   }
   function updateLimits(limits, orig, angle, hLimits, vLimits) {
@@ -53338,29 +56280,66 @@ img.ProseMirror-separator {
       limits.b = Math.max(limits.b, orig.b + y);
     }
   }
+  function createPointLabelItem(scale, index3, itemOpts) {
+    const outerDistance = scale.drawingArea;
+    const { extra, additionalAngle, padding, size } = itemOpts;
+    const pointLabelPosition = scale.getPointPosition(index3, outerDistance + extra + padding, additionalAngle);
+    const angle = Math.round(toDegrees(_normalizeAngle(pointLabelPosition.angle + HALF_PI)));
+    const y = yForAngle(pointLabelPosition.y, size.h, angle);
+    const textAlign = getTextAlignForAngle(angle);
+    const left2 = leftForTextAlign(pointLabelPosition.x, size.w, textAlign);
+    return {
+      visible: true,
+      x: pointLabelPosition.x,
+      y,
+      textAlign,
+      left: left2,
+      top: y,
+      right: left2 + size.w,
+      bottom: y + size.h
+    };
+  }
+  function isNotOverlapped(item, area) {
+    if (!area) {
+      return true;
+    }
+    const { left: left2, top: top2, right: right2, bottom: bottom2 } = item;
+    const apexesInArea = _isPointInArea({
+      x: left2,
+      y: top2
+    }, area) || _isPointInArea({
+      x: left2,
+      y: bottom2
+    }, area) || _isPointInArea({
+      x: right2,
+      y: top2
+    }, area) || _isPointInArea({
+      x: right2,
+      y: bottom2
+    }, area);
+    return !apexesInArea;
+  }
   function buildPointLabelItems(scale, labelSizes, padding) {
     const items = [];
     const valueCount = scale._pointLabels.length;
     const opts = scale.options;
-    const extra = getTickBackdropHeight(opts) / 2;
-    const outerDistance = scale.drawingArea;
-    const additionalAngle = opts.pointLabels.centerPointLabels ? PI / valueCount : 0;
+    const { centerPointLabels, display } = opts.pointLabels;
+    const itemOpts = {
+      extra: getTickBackdropHeight(opts) / 2,
+      additionalAngle: centerPointLabels ? PI / valueCount : 0
+    };
+    let area;
     for (let i = 0; i < valueCount; i++) {
-      const pointLabelPosition = scale.getPointPosition(i, outerDistance + extra + padding[i], additionalAngle);
-      const angle = Math.round(toDegrees(_normalizeAngle(pointLabelPosition.angle + HALF_PI)));
-      const size = labelSizes[i];
-      const y = yForAngle(pointLabelPosition.y, size.h, angle);
-      const textAlign = getTextAlignForAngle(angle);
-      const left2 = leftForTextAlign(pointLabelPosition.x, size.w, textAlign);
-      items.push({
-        x: pointLabelPosition.x,
-        y,
-        textAlign,
-        left: left2,
-        top: y,
-        right: left2 + size.w,
-        bottom: y + size.h
-      });
+      itemOpts.padding = padding[i];
+      itemOpts.size = labelSizes[i];
+      const item = createPointLabelItem(scale, i, itemOpts);
+      items.push(item);
+      if (display === "auto") {
+        item.visible = isNotOverlapped(item, area);
+        if (item.visible) {
+          area = item;
+        }
+      }
     }
     return items;
   }
@@ -53388,47 +56367,48 @@ img.ProseMirror-separator {
     }
     return y;
   }
+  function drawPointLabelBox(ctx, opts, item) {
+    const { left: left2, top: top2, right: right2, bottom: bottom2 } = item;
+    const { backdropColor } = opts;
+    if (!isNullOrUndef(backdropColor)) {
+      const borderRadius = toTRBLCorners(opts.borderRadius);
+      const padding = toPadding(opts.backdropPadding);
+      ctx.fillStyle = backdropColor;
+      const backdropLeft = left2 - padding.left;
+      const backdropTop = top2 - padding.top;
+      const backdropWidth = right2 - left2 + padding.width;
+      const backdropHeight = bottom2 - top2 + padding.height;
+      if (Object.values(borderRadius).some((v) => v !== 0)) {
+        ctx.beginPath();
+        addRoundedRectPath(ctx, {
+          x: backdropLeft,
+          y: backdropTop,
+          w: backdropWidth,
+          h: backdropHeight,
+          radius: borderRadius
+        });
+        ctx.fill();
+      } else {
+        ctx.fillRect(backdropLeft, backdropTop, backdropWidth, backdropHeight);
+      }
+    }
+  }
   function drawPointLabels(scale, labelCount) {
     const { ctx, options: { pointLabels } } = scale;
     for (let i = labelCount - 1; i >= 0; i--) {
-      const optsAtIndex = pointLabels.setContext(scale.getPointLabelContext(i));
-      const plFont = toFont(optsAtIndex.font);
-      const { x, y, textAlign, left: left2, top: top2, right: right2, bottom: bottom2 } = scale._pointLabelItems[i];
-      const { backdropColor } = optsAtIndex;
-      if (!isNullOrUndef(backdropColor)) {
-        const borderRadius = toTRBLCorners(optsAtIndex.borderRadius);
-        const padding = toPadding(optsAtIndex.backdropPadding);
-        ctx.fillStyle = backdropColor;
-        const backdropLeft = left2 - padding.left;
-        const backdropTop = top2 - padding.top;
-        const backdropWidth = right2 - left2 + padding.width;
-        const backdropHeight = bottom2 - top2 + padding.height;
-        if (Object.values(borderRadius).some((v) => v !== 0)) {
-          ctx.beginPath();
-          addRoundedRectPath(ctx, {
-            x: backdropLeft,
-            y: backdropTop,
-            w: backdropWidth,
-            h: backdropHeight,
-            radius: borderRadius
-          });
-          ctx.fill();
-        } else {
-          ctx.fillRect(backdropLeft, backdropTop, backdropWidth, backdropHeight);
-        }
+      const item = scale._pointLabelItems[i];
+      if (!item.visible) {
+        continue;
       }
-      renderText(
-        ctx,
-        scale._pointLabels[i],
-        x,
-        y + plFont.lineHeight / 2,
-        plFont,
-        {
-          color: optsAtIndex.color,
-          textAlign,
-          textBaseline: "middle"
-        }
-      );
+      const optsAtIndex = pointLabels.setContext(scale.getPointLabelContext(i));
+      drawPointLabelBox(ctx, optsAtIndex, item);
+      const plFont = toFont(optsAtIndex.font);
+      const { x, y, textAlign } = item;
+      renderText(ctx, scale._pointLabels[i], x, y + plFont.lineHeight / 2, plFont, {
+        color: optsAtIndex.color,
+        textAlign,
+        textBaseline: "middle"
+      });
     }
   }
   function pathRadiusLine(scale, radius, circular, labelCount) {
@@ -53444,7 +56424,7 @@ img.ProseMirror-separator {
       }
     }
   }
-  function drawRadiusLine(scale, gridLineOpts, radius, labelCount) {
+  function drawRadiusLine(scale, gridLineOpts, radius, labelCount, borderOpts) {
     const ctx = scale.ctx;
     const circular = gridLineOpts.circular;
     const { color: color2, lineWidth } = gridLineOpts;
@@ -53454,8 +56434,8 @@ img.ProseMirror-separator {
     ctx.save();
     ctx.strokeStyle = color2;
     ctx.lineWidth = lineWidth;
-    ctx.setLineDash(gridLineOpts.borderDash);
-    ctx.lineDashOffset = gridLineOpts.borderDashOffset;
+    ctx.setLineDash(borderOpts.dash);
+    ctx.lineDashOffset = borderOpts.dashOffset;
     ctx.beginPath();
     pathRadiusLine(scale, radius, circular, labelCount);
     ctx.closePath();
@@ -53470,6 +56450,49 @@ img.ProseMirror-separator {
     });
   }
   var RadialLinearScale = class extends LinearScaleBase {
+    static id = "radialLinear";
+    static defaults = {
+      display: true,
+      animate: true,
+      position: "chartArea",
+      angleLines: {
+        display: true,
+        lineWidth: 1,
+        borderDash: [],
+        borderDashOffset: 0
+      },
+      grid: {
+        circular: false
+      },
+      startAngle: 0,
+      ticks: {
+        showLabelBackdrop: true,
+        callback: Ticks.formatters.numeric
+      },
+      pointLabels: {
+        backdropColor: void 0,
+        backdropPadding: 2,
+        display: true,
+        font: {
+          size: 10
+        },
+        callback(label) {
+          return label;
+        },
+        padding: 5,
+        centerPointLabels: false
+      }
+    };
+    static defaultRoutes = {
+      "angleLines.color": "borderColor",
+      "pointLabels.color": "color",
+      "ticks.color": "color"
+    };
+    static descriptors = {
+      angleLines: {
+        _fallback: "grid"
+      }
+    };
     constructor(cfg) {
       super(cfg);
       this.xCenter = void 0;
@@ -53498,7 +56521,10 @@ img.ProseMirror-separator {
     generateTickLabels(ticks) {
       LinearScaleBase.prototype.generateTickLabels.call(this, ticks);
       this._pointLabels = this.getLabels().map((value, index3) => {
-        const label = callback(this.options.pointLabels.callback, [value, index3], this);
+        const label = callback(this.options.pointLabels.callback, [
+          value,
+          index3
+        ], this);
         return label || label === 0 ? label : "";
       }).filter((v, i) => this.chart.getDataVisibility(i));
     }
@@ -53583,7 +56609,7 @@ img.ProseMirror-separator {
     drawGrid() {
       const ctx = this.ctx;
       const opts = this.options;
-      const { angleLines, grid } = opts;
+      const { angleLines, grid, border } = opts;
       const labelCount = this._pointLabels.length;
       let i, offset2, position;
       if (opts.pointLabels.display) {
@@ -53593,8 +56619,10 @@ img.ProseMirror-separator {
         this.ticks.forEach((tick, index3) => {
           if (index3 !== 0) {
             offset2 = this.getDistanceFromCenterForValue(tick.value);
-            const optsAtIndex = grid.setContext(this.getContext(index3 - 1));
-            drawRadiusLine(this, optsAtIndex, offset2, labelCount);
+            const context = this.getContext(index3);
+            const optsAtIndex = grid.setContext(context);
+            const optsAtIndexBorder = border.setContext(context);
+            drawRadiusLine(this, optsAtIndex, offset2, labelCount, optsAtIndexBorder);
           }
         });
       }
@@ -53648,15 +56676,12 @@ img.ProseMirror-separator {
           width = ctx.measureText(tick.label).width;
           ctx.fillStyle = optsAtIndex.backdropColor;
           const padding = toPadding(optsAtIndex.backdropPadding);
-          ctx.fillRect(
-            -width / 2 - padding.left,
-            -offset2 - tickFont.size / 2 - padding.top,
-            width + padding.width,
-            tickFont.size + padding.height
-          );
+          ctx.fillRect(-width / 2 - padding.left, -offset2 - tickFont.size / 2 - padding.top, width + padding.width, tickFont.size + padding.height);
         }
         renderText(ctx, tick.label, 0, -offset2, tickFont, {
-          color: optsAtIndex.color
+          color: optsAtIndex.color,
+          strokeColor: optsAtIndex.textStrokeColor,
+          strokeWidth: optsAtIndex.textStrokeWidth
         });
       });
       ctx.restore();
@@ -53664,61 +56689,53 @@ img.ProseMirror-separator {
     drawTitle() {
     }
   };
-  RadialLinearScale.id = "radialLinear";
-  RadialLinearScale.defaults = {
-    display: true,
-    animate: true,
-    position: "chartArea",
-    angleLines: {
-      display: true,
-      lineWidth: 1,
-      borderDash: [],
-      borderDashOffset: 0
-    },
-    grid: {
-      circular: false
-    },
-    startAngle: 0,
-    ticks: {
-      showLabelBackdrop: true,
-      callback: Ticks.formatters.numeric
-    },
-    pointLabels: {
-      backdropColor: void 0,
-      backdropPadding: 2,
-      display: true,
-      font: {
-        size: 10
-      },
-      callback(label) {
-        return label;
-      },
-      padding: 5,
-      centerPointLabels: false
-    }
-  };
-  RadialLinearScale.defaultRoutes = {
-    "angleLines.color": "borderColor",
-    "pointLabels.color": "color",
-    "ticks.color": "color"
-  };
-  RadialLinearScale.descriptors = {
-    angleLines: {
-      _fallback: "grid"
-    }
-  };
   var INTERVALS = {
-    millisecond: { common: true, size: 1, steps: 1e3 },
-    second: { common: true, size: 1e3, steps: 60 },
-    minute: { common: true, size: 6e4, steps: 60 },
-    hour: { common: true, size: 36e5, steps: 24 },
-    day: { common: true, size: 864e5, steps: 30 },
-    week: { common: false, size: 6048e5, steps: 4 },
-    month: { common: true, size: 2628e6, steps: 12 },
-    quarter: { common: false, size: 7884e6, steps: 4 },
-    year: { common: true, size: 3154e7 }
+    millisecond: {
+      common: true,
+      size: 1,
+      steps: 1e3
+    },
+    second: {
+      common: true,
+      size: 1e3,
+      steps: 60
+    },
+    minute: {
+      common: true,
+      size: 6e4,
+      steps: 60
+    },
+    hour: {
+      common: true,
+      size: 36e5,
+      steps: 24
+    },
+    day: {
+      common: true,
+      size: 864e5,
+      steps: 30
+    },
+    week: {
+      common: false,
+      size: 6048e5,
+      steps: 4
+    },
+    month: {
+      common: true,
+      size: 2628e6,
+      steps: 12
+    },
+    quarter: {
+      common: false,
+      size: 7884e6,
+      steps: 4
+    },
+    year: {
+      common: true,
+      size: 3154e7
+    }
   };
-  var UNITS = Object.keys(INTERVALS);
+  var UNITS = /* @__PURE__ */ Object.keys(INTERVALS);
   function sorter(a, b) {
     return a - b;
   }
@@ -53808,6 +56825,26 @@ img.ProseMirror-separator {
     return ilen === 0 || !majorUnit ? ticks : setMajorTicks(scale, ticks, map4, majorUnit);
   }
   var TimeScale = class extends Scale {
+    static id = "time";
+    static defaults = {
+      bounds: "data",
+      adapters: {},
+      time: {
+        parser: false,
+        unit: false,
+        round: false,
+        isoWeekday: false,
+        minUnit: "millisecond",
+        displayFormats: {}
+      },
+      ticks: {
+        source: "auto",
+        callback: false,
+        major: {
+          enabled: false
+        }
+      }
+    };
     constructor(props) {
       super(props);
       this._cache = {
@@ -53821,7 +56858,7 @@ img.ProseMirror-separator {
       this._normalized = false;
       this._parseOpts = void 0;
     }
-    init(scaleOpts, opts) {
+    init(scaleOpts, opts = {}) {
       const time = scaleOpts.time || (scaleOpts.time = {});
       const adapter = this._adapter = new adapters._date(scaleOpts.adapters.date);
       adapter.init(opts);
@@ -53880,7 +56917,10 @@ img.ProseMirror-separator {
         min2 = arr[0];
         max2 = arr[arr.length - 1];
       }
-      return { min: min2, max: max2 };
+      return {
+        min: min2,
+        max: max2
+      };
     }
     buildTicks() {
       const options = this.options;
@@ -53907,7 +56947,7 @@ img.ProseMirror-separator {
         this.initOffsets(this.ticks.map((tick) => +tick.value));
       }
     }
-    initOffsets(timestamps) {
+    initOffsets(timestamps = []) {
       let start3 = 0;
       let end2 = 0;
       let first2, last;
@@ -53928,7 +56968,11 @@ img.ProseMirror-separator {
       const limit = timestamps.length < 3 ? 0.5 : 0.25;
       start3 = _limitValue(start3, 0, limit);
       end2 = _limitValue(end2, 0, limit);
-      this._offsets = { start: start3, end: end2, factor: 1 / (start3 + 1 + end2) };
+      this._offsets = {
+        start: start3,
+        end: end2,
+        factor: 1 / (start3 + 1 + end2)
+      };
     }
     _generate() {
       const adapter = this._adapter;
@@ -53937,7 +56981,7 @@ img.ProseMirror-separator {
       const options = this.options;
       const timeOpts = options.time;
       const minor = timeOpts.unit || determineUnitForAutoTicks(timeOpts.minUnit, min2, max2, this._getLabelCapacity(min2));
-      const stepSize = valueOrDefault(timeOpts.stepSize, 1);
+      const stepSize = valueOrDefault(options.ticks.stepSize, 1);
       const weekday = minor === "week" ? timeOpts.isoWeekday : false;
       const hasWeekday = isNumber(weekday) || weekday === true;
       const ticks = {};
@@ -53957,7 +57001,7 @@ img.ProseMirror-separator {
       if (time === max2 || options.bounds === "ticks" || count === 1) {
         addTick(ticks, time, timestamps);
       }
-      return Object.keys(ticks).sort((a, b) => a - b).map((x) => +x);
+      return Object.keys(ticks).sort(sorter).map((x) => +x);
     }
     getLabelForValue(value) {
       const adapter = this._adapter;
@@ -53967,8 +57011,23 @@ img.ProseMirror-separator {
       }
       return adapter.format(value, timeOpts.displayFormats.datetime);
     }
+    format(value, format2) {
+      const options = this.options;
+      const formats = options.time.displayFormats;
+      const unit = this._unit;
+      const fmt = format2 || formats[unit];
+      return this._adapter.format(value, fmt);
+    }
     _tickFormatFunction(time, index3, ticks, format2) {
       const options = this.options;
+      const formatter2 = options.ticks.callback;
+      if (formatter2) {
+        return callback(formatter2, [
+          time,
+          index3,
+          ticks
+        ], this);
+      }
       const formats = options.time.displayFormats;
       const unit = this._unit;
       const majorUnit = this._majorUnit;
@@ -53976,9 +57035,7 @@ img.ProseMirror-separator {
       const majorFormat = majorUnit && formats[majorUnit];
       const tick = ticks[index3];
       const major = majorUnit && majorFormat && tick && tick.major;
-      const label = this._adapter.format(time, format2 || (major ? majorFormat : minorFormat));
-      const formatter2 = options.ticks.callback;
-      return formatter2 ? callback(formatter2, [label, index3, ticks], this) : label;
+      return this._adapter.format(time, format2 || (major ? majorFormat : minorFormat));
     }
     generateTickLabels(ticks) {
       let i, ilen, tick;
@@ -54016,7 +57073,9 @@ img.ProseMirror-separator {
       const timeOpts = this.options.time;
       const displayFormats = timeOpts.displayFormats;
       const format2 = displayFormats[timeOpts.unit] || displayFormats.millisecond;
-      const exampleLabel = this._tickFormatFunction(exampleTime, 0, ticksFromTimestamps(this, [exampleTime], this._majorUnit), format2);
+      const exampleLabel = this._tickFormatFunction(exampleTime, 0, ticksFromTimestamps(this, [
+        exampleTime
+      ], this._majorUnit), format2);
       const size = this._getLabelSize(exampleLabel);
       const capacity = Math.floor(this.isHorizontal() ? this.width / size.w : this.height / size.h) - 1;
       return capacity > 0 ? capacity : 1;
@@ -54052,25 +57111,6 @@ img.ProseMirror-separator {
       return _arrayUnique(values.sort(sorter));
     }
   };
-  TimeScale.id = "time";
-  TimeScale.defaults = {
-    bounds: "data",
-    adapters: {},
-    time: {
-      parser: false,
-      unit: false,
-      round: false,
-      isoWeekday: false,
-      minUnit: "millisecond",
-      displayFormats: {}
-    },
-    ticks: {
-      source: "auto",
-      major: {
-        enabled: false
-      }
-    }
-  };
   function interpolate3(table, val, reverse) {
     let lo = 0;
     let hi = table.length - 1;
@@ -54092,6 +57132,8 @@ img.ProseMirror-separator {
     return span ? prevTarget + (nextTarget - prevTarget) * (val - prevSource) / span : prevTarget;
   }
   var TimeSeriesScale = class extends TimeScale {
+    static id = "timeseries";
+    static defaults = TimeScale.defaults;
     constructor(props) {
       super(props);
       this._table = [];
@@ -54118,8 +57160,14 @@ img.ProseMirror-separator {
       }
       if (items.length < 2) {
         return [
-          { time: min2, pos: 0 },
-          { time: max2, pos: 1 }
+          {
+            time: min2,
+            pos: 0
+          },
+          {
+            time: max2,
+            pos: 1
+          }
         ];
       }
       for (i = 0, ilen = items.length; i < ilen; ++i) {
@@ -54127,10 +57175,25 @@ img.ProseMirror-separator {
         prev = items[i - 1];
         curr = items[i];
         if (Math.round((next + prev) / 2) !== curr) {
-          table.push({ time: curr, pos: i / (ilen - 1) });
+          table.push({
+            time: curr,
+            pos: i / (ilen - 1)
+          });
         }
       }
       return table;
+    }
+    _generate() {
+      const min2 = this.min;
+      const max2 = this.max;
+      let timestamps = super.getDataTimestamps();
+      if (!timestamps.includes(min2) || !timestamps.length) {
+        timestamps.splice(0, 0, min2);
+      }
+      if (!timestamps.includes(max2) || timestamps.length === 1) {
+        timestamps.push(max2);
+      }
+      return timestamps.sort((a, b) => a - b);
     }
     _getTimestampsForTable() {
       let timestamps = this._cache.all || [];
@@ -54156,8 +57219,6 @@ img.ProseMirror-separator {
       return interpolate3(this._table, decimal * this._tableRange + this._minPos, true);
     }
   };
-  TimeSeriesScale.id = "timeseries";
-  TimeSeriesScale.defaults = TimeScale.defaults;
   var scales = /* @__PURE__ */ Object.freeze({
     __proto__: null,
     CategoryScale,
@@ -54174,11 +57235,12 @@ img.ProseMirror-separator {
     scales
   ];
 
-  // node_modules/chart.js/auto/auto.mjs
+  // node_modules/chart.js/auto/auto.js
   Chart.register(...registerables);
 
   // node_modules/bali-view-components/app/components/bali/modal/index.js
-  var ModalController = class extends Controller {
+  var ModalController = class extends Controller2 {
+    static targets = ["template", "background", "wrapper", "content", "closeBtn"];
     async connect() {
       this.setupListeners("openModal");
     }
@@ -54355,10 +57417,13 @@ img.ProseMirror-separator {
       return classes.split(" ");
     }
   };
-  __publicField(ModalController, "targets", ["template", "background", "wrapper", "content", "closeBtn"]);
 
   // node_modules/bali-view-components/app/components/bali/dropdown/index.js
-  var DropdownController = class extends Controller {
+  var DropdownController = class extends Controller2 {
+    static values = {
+      hoverable: { type: Boolean, default: false },
+      closeOnClick: { type: Boolean, default: true }
+    };
     connect() {
       if (this.closeOnClickValue) {
         document.addEventListener("click", this.closeDropdowns);
@@ -54386,10 +57451,6 @@ img.ProseMirror-separator {
       this.element.classList.remove("is-active");
     };
   };
-  __publicField(DropdownController, "values", {
-    hoverable: { type: Boolean, default: false },
-    closeOnClick: { type: Boolean, default: true }
-  });
 
   // node_modules/sortablejs/modular/sortable.esm.js
   function ownKeys(object, enumerableOnly) {
@@ -54760,7 +57821,7 @@ img.ProseMirror-separator {
     } while (elem = elem.parentNode);
     return getWindowScrollingElement();
   }
-  function extend3(dst, src) {
+  function extend4(dst, src) {
     if (dst && src) {
       for (var key in src) {
         if (src.hasOwnProperty(key)) {
@@ -54797,7 +57858,7 @@ img.ProseMirror-separator {
     el.scrollLeft += x;
     el.scrollTop += y;
   }
-  function clone2(el) {
+  function clone3(el) {
     var Polymer = window.Polymer;
     var $ = window.jQuery || window.Zepto;
     if (Polymer && Polymer.dom) {
@@ -55671,7 +58732,7 @@ img.ProseMirror-separator {
       }
       pluginEvent2("setupClone", this);
       if (!Sortable.eventCanceled) {
-        cloneEl = clone2(dragEl);
+        cloneEl = clone3(dragEl);
         cloneEl.removeAttribute("id");
         cloneEl.draggable = false;
         cloneEl.style["will-change"] = "";
@@ -56335,11 +59396,11 @@ img.ProseMirror-separator {
     is: function is(el, selector) {
       return !!closest(el, selector, el, false);
     },
-    extend: extend3,
+    extend: extend4,
     throttle,
     closest,
     toggleClass,
-    clone: clone2,
+    clone: clone3,
     index: index2,
     nextTick: _nextTick,
     cancelNextTick: _cancelNextTick,
@@ -56605,11 +59666,25 @@ img.ProseMirror-separator {
   var import_lodash = __toESM(require_lodash());
   init_src2();
 
+  // node_modules/@googlemaps/markerclusterer/dist/index.esm.js
+  var import_fast_deep_equal = __toESM(require_fast_deep_equal());
+  var MarkerClustererEvents;
+  (function(MarkerClustererEvents2) {
+    MarkerClustererEvents2["CLUSTERING_BEGIN"] = "clusteringbegin";
+    MarkerClustererEvents2["CLUSTERING_END"] = "clusteringend";
+    MarkerClustererEvents2["CLUSTER_CLICK"] = "click";
+  })(MarkerClustererEvents || (MarkerClustererEvents = {}));
+
   // node_modules/bali-view-components/app/components/bali/navbar/index.js
   var import_lodash2 = __toESM(require_lodash());
 
   // node_modules/bali-view-components/app/components/bali/notification/index.js
-  var NotificationController = class extends Controller {
+  var NotificationController = class extends Controller2 {
+    static classes = ["animation"];
+    static values = {
+      delay: { type: Number, default: 3e3 },
+      dismiss: { type: Boolean, default: true }
+    };
     connect() {
       this.closed = false;
       if (this.dismissValue) {
@@ -56635,11 +59710,6 @@ img.ProseMirror-separator {
       }
     }
   };
-  __publicField(NotificationController, "classes", ["animation"]);
-  __publicField(NotificationController, "values", {
-    delay: { type: Number, default: 3e3 },
-    dismiss: { type: Boolean, default: true }
-  });
 
   // node_modules/bali-view-components/app/components/bali/rich_text_editor/index.js
   var import_lodash4 = __toESM(require_lodash());
@@ -57130,7 +60200,22 @@ img.ProseMirror-separator {
   };
 
   // node_modules/bali-view-components/app/components/bali/rich_text_editor/index.js
-  var RichTextEditorController = class extends Controller {
+  var RichTextEditorController = class extends Controller2 {
+    static targets = [
+      ...defaultTargets,
+      ...nodesTargets,
+      ...marksTargets,
+      ...linkTargets,
+      ...tableTargets,
+      ...imageTargets,
+      "output"
+    ];
+    static values = {
+      content: { type: String, default: "" },
+      placeholder: { type: String, default: "" },
+      editable: { type: Boolean, default: true },
+      imagesUrl: String
+    };
     allMenuButtons = toolbarMarks.concat(toolbarNodes, toolbarExtensions);
     async connect() {
       const { Editor: Editor2 } = await Promise.resolve().then(() => (init_dist16(), dist_exports));
@@ -57202,28 +60287,14 @@ img.ProseMirror-separator {
       this.editor.chain().focus().blur().run();
     }
   };
-  __publicField(RichTextEditorController, "targets", [
-    ...defaultTargets,
-    ...nodesTargets,
-    ...marksTargets,
-    ...linkTargets,
-    ...tableTargets,
-    ...imageTargets,
-    "output"
-  ]);
-  __publicField(RichTextEditorController, "values", {
-    content: { type: String, default: "" },
-    placeholder: { type: String, default: "" },
-    editable: { type: Boolean, default: true },
-    imagesUrl: String
-  });
 
   // node_modules/bali-view-components/app/components/bali/sortable_list/index.js
   init_src2();
 
   // node_modules/bali-view-components/app/components/bali/tabs/index.js
   init_src2();
-  var TabsController = class extends Controller {
+  var TabsController = class extends Controller2 {
+    static targets = ["tab", "tabContent"];
     connect() {
       if (!this.hasTabTarget)
         return;
@@ -57271,10 +60342,11 @@ img.ProseMirror-separator {
       }
     }
   };
-  __publicField(TabsController, "targets", ["tab", "tabContent"]);
 
   // node_modules/bali-view-components/app/components/bali/tree_view/item/index.js
-  var TreeViewItemController = class extends Controller {
+  var TreeViewItemController = class extends Controller2 {
+    static targets = ["caret", "children"];
+    static values = { url: String };
     toggle(event) {
       event.preventDefault();
       this.caretTarget.classList.toggle("caret-down");
@@ -57293,14 +60365,17 @@ img.ProseMirror-separator {
       }
     }
   };
-  __publicField(TreeViewItemController, "targets", ["caret", "children"]);
-  __publicField(TreeViewItemController, "values", { url: String });
 
   // node_modules/bali-view-components/app/javascript/bali/controllers/elements-overlap-controller.js
   var import_lodash5 = __toESM(require_lodash());
 
   // node_modules/bali-view-components/app/javascript/bali/controllers/file-input-controller.js
-  var FileInputController = class extends Controller {
+  var FileInputController = class extends Controller2 {
+    static targets = ["value", "input"];
+    static values = {
+      nonSelectedText: String,
+      multiple: { type: Boolean, default: false }
+    };
     connect() {
       this.filesArray = [];
     }
@@ -57357,17 +60432,12 @@ img.ProseMirror-separator {
     `;
     }
   };
-  __publicField(FileInputController, "targets", ["value", "input"]);
-  __publicField(FileInputController, "values", {
-    nonSelectedText: String,
-    multiple: { type: Boolean, default: false }
-  });
 
   // node_modules/bali-view-components/app/javascript/bali/controllers/input-on-change-controller.js
   init_src2();
 
   // node_modules/bali-view-components/app/javascript/bali/controllers/print-controller.js
-  var PrintController = class extends Controller {
+  var PrintController = class extends Controller2 {
     connect() {
       window.print();
       window.onfocus = window.close;
@@ -57402,9 +60472,29 @@ img.ProseMirror-separator {
   }
 
   // node_modules/bali-view-components/app/javascript/bali/controllers/slim-select-controller.js
-  var SlimSelectController = class extends Controller {
+  init_src2();
+  var SlimSelectController = class extends Controller2 {
+    static values = {
+      placeholder: String,
+      addItems: Boolean,
+      showContent: String,
+      showSearch: Boolean,
+      searchPlaceholder: String,
+      addToBody: Boolean,
+      closeOnSelect: Boolean,
+      allowDeselectOption: Boolean,
+      ajaxParamName: String,
+      ajaxValueName: String,
+      ajaxTextName: String,
+      ajaxUrl: String,
+      ajaxPlaceholder: {
+        type: String,
+        default: "Type 2 chars to search..."
+      }
+    };
+    static targets = ["select", "selectAllButton", "deselectAllButton"];
     async connect() {
-      const { default: SlimSelect } = await Promise.resolve().then(() => (init_slimselect_min(), slimselect_min_exports));
+      const { default: SlimSelect } = await Promise.resolve().then(() => __toESM(require_slimselect()));
       Object.assign(SlimSelect.prototype, {
         destroy: destroyWithCheck
       });
@@ -57417,7 +60507,8 @@ img.ProseMirror-separator {
         addToBody: this.addToBodyValue,
         closeOnSelect: this.closeOnSelectValue,
         allowDeselectOption: this.allowDeselectOptionValue,
-        addable: this.addable()
+        addable: this.addable(),
+        ajax: this.ajax()
       };
       if (this.hasInnerHTML()) {
         options.data = this.dataWithHTML();
@@ -57462,22 +60553,36 @@ img.ProseMirror-separator {
       this.deselectAllButtonTarget.style.display = "none";
       this.selectAllButtonTarget.style.display = "block";
     }
+    ajax() {
+      if (!this.hasAjaxValues())
+        return;
+      return async (search, callback2) => {
+        if (search.length < 2) {
+          return callback2(this.ajaxPlaceholderValue);
+        }
+        const response = await get(this.ajaxUrlValue, {
+          query: { [this.ajaxParamNameValue]: search },
+          responseKind: "json"
+        });
+        const json2 = await response.json;
+        const options = json2.map((record) => {
+          return {
+            text: record[this.ajaxTextNameValue],
+            value: record[this.ajaxValueNameValue]
+          };
+        });
+        callback2(options.length > 0 ? options : false);
+      };
+    }
+    hasAjaxValues() {
+      return this.hasAjaxParamNameValue && this.hasAjaxValueNameValue && this.hasAjaxTextNameValue && this.hasAjaxUrlValue;
+    }
   };
-  __publicField(SlimSelectController, "values", {
-    placeholder: String,
-    addItems: Boolean,
-    showContent: String,
-    showSearch: Boolean,
-    searchPlaceholder: String,
-    addToBody: Boolean,
-    closeOnSelect: Boolean,
-    allowDeselectOption: Boolean
-  });
-  __publicField(SlimSelectController, "targets", ["select", "selectAllButton", "deselectAllButton"]);
 
   // node_modules/bali-view-components/app/javascript/bali/controllers/submit-on-change-controller.js
   var import_lodash6 = __toESM(require_lodash2());
-  var SubmitOnChangeController = class extends Controller {
+  var SubmitOnChangeController = class extends Controller2 {
+    static values = { delay: Number, action: String, method: String };
     connect() {
       if (this.hasDelayValue && this.delayValue > 0) {
         this.submit = (0, import_lodash6.default)(this.submit, this.delayValue);
@@ -57505,7 +60610,6 @@ img.ProseMirror-separator {
       return this.hasMethodValue ? this.methodValue : this.element.getAttribute("method");
     }
   };
-  __publicField(SubmitOnChangeController, "values", { delay: Number, action: String, method: String });
 
   // app/javascript/documentation/application.js
   var application = Application.start();
@@ -57522,27 +60626,27 @@ img.ProseMirror-separator {
 })();
 /*! Bundled license information:
 
-chart.js/dist/chunks/helpers.segment.mjs:
+@kurkle/color/dist/color.esm.js:
   (*!
-   * Chart.js v3.9.1
-   * https://www.chartjs.org
-   * (c) 2022 Chart.js Contributors
-   * Released under the MIT License
-   *)
-
-chart.js/dist/chunks/helpers.segment.mjs:
-  (*!
-   * @kurkle/color v0.2.1
+   * @kurkle/color v0.3.2
    * https://github.com/kurkle/color#readme
-   * (c) 2022 Jukka Kurkela
+   * (c) 2023 Jukka Kurkela
    * Released under the MIT License
    *)
 
-chart.js/dist/chart.mjs:
+chart.js/dist/chunks/helpers.segment.js:
   (*!
-   * Chart.js v3.9.1
+   * Chart.js v4.4.1
    * https://www.chartjs.org
-   * (c) 2022 Chart.js Contributors
+   * (c) 2023 Chart.js Contributors
+   * Released under the MIT License
+   *)
+
+chart.js/dist/chart.js:
+  (*!
+   * Chart.js v4.4.1
+   * https://www.chartjs.org
+   * (c) 2023 Chart.js Contributors
    * Released under the MIT License
    *)
 
@@ -57553,5 +60657,21 @@ sortablejs/modular/sortable.esm.js:
    * @author	owenm    <owen23355@gmail.com>
    * @license MIT
    *)
+
+@googlemaps/markerclusterer/dist/index.esm.js:
+  (*! *****************************************************************************
+  Copyright (c) Microsoft Corporation.
+  
+  Permission to use, copy, modify, and/or distribute this software for any
+  purpose with or without fee is hereby granted.
+  
+  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+  REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+  AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+  INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+  LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+  OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+  PERFORMANCE OF THIS SOFTWARE.
+  ***************************************************************************** *)
 */
 //# sourceMappingURL=application.js.map
