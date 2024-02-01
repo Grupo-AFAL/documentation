@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: b25928befa4ce336d1c79254f5281791ab294948
-  branch: fix-slim-select
+  revision: f02b6bf91df40f3cb8aa1bfee79f77003d6053a1
+  branch: main
   specs:
     bali_view_components (0.73.1)
       rails (>= 7.0.2)

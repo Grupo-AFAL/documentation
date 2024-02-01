@@ -459,9 +459,9 @@ argparse@^2.0.1:
   resolved "https://registry.yarnpkg.com/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
   integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
 
-"bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git#fix-slim-select":
+"bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git":
   version "0.73.1"
-  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#b25928befa4ce336d1c79254f5281791ab294948"
+  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#f02b6bf91df40f3cb8aa1bfee79f77003d6053a1"
   dependencies:
     "@glidejs/glide" "^3.6.0"
     "@googlemaps/markerclusterer" "^2.3.2"
