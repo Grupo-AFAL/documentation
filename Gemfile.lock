@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 238743a018b5d127a21dbc920a5769759ebfab67
-  branch: main
+  revision: b25928befa4ce336d1c79254f5281791ab294948
+  branch: fix-slim-select
   specs:
-    bali_view_components (0.73.0)
+    bali_view_components (0.73.1)
       rails (>= 7.0.2)
       ransack
       view_component (>= 2.0.0, < 4.0)
