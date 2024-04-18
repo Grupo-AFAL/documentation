@@ -15,7 +15,7 @@ gem 'jbuilder'
 gem 'jsbundling-rails'
 gem 'simple_command'
 gem 'sprockets-rails'
-gem 'turbo-rails', '~> 1.0'
+gem 'turbo-rails', '~> 2.0'
 
 gem 'bali_view_components', github: 'Grupo-AFAL/bali-view-components', branch: 'main'
 # gem 'bali_view_components', path: ENV['BALI_VIEW_COMPONENTS_PATH']
