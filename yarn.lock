@@ -418,9 +418,9 @@ argparse@^2.0.1:
   resolved "https://registry.yarnpkg.com/argparse/-/argparse-2.0.1.tgz#246f50f3ca78a3240f6c997e8a9bd1eac49e4b38"
   integrity sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==
 
-"bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git#update-gems-and-npm-packages":
+"bali-view-components@https://github.com/Grupo-AFAL/bali-view-components.git":
   version "0.76.0"
-  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#8fa111735476758bd0f2e4a442c5840022e3ba15"
+  resolved "https://github.com/Grupo-AFAL/bali-view-components.git#4ee66ca084ed065393143a3048a6437fb302ae6b"
   dependencies:
     "@glidejs/glide" "^3.6.0"
     "@googlemaps/markerclusterer" "^2.3.2"

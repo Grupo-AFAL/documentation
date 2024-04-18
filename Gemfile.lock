@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 8fa111735476758bd0f2e4a442c5840022e3ba15
-  branch: update-gems-and-npm-packages
+  revision: 4ee66ca084ed065393143a3048a6437fb302ae6b
+  branch: main
   specs:
     bali_view_components (0.76.0)
       caxlsx
