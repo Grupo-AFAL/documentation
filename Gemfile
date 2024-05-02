@@ -12,12 +12,11 @@ gem 'bulma-rails', '~> 0.9.3'
 gem 'dartsass-rails'
 gem 'image_processing', '>= 1.2'
 gem 'jbuilder'
-gem 'jsbundling-rails'
 gem 'simple_command'
 gem 'sprockets-rails'
 gem 'turbo-rails', '~> 2.0'
 
-gem 'bali_view_components', github: 'Grupo-AFAL/bali-view-components', branch: 'main'
+gem 'bali_view_components', github: 'Grupo-AFAL/bali-view-components', branch: 'import-maps'
 # gem 'bali_view_components', path: ENV['BALI_VIEW_COMPONENTS_PATH']
 
 gem 'acts_as_tree'
@@ -27,7 +26,9 @@ gem 'debug', '>= 1.0.0'
 
 group :development, :test do
   gem 'data_migrate'
+  gem 'importmap-rails', '~> 2.0'
   gem 'rspec-rails', '~> 6'
+  gem 'stimulus-rails', '~> 1.3'
 end
 
 group :development do

@@ -47,7 +47,7 @@
   <% end %>
 
   <%= render Bali::RichTextEditor::Component.new(
-      html_content: page.content, editable: false, class: 'mb-4', data: { 'turbo-cache': false }) %>
+      html_content: page.content, editable: false, class: 'mb-4', data: { 'data-turbo-temporary': true }) %>
 
 </div>
 
