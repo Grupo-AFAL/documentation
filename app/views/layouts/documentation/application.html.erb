@@ -4,22 +4,17 @@
     <title>Documentation</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
     <%= stylesheet_link_tag "documentation/application", media: "all" %>
-    <%= javascript_include_tag "documentation/application", "data-turbo-track": "reload", defer: true %>
+    <%= javascript_importmap_tags %>
   </head>
-
   <body data-controller="modal">
     <%= yield :menu %>
-
     <section class="section app-frame <%= yield :app_frame_class %>">
       <div class="container <%= yield :container_class %>">
         <%= render 'layouts/documentation/notifications' %>
-
         <%= yield %>
       </div>
     </section>
-
     <%= render Bali::Modal::Component.new(active: false) %>
   </body>
 </html>

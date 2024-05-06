@@ -13,10 +13,12 @@ module Documentation
 
     initializer 'Documentation precompile hook' do |app|
       if defined?(Sprockets)
-        app.config.assets.precompile += %w[
-          documentation/application.js
-          documentation/application.css
-        ]
+        app.config.assets.precompile += %w[documentation/application.css]
+
+        dir_path = root.join('app', 'assets', 'javascripts')
+        Dir[File.join(dir_path, 'documentation', '**', '*.js')].each do |path|
+          app.config.assets.precompile << path.gsub("#{dir_path.to_path}/", '')
+        end
 
         app.config.assets.paths << Rails.root.join('app/components')
       end

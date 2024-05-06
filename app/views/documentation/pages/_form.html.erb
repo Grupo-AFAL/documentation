@@ -1,19 +1,15 @@
 <%= form_with(model: [@workspace, page]) do |form| %>
   <%= render 'layouts/documentation/target_errors', target: page %>
-
   <% unless page.home_page? %>
     <%= form.slim_select_group :parent_id, @pages.map {|p| [p.title, p.id] }, include_blank: t('documentation.page.select_parent_page'), label: false %>
   <% end %>
-
   <%= form.text_field_group :title, label: false, placeholder: 'Title', class: 'is-large' %>
   <%= form.text_field_group :description, label: false, placeholder: 'Description' %>
-
   <%= render Bali::RichTextEditor::Component.new(
       html_content: page.content, editable: true, placeholder: "Type '/' for commands",
       images_url: page_image_thumbnails_path(@page),
       output_input_name: 'page[content]', class: 'mb-4',
-      data: { 'turbo-cache': false },
+      data: { 'data-turbo-temporary': true },
       page_hyperlink_options: @pages.map { |page| { title: page.title, id: page.id, url: workspace_page_url(@workspace, page)} } ) %>
-
   <%= form.submit_actions 'Guardar', class: 'button is-primary', cancel_path: workspace_page_path(@workspace, page) %>
 <% end %>
