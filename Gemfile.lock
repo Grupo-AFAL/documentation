@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 64801d9ee19ea6eb34df78d6e95931b04ef39d57
-  branch: import-maps
+  revision: 944c20b608b8130aadad4a0e79411b9f00435989
+  branch: main
   specs:
-    bali_view_components (1.0.0)
+    bali_view_components (1.1.0)
       caxlsx
       rails (>= 7.0.2)
       ransack
@@ -146,7 +146,7 @@ GEM
       activesupport (>= 6.0.0)
       railties (>= 6.0.0)
     io-console (0.7.2)
-    irb (1.13.0)
+    irb (1.13.1)
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     jbuilder (2.11.5)
