@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 1d4039d49ee5fbff71dce35e3e802614c375c64b
+  revision: ca82bd4958cca4189e961dde54c8b7bf38a72c05
   branch: main
   specs:
-    bali_view_components (1.2.2)
+    bali_view_components (1.2.3)
       caxlsx
       rails (>= 7.0.2)
       ransack
