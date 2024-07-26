@@ -31,8 +31,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rails', '>= 7.0.2'
   spec.add_dependency 'turbo-rails', '>= 1.0.1'
 
-  spec.add_runtime_dependency 'view_component', ['>= 2.0.0', '< 4.0']
-  spec.add_runtime_dependency 'view_component-contrib'
+  spec.add_dependency 'view_component', ['>= 2.0.0', '< 4.0']
+  spec.add_dependency 'view_component-contrib'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
