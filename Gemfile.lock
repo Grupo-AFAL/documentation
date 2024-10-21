@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/Grupo-AFAL/bali-view-components.git
-  revision: 7505a4eeee5b3657f22a5493de69cb0d2a6f6fa4
-  branch: update-rails-to-7.2
+  revision: b091552c9f60d99c34356d2d1cedaa3ecf4965b4
+  branch: main
   specs:
     bali_view_components (1.3.0)
       caxlsx
@@ -320,7 +320,7 @@ GEM
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.7.0)
+    zeitwerk (2.7.1)
 
 PLATFORMS
   ruby
