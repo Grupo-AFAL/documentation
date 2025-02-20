@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Be sure to restart your server when you modify this file.
 #
 # This file eases your Rails 8.0 framework defaults upgrade.
@@ -10,7 +12,8 @@
 # https://guides.rubyonrails.org/upgrading_ruby_on_rails.html
 
 ###
-# Specifies whether `to_time` methods preserve the UTC offset of their receivers or preserves the timezone.
+# Specifies whether `to_time` methods preserve the UTC offset of their receivers or preserves the
+# timezone.
 # If set to `:zone`, `to_time` methods will use the timezone of their receivers.
 # If set to `:offset`, `to_time` methods will use the UTC offset.
 # If `false`, `to_time` methods will convert to the local system UTC offset instead.

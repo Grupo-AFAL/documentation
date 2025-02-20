@@ -17,7 +17,7 @@ module Documentation
     private
 
     def page_params
-      params.require(:page).permit(:documentation_workspace_id)
+      params.expect(page: [:documentation_workspace_id])
     end
   end
 end

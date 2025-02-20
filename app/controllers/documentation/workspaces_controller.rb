@@ -52,7 +52,7 @@ module Documentation
     end
 
     def workspace_params
-      params.require(:workspace).permit(:name)
+      params.expect(workspace: [:name])
     end
   end
 end

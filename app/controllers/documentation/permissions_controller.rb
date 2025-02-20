@@ -47,7 +47,7 @@ module Documentation
     end
 
     def permission_params
-      params.require(:permission).permit(:subject_id, :subject_type, :action)
+      params.expect(permission: %i[subject_id subject_type action])
     end
   end
 end
