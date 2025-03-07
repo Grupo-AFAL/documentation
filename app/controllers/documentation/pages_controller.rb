@@ -67,8 +67,8 @@ module Documentation
     end
 
     def page_params
-      params.require(:page).permit(
-        :title, :description, :content, :parent_id
+      params.expect(
+        page: %i[title description content parent_id]
       )
     end
 
